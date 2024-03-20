@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="礦坑系列 ── 四個你不該用 &quot;const&quot; 的時機   礦坑系列首頁：首頁 hackmd 版首頁：首頁 四個你不該用 “const” 的時機source：C++ Weekly - Ep 75 - Why You Cannot Move From Const source：C++ Weekly - Ep 322 - Top 4 Places To Never Use “const” 主要原因是因">
+<meta property="og:type" content="article">
+<meta property="og:title" content="礦坑系列 ── 四個你不該用 &quot;const&quot; 的時機">
+<meta property="og:url" content="https://mes0903.github.io/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="礦坑系列 ── 四個你不該用 &quot;const&quot; 的時機   礦坑系列首頁：首頁 hackmd 版首頁：首頁 四個你不該用 “const” 的時機source：C++ Weekly - Ep 75 - Why You Cannot Move From Const source：C++ Weekly - Ep 322 - Top 4 Places To Never Use “const” 主要原因是因">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-05-21T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-20T23:15:38.149Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="C++ Miner-BlackMagic">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="../../../../../../../assets/Mes.ico">
+    
+    <title>礦坑系列 ── 四個你不該用 &#34;const&#34; 的時機 · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("../../../../../../../font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="../../../../../../../css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="../../../../../../../css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="../../../../../../../css/dark.css">
+    <link rel="stylesheet" href="../../../../../../../css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="../../../../../../../scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="../../../../../../../lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="../../../../../../../index.html">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(../../../../../../../intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                礦坑系列 ── 四個你不該用 "const" 的時機
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner-BlackMagic">C++ Miner-BlackMagic</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">1.6k</span>閱讀時長: <span class="post-count reading-time">8 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/05/21</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "../../../../../../../lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="../../../../../../../assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> 礦坑系列 ── 四個你不該用 "const" 的時機 <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>
+
+<p>礦坑系列首頁：<strong><a href = "https://github.com/Mes0903/Cpp-Miner" class = "redlink">首頁</a></strong></p>
+<p>hackmd 版首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
+<h1 id="四個你不該用-“const”-的時機"><a href="#四個你不該用-“const”-的時機" class="headerlink" title="四個你不該用 “const” 的時機"></a>四個你不該用 “const” 的時機</h1><p>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=ZKaoR3dP9uM">C++ Weekly - Ep 75 - Why You Cannot Move From Const</a></p>
+<p>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=dGCxMmGvocE&t=929s">C++ Weekly - Ep 322 - Top 4 Places To Never Use “const”</a></p>
+<p>主要原因是因為 <code>const</code> 會破壞移動，看看這個例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  S s1;</span><br><span class="line">  S t1 = std::<span class="built_in">move</span>(s1);    <span class="comment">// rvalue reference, called move</span></span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> S s2;</span><br><span class="line">  S t2 = std::<span class="built_in">move</span>(s2);    <span class="comment">// const rvalue reference, called S(const S&amp;), which is copy</span></span><br><span class="line"></span><br><span class="line">  S s3;</span><br><span class="line">  S &amp;&amp;r1 = std::<span class="built_in">move</span>(s3);    <span class="comment">// ok</span></span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> S s4;</span><br><span class="line">  <span class="comment">// S&amp;&amp; r2 = std::move(s4); // error</span></span><br><span class="line">  <span class="type">const</span> S &amp;&amp;r2 = std::<span class="built_in">move</span>(s4);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由於 <code>std::move()</code> 基本上是在做轉型，這會保留 const 的修飾，因此若原物件有 const 修飾，就需要使用 const rvalue reference 來做繫結，也因此他會無法去呼叫移動建構子，破壞了移動。</p>
+<p>由此可知 <code>const</code> 也會破壞隱式移動(implicit move)，有關隱式移動，可以去看之前寫得值類別篇。這邊 Jason Turner 給了四個要注意不該使用 <code>const</code> 的例子：</p>
+<h2 id="當-function-回傳-non-reference-type-時，return-type-不應該用-const-修飾"><a href="#當-function-回傳-non-reference-type-時，return-type-不應該用-const-修飾" class="headerlink" title="當 function 回傳 non-reference type 時，return type 不應該用 const 修飾"></a>當 function 回傳 non-reference type 時，return type 不應該用 const 修飾</h2><p>寫在 return type 的 <code>const</code> 大部分的時候都會被忽略，有時候甚至會破壞效能，如這邊提到的它會破壞隱式移動，看看這段 code：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// will called copy</span></span><br><span class="line"><span class="function"><span class="type">const</span> S <span class="title">make_value</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> S&#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// will called move</span></span><br><span class="line"><span class="function">S <span class="title">make_value2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> S&#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;s&quot;</span>);</span><br><span class="line">  S s;</span><br><span class="line">  s = <span class="built_in">make_value</span>();</span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\ns2&quot;</span>);</span><br><span class="line">  S s2;</span><br><span class="line">  s2 = <span class="built_in">make_value2</span>();</span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nend&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">s</span><br><span class="line">S()</span><br><span class="line">S()</span><br><span class="line">operator=(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line"></span><br><span class="line">s2</span><br><span class="line">S()</span><br><span class="line">S()</span><br><span class="line">operator=(S &amp;&amp;)</span><br><span class="line">~S()</span><br><span class="line"></span><br><span class="line">end</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+<p>這邊有兩個 function，上面那個在 return type 上有 <code>const</code> 修飾，下面的沒有。你可以看見上面那個使用的是 copy，而下面那個使用的是 move。</p>
+<p>原因就如前面所述，一旦加上了 <code>const</code>，reference 要連結時就變成要使用 const rvalue reference，但通常 const rvalue reference 並不會有用處(幾乎沒意義，很多餘)，因此通常我們函式不會實作 const rvalue reference 的版本，也因此會去呼叫複製，破壞了隱式移動。</p>
+<p>當然，const rvalue reference 偶爾會有用就是了，真的很偶爾。</p>
+<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/4938875/do-rvalue-references-to-const-have-any-use">Do rvalue references to const have any use?</a></p>
+<h2 id="需要隱式移動時，回傳的變數不該用-const-修飾"><a href="#需要隱式移動時，回傳的變數不該用-const-修飾" class="headerlink" title="需要隱式移動時，回傳的變數不該用 const 修飾"></a>需要隱式移動時，回傳的變數不該用 const 修飾</h2><p>原因一樣是因為會破壞隱式移動，看看這個例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">S <span class="title">make_value</span><span class="params">(<span class="type">bool</span> flag)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (flag) &#123;</span><br><span class="line">    <span class="type">const</span> S s;    <span class="comment">// bad use of const</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="type">const</span> S s2;    <span class="comment">// bad use of const</span></span><br><span class="line">    <span class="keyword">return</span> s2;    <span class="comment">// 直接回傳 S&#123;&#125; 會更好，因為有 Copy Elision</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  S s = <span class="built_in">make_value</span>(argc == <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">S()</span><br><span class="line">S(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+<p>function 內回傳的是有名物件，因此套用的是 NRVO，但因為有 branch，因此編譯器會嘗試去做隱式移動，然而一樣由於無法利用 rvalue reference 去做連結，因此無法套用移動，導致去呼叫了 copy。</p>
+<h2 id="在你可能需要直接回傳的-non-trivial-參數上，不應該用-const-修飾"><a href="#在你可能需要直接回傳的-non-trivial-參數上，不應該用-const-修飾" class="headerlink" title="在你可能需要直接回傳的 non-trivial 參數上，不應該用 const 修飾"></a>在你可能需要直接回傳的 non-trivial 參數上，不應該用 const 修飾</h2><p>原因跟前面都一樣，因為會破壞隱式移動，看這個例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">S <span class="title">make_value</span><span class="params">(<span class="type">const</span> S s)</span>    <span class="comment">// return statement make this bad use of `const`</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> s;    <span class="comment">// because we return it, const is bad in function definition!</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  S s = <span class="built_in">make_value</span>(S&#123;&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">S()</span><br><span class="line">S(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+
+<p>當然我們可能會使用 const reference，那就沒關係，但這邊討論的是一般的 pass by value 的狀況。</p>
+<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/3899223/what-is-a-non-trivial-constructor-in-c">What is a non-trivial constructor in C++?</a> </p>
+<h2 id="Data-member-不應該用-const-修飾"><a href="#Data-member-不應該用-const-修飾" class="headerlink" title="Data member 不應該用 const 修飾"></a>Data member 不應該用 const 修飾</h2><p>這點就比較有趣了，如果你的 data member 有 <code>const</code> 修飾，那這不只會破壞掉隱式移動，也有可能會破壞掉 assignment 的語意，看看這個例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Data</span> &#123;</span><br><span class="line">  <span class="type">const</span> S s;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  Data d;</span><br><span class="line">  Data d2 = std::<span class="built_in">move</span>(d);    <span class="comment">// the member `s` will be copied</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">S()</span><br><span class="line">S(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+
+<p>上例中你可以看見 s 使用的並不是 move 而是 copy，這跟我們大部分時候預期的不太一樣，除非你有特殊用途。</p>
+<p>這在我們要使用 STL 容器時會有些問題：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;S()&quot;</span>); &#125;</span><br><span class="line">  <span class="built_in">S</span>(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(const S &amp;)&quot;</span>);&#125;</span><br><span class="line">  <span class="built_in">S</span>(S&amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;S(S&amp;&amp;)&quot;</span>); &#125;</span><br><span class="line">  ~<span class="built_in">S</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~S()&quot;</span>); &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(<span class="type">const</span> S &amp;) &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(const S &amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">  S &amp;<span class="keyword">operator</span>=(S &amp;&amp;) <span class="keyword">noexcept</span> &#123; <span class="built_in">puts</span>(<span class="string">&quot;operator=(S &amp;&amp;)&quot;</span>); <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Data</span> &#123;</span><br><span class="line">  <span class="type">const</span> S s;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  std::vector&lt;Data&gt; data;</span><br><span class="line">  data.<span class="built_in">emplace_back</span>();</span><br><span class="line">  data.<span class="built_in">emplace_back</span>();</span><br><span class="line">  data.<span class="built_in">emplace_back</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">S()</span><br><span class="line">S()</span><br><span class="line">S(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line">S()</span><br><span class="line">S(const S &amp;)</span><br><span class="line">S(const S &amp;)</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+
+<p>因為我們把隱式移動給破壞掉了，導致在 resize 容器時會需要整個複製，如果 <code>s</code> 沒有加上 const，輸出會是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">S()</span><br><span class="line">S()</span><br><span class="line">S(S&amp;&amp;)</span><br><span class="line">~S()</span><br><span class="line">S()</span><br><span class="line">S(S&amp;&amp;)</span><br><span class="line">~S()</span><br><span class="line">S(S&amp;&amp;)</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br><span class="line">~S()</span><br></pre></td></tr></table></figure>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">https://mes0903.github.io/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">May 21st 2022, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="../../../../../22/Cpp-Miner/Miner_BlackMagic/SSO/README/" title="礦坑系列 ── Small String Optimization (SSO)">
+                    <div class="nextTitle">礦坑系列 ── Small String Optimization (SSO)</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="../../../../../19/Cpp-Miner/Miner_Tutorial/OO/README/" title="C++ 教學系列 ── Class & 物件導向">
+                    <div class="prevTitle">C++ 教學系列 ── Class & 物件導向</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> 礦坑系列 ── 四個你不該用 &quot;const&quot; 的時機 </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E5%80%8B%E4%BD%A0%E4%B8%8D%E8%A9%B2%E7%94%A8-%E2%80%9Cconst%E2%80%9D-%E7%9A%84%E6%99%82%E6%A9%9F"><span class="toc-number">2.</span> <span class="toc-text">四個你不該用 “const” 的時機</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%95%B6-function-%E5%9B%9E%E5%82%B3-non-reference-type-%E6%99%82%EF%BC%8Creturn-type-%E4%B8%8D%E6%87%89%E8%A9%B2%E7%94%A8-const-%E4%BF%AE%E9%A3%BE"><span class="toc-number">2.1.</span> <span class="toc-text">當 function 回傳 non-reference type 時，return type 不應該用 const 修飾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E9%9A%B1%E5%BC%8F%E7%A7%BB%E5%8B%95%E6%99%82%EF%BC%8C%E5%9B%9E%E5%82%B3%E7%9A%84%E8%AE%8A%E6%95%B8%E4%B8%8D%E8%A9%B2%E7%94%A8-const-%E4%BF%AE%E9%A3%BE"><span class="toc-number">2.2.</span> <span class="toc-text">需要隱式移動時，回傳的變數不該用 const 修飾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E4%BD%A0%E5%8F%AF%E8%83%BD%E9%9C%80%E8%A6%81%E7%9B%B4%E6%8E%A5%E5%9B%9E%E5%82%B3%E7%9A%84-non-trivial-%E5%8F%83%E6%95%B8%E4%B8%8A%EF%BC%8C%E4%B8%8D%E6%87%89%E8%A9%B2%E7%94%A8-const-%E4%BF%AE%E9%A3%BE"><span class="toc-number">2.3.</span> <span class="toc-text">在你可能需要直接回傳的 non-trivial 參數上，不應該用 const 修飾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-member-%E4%B8%8D%E6%87%89%E8%A9%B2%E7%94%A8-const-%E4%BF%AE%E9%A3%BE"><span class="toc-number">2.4.</span> <span class="toc-text">Data member 不應該用 const 修飾</span></a></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 18
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="../../../../../../../scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="../../../../../../../scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="../../../../../../../scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

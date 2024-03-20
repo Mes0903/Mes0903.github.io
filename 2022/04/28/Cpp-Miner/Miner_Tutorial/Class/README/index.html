@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="C++ 教學系列 ── Class     tags: C++ Miner_tutorial點此回到礦坑系列首頁：首頁   前言Class 背後最核心的概念是資料的抽象化(data abstraction)與資料封裝(data encapsulation)。這些是一種程式設計上的技巧、想法，其清楚區分了介面(interface)和實作(implementation)的不同，介面是與使用者直接互動">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 教學系列 ── Class">
+<meta property="og:url" content="https://mes0903.github.io/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="C++ 教學系列 ── Class     tags: C++ Miner_tutorial點此回到礦坑系列首頁：首頁   前言Class 背後最核心的概念是資料的抽象化(data abstraction)與資料封裝(data encapsulation)。這些是一種程式設計上的技巧、想法，其清楚區分了介面(interface)和實作(implementation)的不同，介面是與使用者直接互動">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.imgur.com/codc4xj.png">
+<meta property="article:published_time" content="2022-04-28T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-20T23:15:38.149Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="C++ Miner_tutorial">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/codc4xj.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="../../../../../../../assets/Mes.ico">
+    
+    <title>C++ 教學系列 ── Class · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("../../../../../../../font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="../../../../../../../css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="../../../../../../../css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="../../../../../../../css/dark.css">
+    <link rel="stylesheet" href="../../../../../../../css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="../../../../../../../scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="../../../../../../../lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="../../../../../../../index.html">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">C++ 教學系列 ── Class</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(../../../../../../../intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                C++ 教學系列 ── Class
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner_tutorial">C++ Miner_tutorial</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">5.3k</span>閱讀時長: <span class="post-count reading-time">24 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/04/28</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "../../../../../../../lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="../../../../../../../assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> C++ 教學系列 ── Class <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>  
+
+<h6 id="tags-C-Miner-tutorial"><a href="#tags-C-Miner-tutorial" class="headerlink" title="tags: C++ Miner_tutorial"></a>tags: <code>C++ Miner_tutorial</code></h6><p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong>  </p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Class 背後最核心的概念是資料的抽象化(data abstraction)與資料封裝(data encapsulation)。這些是一種程式設計上的技巧、想法，其清楚區分了介面(interface)和實作(implementation)的不同，介面是與使用者直接互動的運算，實作則是利用了 Class 內的資料成員與成員函式來寫出的演算法，而封裝則是強制分開了介面與實作，實作會被隱藏，使用者只看的到介面，但看不到實作。  </p>
+<p>舉個例子，有一個肯x雞的自動販賣機，可以讓使用者購買炸雞，使用者可以利用販賣機上的按鈕來購買炸雞，但使用者不會知道炸雞是怎麼被做出來的，此時這個販賣機就是一種封裝，介面為機器上的按鈕，而實作就是製作炸雞的細節。  </p>
+<p>封裝的目的是為了將程式切分為很多模組，盡量讓模組與模組之間沒有關聯，有點像模組化設計的感覺，而封裝出來的東西我們就稱為 Class，以上例來說，這個販賣機就會是一個 Class。  </p>
+<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/18034683/what-is-the-big-difference-between-modular-and-object-oriented-programming">What is the big difference between modular and object oriented programming?</a>  </p>
+<h1 id="類別-Class"><a href="#類別-Class" class="headerlink" title="類別(Class)"></a>類別(Class)</h1><p>因此 Class 你可以把他想像為一個設計藍圖，設計者可以利用這個藍圖來去建立物件，換句話說 Class 是一種使用者定義的型態，  </p>
+<blockquote>
+<p>n4868(11.1)：A class is a type. Its name becomes a class-name within its scope.  </p>
+</blockquote>
+<h2 id="Class-Declaration-與-Class-Definition"><a href="#Class-Declaration-與-Class-Definition" class="headerlink" title="Class Declaration 與 Class Definition"></a>Class Declaration 與 Class Definition</h2><p>Class Declaration 與 Class Definition 都是屬於 Simple Declaration 中的 Declaration Specifier，幫大家複習一下，一個 Simple Declaration 的形式會長：  </p>
+<blockquote>
+<p>decl-specifier-seq init-declarator-list(opt);  </p>
+</blockquote>
+<p>所以就是前面 decl-specifier-seq 那部分。  </p>
+<p>Class Declaration 的意思為我們要引入 Class 的名字，告訴編譯器這是一個我們自己定義的型態，語法很簡單，會在最一開始加上 <code>class</code> 關鍵字，後面接上名字：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span>;  </span><br></pre></td></tr></table></figure>
+
+<p>這樣的話 <code>T</code> 就是一個 Class，但尚未有 Class 的定義，此時這個 <code>T</code> 是個不完整的型態(incomplete type)，如果要使其成為 complete type，就要定義 Class，要定義 Class 的話我們需要在後面接上大括號 <code>&#123;&#125;</code>，語法像這樣：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> &#123; member-<span class="built_in">specification</span>(opt) &#125;  </span><br></pre></td></tr></table></figure>
+
+<p>大括號內填的是 Class 成員的資訊，成員的所有權與 scope 屬於這個 Class，可以有 function、object declaration、using、enum 等(<a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/class#nt:member-declaration">一覽</a>)，一樣用前面販賣機的例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Vending_machine</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">ordered_chicken</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;the machine get your order\n&quot;</span>;  </span><br><span class="line">    price = <span class="number">50</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">int</span> <span class="title">money</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> price;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> price;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>這個 Class 叫做 Vending_machine，裡面有兩個 member function 與一個 data member，其中有兩個關鍵字 <code>public</code> 與 <code>private</code>，<code>public</code> 代表可以給使用者使用的成員，<code>private</code> 表示只有自己這個 Class type 可以使用的成員，但同一種 Class type 的不同 object 是可以使用 private 成員的：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">set_other_val</span><span class="params">(T &amp;other)</span> </span>&#123; other.val = <span class="number">100</span>; &#125;;  </span><br><span class="line">  <span class="function"><span class="type">int</span> <span class="title">get_val</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> val; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1, t2;  </span><br><span class="line">  t1.<span class="built_in">set_other_val</span>(t2);  </span><br><span class="line">  std::cout &lt;&lt; t2.<span class="built_in">get_val</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>還有一個關鍵字叫 <code>protected</code>，表示繼承的子類和自己可以使用的成員，先記前面兩個就好，第三個在之後講繼承時會提到。  </p>
+<p>成員的宣告與定義也可以分開來寫，我們通常會在 <code>.h</code> 內寫 member 的宣告，並在對應的 cpp file 內寫定義，舉個例子：  </p>
+<p>在 Vending_machine.h 內：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> VENDING_MACHINE  </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> VENDING_MACHINE  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Vending_machine</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">ordered_chicken</span><span class="params">()</span></span>;  </span><br><span class="line">  <span class="function"><span class="type">int</span> <span class="title">money</span><span class="params">()</span></span>;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> price;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span>  </span></span><br></pre></td></tr></table></figure>
+
+<p>在 Vending_machine.cpp 內：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;Vending_machine.h&quot;</span>  </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Vending_machine::ordered_chicken</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;the machine get your order\n&quot;</span>;  </span><br><span class="line">  price = <span class="number">50</span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">Vending_machine::money</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="keyword">return</span> price;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>要注意的是我們需要透過範圍解析運算子 <code>::</code> 來定義成員函式，否則編譯器會以為我們在定義的是一般的函式。  </p>
+<p>這樣的話我們就設計好了一張「藍圖」、「設計圖」，我們可以利用這個設計圖去建構物件：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  Vending_machine machine1, machine2;  </span><br><span class="line"></span><br><span class="line">  machine1.<span class="built_in">ordered_chicken</span>();  </span><br><span class="line">  std::cout &lt;&lt; machine1.<span class="built_in">money</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>這裡我們建構了兩個販賣機出來，Class 的物件可以透過成員訪問運算子 <code>.</code> 來使用 Class 中存取權限為 <code>public</code> 的成員，以上面這個例子，我們使用了第一台機器的 <code>ordered_chicken()</code> 這個函式，又再使用了 <code>money()</code> 這個函數來確認金錢。  </p>
+<h2 id="建構子-Constructor-與解構子-Destructor"><a href="#建構子-Constructor-與解構子-Destructor" class="headerlink" title="建構子(Constructor) 與解構子(Destructor)"></a>建構子(Constructor) 與解構子(Destructor)</h2><p>在前面的章節我們很強調建構與賦值不同，大家可能沒什麼感覺，但在這裡就會很強烈的發現兩者的不同了。  </p>
+<p>一個 Class type 的物件在建構時可能會有預設的狀態，以上方的販賣機為例，一開始 price 需要初始化為 0，否則可能為亂數，此時就要利用建構子來操作。  </p>
+<p>建構子的語法和一般的函式不同，其沒有回傳型態，也沒有 function name，並且有一個特殊的組件叫做初始化清單(initialization list)，可以幫助我們初始化物件，速度會比較快，建構子的語法長這樣：  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class名() initialization_list(opt) &#123;&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() &#123;&#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T2</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T2</span>() : <span class="built_in">val</span>(<span class="number">5</span>) &#123; std::cout &lt;&lt; <span class="string">&quot;build T2\n&quot;</span>; &#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>Class <code>T</code> 的建構子沒有任何內容，也沒有 initialization list，這種建構子我們稱他為預設建構子(default constructor)。  </p>
+<p>而 <code>T2</code> 的建構子有 initialization list，將 <code>val</code> 初始化為 5，因此如果我們去訪問一個剛建構出來的 <code>T2</code> 的 <code>val</code>，就會得到 5：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T2</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T2</span>() : <span class="built_in">val</span>(<span class="number">5</span>) &#123;&#125;  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">print_val</span><span class="params">()</span> </span>&#123; std::cout &lt;&lt; <span class="string">&quot;val = &quot;</span> &lt;&lt; val &lt;&lt; <span class="string">&#x27;\n&#x27;</span>; &#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T2 obj;  </span><br><span class="line">  obj.<span class="built_in">print_val</span>();    <span class="comment">// val = 5  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>但要注意初始化清單並沒有指定成員初始化的順序：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">A</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;A()&quot;</span>); &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">B</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;B()&quot;</span>); &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">C</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;C()&quot;</span>); &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  A a;  </span><br><span class="line">  B b;  </span><br><span class="line">  C c;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">c</span>(), <span class="built_in">b</span>(), <span class="built_in">a</span>() &#123;&#125;    <span class="comment">// A() B() C()  </span></span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>初始化的順序不是透過初始化清單來決定，而是透過 non-static data member 被宣告的順序來決定，所以這裡初始化的順序是 A-&gt;B-&gt;C。  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://eel.is/c++draft/class.base.init#13.3">11.9.3</a>：Then, non-static data members are initialized in the order they were declared in the class definition (again regardless of the order of the mem-initializers).  </p>
+</blockquote>
+<p>而在解構時也有解構子可以使用，例如原本有在 Class 內動態配置記憶體，那解構時就要幫忙呼叫 delete，解構子的語法為：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~Class名()&#123;&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>舉個例子  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">ptr</span>(<span class="keyword">new</span> <span class="type">int</span>) &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  ~<span class="built_in">T</span>() &#123; <span class="keyword">delete</span> ptr; &#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> *ptr;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>我們也可以傳遞參數進去建構子，根據傳遞進去的參數不同，有分移動建構子與複製建構子，同樣的我們可以透過 <code>operator=</code> 的 overload 來建立複製運算子與移動運算子，這些會在複製、移動 Class 的實例時用到：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>() &#123; std::cout &lt;&lt; <span class="string">&quot;calling T()\n&quot;</span>; &#125;    <span class="comment">// default constructor  </span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>(<span class="type">const</span> T &amp;other) : <span class="built_in">val</span>(other.val) &#123; std::cout &lt;&lt; <span class="string">&quot;calling T(const T &amp;other)\n&quot;</span>; &#125;    <span class="comment">// copy constructor  </span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>(T &amp;&amp;other) : <span class="built_in">val</span>(std::<span class="built_in">move</span>(other.val)) &#123;&#125;    <span class="comment">// move constructor  </span></span><br><span class="line"></span><br><span class="line">  T &amp;<span class="keyword">operator</span>=(<span class="type">const</span> T &amp;other)  </span><br><span class="line">  &#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;calling operator=(const T &amp;other)\n&quot;</span>;  </span><br><span class="line">    val = other.val;  </span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">  &#125;    <span class="comment">// copy operator=  </span></span><br><span class="line"></span><br><span class="line">  T &amp;<span class="keyword">operator</span>=(T &amp;&amp;other)  </span><br><span class="line">  &#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;calling operator=(T &amp;&amp;other)\n&quot;</span>;  </span><br><span class="line">    val = std::<span class="built_in">move</span>(other.val);  </span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">  &#125;    <span class="comment">// move operator=  </span></span><br><span class="line"></span><br><span class="line">  ~<span class="built_in">T</span>() &#123;&#125;    <span class="comment">// destructor  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  T t2 = t1;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="Rule-of-three、Rule-of-five、Rule-of-zero"><a href="#Rule-of-three、Rule-of-five、Rule-of-zero" class="headerlink" title="Rule of three、Rule of five、Rule of zero"></a>Rule of three、Rule of five、Rule of zero</h3><p>而當我們自己定義了解構子、複製建構子或複製運算符時，通常就代表我們需要自己管理 Class 的內部資源，因此就會需要同時定義這三個建構子，這就是 R3，而如果考慮了移動進去，則多了移動建構子與移動運算子進去，因此是 R5，而如果都沒有動到，就一個都不用寫，這就是 R0。  </p>
+<h1 id="this"><a href="#this" class="headerlink" title="this"></a>this</h1><p><code>this</code> 是一個特殊的指標，基本上會出現在 class 的 non-static member function 內，<code>this</code> 會指向呼叫他的 member function 所屬的 class instance。  </p>
+<p>舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">print_this</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="keyword">this</span> &lt;&lt; <span class="string">&quot;\n&quot;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1, t2;  </span><br><span class="line">  std::cout &lt;&lt; &amp;t1 &lt;&lt; <span class="string">&quot; &quot;</span>;  </span><br><span class="line">  t1.<span class="built_in">print_this</span>();  </span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; &amp;t2 &lt;&lt; <span class="string">&quot; &quot;</span>;  </span><br><span class="line">  t2.<span class="built_in">print_this</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>這個 class instance，也就是呼叫的物件有個名字叫 implicit object。  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://eel.is/c++draft/expr.prim.this#1">7.5.2</a>：The keyword this names a pointer to the object for which an implicit object member function ([class.mfct.non.static]) is invoked or a non-static data member’s initializer ([class.mem]) is evaluated.  </p>
+</blockquote>
+<p>在 parameter 與 data member 名稱衝突時，我們需要 <code>this</code> 來告訴 compiler 說我們使用的是哪個變數：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">print_var</span><span class="params">(<span class="type">int</span> var)</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="keyword">this</span>-&gt;var &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; var &lt;&lt; <span class="string">&quot;\n&quot;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">var</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> var;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  t1.<span class="built_in">print_var</span>(<span class="number">100</span>);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>在需要回傳自己或自己的位址時，我們也會透過 <code>this</code> 來回傳：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function">T &amp;<span class="title">self_obj</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;  </span><br><span class="line">  <span class="function">T *<span class="title">self_addr</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>; &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">var</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> var;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>這在前一小節的 <code>operator=</code> 也可以看到。  </p>
+<p>對於 member function 可以使用 <code>this</code> 這件事，有一個 compiler 很常用的實作方式，應該說到現在我只看過這種方式，其會把 <code>this</code> 當作第一個參數傳入 member function：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">()</span> </span>&#123; std::cout &lt;&lt; <span class="keyword">this</span>; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  t1.<span class="built_in">fn</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>在 <code>t1.fn()</code> 這裡，通常 compiler 會改寫為 <code>t1.fn(&amp;t1)</code>，如此一來就可以實作 <code>this</code> 了，但要注意這不是標準，我一開始一直以為這是標準規定的，後來花了很多時間去理解才發現這件事，標準只規定了行為，說了 <code>this</code> 是一個 prvalue pointer，值是 implicit object 的位址，並沒有規定如何實作。  </p>
+<h1 id="friend"><a href="#friend" class="headerlink" title="friend"></a>friend</h1><p>前面說了權限為 private 的成員只有同一個 class type 的 object 能使用，如果今天有外部的函式或 class 想存取 private 成員時，可以將其設為 friend，使用方法如下：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">friend</span> <span class="type">void</span> <span class="title">set_val</span><span class="params">(T &amp;obj, <span class="type">int</span> i)</span> </span>&#123; obj.val = i; &#125;    <span class="comment">// define in class  </span></span><br><span class="line">  <span class="function"><span class="keyword">friend</span> <span class="type">int</span> <span class="title">get_val</span><span class="params">(T &amp;obj)</span></span>;    <span class="comment">// define outside  </span></span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">set_val</span><span class="params">(T &amp;obj, <span class="type">int</span> i)</span></span>;  </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">get_val</span><span class="params">(T &amp;obj)</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="keyword">return</span> obj.val;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  <span class="built_in">set_val</span>(t1, <span class="number">20</span>);  </span><br><span class="line">  std::cout &lt;&lt; <span class="built_in">get_val</span>(t1);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>我們需要在外部函式或 class 的前面加上 <code>friend</code> 關鍵字，而其一樣可以在 class 內或外定義，要注意的是我們需要在外面宣告它，否則由於 scope 的關係，於 class 外面我們無法存取它，而因為它是外部函式或 class，本身並不屬於 class 的成員，因此也沒辦法透過 <code>::</code> 來存取：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// void f(); without this line  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">X</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="keyword">friend</span> <span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>&#123; <span class="comment">/*you can define friend function here*/</span> &#125;  </span><br><span class="line">  <span class="built_in">X</span>()&#123; <span class="built_in">f</span>(); &#125; <span class="comment">// error: &#x27;f&#x27; was not declared in this scope  </span></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">g</span><span class="params">()</span></span>;  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">h</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">X::g</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">f</span>(); &#125; <span class="comment">// error: &#x27;f&#x27; was not declared in this scope  </span></span><br></pre></td></tr></table></figure>
+
+<p>主要的重點在於 <code>friend</code> 會影響到存取權，但它不是一般意義上的宣告  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4659/class.friend#1">n4659(14.3)</a>：A friend of a class is a function or class that is given permission to use the private and protected member names from the class. A class specifies its friends, if any, by way of friend declarations. Such declarations give special access rights to the friends, but they do not make the nominated friends members of the befriending class. [ Example: The following example illustrates the differences between members and friends:  </p>
+</blockquote>
+<h1 id="運算子重載-operator-overload"><a href="#運算子重載-operator-overload" class="headerlink" title="運算子重載 (operator overload)"></a>運算子重載 (operator overload)</h1><p>當我們要定義一個運算子如何操作自定義的 class 時，我們可以使用運算子重載，在上面建構子的地方我們其實已經用過運算子重載了，那邊重載了 <code>=</code>，改變了 <code>=</code> 的行為，這邊再多舉一個例子，假設有個 2*2 矩陣的 class，我們要定義矩陣的加法：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">M</span> &#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>][<span class="number">2</span>];  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">M</span>() : arr&#123; <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span> &#125; &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">M</span>(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> c, <span class="type">int</span> d) : arr&#123; a, b, c, d &#125; &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">M</span>(<span class="built_in">int</span> (&amp;other)[<span class="number">2</span>][<span class="number">2</span>]) : arr&#123; other[<span class="number">0</span>][<span class="number">0</span>], other[<span class="number">0</span>][<span class="number">1</span>], other[<span class="number">1</span>][<span class="number">0</span>], other[<span class="number">1</span>][<span class="number">1</span>] &#125; &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  M &amp;<span class="keyword">operator</span>+(M &amp;other)  </span><br><span class="line">  &#123;  </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)  </span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">2</span>; ++j)  </span><br><span class="line">        arr[i][j] += other.arr[i][j];  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">print_arr</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)  </span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">2</span>; ++j)  </span><br><span class="line">        std::cout &lt;&lt; arr[i][j] &lt;&lt; <span class="string">&quot; &quot;</span>;  </span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  M m1&#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span> &#125;, m2&#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;  </span><br><span class="line">  m1 + m2;  </span><br><span class="line"></span><br><span class="line">  m1.<span class="built_in">print_arr</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h1 id="const、mutable"><a href="#const、mutable" class="headerlink" title="const、mutable"></a>const、mutable</h1><p>如果一個 class instance 有被 <code>const</code> 修飾，此時若有用到沒有用 <code>const</code> 修飾的 member function 便不會通過編譯。  </p>
+<p>對 member function 加上 <code>const</code> 修飾的方法很簡單，在 function body 與 parameter list 之間加上 <code>const</code> 就好，這代表此 member function 無法對其 data member 進行改動，但改別人的 data member 是沒問題的：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>(<span class="type">int</span> i) : <span class="built_in">val</span>(i) &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="comment">// error  </span></span><br><span class="line">  <span class="comment">//  int get_val() &#123; return val; &#125;  </span></span><br><span class="line">  <span class="function"><span class="type">int</span> <span class="title">get_val</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> val; &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="comment">// error  </span></span><br><span class="line">  <span class="comment">// void set_val(int i) const &#123; val = 5; &#125;  </span></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">set_other</span><span class="params">(T &amp;other)</span> <span class="type">const</span> </span>&#123; other.val = <span class="number">5</span>; &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="comment">// error  </span></span><br><span class="line">  <span class="comment">// T &amp;get_obj() &#123; return *this; &#125;;  </span></span><br><span class="line">  <span class="comment">// const T &amp;get_obj() &#123; return *this; &#125;;  </span></span><br><span class="line">  <span class="comment">// T &amp;get_obj() const &#123; return *this; &#125;;  </span></span><br><span class="line">  <span class="function"><span class="type">const</span> T &amp;<span class="title">get_obj</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> *<span class="keyword">this</span>; &#125;;  </span><br><span class="line"></span><br><span class="line">  <span class="function">T &amp;<span class="title">get_other</span><span class="params">(T &amp;other)</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> other; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">const</span> T t1;  </span><br><span class="line">  T t2;  </span><br><span class="line"></span><br><span class="line">  t1.<span class="built_in">get_val</span>();  </span><br><span class="line">  t1.<span class="built_in">set_other</span>(t2);  </span><br><span class="line">  t1.<span class="built_in">get_obj</span>();  </span><br><span class="line">  t1.<span class="built_in">get_other</span>(t2);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p>要注意的是如果有 return <code>*this</code> 的，那在回傳的型態上也需要加上 <code>const</code>。  </p>
+<p>我們可以利用這個特性來實作 overloading：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>() &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>(<span class="type">int</span> i) : <span class="built_in">val</span>(i) &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">const</span> T &amp;<span class="title">check_version</span><span class="params">()</span> <span class="type">const</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;const version\n&quot;</span>;  </span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">  &#125;;  </span><br><span class="line"></span><br><span class="line">  <span class="function">T &amp;<span class="title">check_version</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;without const version\n&quot;</span>;  </span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">  &#125;;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">const</span> T t1;  </span><br><span class="line">  T t2;  </span><br><span class="line"></span><br><span class="line">  t1.<span class="built_in">check_version</span>();    <span class="comment">// const version  </span></span><br><span class="line">  t2.<span class="built_in">check_version</span>();    <span class="comment">// without const version  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>這個 overload 是利用作用在 member function 的 <code>const</code> 來判斷的，也就是說上例中的第二個 <code>check_version</code> 的 return type 就算加上 <code>const</code> 也是沒問題的：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// can still complete the overloading  </span></span><br><span class="line"><span class="function"><span class="type">const</span> T &amp;<span class="title">check_version</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;without const version\n&quot;</span>;  </span><br><span class="line">  <span class="keyword">return</span> *<span class="keyword">this</span>;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>然而有些特殊狀況我們會需要在有 <code>const</code> 修飾的 member function 內修改某些特殊的變數，此時我們需要在這個特殊的變數上加上 <code>mutable</code> 修飾，這種變數不能有 <code>const</code> 修飾，因為他的值一定要可以被改：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="keyword">mutable</span> <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line">  <span class="comment">// error  </span></span><br><span class="line">  <span class="comment">// const mutable int val2;  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">set_val</span><span class="params">(<span class="type">int</span> i)</span> <span class="type">const</span> </span>&#123; val = i; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  t1.<span class="built_in">set_val</span>(<span class="number">5</span>);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h1 id="自定義的型態轉換-user-defined-conversion"><a href="#自定義的型態轉換-user-defined-conversion" class="headerlink" title="自定義的型態轉換 (user-defined conversion)"></a>自定義的型態轉換 (user-defined conversion)</h1><p>有時我們自己定義的 class 可以與其它的型態互相轉換，此時我們就要自定義轉型的函式，語法是這樣：  </p>
+<blockquote>
+<p>explicit(opt) operator conversion-type-id() {}  </p>
+</blockquote>
+<p>會有一個 <code>operator</code> 關鍵字，後面接上我們要轉換的型態。  </p>
+<p>假設我們的 <code>T</code> 可以轉換為 <code>int</code>，那麼我們可以這樣寫：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>(<span class="number">20</span>) &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">operator</span> <span class="title">int</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> val; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  std::cout &lt;&lt; t1 + <span class="number">5</span>;    <span class="comment">// 25  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>可以看見在第 16 行的地方 <code>t1</code> 被隱式轉換為 <code>int</code> 了，因此輸出 25。  </p>
+<p>如果我們不想要有隱式轉換，則需要加上 <code>explicit</code> 關鍵字在轉換函式的前方：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> val;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">val</span>(<span class="number">20</span>) &#123;&#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="keyword">operator</span> <span class="title">int</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> val; &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  <span class="comment">// error  </span></span><br><span class="line">  <span class="comment">// std::cout &lt;&lt; t1 + 5;  </span></span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(t1) + <span class="number">5</span>;    <span class="comment">// 25  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>加上 <code>explicit</code> 關鍵字的轉換函式，compiler 不會自動套用它，需要我們加上 cast operator 時才會去套用轉換，像 19 行那樣。  </p>
+<h1 id="static"><a href="#static" class="headerlink" title="static"></a>static</h1><p><code>static</code> 有主要會出現在三個地方：  </p>
+<ol>
+<li>global variable&#x2F;function 前  </li>
+<li>function 內的 varaible 前  </li>
+<li>class 的 member variable&#x2F;function 前</li>
+</ol>
+<p>這三個地方的 <code>static</code> 所代表的意義會不太一樣，這邊就由上往下來一一解釋  </p>
+<h2 id="global-variable-function-前"><a href="#global-variable-function-前" class="headerlink" title="global variable&#x2F;function 前"></a>global variable&#x2F;function 前</h2><p>在前面我們有提到 TU(.o 檔) 的概念，一個 TU 會有一組自己的 symbol table 來記錄哪些 symbol 需要從外部取得，這個 table、symbol 我們稱它為 ABI(Application Binary interface)。  </p>
+<p>在 global variable&#x2F;function 前加上 <code>static</code> 的意義代表接下來的這個變數&#x2F;函式只能在這個 TU 內使用，舉個例子：  </p>
+<p>test.cpp：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">()</span></span>;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="built_in">fn</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>test2.cpp：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> i;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  ++i;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>第一個檔案中有個 <code>static</code> 關鍵字修飾的整數 <code>i</code>，而我們在第二個檔案中想要使用這個 <code>i</code>，我們先把兩個 <code>.o</code> 檔編譯出來：  </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -c test1.cpp  </span><br><span class="line">g++ -c test2.cpp  </span><br></pre></td></tr></table></figure>
+
+<p>然後去 link 這兩個檔案，生成執行檔：  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -o output test.o test2.o  </span><br></pre></td></tr></table></figure>
+
+<p>此時 linker 就會報錯，告訴你 undefined reference to <code>i</code>：  </p>
+<p><img src="https://i.imgur.com/codc4xj.png">  </p>
+<p>這是由於當 <code>test2.o</code> 要去找 <code>i</code> 的定義時他找不到，因為我們把 <code>i</code> 限定在 <code>test.o</code> 內了。  </p>
+<p>這邊可以看一下 ABI 實際上長的樣子，你會發現有些差別，指令是  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -S -o output.asm input.cpp  </span><br></pre></td></tr></table></figure>
+
+<p>這邊我把輸出結果丟到 github 上了：<a target="_blank" rel="noopener" href="https://github.com/Mes0903/Cpp-Miner/blob/main/Miner_Tutorial/Class/normal.asm">普通版本</a>、<a target="_blank" rel="noopener" href="https://github.com/Mes0903/Cpp-Miner/blob/main/Miner_Tutorial/Class/extern.asm">extern 版本</a>、<a target="_blank" rel="noopener" href="https://github.com/Mes0903/Cpp-Miner/blob/main/Miner_Tutorial/Class/static.asm">static 版本</a>。  </p>
+<p>對比一下你會發現在 <code>extern</code> 版本，多了一行 <code>def	_Z2fnv;	.scl	2;	.type	32;	.endef</code>，表示他要去找定義，我們之前也提過 <code>extern</code> 修飾的變數會只有宣告，並且要從其他 TU 裡面去找定義；  </p>
+<p>而 <code>static</code> 版本則是在最一開始的地方少了 <code>.globl i</code>，表示 <code>i</code> 這個變數不再是所有 TU 都可以使用的了，後面也少了一行 <code>.globl _Z2fnv</code>。  </p>
+<h2 id="function-內的-varaible-前"><a href="#function-內的-varaible-前" class="headerlink" title="function 內的 varaible 前"></a>function 內的 varaible 前</h2><p>如果 <code>static</code> 出現在 function 內的變數前，表示這個變數為<span class = "yellow">靜態變數</span>，生命週期要到程式結束才會跟著結束：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">static</span> <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line">  std::cout &lt;&lt; ++i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="built_in">fn</span>();    <span class="comment">// 1  </span></span><br><span class="line">  <span class="built_in">fn</span>();    <span class="comment">// 2  </span></span><br><span class="line">  <span class="built_in">fn</span>();    <span class="comment">// 3  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>因為 <code>fn</code> 中的 <code>i</code> 變為一個靜態變數，因此離開 <code>fn</code> 時 <code>i</code> 並不會解構，所以上例輸出的結果為 <code>1 2 3</code>。  </p>
+<h2 id="class-的-member-variable-function-前"><a href="#class-的-member-variable-function-前" class="headerlink" title="class 的 member variable&#x2F;function 前"></a>class 的 member variable&#x2F;function 前</h2><p>利用 <code>static</code> 修飾的 member variable&#x2F;function 所有權並不屬於任何一個 instance，所有的 class instance 會共用這個 member，因此有 <code>static</code> 修飾的 member variable 不能利用建構子來初始化，需要在外部定義它：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="type">static</span> <span class="type">int</span> i;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; ++i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">s_fn</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;s_fn\n&quot;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> T::i = <span class="number">5</span>;    <span class="comment">// definition of T::i  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T::<span class="built_in">s_fn</span>();    <span class="comment">// okay  </span></span><br><span class="line">  T::i = <span class="number">0</span>;    <span class="comment">// okay  </span></span><br><span class="line"></span><br><span class="line">  T t1, t2, t3;  </span><br><span class="line">  t1.<span class="built_in">fn</span>();    <span class="comment">// 1  </span></span><br><span class="line">  t2.<span class="built_in">fn</span>();    <span class="comment">// 2  </span></span><br><span class="line">  t3.<span class="built_in">fn</span>();    <span class="comment">// 3  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>由於 static member 不屬於任何一個 class instance，因此我們可以直接使用它，這是一個特例，如上例中的 22、23 行。  </p>
+<p>static data member 的生命週期也是靜態的，它被定義後會一直存在到程式結束。另外，static data member 可以做為 default-argument 來使用，但 non-static data member 不行：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="type">static</span> <span class="type">int</span> i;  </span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">(<span class="type">int</span> j = i)</span>    <span class="comment">// okay, static data member as default argument.  </span></span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; ++i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://eel.is/c++draft/intro.object#2">6.7.2</a>：Objects can contain other objects, called subobjects. A subobject can be a member subobject ([class.mem]), a base class subobject ([class.derived]), or an array element.   </p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://eel.is/c++draft/class.static#data-1">11.4.9</a>：A static data member is not part of the subobjects of a class.  </p>
+</blockquote>
+<h1 id="default-member-initializer"><a href="#default-member-initializer" class="headerlink" title="default member initializer"></a>default member initializer</h1><p>在 C++11 後，我們可以使用 default member initializer 來初始化 non-static data member，也有人稱這方法為 in-class initializer 或 non-static data member initializer，寫法很簡單，直接在 data member 的後方加上初始化器就可以了：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t1;  </span><br><span class="line">  std::cout &lt;&lt; t1.i;    <span class="comment">// 0  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>如果 static data member 要使用 in-class initializer，則它需要是被 const 修飾的：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="type">static</span> <span class="type">const</span> <span class="type">int</span> i = <span class="number">0</span>;    <span class="comment">// okay  </span></span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<p>如果有建構子也去初始化了這個變數，那麼初始化器會被跳過：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">T</span>() : <span class="built_in">i</span>(<span class="number">2</span>) &#123;&#125;    <span class="comment">// initializer i by initialization list,  </span></span><br><span class="line">                   <span class="comment">// default member initializer of i was skip  </span></span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  T t;    <span class="comment">// t.i is 2  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>然而這有時會讓邏輯變得有些複雜，尤其是你有多個建構子的時候，因為你會需要不停的判斷它是使用建構子的清單初始化還是預設初始化器的初始化，如果少寫或少看就會造成杯具，所以使用的時候自己要注一下。  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://www.eel.is/c++draft/class#base.init-9">11.9.3-9</a>：<br>In a non-delegating constructor other than an implicitly-defined copy&#x2F;move constructor ([class.copy.ctor]), <strong>if a given potentially constructed subobject is not designated by a mem-initializer-id</strong> (including the case where there is no mem-initializer-list because the constructor has no ctor-initializer), then<br>  (9.1)<br>    if the entity is a non-static data member that has a default member initializer ([class.mem]) and either  </p>
+<blockquote>
+<p>(9.1.1)<br>        the constructor’s class is a union ([class.union]), and no other variant member of that union is designated by a mem-initializer-id or<br>        (9.1.2)<br>        the constructor’s class is not a union, and, if the entity is a member of an anonymous union, no other member of that union is designated by a mem-initializer-id,<br>    the entity is initialized from its default member initializer as specified in [dcl.init];  </p>
+</blockquote>
+</blockquote>
+<center>(感謝群裡的 DXPower 幫找 ><)</center><br>  
+
+<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/27352021/c11-member-initializer-list-vs-in-class-initializer">C++11 member initializer list vs in-class initializer?</a>  </p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">https://mes0903.github.io/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">April 28th 2022, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="../../../../../../05/19/Cpp-Miner/Miner_Tutorial/OO/README/" title="C++ 教學系列 ── Class & 物件導向">
+                    <div class="nextTitle">C++ 教學系列 ── Class & 物件導向</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="../../../../../../03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/" title="C++ 教學系列 ── Function 與 Memory">
+                    <div class="prevTitle">C++ 教學系列 ── Function 與 Memory</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> C++ 教學系列 ── Class </span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tags-C-Miner-tutorial"><span class="toc-number">1.0.0.0.0.1.</span> <span class="toc-text">tags: C++ Miner_tutorial</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A1%9E%E5%88%A5-Class"><span class="toc-number">3.</span> <span class="toc-text">類別(Class)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Class-Declaration-%E8%88%87-Class-Definition"><span class="toc-number">3.1.</span> <span class="toc-text">Class Declaration 與 Class Definition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E6%A7%8B%E5%AD%90-Constructor-%E8%88%87%E8%A7%A3%E6%A7%8B%E5%AD%90-Destructor"><span class="toc-number">3.2.</span> <span class="toc-text">建構子(Constructor) 與解構子(Destructor)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Rule-of-three%E3%80%81Rule-of-five%E3%80%81Rule-of-zero"><span class="toc-number">3.2.1.</span> <span class="toc-text">Rule of three、Rule of five、Rule of zero</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#this"><span class="toc-number">4.</span> <span class="toc-text">this</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#friend"><span class="toc-number">5.</span> <span class="toc-text">friend</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%81%8B%E7%AE%97%E5%AD%90%E9%87%8D%E8%BC%89-operator-overload"><span class="toc-number">6.</span> <span class="toc-text">運算子重載 (operator overload)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#const%E3%80%81mutable"><span class="toc-number">7.</span> <span class="toc-text">const、mutable</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E7%BE%A9%E7%9A%84%E5%9E%8B%E6%85%8B%E8%BD%89%E6%8F%9B-user-defined-conversion"><span class="toc-number">8.</span> <span class="toc-text">自定義的型態轉換 (user-defined conversion)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#static"><span class="toc-number">9.</span> <span class="toc-text">static</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#global-variable-function-%E5%89%8D"><span class="toc-number">9.1.</span> <span class="toc-text">global variable&#x2F;function 前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#function-%E5%85%A7%E7%9A%84-varaible-%E5%89%8D"><span class="toc-number">9.2.</span> <span class="toc-text">function 內的 varaible 前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#class-%E7%9A%84-member-variable-function-%E5%89%8D"><span class="toc-number">9.3.</span> <span class="toc-text">class 的 member variable&#x2F;function 前</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#default-member-initializer"><span class="toc-number">10.</span> <span class="toc-text">default member initializer</span></a></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 18
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="../../../../../../../scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="../../../../../../../scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="../../../../../../../scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

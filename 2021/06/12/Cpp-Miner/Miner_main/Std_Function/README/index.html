@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="礦坑系列 ── std::function   礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言std::function 是 C++11 時加入的東西，它基本上是一個類型模板(Class Template)，目的是對可呼叫物件進行包裝，用起來會像是函式指標那樣，但用途更為廣泛，只要是可使用複製建構的可呼叫物件都可以使用，像是函式、lambda、std::bind、Functor(funct">
+<meta property="og:type" content="article">
+<meta property="og:title" content="礦坑系列 ── std::function">
+<meta property="og:url" content="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="礦坑系列 ── std::function   礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言std::function 是 C++11 時加入的東西，它基本上是一個類型模板(Class Template)，目的是對可呼叫物件進行包裝，用起來會像是函式指標那樣，但用途更為廣泛，只要是可使用複製建構的可呼叫物件都可以使用，像是函式、lambda、std::bind、Functor(funct">
+<meta property="og:locale">
+<meta property="og:image" content="https://walfiegif.files.wordpress.com/2021/02/out-transparent-3.gif?w=875">
+<meta property="article:published_time" content="2021-06-12T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-20T23:15:38.157Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="C++ Miner">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://walfiegif.files.wordpress.com/2021/02/out-transparent-3.gif?w=875">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="../../../../../../../assets/Mes.ico">
+    
+    <title>礦坑系列 ── std::function · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("../../../../../../../font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="../../../../../../../css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="../../../../../../../css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="../../../../../../../css/dark.css">
+    <link rel="stylesheet" href="../../../../../../../css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="../../../../../../../scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="../../../../../../../lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="../../../../../../../index.html">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">礦坑系列 ── std::function</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(../../../../../../../intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                礦坑系列 ── std::function
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">6.9k</span>閱讀時長: <span class="post-count reading-time">31 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2021/06/12</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "../../../../../../../lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="../../../../../../../assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> 礦坑系列 ── std::function <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>
+
+<p>礦坑系列首頁：<strong><a href = "https://github.com/Mes0903/Cpp-Miner" class = "redlink">首頁</a></strong></p>
+<p>hackmd 版首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>std::function</code> 是 C++11 時加入的東西，它基本上是一個類型模板(Class Template)，目的是對可呼叫物件進行包裝，用起來會像是函式指標那樣，但用途更為廣泛，只要是可使用複製建構的可呼叫物件都可以使用，像是函式、lambda、<code>std::bind</code>、Functor(function object) 等等。</p>
+<p>包裝起來的可呼叫物件我們稱它為 <code>target</code>，如果一個 <code>std::function</code> 還沒包裝任何物件，也就是沒有 target，我們稱它為空(empty)，此時我們如果使用了 target，它會丟出一個 <a href = "https://en.cppreference.com/w/cpp/utility/functional/bad_function_call" class = "pinklink">std::bad_function_call</a> 的例外處理。</p>
+<p><code>std::function</code> 在 C++17 時有做了一些修正，遺棄了一些東西，這篇文章會以新版的規則來記錄。</p>
+<h2 id="為什麼要有-std-function"><a href="#為什麼要有-std-function" class="headerlink" title="為什麼要有 std::function?"></a>為什麼要有 std::function?</h2><p>也許有人想問為什麼需要有 <code>std::function</code> ? 直接用 function pointer 之類的不行嗎? 其實 <code>std::function</code> 的設計初衷就是保證泛用性，看一下這個例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call_func</span><span class="params">( <span class="type">void</span> ( *func_ptr )( <span class="type">int</span> ), <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func_ptr</span>( a );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">normal_func</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a&#123; <span class="number">5</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">call_func</span>( normal_func, a );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">輸出：</span><br><span class="line">a = <span class="number">5</span></span><br><span class="line">b = <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<p>上面這個例子中我們有一個 <code>normal_func</code>，作用是將傳入的數字和 b &#x3D; 10 印出來。然後有一個 <code>call_func</code>，作用是吃一個 function pointer，並且把傳入的數字傳進這個 function pointer。</p>
+<p>上面這個例子會正常的輸出，但如果我們今天加入了 lambda：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call_func</span><span class="params">( <span class="type">void</span> ( *func_ptr )( <span class="type">int</span> a ), <span class="type">int</span> b )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func_ptr</span>( b );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">ret_lambda</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> [a]( <span class="type">int</span> b ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">normal_func</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a&#123; <span class="number">5</span> &#125;, b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> lambda_func = [a]( <span class="type">int</span> b ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> lambda2 = <span class="built_in">ret_lambda</span>( a );</span><br><span class="line"></span><br><span class="line">    <span class="built_in">call_func</span>( normal_func, a );</span><br><span class="line">    <span class="built_in">call_func</span>( lambda_func, b );</span><br><span class="line">    <span class="built_in">call_func</span>( lambda2, b );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面這兩個 <code>lambda_func</code> 和 <code>lambda2</code> 就無法傳入 call_func，因為 capture list 有東西的 lambda 是無法轉換成 function pointer 的。</p>
+<p>此時我們就需要 <code>std::function</code> 了，前面有提到，這個東西的產生就是為了保證泛用性，讓 lambda 或其他 collable 物件都可以被傳入：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call_func</span><span class="params">( std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; func_ptr, <span class="type">int</span> b )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func_ptr</span>( b );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::function&lt;<span class="title">void</span><span class="params">( <span class="type">int</span> )</span>&gt; <span class="title">ret_lambda</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> [a]( <span class="type">int</span> b ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">normal_func</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a&#123; <span class="number">5</span> &#125;, b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; lambda_func = [a]( <span class="type">int</span> b ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; lambda2 = <span class="built_in">ret_lambda</span>( a );</span><br><span class="line"></span><br><span class="line">    <span class="built_in">call_func</span>( normal_func, a );</span><br><span class="line">    <span class="built_in">call_func</span>( lambda_func, b );</span><br><span class="line">    <span class="built_in">call_func</span>( lambda2, b );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣一來就可以成功的運作了，可呼叫的 Class 也可以用：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call_func</span><span class="params">( std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; func_ptr, <span class="type">int</span> b )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func_ptr</span>( b );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::function&lt;<span class="title">void</span><span class="params">( <span class="type">int</span> )</span>&gt; <span class="title">ret_lambda</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> [a]( <span class="type">int</span> b ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Collable_class</span> &#123;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">( <span class="type">int</span> a )</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;a = &quot;</span> &lt;&lt; a &lt;&lt; <span class="string">&quot;\nb = &quot;</span> &lt;&lt; b &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> b&#123; <span class="number">10</span> &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a&#123; <span class="number">5</span> &#125;, b&#123; <span class="number">10</span> &#125;;</span><br><span class="line"></span><br><span class="line">    Collable_class C_instance;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">call_func</span>( C_instance, a );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>記得要引入標頭檔 <code>&lt;functional&gt;</code>。</p>
+<h1 id="語法與相關函式"><a href="#語法與相關函式" class="headerlink" title="語法與相關函式"></a>語法與相關函式</h1><p>這次試著改了文章的順序，先教大家怎麼用，再去講內部實現的概念，主要是因為有些人比較在意該怎麼用與何時使用，並不是太在意裡面怎麼實作的。再來雖然核心概念差不多，但不同編譯器實作的方法還是會稍微不太一樣。</p>
+<h2 id="語法與重要定義"><a href="#語法與重要定義" class="headerlink" title="語法與重要定義"></a>語法與重要定義</h2><p>語法其實挺簡單的，基本上就是</p>
+<blockquote>
+<p>std::function&lt;回傳型態(參數列)&gt; 實例名 &#x3D; 初始化器</p>
+</blockquote>
+<p>初始化器就是拿來初始化的東西，前面也提到了只要是可呼叫的物件都可以拿來用，看看 <a href = "https://en.cppreference.com/w/cpp/utility/functional/function" class = "pinklink">cppreference</a> 上的例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Foo</span> &#123;</span><br><span class="line">    <span class="built_in">Foo</span>( <span class="type">int</span> num ) : <span class="built_in">num_</span>( num ) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">print_add</span><span class="params">( <span class="type">int</span> i )</span> <span class="type">const</span> </span>&#123; std::cout &lt;&lt; num_ + i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>; &#125;</span><br><span class="line">    <span class="type">int</span> num_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//一般函式</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_num</span><span class="params">( <span class="type">int</span> i )</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//可呼叫的Struct，有重載operator()</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">PrintNum</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">( <span class="type">int</span> i )</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// std::function 儲存一個回傳 void 的 function，參數吃一個int</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; f_display = print_num;</span><br><span class="line">    <span class="built_in">f_display</span>( <span class="number">-9</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個回傳 void 的 lambda，參數沒吃東西</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; f_display_42 = []() &#123; <span class="built_in">print_num</span>( <span class="number">42</span> ); &#125;;</span><br><span class="line">    <span class="built_in">f_display_42</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存 std::bind 回傳的 function，function 回傳 void，參數列不吃東西</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; f_display_31337 = std::<span class="built_in">bind</span>( print_num, <span class="number">31337</span> );</span><br><span class="line">    <span class="built_in">f_display_31337</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個 member function，這個 member function 回傳 void，參數吃一個 Foo 和一個 int</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">const</span> Foo &amp;, <span class="type">int</span> )&gt; f_add_display = &amp;Foo::print_add;</span><br><span class="line">    <span class="function"><span class="type">const</span> Foo <span class="title">foo</span><span class="params">( <span class="number">314159</span> )</span></span>;</span><br><span class="line">    <span class="built_in">f_add_display</span>( foo, <span class="number">1</span> );</span><br><span class="line">    <span class="built_in">f_add_display</span>( <span class="number">314159</span>, <span class="number">1</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個 accessor</span></span><br><span class="line">    std::function&lt;<span class="type">int</span>( <span class="type">const</span> Foo &amp; )&gt; f_num = &amp;Foo::num_;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;num_: &quot;</span> &lt;&lt; <span class="built_in">f_num</span>( foo ) &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個 std::bind 回傳的 function，std::bind 吃一個 member function 和實例</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; f_add_display2 = std::<span class="built_in">bind</span>( &amp;Foo::print_add, foo, std::placeholders::_1 );</span><br><span class="line">    <span class="built_in">f_add_display2</span>( <span class="number">2</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個 std::bind 回傳的 function，std::bind 吃一個 member function 和實例的位址</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; f_add_display3 = std::<span class="built_in">bind</span>( &amp;Foo::print_add, &amp;foo, std::placeholders::_1 );</span><br><span class="line">    <span class="built_in">f_add_display3</span>( <span class="number">3</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// std::function 儲存一個可呼叫的物件</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>( <span class="type">int</span> )&gt; f_display_obj = <span class="built_in">PrintNum</span>();</span><br><span class="line">    <span class="built_in">f_display_obj</span>( <span class="number">18</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> factorial = []( <span class="type">int</span> n ) &#123;</span><br><span class="line">        <span class="comment">// store a lambda object to emulate &quot;recursive lambda&quot;; aware of extra overhead</span></span><br><span class="line">        std::function&lt;<span class="built_in">int</span>( <span class="type">int</span> )&gt; fac = [&amp;]( <span class="type">int</span> n ) &#123; <span class="built_in">return</span> ( n &lt; <span class="number">2</span> ) ? <span class="number">1</span> : n * <span class="built_in">fac</span>( n - <span class="number">1</span> ); &#125;;</span><br><span class="line">        <span class="comment">// note that &quot;auto fac = [&amp;](int n)&#123;...&#125;;&quot; does not work in recursive calls</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">fac</span>( n );</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">for</span> ( <span class="type">int</span> i&#123; <span class="number">5</span> &#125;; i != <span class="number">8</span>; ++i ) &#123;</span><br><span class="line">        std::cout &lt;&lt; i &lt;&lt; <span class="string">&quot;! = &quot;</span> &lt;&lt; <span class="built_in">factorial</span>( i ) &lt;&lt; <span class="string">&quot;;  &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>從上例可見可儲存的東西挺多的，只要是可呼叫物件基本上都可以儲存。不過不知道大家有沒有覺得有其中一個很奇怪，那就是 <code>std::function&lt;int( const Foo &amp; )&gt; f_num = &amp;Foo::num_;</code>，右邊的這個 <code>&amp;Foo::num_</code> 是個資料成員指標，那為什麼這個可以拿來初始化 <code>std::function</code> 呢?</p>
+<p>讓我們回顧一下最一開始的<a href = "https://timsong-cpp.github.io/cppwp/n4868/func.wrap.func#general-1" class = "pinklink">定義</a>：</p>
+<blockquote>
+<p>std::funtion 這個類別模板提供了多型的 wrapper，通常拿來包函式指標。 這個 Wrapper 可以儲存，複製，和透過 <code>()</code> 呼叫任何的可呼叫物件，並允許 function 為一級函式。</p>
+</blockquote>
+<p>接下來就有個問題了，到底什麼是可呼叫物件呢? 定義如下：</p>
+<blockquote>
+<p>一個可呼叫物件指的是一個物件擁有可呼叫的型態 ( <a href = "" class = "pinklink">20.14.3-4</a> )</p>
+</blockquote>
+<p>所以接下來的問題就變成「什麼是可呼叫的型態」了，定義如下：</p>
+<blockquote>
+<p>可呼叫型態指的是 function object type 或是一個資料成員的指標 ( <a href = "https://timsong-cpp.github.io/cppwp/n4868/func.def#3" class = "pinklink">20.14.3-3</a> )</p>
+</blockquote>
+<p>這樣答案就很明顯了，<code>&amp;Foo::num_</code> 是個資料成員指標，代表他是可呼叫的物件，因此可以拿來初始化 <code>std::function</code>。</p>
+<p>至於 function object type 指的則是一種在 function call 內可以是後序表達式(<a href = "https://timsong-cpp.github.io/cppwp/n4868/expr.post.general#nt:postfix-expression" class = "pinklink">postfix-expression</a>) 的物件型態，至於什麼是後序表達式這邊就先不介紹了，再寫下去會有點偏題。</p>
+<p>那麼既然知道了什麼是 function object type，那麼 function object 很直覺的就是那些型態是 function object type 的物件了。</p>
+<p>簡單來說，可呼叫物件(collable object) 的意思就是某個有明確定義動作的物件，對 function object 來說就是透過 <code>()</code> 來呼叫的相對應的物件，對函式指標來說就是呼叫相對應的函式，對成員指標來說就是拜訪相對應的成員。</p>
+<p>複雜的定義大概就這樣，那麼 <code>std::function</code> 的使用時機在前言的地方也提到了，<code>std::function</code> 主要就是為了泛用性，消除型態上面的差異而出現的東西。 代價也不大，<code>std::function</code> 並不肥，能使用的話就盡量使用吧。</p>
+<h2 id="相關函式"><a href="#相關函式" class="headerlink" title="相關函式"></a>相關函式</h2><p>在 C++17、C++20 時有部分的相關函式被刪除了，那些被刪除的函式本篇就不介紹了，主要介紹那些仍可使用的，有興趣的可以到 cppreference 上看。</p>
+<p>這邊的內容除了怎麼使用以外可能也會扯到內部的結構，</p>
+<p>接下來的 <code>fn</code> 代表某個 <code>std::function</code> 的 instance，簡單來說就是 <code>std::function&lt;void()&gt; fn = 某個 callable object</code> 這樣，只是一個代稱方便大家理解。</p>
+<ul>
+<li><p>建構子</p>
+<p>  基本上內部寫好的建構子有五個，加上最新的 <a href = "https://cplusplus.github.io/LWG/issue2774" class = "pinklink">Defect Report(C++23)</a> 內提出的方法有六個 </p>
+<p>  1、2：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">function</span>() <span class="keyword">noexcept</span>;    <span class="comment">// 1</span></span><br><span class="line"><span class="built_in">function</span>( std::<span class="type">nullptr_t</span> ) <span class="keyword">noexcept</span>;    <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p>  上面這兩個(1、2) 會建構出空的 <code>std::function</code></p>
+<p>  3、4：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">function</span>( <span class="type">const</span> function&amp; other );    <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">function</span>( function&amp;&amp; other ) <span class="keyword">noexcept</span>;    <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+<p>  上面這兩個(3、4) 會將 other 的 target 複製(3) 或移動(4) 到 <code>*this</code>。 簡單來說就是把對象包裝起來的東西移動或複製到自己身上。如果 other 是空的，<code>*this</code> 也會是空的。 </p>
+<p>  另外，移動(4) 後的 other 會處於有效但未指定的狀態。</p>
+<p>  5：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> F &gt;</span></span><br><span class="line"><span class="function"><span class="title">function</span><span class="params">( F f )</span></span>;    <span class="comment">// 5</span></span><br></pre></td></tr></table></figure>
+
+<p>  前面的 4 個都是用 <code>std::function</code> 來初始化，這個可以說是最常用的了，這個建構子也是 <code>std::function</code> 可以做到高泛用性的原因。</p>
+<p>  基本上就是用我們給的東西來初始化內部的 target，如果想看內部的實作可以直接往下拉到內部概念那邊看，因為這扯到整個結構的問題。</p>
+<p>  不過要注意的是如果 <code>std::function</code> 的回傳型態是個繫結到某個沒有 trailing-return-type 的 lambda 所回傳的 reference type，由於 auto deduction 的關係，這種 lambda 回傳的型態一定會是個 prvalue，因此 <code>std::function</code> 的回傳型態的 reference 會繫結到一個暫時物件，但這個暫時物件的生命週期會在 <code>std::function::operator()</code> 回傳時結束，因此會變一個懸掛的 reference(dangling reference)。</p>
+<p>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::function&lt;<span class="type">const</span> <span class="type">int</span>&amp;<span class="params">()</span>&gt; <span class="title">F</span><span class="params">([]&#123; <span class="keyword">return</span> <span class="number">42</span>; &#125;)</span></span>;</span><br><span class="line"><span class="type">int</span> x = <span class="built_in">F</span>(); <span class="comment">// Undefined behavior: the result of F() is a dangling reference</span></span><br></pre></td></tr></table></figure>
+
+<p>  6：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> F &gt;</span></span><br><span class="line"><span class="function"><span class="title">function</span><span class="params">( F&amp;&amp; f )</span></span>;    <span class="comment">// 6</span></span><br></pre></td></tr></table></figure>
+
+<p>  最後這個是最近更新的，還不在標準裡面，但有在 <a href = "https://eel.is/c++draft/func.wrap.func#lib:function,constructor____" class = "pinklink">C++23 的草案</a>裡面，如果想看舊版的規範可以到<a href = "https://timsong-cpp.github.io/cppwp/n4868/func.wrap.func.con#lib:function,constructor____" class = "pinklink">這裡</a>看，另外裡面還有對編譯器實作的建議、Postconditions 和 Preconditions 等等，有興趣的也可以進來看。</p>
+<p>  具體上的原因可以到 <a href = "https://cplusplus.github.io/LWG/issue2774" class = "pinklink">Defect Report(C++23)</a> 看，簡單來說就是 <code>operator=</code> 吃的是 <code>F&amp;&amp; f</code>，而如果 constructor 用複製的會有一些 Value Categories 上的影響。</p>
+<p>  在新版的實作內，我們會利用 <code>std::forward&lt;F&gt;(f)</code> 來初始化 target，target 的型態會是 <code>std::decay&lt;F&gt;::type</code>。</p>
+<p>  如果 <code>f</code> 是個 null 的 function pointer、member pointer 或一個由 <code>std::function</code> 特化的空值，那麼 <code>*this</code> 會是一個空的 <code>std::function</code>。</p>
+<p>  這個 constructor 不會參加多載解析(<a href = "https://en.cppreference.com/w/cpp/language/overload_resolution" class = "pinklink">Overload resolution</a>)，除非 target 的 type 不是 <code>std::function</code>，而且對於那些參數的型態 Args… 來說，它的 lvalue 是可呼叫的而且回傳的型態 R 也是可呼叫的型態。</p>
+<p>  如果 target 的 type 不能複製，或者初始化的格式不對，那麼這是個 ill-formed。</p>
+</li>
+<li><p>解構子</p>
+<p>  destructor 就相對沒那麼複雜了，但要注意一下解構的時候的時候會連 target 一起解構。</p>
+</li>
+<li><p>operator&#x3D;</p>
+<p>  基本上內部寫好的有五個</p>
+<p>  1：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function&amp; <span class="keyword">operator</span>= ( <span class="type">const</span> function&amp; other );</span><br></pre></td></tr></table></figure>
+
+<p>  上面這個會 copy other 的 target 到 <code>*this</code> 的 target。</p>
+<p>  2：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function&amp; <span class="keyword">operator</span>=( function&amp;&amp; other );</span><br></pre></td></tr></table></figure>
+
+<p>  上面這個會移動 other 的 target 到 <code>*this</code> 的 target，此時 other 會處於未定義的有效狀態。</p>
+<p>  3:</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function&amp; <span class="keyword">operator</span>=( std::<span class="type">nullptr_t</span> ) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p>  上面這個會把目前的 target 解構，讓 <code>*this</code> 回復為空。</p>
+<p>  4：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt; <span class="keyword">class</span> <span class="title class_">F</span> &gt;</span><br><span class="line">function&amp; <span class="keyword">operator</span>=( F&amp;&amp; f );</span><br></pre></td></tr></table></figure>
+
+<p>  上面這個將會把 <code>*this</code> 的 target 設為可呼叫的 f。</p>
+<p>  除非 f 對於參數的類型 Args… 和回傳的型態 R 是可呼叫的，不然這個運算符不會執行 Overload Resolution。</p>
+<p>  5：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt; <span class="keyword">class</span> <span class="title class_">F</span> &gt;</span><br><span class="line">function&amp; <span class="keyword">operator</span>=( std::reference_wrapper&lt;F&gt; f ) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p>  上面這個會把 f 的 target 複製給 <code>*this</code> 的 target。</p>
+</li>
+<li><p>operator bool</p>
+<p>  <code>std::function</code> 的 operator bool 會檢查 <code>*this</code> 的 target 是否為空，如果非空就回傳 true，如果是空的就回傳 false。</p>
+<p>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">checkFunc</span><span class="params">( std::function&lt;<span class="type">void</span>()&gt; &amp;func )</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 利用 operator bool 來確認 std::function 是否為空。</span></span><br><span class="line">    <span class="keyword">if</span> ( func ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Function is not empty!\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Function is empty. Nothing to do.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; f1;</span><br><span class="line">    <span class="function">std::function&lt;<span class="title">void</span><span class="params">()</span>&gt; <span class="title">f2</span><span class="params">( sampleFunction )</span></span>;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;f1: &quot;</span>;</span><br><span class="line">    <span class="built_in">checkFunc</span>( f1 );    <span class="comment">// std::function 為空，進入 else</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;f2: &quot;</span>;</span><br><span class="line">    <span class="built_in">checkFunc</span>( f2 );    <span class="comment">// std::function 非空，進入 if</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>operator()</p>
+<blockquote>
+<p>R operator()( Args… args ) const;</p>
+</blockquote>
+<p>  <code>std::function</code> 的 operator() 會傳入參數，呼叫儲存的 callable object。</p>
+<p>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call</span><span class="params">( std::function&lt;<span class="type">int</span>()&gt; f )</span>    <span class="comment">// std::function 可以 passed by value</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">f</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">normal_function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">42</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">1</span>;</span><br><span class="line">    std::function&lt;<span class="type">int</span>()&gt; f = [&amp;n]() &#123; <span class="keyword">return</span> n; &#125;;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">    n = <span class="number">2</span>;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">    f = normal_function;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>swap<br>  語法： <code>fn.swap(目標)</code><br>  作用： 交換所存的 callable object<br>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;fn 1\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;fn 2\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; s1&#123; fn1 &#125;;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; s2&#123; fn2 &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn1 \n fn2</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;&quot;</span> ), s1.<span class="built_in">swap</span>( s2 );</span><br><span class="line"></span><br><span class="line">    <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn2 \n fn1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>target_type</p>
+<blockquote>
+<p>const std::type_info&amp; target_type() const noexcept;</p>
+</blockquote>
+<p>  回傳儲存的 target 的 <code>typeid</code></p>
+<p>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123; <span class="keyword">return</span> -a; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">g</span><span class="params">( <span class="type">double</span> )</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// fn1 and fn2 have the same type, but their targets do not</span></span><br><span class="line">    <span class="function">std::function&lt;<span class="title">int</span><span class="params">( <span class="type">int</span> )</span>&gt; <span class="title">fn1</span><span class="params">( f )</span>,</span></span><br><span class="line"><span class="function">                              <span class="title">fn2</span><span class="params">( []( <span class="type">int</span> a ) &#123; <span class="keyword">return</span> -a; &#125; )</span></span>;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; fn1.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>    <span class="comment">// PFiiE</span></span><br><span class="line">              &lt;&lt; fn2.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// Z4mainEUliE_</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// since C++17 deduction guides (CTAD) can avail</span></span><br><span class="line">    std::cout &lt;&lt; std::function&#123; g &#125;.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// PFvdE</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>target</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> T &gt;</span></span><br><span class="line"><span class="function">T* <span class="title">target</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;    <span class="comment">// (1)</span></span><br><span class="line"><span class="comment">//----------------------------------//</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> T &gt;</span></span><br><span class="line"><span class="function"><span class="type">const</span> T* <span class="title">target</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span>    <span class="comment">// (2)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>  如果 <code>target_type() == typeid(T)</code>，回傳一個指向儲存的 target 的 pointer，否則回傳一個 null pointer。</p>
+<p>  例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;calling f&quot;</span> );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">g</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;calling g&quot;</span> );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="built_in">puts</span>( <span class="string">&quot;calling ssample Function&quot;</span> );</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">( <span class="type">const</span> std::function&lt;<span class="type">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt; &amp;arg )</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;test function: &quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> ( arg.target&lt;std::plus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is plus\n&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> ( arg.target&lt;std::minus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is minus\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">int</span> ( *<span class="type">const</span> *ptr )( <span class="type">int</span>, <span class="type">int</span> ) = arg.<span class="built_in">target</span>&lt;<span class="built_in">int</span> ( * )( <span class="type">int</span>, <span class="type">int</span> )&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == f ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is the function f\n&quot;</span>;</span><br><span class="line">        ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == g ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is the function g\n&quot;</span>;</span><br><span class="line">        ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">plus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">minus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( f ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( g ) );</span><br><span class="line"></span><br><span class="line">       std::function&lt;<span class="type">void</span>()&gt; fn = sampleFunction;</span><br><span class="line"></span><br><span class="line">       <span class="built_in">void</span> ( **fn_ptr )() = fn.<span class="built_in">target</span>&lt;<span class="built_in">void</span> ( * )()&gt;();</span><br><span class="line">       ( *fn_ptr )();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="Deduction-Guides-模板推導指引"><a href="#Deduction-Guides-模板推導指引" class="headerlink" title="Deduction Guides 模板推導指引"></a>Deduction Guides 模板推導指引</h2><p>在 C++17 時有個叫 CTAD 的東西出現了，不知道的朋友可以先到 <a href = "https://en.cppreference.com/w/cpp/language/class_template_argument_deduction" class = "pinklink">cppreference</a> 上看，或看一下 <a href = "https://tjsw.medium.com/%E6%BD%AE-c-17-class-template-argument-deduction-%E5%92%8C-deduction-guide-%E9%A1%9E%E5%88%A5%E6%A8%A3%E7%89%88%E5%8F%83%E6%95%B8%E6%8E%A8%E5%B0%8E-70cc36307a42" class = "pinklink">TSJW的文章</a>。</p>
+<p>簡單來說就是讓模板自己推定型態的技術，舉個例子：<code>std::vector&lt;int&gt; vec = &#123;5&#125;;</code> 可以寫成 <code>std::vector vec = &#123;5&#125;;</code> 這樣，int 可以由編譯器推導出來。雖然看起來好像很簡單，但後面牽扯到的東西挺多的，像是自訂的型態等等，這邊不討論太多，因為不是今天的主題</p>
+<p>那麼 <code>std::function</code> 自然也會有這個技術了，畢竟也是一個通過模板來實現的東西。</p>
+<p>內部有兩個定義：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> R, <span class="keyword">class</span>... ArgTypes&gt;</span></span><br><span class="line"><span class="function"><span class="title">function</span><span class="params">(R(*)(ArgTypes...))</span> -&gt; function&lt;<span class="title">R</span><span class="params">(ArgTypes...)</span>&gt;</span>;    <span class="comment">// (1)</span></span><br></pre></td></tr></table></figure>
+
+<p>上面這個讓 <code>std::function</code> 可以自動推斷出一般函式的型態。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> F&gt;</span></span><br><span class="line"><span class="function"><span class="title">function</span><span class="params">(F)</span> -&gt; function&lt;<span class="comment">/*see below*/</span>&gt;</span>;    <span class="comment">// (2)</span></span><br></pre></td></tr></table></figure>
+
+<p>而第二個這個，只有當 <code>&amp;F::operator()</code> 不是拿來當計算的操作數，語法合法，且 <code>decltype(&amp;F::operator())</code> 的形式是 <code>R(G::*)(A...)</code> (可有 cv限定詞、noexcept、lvalue reference)，用於某些 class type G 時，會進入 Overload Resolution。</p>
+<p>看起來很複雜，但簡單來說就是 <code>decltype(&amp;F::operator())</code> 是有效的，此時的型態會被推導為 <code>std::function&lt;R(A...)&gt;</code>。</p>
+<p>例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">( <span class="type">double</span> )</span> </span>&#123; <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::function f&#123; func &#125;;    <span class="comment">// 利用第一個規則推導出 std::function&lt;int(double)&gt;</span></span><br><span class="line">    <span class="type">int</span> i = <span class="number">5</span>;</span><br><span class="line">    std::function g = [&amp;]( <span class="type">double</span> ) &#123; <span class="keyword">return</span> i; &#125;;    <span class="comment">// 利用第二個規則推導出 std::function&lt;int(double)&gt;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不過未來這個 Deduction Guides 可能還會改變，尤其是在 <code>std::function</code> 支援 <code>noexcept</code> 之後。</p>
+<h1 id="內部概念"><a href="#內部概念" class="headerlink" title="內部概念"></a>內部概念</h1><p>內部概念我大概會講一下架構，然後帶大家看一下 GCC 上的優化與 code。</p>
+<p>接下來的內容主要參考了 Raymond 的兩篇文章、 Stackoverflow 上的講解與 jerrt_fuyi 的文章：<a href = "https://devblogs.microsoft.com/oldnewthing/20200513-00/?p=103745" class = "pinklink">連結 1</a>、<a href = "https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749" class = "pinklink">連結 2</a>、<a href = "https://stackoverflow.com/questions/18453145/how-is-stdfunction-implemented" class = "pinklink">連結 3</a>、<a href = "https://www.cnblogs.com/jerry-fuyi/p/std_function_interface_implementation.html" class = "pinklink">連結 4</a>，有興趣的可以進去看看原文。</p>
+<h2 id="架構"><a href="#架構" class="headerlink" title="架構"></a>架構</h2><p>我們的目的是消除型態，雖然有很多不同的方法能達到這個目的，但概念上的架構上主要會有一個可呼叫物件的基類，之後利用模板，由這個基類衍生出不同的可呼叫物件的實例，之後 <code>std::function</code> 再去存取這個實例的指標，大概會像這樣：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">callable_base</span> &#123;</span><br><span class="line">    <span class="built_in">callable_base</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">callable_base</span>() &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">invoke</span><span class="params">( <span class="type">int</span>, <span class="type">char</span> * )</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::unique_ptr&lt;callable_base&gt; <span class="title">clone</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">callable</span> : callable_base &#123;</span><br><span class="line">    T <span class="type">m_t</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">callable</span>( T <span class="type">const</span> &amp;t ) : <span class="built_in">m_t</span>( t ) &#123;&#125;</span><br><span class="line">    <span class="built_in">callable</span>( T &amp;&amp;t ) : <span class="built_in">m_t</span>( <span class="built_in">move</span>( t ) ) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">invoke</span><span class="params">( <span class="type">int</span> a, <span class="type">char</span> *b )</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">m_t</span>( a, b );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::unique_ptr&lt;callable_base&gt; <span class="title">clone</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">make_unique</span>&lt;callable&gt;( <span class="type">m_t</span> );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">function</span> &#123;</span><br><span class="line">    std::unique_ptr&lt;callable_base&gt; m_callable;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="built_in">function</span>( T &amp;&amp;t ) : <span class="built_in">m_callable</span>( <span class="keyword">new</span> callable&lt;<span class="type">decay_t</span>&lt;T&gt;&gt;( forward&lt;T&gt;( t ) ) ) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">function</span>( <span class="type">const</span> function &amp;other ) : <span class="built_in">m_callable</span>( other.m_callable ? other.m_callable-&gt;<span class="built_in">clone</span>() : <span class="literal">nullptr</span> ) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">function</span>( function &amp;&amp;other ) = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">( <span class="type">int</span> a, <span class="type">char</span> *b )</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> m_callable-&gt;<span class="built_in">invoke</span>( a, b );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這只是一個簡單的偽代碼，可能無法編譯，<code>callable_base</code> 提供了解構、呼叫、複製等動作的介面，再由各種可呼叫物件自行去實作。</p>
+<p>在上面使用了 <code>unique_ptr</code>，這會讓複製建構子有些難做，因為 <code>unique_ptr</code> 無法複製，因此在實作上通常會使用原生的指標，並自行管理資源的分配，比較複雜，但也比較方便我們優化。</p>
+<p>可以看看另一個人幫忙做的簡化版本，這是 <a href = "https://stackoverflow.com/questions/18453145/how-is-stdfunction-implemented" class = "pinklink">StackOverflow</a> 上有人做的，他簡化的是 Ubuntu 14.04 gcc 4.8 上的 <code>std::function</code>，這邊他選擇將 <code>callable_base</code> 那些繼承的東西給簡化掉了，比較注重在內部消除型態的實現上，我幫忙整理了一下並加上了一些註解：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">function</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span>... Args&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">function</span>&lt;<span class="built_in">R</span>( Args... )&gt; &#123;</span><br><span class="line">    <span class="comment">// 這些 function pointer type 是拿來消除型態的，下面這些 void* 都是從某種 function type 轉過來的</span></span><br><span class="line">    <span class="keyword">using</span> <span class="type">invoke_fn_t</span> = <span class="built_in">R</span> ( * )( <span class="type">void</span> *, Args &amp;&amp;... );    <span class="comment">//拿來呼叫的函式指標</span></span><br><span class="line">    <span class="keyword">using</span> <span class="type">construct_fn_t</span> = <span class="built_in">void</span> ( * )( <span class="type">void</span> *, <span class="type">void</span> * );    <span class="comment">//建構子的函式指標</span></span><br><span class="line">    <span class="keyword">using</span> <span class="type">destroy_fn_t</span> = <span class="built_in">void</span> ( * )( <span class="type">void</span> * );    <span class="comment">//解構子的函式指標</span></span><br><span class="line">    <span class="keyword">using</span> fn_ptr = <span class="built_in">void</span> ( * )();    <span class="comment">//普通的函式指標</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 因為有些 callable 物件無法直接被轉換成 function pointer，像是有捕捉東西的 lambda，所以我們需要一個泛型的函式幫助我們將其轉換成指標並呼叫。</span></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Functor&gt;</span><br><span class="line">    <span class="function"><span class="type">static</span> R <span class="title">invoke_fn</span><span class="params">( Functor *fn, Args &amp;&amp;...args )</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ( *fn )( std::forward&lt;Args&gt;( args )... );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Functor&gt;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">construct_fn</span><span class="params">( Functor *construct_dst, Functor *construct_src )</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Functor type 需要是用複製建構的，這個是 Placement new，沒看過的可以去看一下用法。</span></span><br><span class="line">        <span class="keyword">new</span> ( construct_dst ) <span class="built_in">Functor</span>( *construct_src );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Functor&gt;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">destroy_fn</span><span class="params">( Functor *f )</span> </span>&#123;</span><br><span class="line">        f-&gt;~<span class="built_in">Functor</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 這些 pointer 拿來儲存行為</span></span><br><span class="line">    <span class="type">invoke_fn_t</span> invoke_f;    <span class="comment">// 儲存呼叫韓式的指標</span></span><br><span class="line">    <span class="type">construct_fn_t</span> construct_f;    <span class="comment">// 儲存建構子的函式指標</span></span><br><span class="line">    <span class="type">destroy_fn_t</span> destroy_f;    <span class="comment">// 儲存解構子的函式指標</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 這邊要把 Functor 的型態消除，並將它存到 void*。 因此我們也要能夠拿到儲存的空間。</span></span><br><span class="line">    std::unique_ptr&lt;fn_ptr[]&gt; data_ptr;    <span class="comment">// 「 函式指標的陣列 」的 unique_ptr</span></span><br><span class="line">    std::<span class="type">size_t</span> data_size;    <span class="comment">// 能夠儲存的空間</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 空的 function</span></span><br><span class="line">    <span class="built_in">function</span>()</span><br><span class="line">        : <span class="built_in">invoke_f</span>( <span class="literal">nullptr</span> ), <span class="built_in">construct_f</span>( <span class="literal">nullptr</span> ), <span class="built_in">destroy_f</span>( <span class="literal">nullptr</span> ), <span class="built_in">data_ptr</span>( <span class="literal">nullptr</span> ), <span class="built_in">data_size</span>( <span class="number">0</span> ) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 從任何的 Functor 來建構的 function</span></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Functor&gt;</span><br><span class="line">    <span class="built_in">function</span>( Functor f )</span><br><span class="line">        <span class="comment">// 特化 function 並利用轉型消除它的型態</span></span><br><span class="line">        : <span class="built_in">invoke_f</span>( <span class="built_in">reinterpret_cast</span>&lt;<span class="type">invoke_fn_t</span>&gt;( invoke_fn&lt;Functor&gt; ) ),    <span class="comment">// 初始化呼叫指標</span></span><br><span class="line">          <span class="built_in">construct_f</span>( <span class="built_in">reinterpret_cast</span>&lt;<span class="type">construct_fn_t</span>&gt;( construct_fn&lt;Functor&gt; ) ),    <span class="comment">// 初始化建構指標</span></span><br><span class="line">          <span class="built_in">destroy_f</span>( <span class="built_in">reinterpret_cast</span>&lt;<span class="type">destroy_fn_t</span>&gt;( destroy_fn&lt;Functor&gt; ) ),    <span class="comment">// 初始化解構指標</span></span><br><span class="line">          <span class="built_in">data_ptr</span>( <span class="keyword">new</span> fn_ptr[<span class="built_in">sizeof</span>( Functor )] ),    <span class="comment">// 初始化資料陣列的指標</span></span><br><span class="line">          <span class="built_in">data_size</span>( <span class="built_in">sizeof</span>( Functor ) ) &#123;    <span class="comment">// 初始化儲存空間的大小</span></span><br><span class="line">        <span class="comment">// 複製 functor 到內部拿來儲存行為的指標</span></span><br><span class="line">        <span class="keyword">this</span>-&gt;<span class="built_in">construct_f</span>( <span class="keyword">this</span>-&gt;data_ptr.<span class="built_in">get</span>(), <span class="built_in">reinterpret_cast</span>&lt;<span class="type">void</span> *&gt;( &amp;f ) );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 複製建構子</span></span><br><span class="line">    <span class="built_in">function</span>( function <span class="type">const</span> &amp;rhs )</span><br><span class="line">        : <span class="built_in">invoke_f</span>( rhs.invoke_f ), <span class="built_in">construct_f</span>( rhs.construct_f ), <span class="built_in">destroy_f</span>( rhs.destroy_f ), <span class="built_in">data_size</span>( rhs.data_size ) &#123;</span><br><span class="line">        <span class="keyword">if</span> ( <span class="keyword">this</span>-&gt;invoke_f ) &#123;</span><br><span class="line">            <span class="comment">//如果 target 非空，那就複製 target。</span></span><br><span class="line">            <span class="keyword">this</span>-&gt;data_ptr.<span class="built_in">reset</span>( <span class="keyword">new</span> fn_ptr[<span class="keyword">this</span>-&gt;data_size] );</span><br><span class="line">            <span class="keyword">this</span>-&gt;<span class="built_in">construct_f</span>( <span class="keyword">this</span>-&gt;data_ptr.<span class="built_in">get</span>(), rhs.data_ptr.<span class="built_in">get</span>() );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">function</span>() &#123;</span><br><span class="line">        <span class="keyword">if</span> ( data_ptr != <span class="literal">nullptr</span> ) &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;<span class="built_in">destroy_f</span>( <span class="keyword">this</span>-&gt;data_ptr.<span class="built_in">get</span>() );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 拿來呼叫的運算子</span></span><br><span class="line">    <span class="function">R <span class="title">operator</span><span class="params">()</span><span class="params">( Args &amp;&amp;...args )</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>-&gt;<span class="built_in">invoke_f</span>( <span class="keyword">this</span>-&gt;data_ptr.<span class="built_in">get</span>(), std::forward&lt;Args&gt;( args )... );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// examples</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">auto</span> fn = [i]( <span class="type">const</span> std::string &amp;s ) <span class="keyword">mutable</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; ++i &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; s &lt;&lt; std::endl;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="built_in">fn</span>( <span class="string">&quot;first&quot;</span> );    <span class="comment">// 1. first</span></span><br><span class="line">    <span class="built_in">fn</span>( <span class="string">&quot;second&quot;</span> );    <span class="comment">// 2. second</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用 lambda 建構</span></span><br><span class="line">    ::<span class="function">function&lt;<span class="title">void</span><span class="params">( <span class="type">const</span> std::string &amp; )</span>&gt; <span class="title">f</span><span class="params">( fn )</span></span>;</span><br><span class="line">    <span class="built_in">f</span>( <span class="string">&quot;third&quot;</span> );    <span class="comment">// 3. third</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用別的 function 來建構</span></span><br><span class="line">    ::<span class="function">function&lt;<span class="title">void</span><span class="params">( <span class="type">const</span> std::string &amp; )</span>&gt; <span class="title">g</span><span class="params">( f )</span></span>;</span><br><span class="line">    <span class="built_in">f</span>( <span class="string">&quot;forth - f&quot;</span> );    <span class="comment">// 4. forth - f</span></span><br><span class="line">    <span class="built_in">g</span>( <span class="string">&quot;forth - g&quot;</span> );    <span class="comment">// 4. forth - g</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用有捕捉一個 std::string 的 lambda 建構</span></span><br><span class="line">    <span class="function">std::string <span class="title">x</span><span class="params">( <span class="string">&quot;xxxx&quot;</span> )</span></span>;</span><br><span class="line">    ::<span class="function">function&lt;<span class="title">void</span><span class="params">()</span>&gt; <span class="title">h</span><span class="params">( [x]() &#123; std::cout &lt;&lt; x &lt;&lt; std::endl; &#125; )</span></span>;</span><br><span class="line">    <span class="built_in">h</span>();</span><br><span class="line"></span><br><span class="line">    ::<span class="function">function&lt;<span class="title">void</span><span class="params">()</span>&gt; <span class="title">k</span><span class="params">( h )</span></span>;</span><br><span class="line">    <span class="built_in">k</span>();</span><br><span class="line"></span><br><span class="line">    ::function&lt;<span class="type">int</span>()&gt; ifn = []() &#123; <span class="keyword">return</span> <span class="number">5</span>; &#125;;</span><br><span class="line">    <span class="type">int</span> xx = ifn();</span><br><span class="line">    std::cout &lt;&lt; xx;    <span class="comment">// 5</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>雖然因為簡化的關係和 gcc 裡面寫的已經有點不太一樣了，但主要的核心概念仍一樣，就是透過模板來消除型態。</p>
+<h2 id="內部實作與優化"><a href="#內部實作與優化" class="headerlink" title="內部實作與優化 "></a>內部實作與優化 <img src="https://walfiegif.files.wordpress.com/2021/02/out-transparent-3.gif?w=875"  width="50"></h2><h3 id="前言-1"><a href="#前言-1" class="headerlink" title="前言"></a>前言</h3><p>接下來的內容有很多地方都來自 <a href = "https://www.cnblogs.com/jerry-fuyi/p/std_function_interface_implementation.html" class = "pinklink">jerry_fuyi</a> 的文章，基本上是引用過來，改寫一些部分，自己讀了很久，希望多加一些解釋，抓一些重點出來後，大家能更容易理解，如果看不習慣我的也很建議回去讀讀原文，因為真的寫得蠻好蠻詳細的。</p>
+<p>而如果你已經看得很累了，那麼可以去休息一下，因為接下來的內容會比較生硬 XD</p>
+<p>看完了前面約略的概念後各位可能覺得這個東西就這樣了，其實沒那麼簡單，還有很多隱藏的問題(雖然前面可能先講了答案XD，但大家可能沒想過會有這些問題)，例如，函式不是一個固定大小的對象，但 class 是，我們用 class 來包裝不同的函式，卻要有相同的大小，不會有問題嗎? 還有其他很多的小問題，導致這個東西一直到 C++23 都還拿出來被討論，前面的建構子就是其中一項，有些東西可能會牽扯到 ABI Break，蠻複雜的。</p>
+<h3 id="實作前的想法"><a href="#實作前的想法" class="headerlink" title="實作前的想法"></a>實作前的想法</h3><p><code>std::function</code> 能儲存不同的可呼叫物件，表示有多態性，這我們前面使用了 virtual function 與繼承解決了，這是個簡單、直覺且有效的方法，但這個方法會用到動態內存，很多情況下這是種浪費，像是一個沒捕捉東西的 lambda，這種情況下他只有一個 char 的大小，但我們卻為了它去呼叫了分配動態內存的函式。</p>
+<p>於是我們就需要想辦法避免這種浪費，剛剛說了 <code>std::function</code> 的大小是固定的，但是這個大小是可以讓我們自己定的，所以我們可以在 <code>std::function</code> 裡面放一個空白且大小適中的 field 來存這種小對象，來避免呼叫到動態內存。</p>
+<p>而對於更大的可呼叫物件，雖然放不進這個 field，但可以放這個可呼叫物件的指標，這種 TDM 的結構可以用 union 來做。</p>
+<p>這種小物件直接儲存，大對象才放在 heap 上並儲存指標的方法叫做 <span class = "yellow">small object optimization</span>。</p>
+<p>在利用了繼承的實作中，可呼叫物件被包裝在一個子類裡面，<code>std::function</code> 會持有一個其父類的指標，但為了效率，我們需要把剛剛那個空白的 field 與這個指針用 union 包裝起來。</p>
+<p>既然用了 union，在不確定這個 union 存的是什麼之前，當然不能去呼叫裡面的東西，因此這樣的設計我們就不能使用繼承來去消除型態了。</p>
+<p>於是我們需要想其他的方法來達成多態性，而這邊大家可以想一下 virtual function 是怎麼實現的，有 virtual function 的 class 裡面會有個 vptr，指向一個 vtable，這個 vtable 有很多個 slot，裡面有指向 type_info 對象的指標和函式指標。</p>
+<p>發現了嗎? 就是函式指標，函式指標也是一個能幫助我們實現多態性的東西，如果你是想在 C 裡面實現多態，比較方便的方法也是在 struct 內直接放 function pointer，因此我們主要會使用 function pointer 來實作。</p>
+<h3 id="開始實作"><a href="#開始實作" class="headerlink" title="開始實作"></a>開始實作</h3><p>基本上 <code>std::function</code> 是個模板類，模板參數就是一個 type，注意是一個 type，不是好幾種 type，以這個例子來說：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::function&lt;<span class="type">int</span>(<span class="type">double</span>)&gt; f;</span><br></pre></td></tr></table></figure>
+
+<p><code>f</code> 是一個可以呼叫的對象，參數吃一個 <code>double</code>，回傳一個 <code>int</code>。 你可能會覺得奇怪，這邊這樣不就有兩個 type 了嗎? 怎麼還說是一個 type，其實 <code>int(double)</code> 自己就是一個 type，它是一種 function type，但要注意不是 function pointer。</p>
+<p>接下來我會帶大家看一下 gcc 的實作 (待補，被高微殘害中QQ)</p>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><p><strong><a href = "https://en.cppreference.com/w/cpp/utility/functional/function" class = "redlink">1. std::function</a> (cppreference) (文章部分來源)</strong></p>
+<p><strong><a href = "https://timsong-cpp.github.io/cppwp/n4868/expr.post.general#nt:postfix-expression" class = "redlink">2. Expressions</a></strong></p>
+<p><strong><a href = "https://timsong-cpp.github.io/cppwp/n4868/function.objects#def:function_object,type" class = "redlink">3. General utilities library</a></strong></p>
+<p><strong><a href = "https://timsong-cpp.github.io/cppwp/n4868/func.def" class = "redlink">4. Function Definitions</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/18453145/how-is-stdfunction-implemented" class = "redlink">5. How is std::function implemented?<br></a></strong></p>
+<p><strong><a href = "https://devblogs.microsoft.com/oldnewthing/20200513-00/?p=103745" class = "redlink">6. Inside std::function, part 1: The basic idea</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/1174169/function-passed-as-template-argument" class = "redlink">7. Function passed as template argument</a></strong></p>
+<p><strong><a href = "https://dev.to/lesleylai/what-is-std-function-in-c-and-why-we-need-them-48d0" class = "redlink">8. What is std::function in C++, and why we need them?</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/25848690/should-i-use-stdfunction-or-a-function-pointer-in-c" class = "redlink">9. Should I use std::function or a function pointer in C++?</a></strong></p>
+<p><strong><a href = "https://www.796t.com/article.php?id=14448" class = "redlink">10. C++ 11 std::function和std::bind使用詳解</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/35303332/what-are-preconditions-and-postconditions" class = "redlink">11. What are preconditions and postconditions?</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/overload_resolution" class = "redlink">12. Overload resolution</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/class_template_argument_deduction" class = "redlink">13. Class template argument deduction (CTAD)</a></strong></p>
+<p><strong><a href = "https://tjsw.medium.com/%E6%BD%AE-c-17-class-template-argument-deduction-%E5%92%8C-deduction-guide-%E9%A1%9E%E5%88%A5%E6%A8%A3%E7%89%88%E5%8F%83%E6%95%B8%E6%8E%A8%E5%B0%8E-70cc36307a42" class = "redlink">14. 潮．C++17 | Class Template Argument Deduction 和 Deduction Guide 類別樣版參數推導</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/22180312/difference-between-undefined-behavior-and-ill-formed-no-diagnostic-message-requ" class = "redlink">15. Difference between Undefined Behavior and Ill-formed, no diagnostic message required</a></strong></p>
+<p><strong><a href = "https://iter01.com/553394.html" class = "redlink">16. C++ typeid關鍵字詳解</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/17183761/c11-type-deduction-with-stdfunction" class = "redlink">17. C++11 Type Deduction With std::function</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/12405102/template-argument-type-deduction-from-stdfunction-return-type-with-lambda" class = "redlink">18. template argument type deduction from std::function return type with lambda</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/5712826/argument-type-auto-deduction-and-anonymous-lambda-functions" class = "redlink">19. Argument type auto deduction and anonymous lambda functions</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/42773202/type-deduction-for-stdfunction/42773516" class = "redlink">20. Type deduction for std::function</a></strong></p>
+<p><strong><a href = "https://www.cnblogs.com/jerry-fuyi/p/std_function_interface_implementation.html" class = "redlink">21. 剖析STD::FUNCTION接口与实现</a></strong> (文章部分來源)</p>
+<p><strong><a href = "https://stackoverflow.com/questions/4736044/checking-invariants-in-c" class = "redlink">22. checking invariants in C++</a></strong></p>
+<p><strong><a href = "https://advancedcppwithexamples.blogspot.com/2009/07/example-of-c-class-invariant.html" class = "redlink">23. Example of C++ class invariant</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/14302834/when-to-make-a-type-non-movable-in-c11" class = "redlink">24. When to make a type non-movable in C++11?</a></strong></p>
+<p><strong><a href = "http://llllkkkk.github.io/2014/04/26/-stdfunction-/" class = "redlink">25. 简析 std::function 实现原理</a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink"></a></strong></p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">June 12th 2021, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="../../../../../../../2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/" title="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置">
+                    <div class="nextTitle">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="../../../../../../05/14/Cpp-Miner/README/" title="礦坑系列 ── 序">
+                    <div class="prevTitle">礦坑系列 ── 序</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> 礦坑系列 ── std::function </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A6%81%E6%9C%89-std-function"><span class="toc-number">2.1.</span> <span class="toc-text">為什麼要有 std::function?</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AA%9E%E6%B3%95%E8%88%87%E7%9B%B8%E9%97%9C%E5%87%BD%E5%BC%8F"><span class="toc-number">3.</span> <span class="toc-text">語法與相關函式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%9E%E6%B3%95%E8%88%87%E9%87%8D%E8%A6%81%E5%AE%9A%E7%BE%A9"><span class="toc-number">3.1.</span> <span class="toc-text">語法與重要定義</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E5%87%BD%E5%BC%8F"><span class="toc-number">3.2.</span> <span class="toc-text">相關函式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Deduction-Guides-%E6%A8%A1%E6%9D%BF%E6%8E%A8%E5%B0%8E%E6%8C%87%E5%BC%95"><span class="toc-number">3.3.</span> <span class="toc-text">Deduction Guides 模板推導指引</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%A7%E9%83%A8%E6%A6%82%E5%BF%B5"><span class="toc-number">4.</span> <span class="toc-text">內部概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%A7%8B"><span class="toc-number">4.1.</span> <span class="toc-text">架構</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A7%E9%83%A8%E5%AF%A6%E4%BD%9C%E8%88%87%E5%84%AA%E5%8C%96"><span class="toc-number">4.2.</span> <span class="toc-text">內部實作與優化 </span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80-1"><span class="toc-number">4.2.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C%E5%89%8D%E7%9A%84%E6%83%B3%E6%B3%95"><span class="toc-number">4.2.2.</span> <span class="toc-text">實作前的想法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%96%8B%E5%A7%8B%E5%AF%A6%E4%BD%9C"><span class="toc-number">4.2.3.</span> <span class="toc-text">開始實作</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-number">5.</span> <span class="toc-text">參考資料</span></a></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 18
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="../../../../../../../scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="../../../../../../../scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="../../../../../../../scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

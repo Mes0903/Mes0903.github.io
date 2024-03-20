@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="C++ 教學系列 ── Array 與 Pointer     點此回到礦坑系列首頁：首頁   Array(陣列)Array 與 int、char、bool 一樣是一種型態，稱為 array type，不過 array 並不是 fundamental type，而是 compound type。   Array 常用來儲存同一種資料，像是我們今天要儲存全班 40 人的成績，正常來說，我們需要 4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 教學系列 ── Array 與 Pointer">
+<meta property="og:url" content="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="C++ 教學系列 ── Array 與 Pointer     點此回到礦坑系列首頁：首頁   Array(陣列)Array 與 int、char、bool 一樣是一種型態，稱為 array type，不過 array 並不是 fundamental type，而是 compound type。   Array 常用來儲存同一種資料，像是我們今天要儲存全班 40 人的成績，正常來說，我們需要 4">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.imgur.com/lUlVnFM.png">
+<meta property="article:published_time" content="2022-03-14T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-20T23:15:38.149Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="C++ Miner_tutorial">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/lUlVnFM.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="../../../../../../../assets/Mes.ico">
+    
+    <title>C++ 教學系列 ── Array 與 Pointer · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("../../../../../../../font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="../../../../../../../css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="../../../../../../../css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="../../../../../../../css/dark.css">
+    <link rel="stylesheet" href="../../../../../../../css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="../../../../../../../scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="../../../../../../../font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="../../../../../../../lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="../../../../../../../index.html">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">C++ 教學系列 ── Array 與 Pointer</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(../../../../../../../intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                C++ 教學系列 ── Array 與 Pointer
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner_tutorial">C++ Miner_tutorial</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">5k</span>閱讀時長: <span class="post-count reading-time">22 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/03/14</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "../../../../../../../lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="../../../../../../../assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> C++ 教學系列 ── Array 與 Pointer <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>  
+
+<p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong>  </p>
+<h1 id="Array-陣列"><a href="#Array-陣列" class="headerlink" title="Array(陣列)"></a>Array(陣列)</h1><p>Array 與 int、char、bool 一樣是一種型態，稱為 array type，不過 array 並不是 fundamental type，而是 compound type。  </p>
+<p>Array 常用來儲存同一種資料，像是我們今天要儲存全班 40 人的成績，正常來說，我們需要 40 個變數，這太麻煩了，這種有多筆單一型別資料的狀況我們可以用陣列來幫助我們儲存。  </p>
+<p>Array 是一段連續的記憶體空間，由許多小物件組成，這些小物件稱為 element，陣列可以擁有一個名字方便我們操作元素。  </p>
+<blockquote>
+<p>n4868(9.3.4.5)：An object of type “array of N U” consists of a contiguously allocated non-empty set of N subobjects of type U, known as the elements of the array, and numbered 0 to N-1.  </p>
+</blockquote>
+<h2 id="語法"><a href="#語法" class="headerlink" title="語法"></a>語法</h2><p>我們可以透過 simple declaration 來宣告出一個陣列型態的變數，陣列的宣告語法會長：  </p>
+<blockquote>
+<p>decl-specifier-seq(我自己加上來方便解釋的) noptr-declarator [ expr(optional) ] attr(optional)  </p>
+</blockquote>
+<ul>
+<li><p>decl-specifier-seq  </p>
+<p>  基本上跟上次講的一樣，type 的部分可以是 fundamental type(除了 void)、pointer type、pointer to member type、class、enumeration，或其他<span class = "yellow">已知元素數量的陣列型態</span></p>
+</li>
+</ul>
+<p>後方整坨都是宣告器，attr 我們先忽略它，也就是說宣告器的部分長：  </p>
+<blockquote>
+<p>noptr-declarator [ expr(optional) ]  </p>
+</blockquote>
+<p>他們分別為：  </p>
+<ul>
+<li><p>noptr-declarator  </p>
+<p>  可以是任何合法的宣告器，如果沒有接初始化器，那麼陣列的元素內容會是未知的。如果 Pointer Declarator&#x2F;Reference 要作用在指標&#x2F;參考本身，而不是目標的話，那要加上括號把它們括住，例如  </p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr  </span></span><br><span class="line">  <span class="type">int</span> arr2[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr2，但沒有初始化，內部元素可能為隨機值  </span></span><br><span class="line">  <span class="type">int</span> *p_arr[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數指標元素的陣列型態，其變數名為 p_arr，也沒有初始化  </span></span><br><span class="line">  <span class="built_in">int</span>(*p_arr2[<span class="number">2</span>])[<span class="number">2</span>] = &#123; &amp;arr, &amp;arr2 &#125;;    <span class="comment">// 一個有兩個指向 int[2] 元素的陣列型態，其變數名為 p_arr2  </span></span><br><span class="line">  <span class="built_in">int</span>(*a1)[<span class="number">2</span>] = &amp;arr;    <span class="comment">// 一個指向 int[2] 型態的指標，其變數名為 a1，指向 arr  </span></span><br><span class="line">  <span class="built_in">int</span>(&amp;a2)[<span class="number">2</span>] = arr;    <span class="comment">// 一個參考 int[2] 型態的別名，其變數名為 a2，參考 arr  </span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>  這個部分基本上就是你陣列的變數名，視情況會再加上其他你需要的東西，讀的方法是從右至左，以 <code>int *p_arr[2]</code> 來說，<code>int</code> 屬於 type specifier，<code>*p_arr[2]</code> 屬於 declarator。  </p>
+<p>  另外補充一點，Array 無法使用 assignment，也不能 copy，因為 array type 的物件無法一次修改全部的元素，也就是說像這樣是不行的：  </p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> a[<span class="number">3</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;, b[<span class="number">3</span>] = &#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> c[<span class="number">3</span>] = a;    <span class="comment">// error: array must be initialized with a brace-enclosed initializer  </span></span><br><span class="line">  a = b;    <span class="comment">// error: invalid array assignment  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>expr  </p>
+<p>  一個可以轉換為 <code>const std::size_t</code> 型態的表達式，<span class = "yellow">必須大於 0</span>，<code>std::size_t</code> 你可以把它想像成一個正整數，專門拿來表示大小。  </p>
+<p>  這個部分基本上是你陣列元素的數目，所以需要大於 0，且如果不是使用動態配置，那麼需要是個<span class = "yellow">編譯時期就能算出的值</span>，所以才會說需要是一個 constant expression，例如：  </p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">40</span>;    <span class="comment">// i 不是 constant expression  </span></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> ci = <span class="number">40</span>;    <span class="comment">// ci 是 constant expression  </span></span><br><span class="line">  <span class="type">int</span> arr[i];    <span class="comment">// error，i 不是 constant expression  </span></span><br><span class="line">  <span class="type">int</span> arr2[ci];    <span class="comment">// ok  </span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>  上面這段 code 你可能可以編譯成功，這是因為有些編譯器有幫忙做特殊的處理，像是先在 stack 上分配一些空間之類的，但這種 code 換個編譯器可能就不會過了，這種拿非編譯時期的值拿來當作其大小的陣列叫做 VLA(variable-length array)，有興趣的可以看看。  </p>
+<p>  如果你沒有寫 expression，那就需要有初始化器，此時編譯器會幫忙從初始化器推算出陣列的元素個數，例如：  </p>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;  </span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>  這裡的 <code>arr</code> 是個整數的陣列，編譯器會幫忙推算出陣列有兩個元素。  </p>
+<blockquote>
+<p>n4868(9.3.4.5)：An array bound may also be omitted when an object (but not a non-static data member) of array type is initialized and the declarator is followed by an initializer. In these cases, the array bound is calculated from the number of initial elements (say, N) supplied, and the type of the array is “array of N U”.  </p>
+</blockquote>
+<p>  額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/27495806/why-is-new-intn-valid-when-int-arrayn-is-not?fbclid=IwAR3z9HE5GLnUcPhavgUNpZWOTV35JVpzYXvNQfrcdUnWmp8zFQ5Wt_UeEv8">Why is new int[n] valid when int array[n] is not?</a><br>  額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/13779273/in-the-standard-what-is-derived-declarator-type">In the standard, what is “derived-declarator-type”?</a><br>  額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1887097/why-arent-variable-length-arrays-part-of-the-c-standard">Why aren’t variable-length arrays part of the C++ standard?</a></p>
+</li>
+</ul>
+<h2 id="使用-Array"><a href="#使用-Array" class="headerlink" title="使用 Array"></a>使用 Array</h2><p><code>T a[N];</code> 這樣宣告了一個變數叫 <code>a</code>，型態為 <code>T[N]</code>，念法為 <code>array of N T</code>，array 中的元素會從 0 到 N - 1 的被編號，我們可以利用 <code>[]</code> operator 來使用這些元素，<code>[]</code> 內放要使用的元素的編號。  </p>
+<p><code>[]</code> 並不會對你填入的數字做檢查，也就是說如果你填了 N+1，編譯也會過，但這可能會導致我們訪問一個非法的記憶體位址，導致執行期的錯誤，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">5</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> i = arr[<span class="number">0</span>];    <span class="comment">// arr[0] 為陣列中第一個元素，因此 i == 1  </span></span><br><span class="line">  <span class="type">int</span> i2 = arr[<span class="number">4</span>];    <span class="comment">// arr[4] 為陣列中第五個元素，因此 i2 == 5  </span></span><br><span class="line">  <span class="type">int</span> i3 = arr[<span class="number">5</span>];    <span class="comment">// 5 號超出 array 的元素個數了，這可能會導致執行期的錯誤，  </span></span><br><span class="line">                      <span class="comment">// 因為 arr[5] 這個記憶體位址可能不是可以使用的空間  </span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h2 id="多維陣列"><a href="#多維陣列" class="headerlink" title="多維陣列"></a>多維陣列</h2><p>我們一開始提到了陣列的 decl-specifier-seq，那段講的意思簡單來說就是陣列的元素可以是 fundamental type(除了 void)、pointer、pointer to member、classes、enumeration 或<span class = "yellow">已知元素數量的陣列</span>。  </p>
+<p>最後一項我特別標成了黃色，因為這代表陣列的元素也可以是陣列，也就是說我們可以有多維陣列這種東西，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>][<span class="number">3</span>] = &#123; &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;,  </span><br><span class="line">                    &#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span> &#125; &#125;;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>上面這樣的 <code>arr</code> 就是一個二維陣列，<code>arr</code> 的有兩個元素，這兩個元素的型態都是<code>int[3]</code>，也就是一個有三個整數元素的陣列，我們依樣可以使用 <code>[]</code> 來使用陣列中的元素：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>][<span class="number">3</span>] = &#123; &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;,  </span><br><span class="line">                    &#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span> &#125; &#125;;  </span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> i = arr[<span class="number">0</span>][<span class="number">0</span>];    <span class="comment">// i == 1  </span></span><br><span class="line">  <span class="type">int</span> i2 = arr[<span class="number">1</span>][<span class="number">2</span>]; <span class="comment">// i == 6  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p><code>arr[0][0]</code> 代表第一個小陣列裡面的第一個元素，而 <code>arr[1][2]</code> 則代表第二個小陣列的第三個元素，使用時一樣要注意編號的問題，小的陣列編號一樣是從 0 開始的。  </p>
+<p>更高維的陣列規則都一樣，依樣畫葫蘆就好。  </p>
+<h2 id="字元陣列"><a href="#字元陣列" class="headerlink" title="字元陣列"></a>字元陣列</h2><p>char array 是一種特殊的陣列，可以用來表示一組字串，一組字串以 <code>&#39;\0&#39;</code> 結尾，因此在使用字元陣列時記得要多加一個位址給 <code>&#39;\0&#39;</code>，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">char</span> c1[] = &#123; <span class="string">&#x27;h&#x27;</span>, <span class="string">&#x27;e&#x27;</span>, <span class="string">&#x27;l&#x27;</span>, <span class="string">&#x27;l&#x27;</span>, <span class="string">&#x27;o&#x27;</span> &#125;;    <span class="comment">// 沒有 &#x27;\0&#x27;，陣列元素個數為 5 個  </span></span><br><span class="line">  <span class="type">char</span> c2[] = &#123; <span class="string">&#x27;h&#x27;</span>, <span class="string">&#x27;e&#x27;</span>, <span class="string">&#x27;l&#x27;</span>, <span class="string">&#x27;l&#x27;</span>, <span class="string">&#x27;o&#x27;</span>, <span class="string">&#x27;\0&#x27;</span> &#125;;    <span class="comment">// 有 &#x27;\0&#x27;，陣列元素個數為 6 個  </span></span><br><span class="line">  <span class="type">char</span> c3[] = <span class="string">&quot;hello&quot;</span>;    <span class="comment">// 使用 string literal 初始化字元陣列的話會自動加上 &#x27;\0&#x27;，陣列元素個數為 6 個  </span></span><br><span class="line">  <span class="type">char</span> c4[<span class="number">5</span>] = <span class="string">&quot;hello&quot;</span>;    <span class="comment">// error: initializer-string for &#x27;char [5]&#x27; is too long  </span></span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; c1 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>    <span class="comment">// 可能後面會有亂碼，因為要讀到 &#x27;\0&#x27; 電腦才會知道這個字串結束了  </span></span><br><span class="line">            &lt;&lt; c2 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; c3 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>使用 list initialize 字元陣列時我們需要手動加上 <code>&#39;\0&#39;</code>，但如果是使用 string literal 來初始化就不用。  </p>
+<h2 id="搭配-for-迴圈遍歷陣列"><a href="#搭配-for-迴圈遍歷陣列" class="headerlink" title="搭配 for 迴圈遍歷陣列"></a>搭配 for 迴圈遍歷陣列</h2><p>上週我們教了 for 迴圈，如果我們想要遍歷整個陣列，那搭配 for 迴圈來操作是個很好的選擇，能方便很多：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>][<span class="number">4</span>] = &#123; &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;,  </span><br><span class="line">                    &#123; <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span> &#125; &#125;;  </span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i) &#123;  </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; ++j) &#123;  </span><br><span class="line">      std::cout &lt;&lt; arr[i][j] &lt;&lt; <span class="string">&quot; &quot;</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h1 id="Pointer-指標"><a href="#Pointer-指標" class="headerlink" title="Pointer 指標"></a>Pointer 指標</h1><p>Pointer 型態的變數存的值有四種：  </p>
+<ul>
+<li>物件或函式的位址  </li>
+<li>一物件尾端後的位址  </li>
+<li>null pointer value  </li>
+<li>無效的值</li>
+</ul>
+<p>無效的值通常指沒有初始化的指標，或是指向一個未知、出界位址的指標。  </p>
+<p>而第二項則是專門在處理出界問題的指標，如  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> *p = &amp;arr[<span class="number">2</span>];    <span class="comment">// 尾端指標  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>裡面的 <code>p</code>，這東西會衍生出一系列的規則，挺麻煩的，這邊講一個比較重要的影響就好，在對指標進行比較與算術運算時，指向非陣列元素的指標會被視作一個指向「只有一個元素的陣列」的第一個元素的指標，講起來很繞口，直接看例子比較快：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line">  <span class="type">int</span> *p = &amp;i;  </span><br><span class="line"></span><br><span class="line">  <span class="comment">/**  </span></span><br><span class="line"><span class="comment">   * 在 p+1; 中，此時 p 被當作一個指向 int[0] 的指標，  </span></span><br><span class="line"><span class="comment">   * 你可以想像成：  </span></span><br><span class="line"><span class="comment">   * int arr[1] = &#123;&amp;i&#125;;  </span></span><br><span class="line"><span class="comment">   * int *p = &amp;arr[0];  </span></span><br><span class="line"><span class="comment">   */</span>  </span><br><span class="line">  p + <span class="number">1</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>這能幫助嚴謹定義出界的行為，更進一步處理指標加法、減法等等越界的問題，如果你看不懂沒關係，只要記住它衍生出來的重點就好：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span>  </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line">  <span class="type">int</span> *p = &amp;i;  </span><br><span class="line">  <span class="built_in">assert</span>(&amp;(p[<span class="number">0</span>]) == &amp;i);    <span class="comment">// 理論上要恆為 true  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>也就是 <code>&amp;(p[0])</code> 與 <code>&amp;i</code> 理論上永遠是等價的。  </p>
+<p>後面我會簡單複習一下語法，然後討論一下第一項與第三項，但先跳過函式。  </p>
+<h2 id="語法-1"><a href="#語法-1" class="headerlink" title="語法"></a>語法</h2><p>宣告的語法之前宣告器的部分有提過了，這邊正式且詳細的再寫一次，宣告的語法長這樣：  </p>
+<blockquote>
+<p>decl-specifier-seq * attr(optional) cv(optional) derived-declarator-type-list  </p>
+</blockquote>
+<p>這邊的 <code>*</code> 稱為 Pointer Declarator，假設我們寫 <code>S *D;</code>，則宣告了一個指標 <code>D</code> 指向 <code>S</code> 型態。除了一開始的 specifier，後面的東西都屬於宣告器。  </p>
+<p>另外 Pointer 不能指向 reference 與 bit fields。  </p>
+<p>舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">20</span>;  </span><br><span class="line">  <span class="type">int</span> *p1 = &amp;i;  </span><br><span class="line">  <span class="type">int</span> **p2 = &amp;p1;  </span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;i 儲存的值 : &quot;</span> &lt;&lt; i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;i 的位址   : &quot;</span> &lt;&lt; &amp;i &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p1 儲存的值: &quot;</span> &lt;&lt; p1 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p1 的位址  : &quot;</span> &lt;&lt; &amp;p1 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p2 儲存的值: &quot;</span> &lt;&lt; p2 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p2 的位址  : &quot;</span> &lt;&lt; &amp;p2 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;\n*p1 = &quot;</span> &lt;&lt; *p1 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;*p2 = &quot;</span> &lt;&lt; *p2 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;**p2 = &quot;</span> &lt;&lt; **p2;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>圖解就會長這樣：  </p>
+<center><img src="https://i.imgur.com/lUlVnFM.png"></center><br>  
+
+<p><code>i</code> 是一個整數變數，儲存的值為 20；<code>p1</code> 是個整數的指標，指向 <code>i</code>，儲存的值為 <code>&amp;i</code>；<code>p2</code> 是個整數的指標的指標，指向 <code>p1</code>，儲存的值為 <code>&amp;p1</code>。  </p>
+<h2 id="Pointer-to-objects"><a href="#Pointer-to-objects" class="headerlink" title="Pointer to objects"></a>Pointer to objects</h2><p>我們可以用 <code>address-of operator</code> 的回傳值或別的指標來初始化指標變數，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> n;  </span><br><span class="line"><span class="type">int</span> *np = &amp;n;    <span class="comment">// pointer to int  </span></span><br><span class="line"><span class="type">int</span> *<span class="type">const</span> *npp = &amp;np;    <span class="comment">// non-const pointer to const pointer to non-const int  </span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a[<span class="number">2</span>];  </span><br><span class="line"><span class="built_in">int</span> (*ap)[<span class="number">2</span>] = &amp;a;    <span class="comment">// pointer to array of int  </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span> &#123;  </span><br><span class="line">  <span class="type">int</span> n;  </span><br><span class="line">&#125;;  </span><br><span class="line">S s = &#123; <span class="number">1</span> &#125;;  </span><br><span class="line"><span class="type">int</span> *sp = &amp;s.n;    <span class="comment">// pointer to the int that is a member of s  </span></span><br></pre></td></tr></table></figure>
+<p>source：<a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/pointer#Pointers_to_objects">cppreference</a>  </p>
+<h3 id="指標的運算"><a href="#指標的運算" class="headerlink" title="指標的運算"></a>指標的運算</h3><p>指標的運算，如 <code>+</code>、<code>-</code> 等 operator 有自己的定義，這邊簡單講一下 <code>+</code>、<code>-</code> 與 <code>==</code>：  </p>
+<p>前兩個合稱為 Additive operators，當他們的運算元為一個指標和一個整數時，會根據指標指向的型態大小來位移，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> a = <span class="number">0</span>;  </span><br><span class="line">  <span class="type">int</span> *p = &amp;a;  </span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;p 指向:&quot;</span> &lt;&lt; p &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p + 1:&quot;</span> &lt;&lt; p + <span class="number">1</span> &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p + 2:&quot;</span> &lt;&lt; p + <span class="number">2</span> &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;2 + p:&quot;</span> &lt;&lt; <span class="number">2</span> + p;  </span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p>source：<a target="_blank" rel="noopener" href="https://openhome.cc/Gossip/CppGossip/PointerArithmetic.html">C++ Gossip</a>  </p>
+<p>這個輸出的是記憶體位址，因為這邊是 <code>int</code>，在我的電腦上是 4 byte，所以每對指標加一，其值就會加上 4(位移 4)，減法同理；另外 <code>N + ptr</code> 與 <code>ptr + N</code> 等價，這邊 <code>N</code> 為整數，<code>ptr</code> 為指標變數名。  </p>
+<p>而指標也可以與指標相減，其結果會是兩個記憶體間的差 (difference)：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> a[<span class="number">4</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> *p = &amp;a[<span class="number">1</span>];  </span><br><span class="line">  <span class="type">int</span> *p2 = &amp;a[<span class="number">3</span>];  </span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;p 指向:&quot;</span> &lt;&lt; p &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;p2 指向:&quot;</span> &lt;&lt; p2 &lt;&lt; <span class="string">&#x27;\n&#x27;</span>  </span><br><span class="line">            &lt;&lt; <span class="string">&quot;Pointer difference: &quot;</span> &lt;&lt; p2 - p &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>source：改自 <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/operator_arithmetic#Additive_operators">cppreference</a>  </p>
+<p>而比較運算子的話只有 <code>==</code> 與 <code>!=</code> 能用在 pointer 上，詳細的狀況可以到 <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/operator_comparison#Pointer_comparison_operators">cppreference</a> 上看，但簡單來說，如果兩者儲存的位址一樣，那 <code>==</code> 回傳 <code>true</code>，否則為 <code>false</code>。  </p>
+<h2 id="Null-pointers"><a href="#Null-pointers" class="headerlink" title="Null pointers"></a>Null pointers</h2><p>就像 int 有 0，char 有空字元這種基本單位一樣，pointer 也有，它是一個特殊的值，叫做 null pointer value，基本上它有三種表示方法，<code>NULL</code>、<code>nullptr</code> 與 <code>0</code>。  </p>
+<p>一個值為 null 的 pointer 不會指向任何的物件或函式，且對一個 null pointer 做 dereference 是 UB，也就是說：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *p = <span class="literal">nullptr</span>;  </span><br><span class="line"><span class="type">int</span> a = *p;    <span class="comment">// undefined behavior  </span></span><br></pre></td></tr></table></figure>
+
+<p>這樣是 UB。  </p>
+<p>不管什麼型態的指標，儲存的值如果是 <code>null</code>，那麼拿去與同型態的空指標做比較運算(<code>==</code>)，出來的結果也會是 <code>true</code>。  </p>
+<p><code>nullptr</code> 為 null pointer literal，<code>NULL</code> 為 null pointer constant，而 <code>0</code> 則是整數，會被隱式轉型為空指標，三者雖然出來的結果一樣，但過程有些許差異。  </p>
+<p>通常一個指標被宣告出來，但不需要初始化時，我們通常會把指標初始化為 <code>nullptr</code>，又或是一個指標指向的物件已經被解構時，我們也會將其值設為 <code>nullptr</code>，這稱為指標歸位，能夠避免我們不小心用到儲存亂數的指標，後者這種指標稱為野指標(dangling pointer)  </p>
+<h2 id="Constness-on-Pointer"><a href="#Constness-on-Pointer" class="headerlink" title="Constness on Pointer"></a>Constness on Pointer</h2><p>之前講宣告的時候我們有在宣告器與說明符的部分同時看到 <code>const</code>，也就是說一個宣告述句裡面就有兩個 <code>const</code> 出現，當時我們有簡單介紹一下，現在我們來詳細看一下情況：  </p>
+<ul>
+<li>如果 <code>cv-qualifier</code> 出現在 <code>*</code> 前，那 <code>*</code> 屬於 decl-specifier-seq，作用於指向的物件上  </li>
+<li>如果 <code>cv-qualifier</code> 出現在 <code>*</code> 後，那 <code>*</code> 屬於 declarator，作用於指標物件上</li>
+</ul>
+<p>所以我們可以簡單寫一個表出來：  </p>
+<table>
+<thead>
+<tr>
+<th>語法</th>
+<th>意思</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>const T*</code></td>
+<td>指向 「constant 物件」的指標</td>
+</tr>
+<tr>
+<td><code>T const*</code></td>
+<td>指向 「constant 物件」的指標</td>
+</tr>
+<tr>
+<td><code>T* const</code></td>
+<td>指向普通物件的「constant 指標」</td>
+</tr>
+<tr>
+<td><code>const T* const</code></td>
+<td>指向「constant 物件」的「constant 指標」</td>
+</tr>
+<tr>
+<td><code>T const* const</code></td>
+<td>指向「constant 物件」的「constant 指標」</td>
+</tr>
+</tbody></table>
+<p>source：<a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/pointer#Constness">cppreference</a>  </p>
+<p>可以看見就分三種，不寫法有五種，判斷方法建議大家記一下，接下來我們簡單看個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">0</span>;  </span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> ci = <span class="number">0</span>;  </span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> *<span class="type">const</span> ptr1_c = &amp;i;    <span class="comment">// constant pointer  </span></span><br><span class="line">  <span class="type">int</span> *<span class="type">const</span> ptr2_c = &amp;ci;    <span class="comment">// error, 指向的物件型態應該要是一個 int，但 ci 是 const int  </span></span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> *c_ptr1 = &amp;i;    <span class="comment">// ok, 會間接限制不能透過 c_ptr1 改 i 的值  </span></span><br><span class="line">  *c_ptr1 = <span class="number">5</span>;    <span class="comment">// error  </span></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> *c_ptr2 = &amp;ci;    <span class="comment">// ok  </span></span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> *<span class="type">const</span> c_ptr1_c = &amp;i;    <span class="comment">// ok，c_ptr1_c 儲存的值不能再改，且也不能透過指標修改 i 的值  </span></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> *<span class="type">const</span> c_ptr1_c = &amp;ci;    <span class="comment">// ok，同上  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>延伸閱讀：<a target="_blank" rel="noopener" href="https://www.codeproject.com/Articles/7042/How-to-interpret-complex-C-C-declarations">How to interpret complex C&#x2F;C++ declarations</a>  </p>
+<p>如果想要看 pointer of pointer 的版本的話，可以看一下上面這篇，主要是有個規則叫做 RTL Rule(right-to-left rule)。  </p>
+<h1 id="Array-to-pointer-decay-conversion"><a href="#Array-to-pointer-decay-conversion" class="headerlink" title="Array to pointer decay(conversion)"></a>Array to pointer decay(conversion)</h1><p>array 在「需要指標，卻填入 array」的狀況時會發生轉型，轉型為一個「指向第一個元素」的指標。  </p>
+<p>這個情況很常發生，也就是說這個轉型很常發生，導致有許多人認為 Array 與 Pointer 是一樣的東西，但<span class = "yellow">不是，Array 與 Pointer 是不同的東西</span>。  </p>
+<p>舉個簡單的例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">3</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> *p = arr;    <span class="comment">// 發生轉型，expression arr 的計算結果型態由 int[3] 轉型為 int*，指向陣列第一個元素  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>上面這個例子第六行的地方就發生了轉型，<code>arr</code> 由一個陣列型態轉型為整數的指標了，此時 <code>p</code> 指向 <code>arr</code> 的第一個元素。  </p>
+<p><span class = "yellow">每一次的 array assign to pointer 都應該視為一種「轉型」</span>！！！！！！！！！  </p>
+<blockquote>
+<p>n4868(7.3.3)：An lvalue or rvalue of type “array of N T” or “array of unknown bound of T” can be converted to a prvalue of type “pointer to T”. The temporary materialization conversion ([conv.rval]) is applied. The result is a pointer to the first element of the array.  </p>
+</blockquote>
+<p>延伸閱讀：<a target="_blank" rel="noopener" href="https://zh-tw.coderbridge.com/series/9c0fd91d2bbb4986b0b451aed1319325/posts/eec6d2b3309e4cafbda712cae3b46f32?fbclid=IwAR1ZBMdoZ_nfQURvsDpZiqT9zgiTwYQJpH4nSEeDK04EvSwNZDERRsLUJv0">[重新理解 C++] Array 和 Pointer 的差異</a>  </p>
+<h2 id="何時發生"><a href="#何時發生" class="headerlink" title="何時發生?"></a>何時發生?</h2><p>基本上原則就是上面講的那樣，是不用記得太詳細，除非踩到坑，但如果想看詳細一點的可以看看以下幾個條例：  </p>
+<h3 id="Expressions"><a href="#Expressions" class="headerlink" title="Expressions"></a>Expressions</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/basic.lval#6">n4868(7.2.1)</a>：Whenever a glvalue appears as an operand of an operator that expects a prvalue for that operand, the lvalue-to-rvalue, array-to-pointer, or function-to-pointer standard conversions are applied to convert the expression to a prvalue.  </p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.context#2">n4868(7.2.3)</a>：In some contexts, an expression only appears for its side effects. Such an expression is called a discarded-value expression. The array-to-pointer and function-to-pointer standard conversions are not applied.  </p>
+</blockquote>
+<h3 id="Type-identification"><a href="#Type-identification" class="headerlink" title="Type identification"></a>Type identification</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.typeid#3">n4868(7.6.1.8)</a>：When typeid is applied to an expression other than a glvalue of a polymorphic class type, the result refers to a std::type_info object representing the static type of the expression. Lvalue-to-rvalue, array-to-pointer, and function-to-pointer conversions are not applied to the expression.  </p>
+</blockquote>
+<h3 id="sizeof-operator"><a href="#sizeof-operator" class="headerlink" title="sizeof operator"></a>sizeof operator</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.sizeof#3">n4868(7.6.2.5)</a>：The lvalue-to-rvalue ([conv.lval]), array-to-pointer ([conv.array]), and function-to-pointer ([conv.func]) standard conversions are not applied to the operand of sizeof. If the operand is a prvalue, the temporary materialization conversion is applied.  </p>
+</blockquote>
+<h3 id="Three-way-comparison-operator"><a href="#Three-way-comparison-operator" class="headerlink" title="Three-way comparison operator"></a>Three-way comparison operator</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.spaceship#6">n4868(7.6.8)</a>：If at least one of the operands is of object pointer type and the other operand is of object pointer or array type, array-to-pointer conversions ([conv.array]), pointer conversions ([conv.ptr]), and qualification conversions are performed on both operands to bring them to their composite pointer type ([expr.type]). After the conversions, the operands shall have the same type.  </p>
+<p>[Note 1: If both of the operands are arrays, array-to-pointer conversions are not applied. — end note]  </p>
+</blockquote>
+<h3 id="關係運算子"><a href="#關係運算子" class="headerlink" title="關係運算子"></a>關係運算子</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.rel#1">(7.6.9)</a>：The lvalue-to-rvalue ([conv.lval]), array-to-pointer ([conv.array]), and function-to-pointer ([conv.func]) standard conversions are performed on the operands. The comparison is deprecated if both operands were of array type prior to these conversions ([depr.array.comp]).  </p>
+</blockquote>
+<h3 id="比較運算子"><a href="#比較運算子" class="headerlink" title="比較運算子"></a>比較運算子</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.eq#1">(7.6.10)</a>：The &#x3D;&#x3D; (equal to) and the !&#x3D; (not equal to) operators group left-to-right. The lvalue-to-rvalue ([conv.lval]), array-to-pointer ([conv.array]), and function-to-pointer ([conv.func]) standard conversions are performed on the operands. The comparison is deprecated if both operands were of array type prior to these conversions ([depr.array.comp]).  </p>
+</blockquote>
+<h3 id="三元運算子"><a href="#三元運算子" class="headerlink" title="三元運算子"></a>三元運算子</h3><p>這要點進去看一下  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4868/expr.cond#4.3.3">(7.6.16)</a>：…otherwise, the target type is the type that E2 would have after applying the lvalue-to-rvalue, array-to-pointer, and function-to-pointer standard conversions.  </p>
+</blockquote>
+<h1 id="Subscript-operator-and-Pointer"><a href="#Subscript-operator-and-Pointer" class="headerlink" title="Subscript operator and Pointer"></a>Subscript operator and Pointer</h1><p>除了計算順序上的不同，<code>[]</code> 基本上可以用 <code>*()</code> 來代替，<code>E1[E2]</code> 與 <code>*(E1 + E2)</code> 基本上完全等價。  </p>
+<p>也就是說假設有個陣列，由於有 Array to pointer decay，又有指標的加法，因此在拜訪元素時我們可以透過 <code>*()</code> 來代替 <code>[]</code> 的操作，舉個例子：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> arr[<span class="number">3</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;  </span><br><span class="line"><span class="type">int</span> i1 = arr[<span class="number">2</span>];  </span><br><span class="line"><span class="type">int</span> i2 = *(arr + <span class="number">2</span>);  </span><br></pre></td></tr></table></figure>
+
+<p>這裡的 <code>i1</code> 與 <code>i2</code> 是完全相同的，在第三行中，<code>arr</code> 先被轉換為一個整數型態的指標，然後再透過指標的加法取得陣列第二個元素的位址，最後再 dereference，結果與 <code>arr[2]</code> 完全一樣。  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://timsong-cpp.github.io/cppwp/n4861/dcl.array#9">n4861(9.3.4.5)</a>：<br>[Example 4:  </p>
+<blockquote>
+<p>int x3d[3][5][7];  </p>
+</blockquote>
+<p>… The expression x3d[i] is equivalent to *(x3d + i); in that expression, x3d is subject to the array-to-pointer conversion ([conv.array]) and is first converted to a pointer to a 2-dimensional array with rank 5×7 that points to the first element of x3d. Then i is added, which on typical implementations involves multiplying i by the length of the object to which the pointer points, which is sizeof(int)×5×7. … — end example]  </p>
+</blockquote>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">March 14th 2022, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="../../../../../22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/" title="C++ 教學系列 ── Function 與 Memory">
+                    <div class="nextTitle">C++ 教學系列 ── Function 與 Memory</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="../../../../../../02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/" title="C++ 教學系列 ── Object、Expression、Statement">
+                    <div class="prevTitle">C++ 教學系列 ── Object、Expression、Statement</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> C++ 教學系列 ── Array 與 Pointer </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Array-%E9%99%A3%E5%88%97"><span class="toc-number">2.</span> <span class="toc-text">Array(陣列)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%9E%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">語法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Array"><span class="toc-number">2.2.</span> <span class="toc-text">使用 Array</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E7%B6%AD%E9%99%A3%E5%88%97"><span class="toc-number">2.3.</span> <span class="toc-text">多維陣列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E5%85%83%E9%99%A3%E5%88%97"><span class="toc-number">2.4.</span> <span class="toc-text">字元陣列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AD%E9%85%8D-for-%E8%BF%B4%E5%9C%88%E9%81%8D%E6%AD%B7%E9%99%A3%E5%88%97"><span class="toc-number">2.5.</span> <span class="toc-text">搭配 for 迴圈遍歷陣列</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Pointer-%E6%8C%87%E6%A8%99"><span class="toc-number">3.</span> <span class="toc-text">Pointer 指標</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%9E%E6%B3%95-1"><span class="toc-number">3.1.</span> <span class="toc-text">語法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pointer-to-objects"><span class="toc-number">3.2.</span> <span class="toc-text">Pointer to objects</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E6%A8%99%E7%9A%84%E9%81%8B%E7%AE%97"><span class="toc-number">3.2.1.</span> <span class="toc-text">指標的運算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Null-pointers"><span class="toc-number">3.3.</span> <span class="toc-text">Null pointers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Constness-on-Pointer"><span class="toc-number">3.4.</span> <span class="toc-text">Constness on Pointer</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Array-to-pointer-decay-conversion"><span class="toc-number">4.</span> <span class="toc-text">Array to pointer decay(conversion)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%95%E6%99%82%E7%99%BC%E7%94%9F"><span class="toc-number">4.1.</span> <span class="toc-text">何時發生?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Expressions"><span class="toc-number">4.1.1.</span> <span class="toc-text">Expressions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Type-identification"><span class="toc-number">4.1.2.</span> <span class="toc-text">Type identification</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sizeof-operator"><span class="toc-number">4.1.3.</span> <span class="toc-text">sizeof operator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Three-way-comparison-operator"><span class="toc-number">4.1.4.</span> <span class="toc-text">Three-way comparison operator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%9C%E4%BF%82%E9%81%8B%E7%AE%97%E5%AD%90"><span class="toc-number">4.1.5.</span> <span class="toc-text">關係運算子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AF%94%E8%BC%83%E9%81%8B%E7%AE%97%E5%AD%90"><span class="toc-number">4.1.6.</span> <span class="toc-text">比較運算子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E5%85%83%E9%81%8B%E7%AE%97%E5%AD%90"><span class="toc-number">4.1.7.</span> <span class="toc-text">三元運算子</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Subscript-operator-and-Pointer"><span class="toc-number">5.</span> <span class="toc-text">Subscript operator and Pointer</span></a></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 18
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="../../../../../../../scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="../../../../../../../scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="../../../../../../../scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>
