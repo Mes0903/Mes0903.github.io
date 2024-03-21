@@ -454,9 +454,9 @@
             <div class="abstract-content">
                  礦坑系列 ── Indirect through null pointer
 
-tags: C++ Miner點此回到礦坑系列首頁：首頁
+點此回到礦坑系列首頁：首頁
 前言事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)
-雖然問題本身莫名其妙變得很複雜，但其實結論很...
+雖然問題本身莫名其妙變得很複雜，但其實結論很簡單：因為 standard ...
             </div>
             <!-- read more -->
             
@@ -818,9 +818,9 @@ source：C++ Weekly - Ep 322 - Top 4 Places To Never Use “const”
             <div class="abstract-content">
                  C++ 教學系列 ── Class   
 
-tags: C++ Miner_tutorial點此回到礦坑系列首頁：首頁  
+點此回到礦坑系列首頁：首頁  
 前言Class 背後最核心的概念是資料的抽象化(data abstraction)與資料封裝(data encapsulation)。這些是一種程式設計上的技巧、想法，其清楚區分了介面(interface)和實作(implementation)的不同，介面是與使用者直接互動的運算，實作則是利用了 Class 內的資料成員與成員函式來寫出的演算法，而封裝則是強制分開了介面與實作，實作會被隱藏，使用者只看的到介面，但看不到實作。  
-舉個例子，有一個肯x雞的自動販賣機...
+舉個例子，有一個肯x雞的自動販賣機，可以讓使用者購買炸雞，使用者可以利用販賣機上的...
             </div>
             <!-- read more -->
             

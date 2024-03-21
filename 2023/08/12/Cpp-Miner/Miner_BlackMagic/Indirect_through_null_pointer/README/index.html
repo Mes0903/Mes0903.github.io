@@ -19,15 +19,15 @@
         <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
     
     <meta name="description" content="">
-    <meta name="description" content="礦坑系列 ── Indirect through null pointer  tags: C++ Miner點此回到礦坑系列首頁：首頁 前言事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard">
+    <meta name="description" content="礦坑系列 ── Indirect through null pointer  點此回到礦坑系列首頁：首頁 前言事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee pap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="礦坑系列 ── Indirect through null pointer">
 <meta property="og:url" content="https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/index.html">
 <meta property="og:site_name" content="Mes&#39;s Studio">
-<meta property="og:description" content="礦坑系列 ── Indirect through null pointer  tags: C++ Miner點此回到礦坑系列首頁：首頁 前言事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard">
+<meta property="og:description" content="礦坑系列 ── Indirect through null pointer  點此回到礦坑系列首頁：首頁 前言事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee pap">
 <meta property="og:locale">
 <meta property="article:published_time" content="2023-08-12T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-20T23:15:38.149Z">
+<meta property="article:modified_time" content="2024-03-20T23:48:19.701Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="C++ Miner-BlackMagic">
 <meta name="twitter:card" content="summary">
@@ -339,7 +339,7 @@
                 <!-- 文章字数统计 -->
                 
                     <div class="post-intro-read">
-                        <span>字數: <span class="post-count word-count">3.5k</span>閱讀時長: <span class="post-count reading-time">16 min</span></span>
+                        <span>字數: <span class="post-count word-count">3.4k</span>閱讀時長: <span class="post-count reading-time">16 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -502,7 +502,7 @@
     <article class="article-entry">
         <h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> 礦坑系列 ── Indirect through null pointer<img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>
 
-<h6 id="tags-C-Miner"><a href="#tags-C-Miner" class="headerlink" title="tags: C++ Miner"></a>tags: <code>C++ Miner</code></h6><p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
+<p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>事情起於 jserv 的講義裡面有個 <code>&amp;((data*)0)-&gt;c)</code> 這樣的操作，作用是求 <code>c</code> 在 <code>data</code> 這個 struct 中的偏移量，但那個 <code>0</code> 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)</p>
 <p>雖然問題本身莫名其妙變得很複雜，但其實結論很簡單：因為 standard 沒有要求，所以是 UB</p>
 <p>不過在翻的過程，找到了一些有趣的討論，所以這邊就記錄一下為何 <code>&amp;((data*)0)-&gt;c)</code> 是 UB，與為何 <em>Indirect through null pointer</em> 會有是不是 UB 的疑慮</p>
@@ -666,7 +666,7 @@
             <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
             <p>原文連結：<a href="https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/</a>
             <p>發布日期：<a href="https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">August 12th 2023, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">March 20th 2024, 11:48:19 pm</a>
             <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
         </div>
     
@@ -824,7 +824,7 @@
                 <div class="toc-catalog">
                     <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
                 </div>
-                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> 礦坑系列 ── Indirect through null pointer</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tags-C-Miner"><span class="toc-number">1.0.0.0.0.1.</span> <span class="toc-text">tags: C++ Miner</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Implicit-Undefined-Behavior"><span class="toc-number">3.</span> <span class="toc-text">Implicit Undefined Behavior?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%95%8F%E9%A1%8C%E8%A8%8E%E8%AB%96"><span class="toc-number">4.</span> <span class="toc-text">問題討論</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pointer-arithmetic-%E7%9A%84%E8%B7%AF%E5%BE%91"><span class="toc-number">4.0.1.</span> <span class="toc-text">pointer arithmetic 的路徑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%88%87-%E7%9A%84%E8%B7%AF%E5%BE%91"><span class="toc-number">4.0.2.</span> <span class="toc-text">* 與 -&gt; 的路徑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">4.0.3.</span> <span class="toc-text">結論</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Indirect-through-null-pointer"><span class="toc-number">5.</span> <span class="toc-text">Indirect through null pointer?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%88%87"><span class="toc-number">6.</span> <span class="toc-text">-&gt; 與 *</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%99%E6%BA%96%E8%87%AA%E5%B7%B1%E7%94%A8%E4%BA%86-indirect-through-null-pointer"><span class="toc-number">7.</span> <span class="toc-text">標準自己用了 indirect through null pointer?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CWG-issue-232-%E7%9A%84%E7%B5%90%E8%AB%96"><span class="toc-number">8.</span> <span class="toc-text">CWG issue#232 的結論</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E9%80%A3%E7%B5%90"><span class="toc-number">9.</span> <span class="toc-text">參考連結</span></a></li></ol>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> 礦坑系列 ── Indirect through null pointer</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Implicit-Undefined-Behavior"><span class="toc-number">3.</span> <span class="toc-text">Implicit Undefined Behavior?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%95%8F%E9%A1%8C%E8%A8%8E%E8%AB%96"><span class="toc-number">4.</span> <span class="toc-text">問題討論</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pointer-arithmetic-%E7%9A%84%E8%B7%AF%E5%BE%91"><span class="toc-number">4.0.1.</span> <span class="toc-text">pointer arithmetic 的路徑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%88%87-%E7%9A%84%E8%B7%AF%E5%BE%91"><span class="toc-number">4.0.2.</span> <span class="toc-text">* 與 -&gt; 的路徑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">4.0.3.</span> <span class="toc-text">結論</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Indirect-through-null-pointer"><span class="toc-number">5.</span> <span class="toc-text">Indirect through null pointer?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%88%87"><span class="toc-number">6.</span> <span class="toc-text">-&gt; 與 *</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%99%E6%BA%96%E8%87%AA%E5%B7%B1%E7%94%A8%E4%BA%86-indirect-through-null-pointer"><span class="toc-number">7.</span> <span class="toc-text">標準自己用了 indirect through null pointer?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CWG-issue-232-%E7%9A%84%E7%B5%90%E8%AB%96"><span class="toc-number">8.</span> <span class="toc-text">CWG issue#232 的結論</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E9%80%A3%E7%B5%90"><span class="toc-number">9.</span> <span class="toc-text">參考連結</span></a></li></ol>
             </div>
         
         <!-- sidebar -->
