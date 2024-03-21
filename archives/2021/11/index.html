@@ -445,6 +445,7 @@
         
         
             
+            
         
         <article class="index-post">
             <a class="abstract-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">
@@ -452,9 +453,7 @@
                 <span class="abstract-title-text">ROS Tutorial Introduction</span>
             </a>
             <div class="abstract-content">
-                ROS Tutorial Introduction此篇為中央大學數學系上課所用的 ROS 教材，若非修課生，Demo 部分需要注意一下自己的機器人設定。 原文放在 hackmd 上，我會不定期更新過來，若發現教材有誤，歡迎到 hackmd 上修改，或是可以發 issue 給我。
-什麼是 ROS?ROS 全名叫 Robot Operating System，但它其實是一種中介軟體(Middleware)，妳也可以說它是一個軟體框架(Software Framework)，所以他是一種抽象化的概念，不是應用程式，也不是作業系統。
-那它主要會幫我們連結各個軟體和零件之間的溝通，並且會提供一些 ...
+                中央大學數學系上課所用的 ROS 教材，原文放在 hackmd 上，我會不定期更新過來
             </div>
             <!-- read more -->
             
@@ -482,6 +481,7 @@
         
         
             
+            
         
         <article class="index-post">
             <a class="abstract-title" href="/2021/11/15/numerical_algebra/Power-Method/">
@@ -489,15 +489,7 @@
                 <span class="abstract-title-text">Power Method</span>
             </a>
             <div class="abstract-content">
-                9.3 Power MethodExample看一下費波那契數列 $F_n &#x3D; F_{n-1} + F_{n-2}$，這個數列長 ${0,1,1,2,3,5,8,13,21,34,\ …}$，我們可以透過矩陣來重寫這個數列：
-
-在這個例子裏面，我們觀察到 eigenvector、eigenvalue 跟長期的外顯行為有關。
-Example看第二個例子，假設這邊有四個網頁，然後我們常像這樣去瀏覽她：
-
-那麼就會有一個機率矩陣：
-
-Thm dominant eigenvalue
-Prop Power Method假設 $A \in \mathbb{R}^{n \times n}$ ...
+                數值線代的上課筆記，講的 Power Method，老實說我已經忘光了
             </div>
             <!-- read more -->
             
@@ -525,6 +517,7 @@ Prop Power Method假設 $A \in \mathbb{R}^{n \times n}$ ...
         
         
             
+            
         
         <article class="index-post">
             <a class="abstract-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">
@@ -532,8 +525,7 @@ Prop Power Method假設 $A \in \mathbb{R}^{n \times n}$ ...
                 <span class="abstract-title-text">Linear Algebra and Eigenvalues</span>
             </a>
             <div class="abstract-content">
-                9.1 Linear Algebra and EigenvaluesGershgorin circle給定一個 $A\in \mathbb{R}^{n\times n}$ 矩陣，$R_i$ 記為一個在複數平面上的圓，圓心是 $a_{ii}$，半徑是 $\Sigma_{j&#x3D;1,\ i\neq j}^n \ |a_{ij}|$，也就是同一個 row 裡面除了圓心以外的其他元素的總和，所以
-$R_i &#x3D; {\ z \in \mathbb{C}\ | \ |z - a_{ii}|\ \leq\ \Sigma_{j&#x3D;1,\ i\neq j}^n \ |a_{ij}|\...
+                數值線代的上課筆記，講的 Linear Algebra and Eigenvalues，老實說我已經忘光了
             </div>
             <!-- read more -->
             
@@ -560,6 +552,7 @@ $R_i &#x3D; {\ z \in \mathbb{C}\ | \ |z - a_{ii}|\ \leq\ \Sigma_{j&#x3D;1,\ i\ne
         
         
         
+            
             
         
         <article class="index-post">
@@ -568,11 +561,7 @@ $R_i &#x3D; {\ z \in \mathbb{C}\ | \ |z - a_{ii}|\ \leq\ \Sigma_{j&#x3D;1,\ i\ne
                 <span class="abstract-title-text">最小平方逼近多項式(Polynomials of Least square)</span>
             </a>
             <div class="abstract-content">
-                8.2 最小平方逼近多項式(Polynomials of Least square)目的我們想要用一個多項式來逼近另一個 function $f\in C[a,b]$，這個多項式我們寫成 
-$Pn(x) &#x3D; a_0 + a_1x^1 +\ …\ + a_kx^k &#x3D; \Sigma_{k&#x3D;0}^n a_kx^k$
-這樣的話 least square error，或一開始的 LDA 的 error 就會長 $f(x) - Pn(x)$，那一樣，我們要找到 $a_0,a_1,\ …\ ,a_n$ 來最小化 $E$：
-
-推導而我們要最小化這個 $E$ 就要用到 gr...
+                數值線代的上課筆記，講的 Polynomials of Least square，老實說我已經忘光了
             </div>
             <!-- read more -->
             
@@ -600,6 +589,7 @@ $Pn(x) &#x3D; a_0 + a_1x^1 +\ …\ + a_kx^k &#x3D; \Sigma_{k&#x3D;0}^n a_kx^k$
         
         
             
+            
         
         <article class="index-post">
             <a class="abstract-title" href="/2021/11/06/numerical_algebra/Least-Squares/">
@@ -607,13 +597,7 @@ $Pn(x) &#x3D; a_0 + a_1x^1 +\ …\ + a_kx^k &#x3D; \Sigma_{k&#x3D;0}^n a_kx^k$
                 <span class="abstract-title-text">Least Squares</span>
             </a>
             <div class="abstract-content">
-                8.1 Least Squares最小絕對偏差法 Least absolute deviation假設現在給你這些點
-(圖源：wiki )
-我們沒辦法用一條直線來通過這些全部的點，但我們可以像這樣找到誤差最小的直線：
-(圖源：wiki )
-這條直線可以幫助我們預測資料的方向。
-假設 $a_1x_i + a_0$ 是這條直線上的第 i 個值，$y_i$ 是第 i 個給定的 y 值(原本的 y 值)，我們期望誤差最小，所以我們想要找到 $a_0$、$a_1$ 最小化這個式子：
-$E_\infty(a_0, a_1) &#x3D; max_{1 \leq i \leq 10}{|\ y_i -...
+                數值線代的上課筆記，講的 Least Squares，老實說我已經忘光了
             </div>
             <!-- read more -->
             
@@ -1262,6 +1246,8 @@ $E_\infty(a_0, a_1) &#x3D; max_{1 \leq i \leq 10}{|\ y_i -...
         
         
         
+        
+        
     
     
     
@@ -1283,6 +1269,21 @@ $E_\infty(a_0, a_1) &#x3D; max_{1 \leq i \leq 10}{|\ y_i -...
         
             
             
+            <div class="archive-year"> 2024 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2024/03/21/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
             <div class="archive-year"> 2023 </div>
             <ul class="year-list">
             
@@ -1296,12 +1297,6 @@ $E_\infty(a_0, a_1) &#x3D; max_{1 \leq i \leq 10}{|\ y_i -...
         <li class="archive-post-item">
             <span class="archive-post-date">11/20</span>
             <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/14</span>
-            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
         </li>
     
         
