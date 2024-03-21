@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="RVOS OSDI 筆記這是我在 bilibili 上面看一門叫做「循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春」的課的筆記 課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 mini-riscv-os 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了 常用的 RISC-V 筆記基本架構一條典型的 R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RVOS OSDI 筆記">
+<meta property="og:url" content="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="RVOS OSDI 筆記這是我在 bilibili 上面看一門叫做「循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春」的課的筆記 課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 mini-riscv-os 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了 常用的 RISC-V 筆記基本架構一條典型的 R">
+<meta property="og:locale">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1cMT1sw3.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BytZakoP2.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1PCAkiwn.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJELFY2Pn.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HJtbAY3Pn.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SyCVM9nP3.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1De6yAPh.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HylR0JAD3.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1WlAxCw2.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1Qm1W0v2.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S11GS4AD3.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HyMCrpFd6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryxSLTFuT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rkjDtpFuT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1RcK6tOp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1gbqaK_6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJq4caFdp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rycyE9qOT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryHsRsquT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r10Uknc_p.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Bk7ixh5d6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJ76bncu6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rywiz3cu6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1rEmh9up.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HJ7YXh9dp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/H16H6nq_p.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1X2JT5dp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1cpnA9Oa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BkXNCCqu6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1iQ0C5da.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1MnyJsuT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryPakkiuT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkETlJsO6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HJye1ls_6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryvOJxjdp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJ651ejda.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkqRJxouT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryszxxidT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryJBglodT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rywiz3cu6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryKuHM2da.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HJI7rrhdT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJOsdHhd6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1U1orn_a.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ByQt3H3_6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rkeToBnd6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rk5CsHnd6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkdmnB3dp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rksBnrn_a.png">
+<meta property="article:published_time" content="2023-06-17T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-21T06:14:00.708Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="OSDI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hackmd.io/_uploads/S1cMT1sw3.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/Ina.ico">
+    
+    <title>RVOS OSDI 筆記 · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">RVOS OSDI 筆記</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                RVOS OSDI 筆記
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="OSDI">OSDI</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">14.6k</span>閱讀時長: <span class="post-count reading-time">62 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2023/06/17</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="RVOS-OSDI-筆記"><a href="#RVOS-OSDI-筆記" class="headerlink" title="RVOS OSDI 筆記"></a>RVOS OSDI 筆記</h1><p>這是我在 bilibili 上面看一門叫做「<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Q5411w7z5/?spm_id_from=333.999.0.0&vd_source=493154d46ef9c42825a755d6b7857b3c">循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春</a>」的課的筆記</p>
+<p>課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 <a target="_blank" rel="noopener" href="https://github.com/cccriscv/mini-riscv-os">mini-riscv-os</a> 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了</p>
+<h1 id="常用的-RISC-V-筆記"><a href="#常用的-RISC-V-筆記" class="headerlink" title="常用的 RISC-V 筆記"></a>常用的 RISC-V 筆記</h1><h2 id="基本架構"><a href="#基本架構" class="headerlink" title="基本架構"></a>基本架構</h2><p>一條典型的 RISC-V 語句由 3 部分組成：</p>
+<blockquote>
+<p>[ label: ] [ operation ] [ comment ]</p>
+</blockquote>
+<p>三個都是可選的，因此可接受空行。 label 後面需接上冒號；operation 是比較重要的部分，真正的操作在這裡，裡面還可以分解；comment 是註釋。 </p>
+<h3 id="label-標籤"><a href="#label-標籤" class="headerlink" title="label(標籤)"></a>label(標籤)</h3><p>任何以冒號結尾的標示符都會被認為是一個標籤，看個例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">.macro do_nothing	# directive</span><br><span class="line">	nop		# pseudo-instruction</span><br><span class="line">	nop		# pseudo-instruction</span><br><span class="line">.endm			# directive</span><br><span class="line"></span><br><span class="line">	.text		# directive</span><br><span class="line">	.global _start	# directive</span><br><span class="line">_start: 		# Label</span><br><span class="line">	li x6, 5	# pseudo-instruction</span><br><span class="line">	li x7, 4	# pseudo-instruction</span><br><span class="line">	add x5, x6, x7	# instruction</span><br><span class="line">	do_nothing	# Calling macro</span><br><span class="line">stop:	j stop		# statement in one line</span><br><span class="line"></span><br><span class="line">	.end		# End of file</span><br></pre></td></tr></table></figure>
+
+<p>當中的 <code>_start:</code> 與 <code>stop</code> 就是 label，可以和後續的東西分成兩行寫，也可以寫同一行。 </p>
+<p>label 可以想成幫一段位址取了一個名字，方便我們後續使用</p>
+<h3 id="operation"><a href="#operation" class="headerlink" title="operation"></a>operation</h3><p>operation 總共有四種變化：</p>
+<ul>
+<li>instruction (指令)<br>  直接對應二進位的機器指令字符串</li>
+<li>pseudo-instruction (偽指令)<br>  為了提高寫程式的效率，可以用一條偽指令指示組譯器產生多條實際的 instruction</li>
+<li>directive (指示&#x2F;偽操作)<br>  通過類似 instruction 的形式(以 「.」 開頭)，通知組譯器如何控制程式碼的產生，不對應具體的指令，是由組譯器定義的</li>
+<li>macro<br>  採用 .macro&#x2F;.endm 自定義的 macro</li>
+</ul>
+<h2 id="指令的操作對象"><a href="#指令的操作對象" class="headerlink" title="指令的操作對象"></a>指令的操作對象</h2><p>指令的操作對象可以分兩大類：</p>
+<ul>
+<li>暫存器<ul>
+<li>RV32I 中共有 32 個通用暫存器，x0~x31，還有一些特權暫存器，其中 x0 是 0 暫存器，不可寫，讀出來的值永遠為 0</li>
+<li>在 RISC-V 中，Hart 在執行算術邏輯運算時操作的數據需要直接來自暫存器</li>
+</ul>
+</li>
+<li>記憶體<ul>
+<li>Hart 可以執行在暫存器和記憶體之間的數據讀寫操作</li>
+<li>讀寫操作使用 Byte 為基本單位尋址</li>
+<li>RV32 可以訪問最多 $2^{32}$ 個 Byte 的記憶體空間</li>
+</ul>
+</li>
+</ul>
+<h2 id="指令編碼格式"><a href="#指令編碼格式" class="headerlink" title="指令編碼格式"></a>指令編碼格式</h2><p><img src="https://hackmd.io/_uploads/S1cMT1sw3.png"></p>
+<p>指令最後會被翻譯為機器指令，裡面的 32 bits 都有對應的意思，以 32 bits 對齊，每個 32 bits 會照上面的圖被劃分為不同的區域(field)</p>
+<p>最終的指令類型是由 funct3&#x2F;funct7 和 opcode 一起決定的，題外話，funct3 中的 “3” 代表佔了 3 個 bit，funct7 同理。</p>
+<p>對於 opcode 的部分有另一張表規定了其內容意義：</p>
+<p><img src="https://hackmd.io/_uploads/BytZakoP2.png"></p>
+<p>opcode 的前兩位永遠為 11，而第 2<del>4 位是一組的，5</del>6 位是一組的，我們用一個例子來學習這個表格是怎麼看得：</p>
+<blockquote>
+<p>0000000 rs2 rs1 000 rd 0110011 | ADD</p>
+</blockquote>
+<p>這是 ADD 這個指令的機器碼範例，依照最前面的表格我們知道後面的 <code>0110011</code> 是 opcode，可以看見前兩位(最右邊)為 <code>11</code></p>
+<p>我們先看第 5~6 位，這裡是 <code>01</code>，因此我們去上表的左邊縱排找 <code>01</code>，之後看有哪些可能，有 STORE、STORE-FP、custom-1、AMO、OP、LUI、OP-32 這些</p>
+<p>我們再依照第 2~4 位來確認位置，這裡是 <code>100</code>，對到表格上就是 <code>OP</code>，也就是說 ADD 屬於 <code>OP</code> 類型的指令，也就是基本操作</p>
+<p>RISC-V 標準中為 little endian，假設在記憶體中的值為 <code>b3 05 95 00</code>，則需要先將其倒反過來為：<code>00 95 05 b3</code>，寫為二進制的話為 <code>00000000-10010101-00000101-10110011</code>，到標準中查表可知此指令為 <code>add x11, x10, x9</code></p>
+<p><img src="https://hackmd.io/_uploads/B1PCAkiwn.png"></p>
+<p>指令格式有 6 種，也就是第一張圖裡面的 R、I、S 那些：</p>
+<ul>
+<li>R-type (register)<br>  每條指令中有三個 fields，用於指定 3 個暫存器參數</li>
+<li>I-type (Immediate)<br>  每條指令除了帶有兩個暫存器參數以外，還帶有一個常數參數 (寬度為 12 bits)</li>
+<li>S-type (Store)<br>  每條指令除了帶有兩個暫存器參數以外，還帶有一個常數參數 (寬度為 12 bits，但 fields 的組成方式不同於 I-type)</li>
+<li>B-type (Branch)<br>  每條指令除了帶有兩個暫存器參數外，還有一個常數參數 (寬度為 12 bits，但取值為 2 的倍數)</li>
+<li>U-type (Upper)<br>  每條指令含有一個暫存器參數和一個常數參數 (寬度為 20 bits，用來表示一個常數的高 20 位)</li>
+<li>J-type (Jump)<br>  每條指令內有一個暫存器參數和一個常數參數 (寬度為 20 bits)</li>
+</ul>
+<h2 id="算術運算指令-Arithmetic-Instruction"><a href="#算術運算指令-Arithmetic-Instruction" class="headerlink" title="算術運算指令(Arithmetic Instruction)"></a>算術運算指令(Arithmetic Instruction)</h2><h3 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h3><p>功能：將兩暫存器的值相加<br>語法：<code>ADD RD, RS1, RS2</code></p>
+<blockquote>
+<p>例：add x5, x6, x7 為 x5 &#x3D; x6 + x7 </p>
+</blockquote>
+<p>格式：R-type</p>
+<p><img src="https://hackmd.io/_uploads/SJELFY2Pn.png"></p>
+<p>對應意義：</p>
+<ul>
+<li>opcode(7)：0110011 (OP)</li>
+<li>funct3 為 000，funct7 為 0000000</li>
+<li>rs1(5)：第一個 operand (source register 1)</li>
+<li>rs2(5)：第二個 operand (source register 2)</li>
+<li>rd(5)：destination register，用於存放加出來的結果</li>
+</ul>
+<h3 id="SUB"><a href="#SUB" class="headerlink" title="SUB"></a>SUB</h3><p>功能：將兩暫存器的值相減<br>語法：<code>SUB RD, RS1, RS2</code></p>
+<blockquote>
+<p>例：sub x5, x6, x7 為 x5 &#x3D; x6 - x7 </p>
+</blockquote>
+<p>格式同為 R-type</p>
+<h3 id="ADDI-ADD-Immediate"><a href="#ADDI-ADD-Immediate" class="headerlink" title="ADDI (ADD Immediate)"></a>ADDI (ADD Immediate)</h3><p>功能：將暫存器中的值與一常數相加<br>語法： <code>ADDI RD, RS1, IMM</code></p>
+<blockquote>
+<p>例：addi x5, x6, 1  為 x5 &#x3D; x6 + 1</p>
+</blockquote>
+<p>格式：I-type</p>
+<p><img src="https://hackmd.io/_uploads/HJtbAY3Pn.png"></p>
+<p>對應意義：</p>
+<ul>
+<li>opcode (7)：0b0010011 (OP-IMM)</li>
+<li>funct3 (3)：和 opcode 一起決定最終指令</li>
+<li>rs1 (5)：第一個 opecrand (source register 1)</li>
+<li>rd (5)：destination register，用於存放加出來的結果</li>
+<li>imm (12)：immediate，常數，要注意只有 12 bits，所以範圍是有限的</li>
+</ul>
+<p>在運算前 <code>imm</code> 會被 sign-extension 為一個 32 位的數，可以表達的範圍為 $-2^{11} ~ 2^{11}$，也就是 $[-2048, 2047)$</p>
+<h3 id="LUI-Load-Upper-Immediate"><a href="#LUI-Load-Upper-Immediate" class="headerlink" title="LUI (Load Upper Immediate)"></a>LUI (Load Upper Immediate)</h3><p>為了要加超過 12 bits 的常數，risc-v 引入了一個新的指令來「載入一個 32 bits 的常數」，作法是把一個 32 bits 的數切為高 20 位與低 12 位，之後先將高 20 位放到一個暫存器內，在利用 <code>ADDI</code> 將低 12 位的部分加上去</p>
+<p>用來構造高 20 位的指令就是 <code>LUI</code></p>
+<p>功能：構造一個 32 bits 的常數，此常數高 20 位為 <code>imm</code> 的內容，低 12 位為 0，這個常數會作為結果存在 RD 中<br>語法：<code>LUI RD, IMM</code></p>
+<blockquote>
+<p>例：lui x5, 0x12345 為 x5 &#x3D; 0x12345 &lt;&lt; 12</p>
+</blockquote>
+<p>格式：U-type</p>
+<p><img src="https://hackmd.io/_uploads/SyCVM9nP3.png"></p>
+<p>對應意義：</p>
+<ul>
+<li>opcode (7)：0b0110111 (LUI)</li>
+<li>rd (5)：destination register，用於存放加出來的結果</li>
+<li>imm (20)：immediate，常數</li>
+</ul>
+<p>假設我們今天要載入 <code>0x12345678</code>，那步驟為：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lui x1, 0x12345     # x1 = 0x12345000</span><br><span class="line">addi x1, x1, 0x678  # x1 = 0x12345678</span><br></pre></td></tr></table></figure>
+
+<p>但如果數字為 <code>0x12345FFF</code>，那在 <code>addi</code> 的部分會有問題，因為在 <code>addi</code> 運算前 <code>imm</code> 會被 sign-extension 為一個 32-bits 的數</p>
+<p>所以如果是做 <code>addi x1, x1, 0xFFF</code>，那麼是不會得到 <code>0x12345FFF</code> 的，所以我們換個想法，提前先借位，步驟為：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lui x1, 0x12346    # x1 = 0x12346000</span><br><span class="line">addi x1, x1, -1    # x1 = 0x12345FFF</span><br></pre></td></tr></table></figure>
+
+<h3 id="AUIPC"><a href="#AUIPC" class="headerlink" title="AUIPC"></a>AUIPC</h3><p>我們在構造一個位址的流程其實和建構一個普通的數值沒有太大的區別，可以用 <code>LUI</code> 和 <code>ADDI</code> 來做，但這樣建構出的會是一個直接指定好的常數，但在構造位址的時候我們還會希望有相對位址，所以就需要 <code>AUIPC</code>，名字中的 <code>PC</code> 指的是 program counter</p>
+<p>功能：構造一個 32 bits 的常數，高 20 位為 <code>imm</code>，低 12 位為 0，但會將此常數與 <code>PC</code> 值相加，結果存於 RD<br>語法：<code>AUIPC RD, IMM</code></p>
+<blockquote>
+<p>例：auipc x5, 0x12345 為 x5 &#x3D; 0x12345 &lt;&lt; 12 + PC</p>
+</blockquote>
+<h3 id="相關的-pseudo-instruction"><a href="#相關的-pseudo-instruction" class="headerlink" title="相關的 pseudo-instruction"></a>相關的 pseudo-instruction</h3><h4 id="NEG"><a href="#NEG" class="headerlink" title="NEG"></a>NEG</h4><p>功能：對 RS 取負號，將結果存在 RD 中<br>語法：<code>NEG RD, RS</code><br>等價指令：<code>SUB RD, x0, RS</code></p>
+<blockquote>
+<p>例：neg x5, x6</p>
+</blockquote>
+<h4 id="MV"><a href="#MV" class="headerlink" title="MV"></a>MV</h4><p>功能：將 RS 中的值複製到 RD 中<br>語法：<code>MV RD, RS</code><br>等價指令：<code>ADDI RD, RS, 0</code></p>
+<blockquote>
+<p>例：mv x5, x6</p>
+</blockquote>
+<h4 id="LI-Load-Immediate"><a href="#LI-Load-Immediate" class="headerlink" title="LI (Load Immediate)"></a>LI (Load Immediate)</h4><p>因為用 <code>LUI</code> 在載入一個數時還要考慮提前借位的問題太麻煩了，所以就有了 <code>LI</code></p>
+<p>功能：載入一個常數，組譯器會根據 imm 的情況自動判斷要不要借位<br>語法：<code>LI RD, IMM</code></p>
+<blockquote>
+<p>例：li x5, 0x12345678 為 x5 &#x3D; 0x12345678</p>
+</blockquote>
+<h4 id="LA-Load-Address"><a href="#LA-Load-Address" class="headerlink" title="LA (Load Address)"></a>LA (Load Address)</h4><p>在寫 code 的時候給出需要載入的 label，組譯器會根據實際情況利用 <code>AUIPC</code> 和其他指令自動生成正確的指令來載入記憶體位址，常用於載入一個函式或變數的位址</p>
+<p>功能：載入一個地址<br>語法：<code>LA RD, LABEL</code></p>
+<blockquote>
+<p>例：la x5, foo</p>
+</blockquote>
+<h4 id="NOP-空指令"><a href="#NOP-空指令" class="headerlink" title="NOP (空指令)"></a>NOP (空指令)</h4><p>功能：不做任何事<br>語法：<code>NOP</code><br>等價指令：<code>ADDI x0, 0, 0</code></p>
+<blockquote>
+<p>例：nop</p>
+</blockquote>
+<h2 id="邏輯運算指令-Logical-Instructions"><a href="#邏輯運算指令-Logical-Instructions" class="headerlink" title="邏輯運算指令 (Logical Instructions)"></a>邏輯運算指令 (Logical Instructions)</h2><h3 id="AND"><a href="#AND" class="headerlink" title="AND"></a>AND</h3><p>功能：<code>RD = RS1 &amp; RS2</code><br>語法：<code>AND RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：and x5, x6, x7</p>
+</blockquote>
+<h3 id="OR"><a href="#OR" class="headerlink" title="OR"></a>OR</h3><p>功能：<code>RD = RS1 | RS2</code><br>語法：<code>OR RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：or x5, x6, x7</p>
+</blockquote>
+<h3 id="XOR"><a href="#XOR" class="headerlink" title="XOR"></a>XOR</h3><p>功能：<code>RD = RS1 ^ RS2</code><br>語法：<code>XOR RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：xor x5, x6, x7</p>
+</blockquote>
+<h3 id="ANDI"><a href="#ANDI" class="headerlink" title="ANDI"></a>ANDI</h3><p>功能：<code>RD = RS1 &amp; IMM</code><br>語法：<code>ANDI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：<code>andi x5, x6, 20</code></p>
+</blockquote>
+<h3 id="ORI"><a href="#ORI" class="headerlink" title="ORI"></a>ORI</h3><p>功能：<code>RD = RS1 | IMM</code><br>語法：<code>ORI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：<code>ori x5, x6, 20</code></p>
+</blockquote>
+<h3 id="XORI"><a href="#XORI" class="headerlink" title="XORI"></a>XORI</h3><p>功能：<code>RD = RS1 ^ IMM</code><br>語法：<code>XORI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：<code>xori x5, x6, 20</code></p>
+</blockquote>
+<h3 id="相關的-pseudo-instruction-1"><a href="#相關的-pseudo-instruction-1" class="headerlink" title="相關的 pseudo-instruction"></a>相關的 pseudo-instruction</h3><h4 id="NOT"><a href="#NOT" class="headerlink" title="NOT"></a>NOT</h4><p>功能：對 RS 做 Bitwise Complement，將結果存在 RD 中<br>語法：<code>NOT RD, RS</code><br>等價指令：<code>XORI RD, RS, -1</code></p>
+<blockquote>
+<p>例：not x5, x6</p>
+</blockquote>
+<h2 id="移位運算指令-Shifting-Instructions"><a href="#移位運算指令-Shifting-Instructions" class="headerlink" title="移位運算指令 (Shifting Instructions)"></a>移位運算指令 (Shifting Instructions)</h2><h3 id="SLL-邏輯左移"><a href="#SLL-邏輯左移" class="headerlink" title="SLL (邏輯左移)"></a>SLL (邏輯左移)</h3><p>補 0</p>
+<p>功能：<code>RD = RS1 &lt;&lt; RS2</code><br>語法：<code>SLL RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：sll x5, x6, x7</p>
+</blockquote>
+<h3 id="SRL-邏輯右移"><a href="#SRL-邏輯右移" class="headerlink" title="SRL (邏輯右移)"></a>SRL (邏輯右移)</h3><p>補 0</p>
+<p>功能：<code>RD = RS1 &gt;&gt; RS2</code><br>語法：<code>SRL RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：srl x5, x6, x7</p>
+</blockquote>
+<h3 id="SLLI-邏輯左移常數"><a href="#SLLI-邏輯左移常數" class="headerlink" title="SLLI (邏輯左移常數)"></a>SLLI (邏輯左移常數)</h3><p>補 0</p>
+<p>功能：<code>RD = RS1 &lt;&lt; IMM</code><br>語法：<code>SLLI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：slli x5, x6, 3</p>
+</blockquote>
+<h3 id="SRLI-邏輯右移常數"><a href="#SRLI-邏輯右移常數" class="headerlink" title="SRLI (邏輯右移常數)"></a>SRLI (邏輯右移常數)</h3><p>補 0</p>
+<p>功能：<code>RD = RS1 &gt;&gt; IMM</code><br>語法：<code>SRLI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：srli x5, x6, 3</p>
+</blockquote>
+<h3 id="SRA-算術右移"><a href="#SRA-算術右移" class="headerlink" title="SRA (算術右移)"></a>SRA (算術右移)</h3><p>按符號位補足</p>
+<p>功能：<code>RD = RS1 &gt;&gt; RS2</code><br>語法：<code>SRA RD, RS1, RS2</code><br>格式：R-type</p>
+<blockquote>
+<p>例：sra x5, x6, x7</p>
+</blockquote>
+<h3 id="SRAI-算術右移常數"><a href="#SRAI-算術右移常數" class="headerlink" title="SRAI (算術右移常數)"></a>SRAI (算術右移常數)</h3><p>按符號位補足</p>
+<p>功能：<code>RD = RS1 &gt;&gt; IMM</code><br>語法：<code>SRAI RD, RS1, IMM</code><br>格式：I-type</p>
+<blockquote>
+<p>例：srai x5, x6, 3</p>
+</blockquote>
+<h2 id="記憶體讀寫指令-Load-and-Store-Instructions"><a href="#記憶體讀寫指令-Load-and-Store-Instructions" class="headerlink" title="記憶體讀寫指令 (Load and Store Instructions)"></a>記憶體讀寫指令 (Load and Store Instructions)</h2><h3 id="LB"><a href="#LB" class="headerlink" title="LB"></a>LB</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$，資料在保存到 RD 前會執行 sign-extension</p>
+<p>功能：Load Byte，從記憶體中讀一個 8 bits 的數據到 RD 中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>LB RD, IMM(RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：lb x5, 40(x6)</p>
+</blockquote>
+<h3 id="LBU"><a href="#LBU" class="headerlink" title="LBU"></a>LBU</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$，資料在保存到 RD 前會執行 zero-extension</p>
+<p>功能：Load Byte Unsigned，從記憶體中讀一個 8 bits 的數據到 RD 中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>LBU RD, IMM(RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：lbu x5, 40(x6)</p>
+</blockquote>
+<h3 id="LH"><a href="#LH" class="headerlink" title="LH"></a>LH</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$，資料在保存到 RD 前會執行 sign-extension</p>
+<p>功能：Load Halfword，從記憶體中讀一個 16 bits 的數據到 RD 中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>LH RD, IMM(RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：lh x5, 40(x6)</p>
+</blockquote>
+<h3 id="LHU"><a href="#LHU" class="headerlink" title="LHU"></a>LHU</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$，資料在保存到 RD 前會執行 zero-extension</p>
+<p>功能：Load Halfword Unsigned，從記憶體中讀一個 16 bits 的數據到 RD 中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>LHU RD, IMM(RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：lhu x5, 40(x6)</p>
+</blockquote>
+<h3 id="LW"><a href="#LW" class="headerlink" title="LW"></a>LW</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$</p>
+<p>功能：Load Word，從記憶體中讀一個 32 bits 的數據到 RD 中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>LW RD, IMM(RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：lw x5, 40(x6)</p>
+</blockquote>
+<h3 id="SB"><a href="#SB" class="headerlink" title="SB"></a>SB</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$</p>
+<p>功能：Store Byte，將 RS2 中低 8 bits 的資料寫到記憶體中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>SB RS2, IMM(RS1)</code><br>格式：S-type</p>
+<blockquote>
+<p>例：sb x5, 40(x6)</p>
+</blockquote>
+<h3 id="SH"><a href="#SH" class="headerlink" title="SH"></a>SH</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$</p>
+<p>功能：Store Halfword，將 RS2 中低 16 bits 的資料寫到記憶體中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>SH RS2, IMM(RS1)</code><br>格式：S-type</p>
+<blockquote>
+<p>例：sh x5, 40(x6)</p>
+</blockquote>
+<h3 id="SW"><a href="#SW" class="headerlink" title="SW"></a>SW</h3><p><code>IMM</code> 範圍為 $[-2048, 2047]$</p>
+<p>功能：Store Word，將 RS2 中低 32 bits 的資料寫到記憶體中，記憶體位址為 <code>RS1 + IMM</code><br>語法：<code>SW RS2, IMM(RS1)</code><br>格式：S-type</p>
+<blockquote>
+<p>例：sw x5, 40(x6)</p>
+</blockquote>
+<h2 id="分支指令-Conditional-Branch-Instructions"><a href="#分支指令-Conditional-Branch-Instructions" class="headerlink" title="分支指令 (Conditional Branch Instructions)"></a>分支指令 (Conditional Branch Instructions)</h2><h3 id="BEQ"><a href="#BEQ" class="headerlink" title="BEQ"></a>BEQ</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if EQual，比較 RS1 和 RS2 的值，若相等，執行路徑跳轉到新的地址<br>語法：<code>BEQ RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：beq x5, x6, 100</p>
+</blockquote>
+<h3 id="BNE"><a href="#BNE" class="headerlink" title="BNE"></a>BNE</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if Not Equal，比較 RS1 和 RS2 的值，若不相等，則執行路徑跳轉到新的地址<br>語法：<code>BNE RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：bne x5, x6, 100</p>
+</blockquote>
+<h3 id="BLT"><a href="#BLT" class="headerlink" title="BLT"></a>BLT</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if Less Than，依照「有號」方式比較 RS1 和 RS2 的值，若 RS1 &lt; RS2，則執行路徑跳轉到新的地址<br>語法：<code>BLT RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：blt x5, x6, 100</p>
+</blockquote>
+<h3 id="BLTU"><a href="#BLTU" class="headerlink" title="BLTU"></a>BLTU</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if Less Than (Unsigned)，依照「無號」方式比較 RS1 和 RS2 的值，若 RS1 &lt; RS2，則執行路徑跳轉到新的地址<br>語法：<code>BLTU RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：bltu x5, x6, 100</p>
+</blockquote>
+<h3 id="BGE"><a href="#BGE" class="headerlink" title="BGE"></a>BGE</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if Greater than or Equal，依照「有號」方式比較 RS1 和 RS2 的值，若 RS1 &gt;&#x3D; RS2，則執行路徑跳轉到新的地址<br>語法：<code>BGE RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：bge x5, x6, 100</p>
+</blockquote>
+<h3 id="BGEU"><a href="#BGEU" class="headerlink" title="BGEU"></a>BGEU</h3><p>跳轉的目標地址計算方法為：先將 IMM * 2，符號擴展後和 PC 值相加得到最終的目標位址，所以跳轉的範圍是以 PC 為基準，加減 4KB 左右 ($[-4096, 4094]$)</p>
+<p>實際上在寫的時候不會直接寫常數，而是會寫標籤帶體，交由 Linker 決定最終的 <code>IMM</code> 值</p>
+<p>功能：Branch if Greator than or Equal (Unsigned)，依照「無號」方式比較 RS1 和 RS2 的值，若 RS1 &gt;&#x3D; RS2，則執行路徑跳轉到新的地址<br>語法：<code>BGEU RS1, RS2, IMM</code><br>格式：B-type</p>
+<blockquote>
+<p>例：bgeu x5, x6, 100</p>
+</blockquote>
+<h3 id="相關的-pseudo-instruction-2"><a href="#相關的-pseudo-instruction-2" class="headerlink" title="相關的 pseudo-instruction"></a>相關的 pseudo-instruction</h3><h3 id="BLE"><a href="#BLE" class="headerlink" title="BLE"></a>BLE</h3><p>功能：Branch if Less and Equal，有號方式比較，如果 RS &lt;&#x3D; RT，跳轉到 OFFSET<br>語法：<code>BLE RS, RT, OFFSET</code><br>等價指令：<code>BGE RT, RS, OFFSET</code></p>
+<h3 id="BLEU"><a href="#BLEU" class="headerlink" title="BLEU"></a>BLEU</h3><p>功能：Branch if Less or Equal Unsigned，無號方式比較，如果 RS &lt;&#x3D; RT，跳轉到 OFFSET<br>語法：<code>BLEU RS, RT, OFFSET</code><br>等價指令：<code>BGEU RT, RS, OFFSET</code></p>
+<h3 id="BGT"><a href="#BGT" class="headerlink" title="BGT"></a>BGT</h3><p>功能：Branch if Greater Than，有號方式比較，如果 RS &gt; RT，跳轉到 OFFSET<br>語法：<code>BGT RS, RT, OFFSET</code><br>等價指令：<code>BLT RT, RS, OFFSET</code></p>
+<h3 id="BGTU"><a href="#BGTU" class="headerlink" title="BGTU"></a>BGTU</h3><p>功能：Branch if Greator Than Unsigned，無號方式比較，如果 RS &gt; RT，跳轉到 OFFSET<br>語法：<code>BGTU RS, RT, OFFSET</code><br>等價指令：<code>BLTU RT, RS, OFFSET</code></p>
+<h3 id="BEQZ"><a href="#BEQZ" class="headerlink" title="BEQZ"></a>BEQZ</h3><p>功能：Branch if Equal Zero，如果 RS &#x3D;&#x3D; 0，跳轉到 OFFSET<br>語法：<code>BEQZ RS, OFFSET</code><br>等價指令：<code>BEQ RS, x0, OFFSET</code></p>
+<h3 id="BNEZ"><a href="#BNEZ" class="headerlink" title="BNEZ"></a>BNEZ</h3><p>功能：Branch if Not Equal Zero，如果 RS !&#x3D; 0，跳轉到 OFFSET<br>語法：<code>BNEZ RS, OFFSET</code><br>等價指令：<code>BNE RS, x0, OFFSET</code></p>
+<h3 id="BLTZ"><a href="#BLTZ" class="headerlink" title="BLTZ"></a>BLTZ</h3><p>功能：Branch if Less Than Zero，如果 RS &lt; 0，跳轉到 OFFSET<br>語法：<code>BLT RS, x0, OFFSET</code><br>等價指令：<code>BLT RS, x0, OFFSET</code></p>
+<h3 id="BLEZ"><a href="#BLEZ" class="headerlink" title="BLEZ"></a>BLEZ</h3><p>功能：Branch if Less or Equal Than Zero，如果 RS &lt;&#x3D; 0，跳轉到 OFFSET<br>語法：<code>BLEZ RS, OFFSET</code><br>等價指令：<code>BGE x0, RS, OFFSET</code></p>
+<h3 id="BGTZ"><a href="#BGTZ" class="headerlink" title="BGTZ"></a>BGTZ</h3><p>功能：Branch if Greater Than Zero，如果 RS &gt; 0，跳轉到 OFFSET<br>語法：<code>BGTZ RS, OFFSET</code><br>等價指令：<code>BLT x0, RS, OFFSET</code></p>
+<h3 id="BGEZ"><a href="#BGEZ" class="headerlink" title="BGEZ"></a>BGEZ</h3><p>功能：Branch if Greater or Equal Zero，如果 RS &gt;&#x3D; 0，跳轉到 OFFSET<br>語法：<code>BGEZ RS, OFFSET</code><br>等價指令：<code>BGE RS, x0, OFFSET</code></p>
+<h2 id="無條件跳轉-Unconditional-Jump-Instructions"><a href="#無條件跳轉-Unconditional-Jump-Instructions" class="headerlink" title="無條件跳轉 (Unconditional Jump Instructions)"></a>無條件跳轉 (Unconditional Jump Instructions)</h2><h3 id="JAL-Jump-And-Link"><a href="#JAL-Jump-And-Link" class="headerlink" title="JAL (Jump And Link)"></a>JAL (Jump And Link)</h3><p>功能：跳轉到目標位址，用於呼叫函式<br>語法：<code>JAL RD, LABEL</code><br>格式：J-type</p>
+<blockquote>
+<p>例：jal x1, label</p>
+</blockquote>
+<p><img src="https://hackmd.io/_uploads/r1De6yAPh.png"></p>
+<p>調用函式時地址的計算方法為先對 20 bits 寬的 <code>IMM</code> 乘以 2，然後進行 sign-extension，最後與 PC 相加，因此跳轉的範圍是以 PC 為基準，上下加減 1 MB</p>
+<p>JAL 指令的下一條指令的地址會寫入 RD，保存為返回位址，實際在寫時會用 label 給出跳轉的目標，具體 <code>IMM</code> 值由組譯器和 linker 負責生成。</p>
+<h3 id="JALR-Jump-And-Link-Register"><a href="#JALR-Jump-And-Link-Register" class="headerlink" title="JALR (Jump And Link Register)"></a>JALR (Jump And Link Register)</h3><p>功能：跳轉到目標位址，用於呼叫函式<br>語法：<code>JALR RD, IMM (RS1)</code><br>格式：I-type</p>
+<blockquote>
+<p>例：jalr x0, 0(x5)</p>
+</blockquote>
+<p><img src="https://hackmd.io/_uploads/HylR0JAD3.png"></p>
+<p>調用函式時地址的計算方法為先對 12 bits 寬的 <code>IMM</code> 進行 sign-extension，然後將其與 RS1 的值相加，得到最終的結果後將其最低位設為 0 (用以確保對齊)，因此跳轉的範圍是以 RS1 為基準，上下加減 2KB</p>
+<h1 id="OS-Development"><a href="#OS-Development" class="headerlink" title="OS Development"></a>OS Development</h1><h2 id="讀取-CSR"><a href="#讀取-CSR" class="headerlink" title="讀取 CSR"></a>讀取 CSR</h2><p>我使用 Qemu 來模擬板子，為了方便先以單核為目標，所以首要目標是怎麼確認當前核心是不是要用的核心</p>
+<p>RISC-V 中，每一個 privilege level 都對應到一組特定的暫存器，被稱為控制暫存器，簡稱 CSR，從這個暫存器中我們可以讀取 Hart 的編號，高 level 可以訪問低 level，但反過來不行。</p>
+<p>要訪問 CSR，我們需要使用 CSR 擴展指令</p>
+<p>首先要看的是 Machine 模式下的 CSR 列表，因為 CPU 一上電時默認是在 machine 模式下，有點類似 x86 的 real mode：</p>
+<p><img src="https://hackmd.io/_uploads/r1WlAxCw2.png"></p>
+<p>可以看見前面有與 Hart ID 相關的暫存器，像是 <code>mvendorid</code>、<code>marchid</code> 等，那接下來要看怎麼讀：</p>
+<p><img src="https://hackmd.io/_uploads/B1Qm1W0v2.png"></p>
+<p>我們關心的是前兩個，先看 CSRRW (Atomic Read&#x2F;Write CSR)：</p>
+<ul>
+<li>CSRRW<ul>
+<li>會先讀出 CSR 中的值，將其按 XLEN 位的寬度進行 zero-extensio 後寫入 RD，然後 RS1 中的值寫入 CSR</li>
+<li>為原子操作 (atomically)</li>
+<li>如果 RD 是 x0，則不讀 CSR</li>
+<li>語法：<code>CSRRW RD, CSR, RS1</code></li>
+<li>例子：<code>csrrw t6, mscratch, t6</code> 為 <code>t6 = mscratch; mscratch = t6</code>(交換值)</li>
+</ul>
+</li>
+<li>CSRW<ul>
+<li>由 CSRRW 來的 pseudo-instruction</li>
+<li>用來寫 CSR</li>
+<li>語法為：<code>csrw csr, rs</code></li>
+<li>等價指令為：<code>csrrw x0, csr, rs</code></li>
+</ul>
+</li>
+</ul>
+<p>接下來是 CSRRS (Atomic Read and Set Bits in CSR)：</p>
+<ul>
+<li><p>CSRRS</p>
+<ul>
+<li>會先讀出 CSR 中的值，將其按 XLEN 位的寬度進行 zero-extensio 後寫入 RD，然後逐位檢查 RS1 中的值，如果某一位為 1 則將 CSR 的對應位置設為 1，否則保持不變</li>
+<li>為原子操作 (atomically)</li>
+<li>語法為：<code>CSRRS RD, CSR, RS1</code></li>
+<li>例子：<code>csrrs x5, mie, x6</code> 為 <code>x5 = mie; mie |= x6</code> (做 mask)</li>
+</ul>
+</li>
+<li><p>CSRR</p>
+<ul>
+<li>由 CSRRS 來的 pseudo-instruction</li>
+<li>用來讀取 CSR</li>
+<li>與法為 <code>csrr rd, csr</code></li>
+<li>等價指令為：<code>csrrs rd, csr, x0</code></li>
+</ul>
+</li>
+</ul>
+<p>所以一開始就先去讀 machine 模式下存有 Hart ID 的暫存器，這個暫存器為 <code>mhartid</code>，它包含了運行當前指令的 Hart 的 ID</p>
+<p>標準中有規定多個 Hart 的 ID 必須是唯一的，而且必須有一個 Hart ID 為 0 (第一個 Hart 的 ID)，所以我們就找 0 的那個用就好：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">_start:</span><br><span class="line">    csrr t0, mhartid</span><br><span class="line">    bnez t0, park</span><br><span class="line">    </span><br><span class="line">park:</span><br><span class="line">    wfi</span><br><span class="line">    j park</span><br></pre></td></tr></table></figure>
+
+<p>這邊做的事為讀取 <code>mhartid</code>，如果不是 0，就跳到下方標籤處做 <code>wfi</code>(Wait for Interrupt)，Hart 執行到 <code>wfi</code> 後會進入類似休眠的狀態</p>
+<p>接下來下一件事是想辦法進到 C 語言的環境中，設定好 stack 後直接 jump 到 main function 就好：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;platform.h&quot;</span><br><span class="line"></span><br><span class="line">	# size of each hart&#x27;s stack is 1024 bytes</span><br><span class="line">	.equ	STACK_SIZE, 1024</span><br><span class="line"></span><br><span class="line">	.global	_start</span><br><span class="line"></span><br><span class="line">	.text</span><br><span class="line">_start:</span><br><span class="line">	# park harts with id != 0</span><br><span class="line">	csrr	t0, mhartid		# read current hart id</span><br><span class="line">	mv	tp, t0			# keep CPU&#x27;s hartid in its tp for later usage.</span><br><span class="line">	bnez	t0, park		# if we&#x27;re not on the hart 0</span><br><span class="line">					# we park the hart</span><br><span class="line">	# Setup stacks, the stack grows from bottom to top, so we put the</span><br><span class="line">	# stack pointer to the very end of the stack range.</span><br><span class="line">	slli	t0, t0, 10		# shift left the hart id by 1024</span><br><span class="line">	la	sp, stacks + STACK_SIZE	# set the initial stack pointer</span><br><span class="line">					# to the end of the first stack space</span><br><span class="line">	add	sp, sp, t0		# move the current hart stack pointer</span><br><span class="line">					# to its place in the stack space</span><br><span class="line"></span><br><span class="line">	j	start_kernel		# hart 0 jump to c</span><br><span class="line"></span><br><span class="line">park:</span><br><span class="line">	wfi</span><br><span class="line">	j	park</span><br><span class="line"></span><br><span class="line">stacks:</span><br><span class="line">	.skip	STACK_SIZE * MAXNUM_CPU # allocate space for all the harts stacks</span><br><span class="line"></span><br><span class="line">	.end				# End of file</span><br></pre></td></tr></table></figure>
+
+<h2 id="設定-UART"><a href="#設定-UART" class="headerlink" title="設定 UART"></a>設定 UART</h2><p>為了方便後面 Debug，接下來的目標是要能夠顯示訊息在螢幕上，我們這邊使用 uart 來傳輸數據，將訊息從板子上傳送到主機上，並在主機上顯示出來</p>
+<p>UART 全名為 Universal Asynchronous Receiver and Transmitter，是一種 Serial communication，代表會一位一位的發送和接收數據，因此需要設定波特率(baud rate)，數字越大發送越快；另外 UART 還支援非同步與全雙工</p>
+<p>這邊簡單看一下 UART 的通訊協議：</p>
+<ul>
+<li>空閒位：空閒時處於高電位</li>
+<li>起始位：開始發送時發送方(TX) 要先發出一個低電位(0)來表示傳輸字符的開始</li>
+<li>數據位：起始位之後就是要傳輸的數據，數據長度(word length) 可以事 5&#x2F;6&#x2F;7&#x2F;8&#x2F;9 位，構成一個字符，一般是 8 位。先發送最低位，最後發送最高位</li>
+<li>奇偶檢查位(parity)：分幾種檢查方式：<ul>
+<li>無檢查(no parity)</li>
+<li>奇檢驗(odd parity)：如果數據中 1 的數目為偶數，則檢驗位為 1，反之為 0</li>
+<li>偶檢驗(even parity)：如果數據中 1 的數目是偶數，則檢驗位為 0，反之為 1</li>
+<li>mark parity：檢驗位始終為 1</li>
+<li>space parity：檢驗位始終為 0</li>
+</ul>
+</li>
+<li>停止位：數據結束的標誌，可以是 1 位、1.5 位、2 位的高電位</li>
+</ul>
+<p>在 QEMU 中 UART 記憶體映射的起始位址在 <code>0x10000000L</code>，總共提供了 8 個暫存器，每個暫存器是 8 bits 的，根據起始位址我們可以設定使用暫存器的 macro：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * The UART control registers are memory-mapped at address UART0. </span></span><br><span class="line"><span class="comment"> * This macro returns the address of one of the registers.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UART_REG(reg) ((volatile uint8_t *)(UART0 + reg))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * UART control registers map. see [1] &quot;PROGRAMMING TABLE&quot;</span></span><br><span class="line"><span class="comment"> * note some are reused by multiple functions</span></span><br><span class="line"><span class="comment"> * 0 (write mode): THR/DLL</span></span><br><span class="line"><span class="comment"> * 1 (write mode): IER/DLM</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RHR 0	<span class="comment">// Receive Holding Register (read mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> THR 0	<span class="comment">// Transmit Holding Register (write mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DLL 0	<span class="comment">// LSB of Divisor Latch (write mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IER 1	<span class="comment">// Interrupt Enable Register (write mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DLM 1	<span class="comment">// MSB of Divisor Latch (write mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FCR 2	<span class="comment">// FIFO Control Register (write mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ISR 2	<span class="comment">// Interrupt Status Register (read mode)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LCR 3	<span class="comment">// Line Control Register</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MCR 4	<span class="comment">// Modem Control Register</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LSR 5	<span class="comment">// Line Status Register</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MSR 6	<span class="comment">// Modem Status Register</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPR 7	<span class="comment">// ScratchPad Register</span></span></span><br></pre></td></tr></table></figure>
+
+<p>如此一來我們就能使用這些暫存器了，重複的代表那個暫存器有多個功能，至於各個暫存器的功用要去看 NS16550a 的手冊</p>
+<p>而要對暫存器讀寫也很簡單，只要這樣就好：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> uart_read_reg(reg) (*(UART_REG(reg)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> uart_write_reg(reg, v) (*(UART_REG(reg)) = (v))</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來要初始化 UART，首先先禁用 interrupt，因為後面才會用到：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* disable interrupts. */</span></span><br><span class="line">uart_write_reg(IER, <span class="number">0x00</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然後要設定波特率(baud rate)：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint8_t</span> lcr = uart_read_reg(LCR);</span><br><span class="line">uart_write_reg(LCR, lcr | (<span class="number">1</span> &lt;&lt; <span class="number">7</span>)); <span class="comment">// 啟用波特率調整</span></span><br><span class="line">uart_write_reg(DLL, <span class="number">0x03</span>); <span class="comment">// 低位</span></span><br><span class="line">uart_write_reg(DLM, <span class="number">0x00</span>); <span class="comment">// 高位</span></span><br></pre></td></tr></table></figure>
+
+<p>還有檢查位：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lcr = <span class="number">0</span>;</span><br><span class="line">uart_write_reg(LCR, lcr | (<span class="number">3</span> &lt;&lt; <span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+
+<p>接下來來處理發送數據：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> LSR_TX_IDLE  (1 &lt;&lt; 5)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">uart_putc</span><span class="params">(<span class="type">char</span> ch)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">while</span> ((uart_read_reg(LSR) &amp; LSR_TX_IDLE) == <span class="number">0</span>); <span class="comment">// busy waiting 等待 THR 為空 </span></span><br><span class="line">  <span class="keyword">return</span> uart_write_reg(THR, ch); <span class="comment">// 將資料寫入 THR</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如此一來可以傳輸一個字，而要傳送一個字串的話就每個字節都呼叫一次就好：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">uart_puts</span><span class="params">(<span class="type">char</span> *s)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">while</span> (*s) &#123;</span><br><span class="line">    uart_putc(*s++);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="記憶體管理"><a href="#記憶體管理" class="headerlink" title="記憶體管理"></a>記憶體管理</h2><p>這樣資料的傳輸就搞定了，接下來要處理記憶體，實現動態的記憶體分配和釋放，還有簡單的 page</p>
+<p>首先來設定記憶體區段，這部份我們可以用 gcc link script 完成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">MEMORY</span><br><span class="line">&#123;</span><br><span class="line">    ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 128M</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">    .text : &#123;</span><br><span class="line">        PROVIDE(_text_start = .);</span><br><span class="line">        *(.text .text.*)</span><br><span class="line">        PROVIDE(_text_end = .);</span><br><span class="line">    &#125; &gt;ram</span><br><span class="line">    </span><br><span class="line">    .rodata : &#123;</span><br><span class="line">        PROVIDE(_rodata_start = .);</span><br><span class="line">        *(.rodata .rodata.*)</span><br><span class="line">        PROVIDE(_rodata_end = .);</span><br><span class="line">    &#125; &gt;ram</span><br><span class="line">    </span><br><span class="line">    .data : &#123;</span><br><span class="line">        . = ALIGN(4096);</span><br><span class="line">        PROVIDE(_data_start = .);</span><br><span class="line">        *(.sdata .sdata.*)</span><br><span class="line">        *(.data .data.*)</span><br><span class="line">        PROVIDE(_data_end = .);</span><br><span class="line">    &#125; &gt;ram	</span><br><span class="line">    </span><br><span class="line">    .bss :&#123;</span><br><span class="line">        PROVIDE(_bss_start = .);</span><br><span class="line">        *(.sbss .sbss.*)</span><br><span class="line">        *(.bss .bss.*)</span><br><span class="line">        *(COMMON)</span><br><span class="line">        PROVIDE(_bss_end = .);</span><br><span class="line">    &#125; &gt;ram	</span><br><span class="line">    </span><br><span class="line">    PROVIDE(_memory_start = ORIGIN(ram));</span><br><span class="line">    PROVIDE(_memory_end = ORIGIN(ram) + LENGTH(ram));	</span><br><span class="line">    PROVIDE(_heap_start = _bss_end);</span><br><span class="line">    PROVIDE(_heap_size = _memory_end - _heap_start);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因為 link script 的變數會被添加到 symbol table 內，因此在 asm、C 語言中我們是可以使用的：</p>
+<p>asm：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">.section .rodata</span><br><span class="line">.global HEAP_START</span><br><span class="line">HEAP_START: .word _heap_start</span><br><span class="line"></span><br><span class="line">.global HEAP_SIZE</span><br><span class="line">HEAP_SIZE: .word _heap_size</span><br><span class="line"></span><br><span class="line">.global TEXT_START</span><br><span class="line">TEXT_START: .word _text_start</span><br><span class="line"></span><br><span class="line">.global TEXT_END</span><br><span class="line">TEXT_END: .word _text_end</span><br><span class="line"></span><br><span class="line">.global DATA_START</span><br><span class="line">DATA_START: .word _data_start</span><br><span class="line"></span><br><span class="line">.global DATA_END</span><br><span class="line">DATA_END: .word _data_end</span><br><span class="line"></span><br><span class="line">.global RODATA_START</span><br><span class="line">RODATA_START: .word _rodata_start</span><br><span class="line"></span><br><span class="line">.global RODATA_END</span><br><span class="line">RODATA_END: .word _rodata_end</span><br><span class="line"></span><br><span class="line">.global BSS_START</span><br><span class="line">BSS_START: .word _bss_start</span><br><span class="line"></span><br><span class="line">.global BSS_END</span><br><span class="line">BSS_END: .word _bss_end</span><br></pre></td></tr></table></figure>
+
+<p>C：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> TEXT_START;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> TEXT_END;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> DATA_START;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> DATA_END;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> RODATA_START;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> RODATA_END;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> BSS_START;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> BSS_END;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> HEAP_START;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">uint32_t</span> HEAP_SIZE;</span><br></pre></td></tr></table></figure>
+
+<p>如此一來記憶體區段就分配好了，也可以在 C 中使用了，接下來要來實現簡單的 page，一個 page 分配為 4k</p>
+<p>這邊使用陣列來實作 page 的管理：</p>
+<p><img src="https://hackmd.io/_uploads/S11GS4AD3.png"></p>
+<p>前方紅藍的部分為管理對應 page 狀態的區域，後方白色的是一個一個的 page</p>
+<p>前方紅藍部分的定義如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_TAKEN (uint8_t)(1 &lt;&lt; 0)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_LAST  (uint8_t)(1 &lt;&lt; 1)</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Page</span> &#123;</span></span><br><span class="line">    <span class="type">uint8_t</span> flags;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>flags</code> 的第一個 bit 代表是否有被使用中，第二個 bit 代表是否為連續區塊的最後一個 page，接下來我們來寫檢測狀態的 API</p>
+<p>將 page 狀態清空：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> _clear(<span class="keyword">struct</span> Page *page)</span><br><span class="line">&#123;</span><br><span class="line">    page-&gt;flags = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>確認 page 是否有人在使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> _is_free(<span class="keyword">struct</span> Page *page)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (page-&gt;flags &amp; PAGE_TAKEN) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>設定 page 狀態：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> _set_flag(<span class="keyword">struct</span> Page *page, <span class="type">uint8_t</span> flags)</span><br><span class="line">&#123;</span><br><span class="line">    page-&gt;flags |= flags;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>確認是否為連續區塊的最後一個 page：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> _is_last(<span class="keyword">struct</span> Page *page)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (page-&gt;flags &amp; PAGE_LAST) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>對齊 page：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">uint32_t</span> _align_page(<span class="type">uint32_t</span> address)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> order = (<span class="number">1</span> &lt;&lt; PAGE_ORDER) - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> (address + order) &amp; (~order);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了這些之後我們就可以來寫怎麼分配和釋放 page 了，首先是分配 page：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">page_alloc</span><span class="params">(<span class="type">int</span> npages)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> found = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">page_i</span> =</span> (<span class="keyword">struct</span> Page *)HEAP_START;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= (_num_pages - npages); i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (_is_free(page_i)) &#123;</span><br><span class="line">            found = <span class="number">1</span>;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">page_j</span> =</span> page_i + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j &lt; (i + npages); j++) &#123;</span><br><span class="line">            	<span class="keyword">if</span> (!_is_free(page_j)) &#123;</span><br><span class="line">            	    found = <span class="number">0</span>;</span><br><span class="line">            	    <span class="keyword">break</span>;</span><br><span class="line">            	&#125;</span><br><span class="line">            	page_j++;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> (found) &#123;</span><br><span class="line">            	<span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">page_k</span> =</span> page_i;</span><br><span class="line">            	<span class="keyword">for</span> (<span class="type">int</span> k = i; k &lt; (i + npages); k++) &#123;</span><br><span class="line">                    _set_flag(page_k, PAGE_TAKEN);</span><br><span class="line">            	    page_k++;</span><br><span class="line">            	&#125;</span><br><span class="line">            	page_k--;</span><br><span class="line">            	_set_flag(page_k, PAGE_LAST);</span><br><span class="line">            	<span class="keyword">return</span> (<span class="type">void</span> *)(_alloc_start + i * PAGE_SIZE);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        page_i++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>npages</code> 代表我們需要幾個 page，我們會分配連續的回傳，假設是 4，那就會是一個大小為 4 個 page 的連續記憶體</p>
+<p>邏輯很簡單，根據前面寫好的 API，循訪前方的狀態區塊，檢查其是否為空與是否是最後一個區塊，條件符合的話便將其標記為使用中並回傳開頭位址</p>
+<p>釋放也是同樣邏輯，循訪前方的狀態區塊，將對應的 page 釋放，並檢查其是否已為最後一個區塊：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">page_free</span><span class="params">(<span class="type">void</span> *p)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!p || (<span class="type">uint32_t</span>)p &gt;= _alloc_end) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* get the first page descriptor of this memory block */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">page</span> =</span> (<span class="keyword">struct</span> Page *)HEAP_START;</span><br><span class="line">    page += ((<span class="type">uint32_t</span>)p - _alloc_start)/ PAGE_SIZE;</span><br><span class="line">    <span class="comment">/* loop and clear all the page descriptors of the memory block */</span></span><br><span class="line">    <span class="keyword">while</span> (!_is_free(page)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (_is_last(page)) &#123;</span><br><span class="line">            _clear(page);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            _clear(page);</span><br><span class="line">            page++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="multitask-and-context-switch"><a href="#multitask-and-context-switch" class="headerlink" title="multitask and context switch"></a>multitask and context switch</h2><h3 id="multitask"><a href="#multitask" class="headerlink" title="multitask"></a>multitask</h3><p>一個 task 的本質是函式的執行過程，也就是一個指令的 flow；假如我們今天不同的 Hart 上面都有跑一個函式與對應的子函式，這種情況就可以算是一個最簡單的多任務了</p>
+<p>那假設我們現在只有一個 Hart，但卻想要能夠實現多任務怎麼辦? 我們可以讓兩個 task 在同一個 Hart 上輪流執行</p>
+<p>我們前面已經提到，執行的狀態是利用暫存器來儲存的，因此我們只要將任務當前使用的暫存器的值給儲存下來，就相當於是把它執行的狀態儲存起來了</p>
+<p>透過改變這些暫存器的值，我們就可以改變目前執行的 task 了，也就可以只用一個 Hart 實現多任務了</p>
+<p>當前 task 的狀態有個名詞，我們稱它為 context，中文翻為上下文</p>
+<p>為了儲存上下文，我們可以定義一個 struct，將 context 使用到的 struct 都儲存起來：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">context</span> &#123;</span></span><br><span class="line">    <span class="comment">/* ignore x0 */</span></span><br><span class="line">    <span class="type">reg_t</span> ra;</span><br><span class="line">    <span class="type">reg_t</span> sp;</span><br><span class="line">    <span class="type">reg_t</span> gp;</span><br><span class="line">    <span class="type">reg_t</span> tp;</span><br><span class="line">    <span class="type">reg_t</span> t0;</span><br><span class="line">    <span class="type">reg_t</span> t1;</span><br><span class="line">    <span class="type">reg_t</span> t2;</span><br><span class="line">    <span class="type">reg_t</span> s0;</span><br><span class="line">    <span class="type">reg_t</span> s1;</span><br><span class="line">    <span class="type">reg_t</span> a0;</span><br><span class="line">    <span class="type">reg_t</span> a1;</span><br><span class="line">    <span class="type">reg_t</span> a2;</span><br><span class="line">    <span class="type">reg_t</span> a3;</span><br><span class="line">    <span class="type">reg_t</span> a4;</span><br><span class="line">    <span class="type">reg_t</span> a5;</span><br><span class="line">    <span class="type">reg_t</span> a6;</span><br><span class="line">    <span class="type">reg_t</span> a7;</span><br><span class="line">    <span class="type">reg_t</span> s2;</span><br><span class="line">    <span class="type">reg_t</span> s3;</span><br><span class="line">    <span class="type">reg_t</span> s4;</span><br><span class="line">    <span class="type">reg_t</span> s5;</span><br><span class="line">    <span class="type">reg_t</span> s6;</span><br><span class="line">    <span class="type">reg_t</span> s7;</span><br><span class="line">    <span class="type">reg_t</span> s8;</span><br><span class="line">    <span class="type">reg_t</span> s9;</span><br><span class="line">    <span class="type">reg_t</span> s10;</span><br><span class="line">    <span class="type">reg_t</span> s11;</span><br><span class="line">    <span class="type">reg_t</span> t3;</span><br><span class="line">    <span class="type">reg_t</span> t4;</span><br><span class="line">    <span class="type">reg_t</span> t5;</span><br><span class="line">    <span class="type">reg_t</span> t6;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊因為 <code>x0</code> 的值是不變的所以就忽略它了</p>
+<h3 id="type-of-multitask"><a href="#type-of-multitask" class="headerlink" title="type of multitask"></a>type of multitask</h3><p>多任務可以分成兩種實現方式：協作式與搶占式的多任務，兩者的差別在於交換 context 的方法不一樣</p>
+<ul>
+<li><p>協作式多任務(Cooperative Multitasking)<br>  目前正在執行的 task 會主動放棄 Hart，呼叫下一個 task，讓下一個 task 來使用 CPU</p>
+</li>
+<li><p>搶占式多任務(Preemptive Multitasking)<br>  由 OS 來決定哪個 task 來使用 CPU，OS 可以剝奪當前 task 對處理器的使用，將處理器交給其他的 task</p>
+</li>
+</ul>
+<p>目前主流的 OS 都是使用 Preemtive Multitasking，早期的 OS 才會使用 Cooperative Multitasking 這種方法</p>
+<p>Cooperative Multitasking 有很大的壞處是「放棄 Hart，讓下一個 task 來使用 CPU」這件事是需要 Programmer 自己做的，因此當你程式沒寫好，發生無窮迴圈這類的情況時，當前的 task 就無法放棄 Hart，也就會讓電腦整個死當</p>
+<p>但由於實作上較為簡單，因此我們這邊就先實作 Cooperative Multitasking，後面再實作 Preemtive Multitasking</p>
+<h3 id="Cooperative-Multitasking"><a href="#Cooperative-Multitasking" class="headerlink" title="Cooperative Multitasking"></a>Cooperative Multitasking</h3><p>前面提到了一個 task 的本質是一堆指令的序列，假設這邊有 Task A 和 B，在 Cooperative Multitasking 的情況下他們會長這樣：</p>
+<p><img src="https://hackmd.io/_uploads/HyMCrpFd6.png" alt="image"></p>
+<p>可以看見兩個 Task 內都是由指令序列組成的(Instruction i)，中間有一個指令是 <code>call switch_to</code>，這就是讓下一個 task 來使用 CPU 的 function</p>
+<p>那我們就來看一下這個 <code>switch_to</code> 裡面到底做了什麼：</p>
+<p><img src="https://hackmd.io/_uploads/ryxSLTFuT.png" alt="image"></p>
+<p>步驟是：</p>
+<ol>
+<li>將目前的 context 儲存起來</li>
+<li>切換 context</li>
+<li>載入新任務的 context</li>
+<li>return</li>
+</ol>
+<p>在這張圖裡面我們只有一個 CPU，我們知道 CPU 內有很多暫存器，像是通用暫存器和一些 csr，也就是控制狀態暫存器，在這邊我們關心兩個暫存器：</p>
+<ol>
+<li><code>ra</code><br> 跟 return 指令有關，用來存放返回的位址</li>
+<li><code>mscratch</code><br> 這是一個 machine 下的暫存器，紀錄(指向)目前的 context</li>
+</ol>
+<p>為了讓 <code>mscratch</code> 可以指向 context，我們需要給 context 分配記憶體空間，保存該 context 的暫存器內容，也就是對應到上面寫的那個 <code>struct context</code></p>
+<p>上圖假設了 Context 會被初始化為第一條指令的位址，因此左下角的 ra 中存的是 <code>i</code>，而右下角的 ra 中存的是 <code>j</code></p>
+<p>初始化好了之後就可以初始化 <code>mscratch</code> 暫存器，假設第一個載入的 task 是 A，那 <code>mscratch</code> 就會指向 A 的 context</p>
+<p>之後開始執行 task 的內容，因此 PC 指標會一個指令一個指令的的跑下來，當 A 執行到 <code>switch_to</code> 的時候就會開始跑交換 context 的流程</p>
+<p>前面有提到 <code>call</code> 這個指令執行的時候是會把下一條指令的位址放到 ra 裡面去的，因此 <code>i+M</code> 會被放到 ra 裡面去：</p>
+<p><img src="https://hackmd.io/_uploads/rkjDtpFuT.png" alt="image"></p>
+<p>接下來就可以開始執行 <code>switch_to</code> 的內容，根據前面的步驟，第一步是儲存當前的 context，會將剛剛 <code>struct context</code> 內列出的暫存器內容全部從 CPU 儲存起來到 context A 的記憶體中</p>
+<p><img src="https://hackmd.io/_uploads/r1RcK6tOp.png" alt="image"></p>
+<p>下一步是切換 context，改變 CPU 的 ra 就可以了：</p>
+<p><img src="https://hackmd.io/_uploads/S1gbqaK_6.png" alt="image"></p>
+<p>下一步是 restore，也就是要載入 Task B 的暫存器內容：</p>
+<p><img src="https://hackmd.io/_uploads/BJq4caFdp.png" alt="image"></p>
+<p>最後是 return，前面有提到 <code>ret</code> 這個指令會跳回到 <code>ra</code> 暫存器儲存的記憶體位址，這邊已經被我們改成 Instruction j 了，因此就會切換到 Task B 了</p>
+<p>看完了邏輯，就來看一下 code 該怎麼寫，因為 <code>switch_to</code> 這個函式執行效率需要非常高，因此這邊就用 asm 來寫：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># void switch_to(struct context *next);</span><br><span class="line"># a0: pointer to the context of the next task</span><br><span class="line">.globl switch_to</span><br><span class="line">.balign 4</span><br><span class="line">switch_to:</span><br><span class="line">    csrrw	t6, mscratch, t6	# swap t6 and mscratch</span><br><span class="line">    beqz	t6, 1f			# Note: the first time switch_to() is</span><br><span class="line">                                    # called, mscratch is initialized as zero</span><br><span class="line">                    # (in sched_init()), which makes t6 zero,</span><br><span class="line">                    # and that&#x27;s the special case we have to</span><br><span class="line">                    # handle with t6</span><br><span class="line">    reg_save t6			# save context of prev task</span><br><span class="line"></span><br><span class="line">    # Save the actual t6 register, which we swapped into</span><br><span class="line">    # mscratch</span><br><span class="line">    mv	t5, t6		# t5 points to the context of current task</span><br><span class="line">    csrr	t6, mscratch	# read t6 back from mscratch</span><br><span class="line">    sw	t6, 120(t5)	# save t6 with t5 as base</span><br><span class="line"></span><br><span class="line">    1:</span><br><span class="line">    # switch mscratch to point to the context of the next task</span><br><span class="line">    csrw	mscratch, a0</span><br><span class="line"></span><br><span class="line">    # Restore all GP registers</span><br><span class="line">    # Use t6 to point to the context of the new task</span><br><span class="line">    mv	t6, a0</span><br><span class="line">    reg_restore t6</span><br><span class="line"></span><br><span class="line">    # Do actual context switching.</span><br><span class="line">    ret</span><br><span class="line">.end</span><br></pre></td></tr></table></figure>
+<p>這段相當於寫了一個 C 的函式 <code>switch_to(struct context *next)</code>，參數前面有提到是放在 <code>a0</code> 這個暫存器裡面的</p>
+<p>切換的部分是使用 <code>csrw</code> 指令來做的，這個指令前面有講過就是對 csr 暫存器進行寫操作，因此這邊就是把 <code>a0</code> 寫入 <code>mscratch</code> 中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">csrw    mscratch, a0</span><br></pre></td></tr></table></figure>
+
+<p>而 <code>reg_save</code> 是一個 macro，會將 CPU 的暫存器內容儲存到記憶體內對應的 struct：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.macro reg_save base</span><br><span class="line">    sw ra, 0(\base)</span><br><span class="line">    sw sp, 4(\base)</span><br><span class="line">    sw t0, 16(\base)</span><br><span class="line">    sw t1, 20(\base)</span><br><span class="line">    sw t2, 24(\base)</span><br><span class="line">    sw s0, 28(\base)</span><br><span class="line">    sw s1, 32(\base)</span><br><span class="line">    sw a0, 36(\base)</span><br><span class="line">    sw a1, 40(\base)</span><br><span class="line">    sw a2, 44(\base)</span><br><span class="line">    sw a3, 48(\base)</span><br><span class="line">    sw a4, 52(\base)</span><br><span class="line">    sw a5, 56(\base)</span><br><span class="line">    sw a6, 60(\base)</span><br><span class="line">    sw a7, 64(\base)</span><br><span class="line">    sw s2, 68(\base)</span><br><span class="line">    sw s3, 72(\base)</span><br><span class="line">    sw s4, 76(\base)</span><br><span class="line">    sw s5, 80(\base)</span><br><span class="line">    sw s6, 84(\base)</span><br><span class="line">    sw s7, 88(\base)</span><br><span class="line">    sw s8, 92(\base)</span><br><span class="line">    sw s9, 96(\base)</span><br><span class="line">    sw s10, 100(\base)</span><br><span class="line">    sw s11, 104(\base)</span><br><span class="line">    sw t3, 108(\base)</span><br><span class="line">    sw t4, 112(\base)</span><br><span class="line">    sw t5, 116(\base)</span><br><span class="line">    # we don&#x27;t save t6 here, due to we have used</span><br><span class="line">    # it as base, we have to save t6 in an extra step</span><br><span class="line">    # outside of reg_save</span><br><span class="line">.endm</span><br></pre></td></tr></table></figure>
+<p>而 <code>reg_restore</code> 也是一個 macro，用處是將記憶體中對應的 struct 內容回復到 CPU 中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">.macro reg_restore base</span><br><span class="line">    lw ra, 0(\base)</span><br><span class="line">    lw sp, 4(\base)</span><br><span class="line">    lw t0, 16(\base)</span><br><span class="line">    lw t1, 20(\base)</span><br><span class="line">    lw t2, 24(\base)</span><br><span class="line">    lw s0, 28(\base)</span><br><span class="line">    lw s1, 32(\base)</span><br><span class="line">    lw a0, 36(\base)</span><br><span class="line">    lw a1, 40(\base)</span><br><span class="line">    lw a2, 44(\base)</span><br><span class="line">    lw a3, 48(\base)</span><br><span class="line">    lw a4, 52(\base)</span><br><span class="line">    lw a5, 56(\base)</span><br><span class="line">    lw a6, 60(\base)</span><br><span class="line">    lw a7, 64(\base)</span><br><span class="line">    lw s2, 68(\base)</span><br><span class="line">    lw s3, 72(\base)</span><br><span class="line">    lw s4, 76(\base)</span><br><span class="line">    lw s5, 80(\base)</span><br><span class="line">    lw s6, 84(\base)</span><br><span class="line">    lw s7, 88(\base)</span><br><span class="line">    lw s8, 92(\base)</span><br><span class="line">    lw s9, 96(\base)</span><br><span class="line">    lw s10, 100(\base)</span><br><span class="line">    lw s11, 104(\base)</span><br><span class="line">    lw t3, 108(\base)</span><br><span class="line">    lw t4, 112(\base)</span><br><span class="line">    lw t5, 116(\base)</span><br><span class="line">    lw t6, 120(\base)</span><br><span class="line">.endm</span><br></pre></td></tr></table></figure>
+
+<p>接下來只要在 user program 裡面呼叫 <code>switch_to</code> 就可以進行 context switch 了，這邊就不寫出來了</p>
+<h2 id="Trap-Exception"><a href="#Trap-Exception" class="headerlink" title="Trap &amp; Exception"></a>Trap &amp; Exception</h2><p>既然要講 Preemtive Multitasking，那就需要中斷的概念</p>
+<h3 id="異常控制流-Exceptional-Control-Flow"><a href="#異常控制流-Exceptional-Control-Flow" class="headerlink" title="異常控制流(Exceptional Control Flow)"></a>異常控制流(Exceptional Control Flow)</h3><p>控制流(Control Flow) 這個名詞代表程式執行的過程，正常的控制流代表著使用者自己寫的指令</p>
+<p>但是一旦有了中斷，程式在執行時就不會只跑使用者寫的指令，因為 OS 會將中斷插入進來影響程式的執行</p>
+<p>這樣的過程被稱為異常控制流，簡稱為 ECP，分為兩種：異常(Exception) 與中斷(Interrupt)；在 risc-v 內統一把 ECP 稱為 Trap</p>
+<h3 id="Machine-mode-下的-CSR"><a href="#Machine-mode-下的-CSR" class="headerlink" title="Machine mode 下的 CSR"></a>Machine mode 下的 CSR</h3><p>因為我們這邊 OS 是寫在 Machine mode 下的，因此就看 Machine mode 下的 CSR：</p>
+<p><img src="https://hackmd.io/_uploads/rycyE9qOT.png" alt="image"></p>
+<p>然後我們把跟 Trap 有關的整理出來：</p>
+<ul>
+<li>mtvec (Machine Trap-Vector Base-Address)<ul>
+<li>保存發生異常時楚利器需要跳轉到的位址</li>
+</ul>
+</li>
+<li>mepc (Machine Exception Program Counter)<ul>
+<li>當 trap 發生時，Hart 會將發生 trap 所對應的指令的位址(pc) 保存在 mepc 中</li>
+</ul>
+</li>
+<li>mcause (Machine Cause)<ul>
+<li>當 trap 發生時，Hart 會設置此暫存器通知我們 trap 發生的原因</li>
+</ul>
+</li>
+<li>mtval (Machine Trap Value)<ul>
+<li>保存了 exception 發生時的附加信息，如：<ul>
+<li>訪問位址出吋時的位址信息</li>
+<li>執行非法指令時的指令本身</li>
+</ul>
+</li>
+<li>對於其他異常，暫存器的值為 0</li>
+</ul>
+</li>
+<li>mstatus (Machine Status)<ul>
+<li>用於跟蹤和控制 Hart 的當前操作狀態<ul>
+<li>包括打開和關閉全局中斷</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>mscratch (Machine Scratch)<ul>
+<li>Machine mode 下專用的暫存器，我們可以自己定義其用法<ul>
+<li>如使用此暫存器保存當前 Hart 上運行的 task 的 context 的位址</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>mie (Machine Interrupt Enable)<ul>
+<li>用於進一步控制(打開和關閉) software interrupt、timer interrupt、external interrupt</li>
+</ul>
+</li>
+<li>mip (Machine Interrupt Pending)<ul>
+<li>列出目前已發生等待處理的中斷</li>
+</ul>
+</li>
+</ul>
+<p>現在看不懂沒關係，後面會慢慢用到，接下來我們先看一下每個暫存器對應的 bit 的意義</p>
+<h3 id="mtvec-Machine-Trap-Vector-Base-Address"><a href="#mtvec-Machine-Trap-Vector-Base-Address" class="headerlink" title="mtvec (Machine Trap-Vector Base-Address)"></a>mtvec (Machine Trap-Vector Base-Address)</h3><p><img src="https://hackmd.io/_uploads/ryHsRsquT.png" alt="image"></p>
+<p>這裡 WARL 的意思是「Write Any Values，Reads Legal Values」，也就是說這個地方可以隨便我們寫的，而讀出來的值都是合法的</p>
+<ul>
+<li>Base<ul>
+<li>trap 入口函式的 base address，必須保證四字節對齊</li>
+<li>這個位址是我們可以自己填的</li>
+</ul>
+</li>
+<li>MODE<ul>
+<li>進一步用於控制入口函式的位址配置方式<ul>
+<li>Direct：所有的 exception 和 interrupt 發生後，PC 都跳轉到 BASE 指定的位址處</li>
+<li>Vectored：exception 處理方式同 Direct；但 interrupt 的入口地址以 array 方式排列</li>
+</ul>
+</li>
+<li><img src="https://hackmd.io/_uploads/r10Uknc_p.png" alt="image"></li>
+</ul>
+</li>
+</ul>
+<h3 id="mepc-Machine-Exception-Program-Counter"><a href="#mepc-Machine-Exception-Program-Counter" class="headerlink" title="mepc (Machine Exception Program Counter)"></a>mepc (Machine Exception Program Counter)</h3><p><img src="https://hackmd.io/_uploads/Bk7ixh5d6.png" alt="image"></p>
+<ul>
+<li><p>當 trap 發生時，PC 會被替換為 mtvec 設定的位址，同時 Hart 會將 mepc 設為目前指令或下一條指令的位址，當我們需要退出 trap 時可以呼叫特殊的 mret 指令，該指令會將 mepc 中的值還原為 PC 中（實現返回的效果）</p>
+</li>
+<li><p>在處理 trap 的程式中我們可以修改 mepc 的值達到改變 mret 回傳位址的目的</p>
+</li>
+</ul>
+<h3 id="mcause-Machine-Cause"><a href="#mcause-Machine-Cause" class="headerlink" title="mcause (Machine Cause)"></a>mcause (Machine Cause)</h3><p><img src="https://hackmd.io/_uploads/BJ76bncu6.png" alt="image"></p>
+<p>這裡 WLRL 的意思是「Write&#x2F;Read Only Legal Values」，表示我們在讀寫的時候需要確保它的值是合法的</p>
+<ul>
+<li>當 trap 發生時，hart 會設定該暫存器通知我們 trap 發生的原因。</li>
+<li>最高位元 Interrupt 為 1 時標識了目前 trap 為 interrupt，否則是  exception。</li>
+<li>剩餘的 Exception Code 用來標識具體的 interrupt 或 exception 的種類。</li>
+<li>spec 內有附一張表格<br>  <img src="https://hackmd.io/_uploads/rywiz3cu6.png" alt="image"></li>
+</ul>
+<h3 id="mtval-Machine-Trap-Value"><a href="#mtval-Machine-Trap-Value" class="headerlink" title="mtval (Machine Trap Value)"></a>mtval (Machine Trap Value)</h3><p>用來輔助 mcause 用的暫存器</p>
+<p><img src="https://hackmd.io/_uploads/S1rEmh9up.png" alt="image"></p>
+<ul>
+<li><p>當 trap 發生時，除了透過 mcause 可以取得 exception 的種類 code 值外，hart 還提供了 mtval 來提供 exception 的其他資訊來輔助我們執行更進一步的操作。</p>
+</li>
+<li><p>具體的輔助資訊由特定的硬體實作定義，RISC-V 規範沒有定義具體的值。 但規範定義了一些行為，譬如訪問地址出錯時的地址資訊、或執行非法指令時的指令本身等</p>
+</li>
+</ul>
+<h3 id="mstatus-Machine-Status"><a href="#mstatus-Machine-Status" class="headerlink" title="mstatus (Machine Status)"></a>mstatus (Machine Status)</h3><p>用來描述一些狀態信息的，分得很細</p>
+<p><img src="https://hackmd.io/_uploads/HJ7YXh9dp.png" alt="image"></p>
+<p>WPRL 的意思是「Reserved Writes Preserve Values，Reads Ignore Values」，也就是說寫是保留值，忽略讀，簡單來說就是盡量不要去動它 </p>
+<p>這邊老師挑了比較會用到的來講，分別是第 0~12 bit，其他部分涉及到記憶體訪問的權限、virtual memory 的控制等，暫時先不去管它</p>
+<ul>
+<li>xIE（x&#x3D;M&#x2F;S&#x2F;U）<ul>
+<li>第 0~3 bit</li>
+<li>分別用於開啟（1）或關閉（0）M&#x2F;S&#x2F;U 模式下的全域中斷。 當 trap 發生時， hart 會自動將 xIE 設定為 0</li>
+</ul>
+</li>
+<li>xPIE（x&#x3D;M&#x2F;S&#x2F;U）<ul>
+<li>第 4~7 bit</li>
+<li>當 trap 發生時用於保存trap 發生之前的xIE值</li>
+</ul>
+</li>
+<li>xPP（x&#x3D;M&#x2F;S）<ul>
+<li>第 8~12 bit </li>
+<li>當 trap 發生時用於保存trap 發生之前的權限等級值</li>
+<li>注意沒有 UPP<ul>
+<li>因為異常發生時通常都是要從低權限往高權限跳，或是維持原權限，因此不需要 UPP</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Trap-處理流程"><a href="#Trap-處理流程" class="headerlink" title="Trap 處理流程"></a>Trap 處理流程</h2><p>Trap 處理的流程主要如下</p>
+<ol>
+<li>Trap 初始化<ul>
+<li>如設置入口位址</li>
+</ul>
+</li>
+<li>Trap 的上半部(Top Half)<ul>
+<li>發生在硬體部份，不受我們控制</li>
+</ul>
+</li>
+<li>Trap 的下半部(Bottom Half)<ul>
+<li>軟體部分，可由我們控制</li>
+</ul>
+</li>
+<li>從 Trap 返回</li>
+</ol>
+<p>那接下來就細看一下這四個部分</p>
+<h3 id="Trap-初始化"><a href="#Trap-初始化" class="headerlink" title="Trap 初始化"></a>Trap 初始化</h3><p>首先我們要設置入口函數，也就是把 Bottom Half 的位址告訴 CPU，它才會跑到這個位址去執行我們的 Trap 下半部</p>
+<p>那要怎麼告訴它呢? 只要設置 mtvec 這個暫存器就可以了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">trap_init</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * set the trap-vector base-address for machine-mode</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    w_mtvec((<span class="type">reg_t</span>)trap_vector);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這裡的 <code>trap_vector</code> 是我們寫好的一段邏輯，後面會提到</p>
+<h3 id="top-half"><a href="#top-half" class="headerlink" title="top half"></a>top half</h3><p>雖然我們沒辦法對這部分做更動，但還是可以看一下硬體部分具體做了什麼</p>
+<ol>
+<li>把 mstatus 的 MIE 值複製到 MPIE 中，清除 mstatus 中的 MIE 標誌位，效果是中斷被禁止<ul>
+<li>前面有提到 MIE 代表中斷的開或關</li>
+<li>MIE 清除的話代表填 0，也就是說中斷目前是被關掉的狀態</li>
+</ul>
+</li>
+<li>設定 mepc，同時 PC 被設定為 mtvec；需要注意的是，對於exception，mepc 指向導致異常的指令；對於 interrupt，它指向被中斷的指令的下一條指令的位置<br> <img src="https://hackmd.io/_uploads/H16H6nq_p.png" alt="image"></li>
+<li>根據 trap 的種類設定 mcause，並根據需要為 mtval 設定附加資訊</li>
+<li>將 trap 發生之前的權限模式保存在 mstatus 的 MPP 域中，再把 hart 權限模式改為 M（也就是說無論在任何 Level 下觸發 trap，hart 首先切換到 Machine 模式）</li>
+</ol>
+<h3 id="Bottom-half"><a href="#Bottom-half" class="headerlink" title="Bottom half"></a>Bottom half</h3><p>這邊寫的是一段異常的處理函式，可以把過程總結為五步：</p>
+<ol>
+<li>保存 context<ul>
+<li>利用 mscratch</li>
+</ul>
+</li>
+<li>呼叫 C 語言的 trap handler</li>
+<li>從 trap handler 函式返回<ul>
+<li>mepc 的值可能需要調整</li>
+</ul>
+</li>
+<li>恢復上下文</li>
+<li>利用 MRET 指令返回到 trap 前的狀態</li>
+</ol>
+<p>下面這段是對應的函式 <code>trap_vector</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># interrupts and exceptions while in machine mode come here.</span><br><span class="line">.globl trap_vector</span><br><span class="line"># the trap vector base address must always be aligned on a 4-byte boundary</span><br><span class="line">.balign 4</span><br><span class="line">trap_vector:</span><br><span class="line">    # save context(registers).</span><br><span class="line">    csrrw	t6, mscratch, t6	# swap t6 and mscratch</span><br><span class="line">    reg_save t6</span><br><span class="line"></span><br><span class="line">    # Save the actual t6 register, which we swapped into</span><br><span class="line">    # mscratch</span><br><span class="line">    mv	t5, t6		# t5 points to the context of current task</span><br><span class="line">    csrr	t6, mscratch	# read t6 back from mscratch</span><br><span class="line">    sw	t6, 120(t5)	# save t6 with t5 as base</span><br><span class="line"></span><br><span class="line">    # Restore the context pointer into mscratch</span><br><span class="line">    csrw	mscratch, t5</span><br><span class="line"></span><br><span class="line">    # call the C trap handler in trap.c</span><br><span class="line">    csrr	a0, mepc</span><br><span class="line">    csrr	a1, mcause</span><br><span class="line">    call	trap_handler</span><br><span class="line"></span><br><span class="line">    # trap_handler will return the return address via a0.</span><br><span class="line">    csrw	mepc, a0</span><br><span class="line"></span><br><span class="line">    # restore context(registers).</span><br><span class="line">    csrr	t6, mscratch</span><br><span class="line">    reg_restore t6</span><br><span class="line"></span><br><span class="line">    # return to whatever we were doing before trap.</span><br><span class="line">    mret</span><br></pre></td></tr></table></figure>
+
+<p>而 <code>trap_handler</code> 是由 C 語言寫的邏輯：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">reg_t</span> <span class="title function_">trap_handler</span><span class="params">(<span class="type">reg_t</span> epc, <span class="type">reg_t</span> cause)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">reg_t</span> return_pc = epc;</span><br><span class="line">    <span class="type">reg_t</span> cause_code = cause &amp; <span class="number">0xfff</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cause &amp; <span class="number">0x80000000</span>) &#123;</span><br><span class="line">        <span class="comment">/* Asynchronous trap - interrupt */</span></span><br><span class="line">        <span class="keyword">switch</span> (cause_code) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;software interruption!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">7</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;timer interruption!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">11</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;external interruption!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;unknown async exception!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Synchronous trap - exception */</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Sync exceptions!, code = %d\n&quot;</span>, cause_code);</span><br><span class="line">        panic(<span class="string">&quot;OOPS! What can I do!&quot;</span>);</span><br><span class="line">        <span class="comment">//return_pc += 4;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> return_pc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>函式中的 <code>cause</code> 是 mcause，因此最高位如果是 1，表示發生的是中斷，是 0 的話表示是異常</p>
+<p>因此將其與 <code>0x80000000</code> 進行 and 操作，如果結果非 0 的話表示進來的是一個中斷，否則為一個異常</p>
+<h3 id="從-Trap-返回"><a href="#從-Trap-返回" class="headerlink" title="從 Trap 返回"></a>從 Trap 返回</h3><p>從 trap 返回的話我們需要 MRET 這個指令</p>
+<p><img src="https://hackmd.io/_uploads/B1X2JT5dp.png" alt="image"></p>
+<ul>
+<li><p>針對不同權限等級下如何退出 trap 有各自的回傳指令 xRET（x &#x3D; M&#x2F;S&#x2F;U)</p>
+<ul>
+<li>我們這裡用的是 MRET</li>
+</ul>
+</li>
+<li><p>以在 M 模式下執行 mret 指令為例，會執行以下操作：</p>
+<ul>
+<li>將 Hart 的權限等級設為 <code>mstatus.MPP</code><ul>
+<li>也就是回復原本的權限</li>
+</ul>
+</li>
+<li><code>mstatus.MPP</code> 設為 U（如果 hart 不支援U 則為M）</li>
+<li><code>mstatus.MIE</code> 設為 <code>mstatus.MPIE</code><ul>
+<li>也就是回復中斷的開關</li>
+</ul>
+</li>
+<li><code>mstatus.MPIE</code> 設為 1</li>
+<li>pc 設為 mepc<ul>
+<li>也就是離開 trap</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Interrupt"><a href="#Interrupt" class="headerlink" title="Interrupt"></a>Interrupt</h2><h3 id="Interrupt-分類"><a href="#Interrupt-分類" class="headerlink" title="Interrupt 分類"></a>Interrupt 分類</h3><p>中斷有分兩種：</p>
+<ul>
+<li>本地中斷(Local Interrupt)<ul>
+<li>software interrupt</li>
+<li>timer interrupt</li>
+</ul>
+</li>
+<li>全局中斷(Global Interrupt)<ul>
+<li>externel interrupt</li>
+</ul>
+</li>
+</ul>
+<p>所以我們也可以說有三種：software、timer 與 externel；每一種下面都會再分 User、Supervisor、Reserved 與 Machine：</p>
+<p><img src="https://hackmd.io/_uploads/S1cpnA9Oa.png" alt="image"></p>
+<h3 id="mie-與-mip"><a href="#mie-與-mip" class="headerlink" title="mie 與 mip"></a>mie 與 mip</h3><p>前面講跟 Trap 有關的暫存器時還剩 mie 和 mip 兩個沒講，這兩個跟 Interrupt 有關，所以在這邊補一下</p>
+<p>mie 用於控制 Interrupt 的開或關；前面有提到一個 mstatus，那個是控制全局的，一旦關閉，不管是哪種中斷都無法使用，而 mie 是可以設置要單獨關閉 software interrupt 這類的操作：</p>
+<p><img src="https://hackmd.io/_uploads/BkXNCCqu6.png" alt="image"></p>
+<p>如果 mie 是用來寫的，那 mip 你可以認為就是拿來讀的，透過讀對應的 bit，我們可以得知當前發生了哪種中斷：</p>
+<p><img src="https://hackmd.io/_uploads/S1iQ0C5da.png" alt="image"></p>
+<h3 id="PLIC"><a href="#PLIC" class="headerlink" title="PLIC"></a>PLIC</h3><p>外部中斷代表的是外部設備所產生的中斷，通常一個 Hart 會有一根引腳來傳遞外部中斷的訊號，然而外部設備很多，那該怎麼辦呢?</p>
+<p><img src="https://hackmd.io/_uploads/B1MnyJsuT.png" alt="image"></p>
+<p>此時我們就引入了一個叫做 PLIC 的設備，全名為 Platform-Level Interrupt Controller，類似一個 hub：</p>
+<p><img src="https://hackmd.io/_uploads/ryPakkiuT.png" alt="image"></p>
+<p>左邊是很多不同的外設，它們全都會接到 PLIC 上；而 PLIC 到每一個 Hart 只會接一根引腳</p>
+<p>所以它的功能也很明顯，因為 CPU 同一個時間肯定只能處理一個中斷，所以 PLIC 就會起到一個代理人的作用，根據中斷的類型或是優先級之類的條件來篩選要先執行哪個中斷</p>
+<p>左邊的這些外設我們將其稱為中斷源：</p>
+<p><img src="https://hackmd.io/_uploads/SkETlJsO6.png" alt="image"></p>
+<p>每一個外設我們會給他一個編號，標準內定義了 53 個中斷源，0 號預留不用，因此實際有效的中斷源為 1~53；前面我們有用到 UART，UART 的 id 為 10，下面是 QEMU 的實作：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// https://github.com/qemu/qemu/blob/master/include/hw/riscv/virt.h</span></span><br><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span></span><br><span class="line">    UART0_IRQ = <span class="number">10</span>,</span><br><span class="line">    RTC_IRQ = <span class="number">11</span>,</span><br><span class="line">    VIRTIO_IRQ = <span class="number">1</span>, <span class="comment">/* 1 to 8 */</span></span><br><span class="line">    VIRTIO_COUNT = <span class="number">8</span>,</span><br><span class="line">    PCIE_IRQ = <span class="number">0x20</span>, <span class="comment">/* 32 to 35 */</span></span><br><span class="line">    VIRT_PLATFORM_BUS_IRQ = <span class="number">64</span>, <span class="comment">/* 64 to 95 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>PLIC 本身也是一個外部設備，和前面的 UART 一樣，所有的外設都是透過 MMIO 來訪問的，再 QEMU 中的定義如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> MemMapEntry virt_memmap[] = &#123;</span><br><span class="line">    [VIRT_DEBUG] =        &#123;        <span class="number">0x0</span>,         <span class="number">0x100</span> &#125;,</span><br><span class="line">    [VIRT_MROM] =         &#123;     <span class="number">0x1000</span>,        <span class="number">0xf000</span> &#125;,</span><br><span class="line">    [VIRT_TEST] =         &#123;   <span class="number">0x100000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    [VIRT_RTC] =          &#123;   <span class="number">0x101000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    [VIRT_CLINT] =        &#123;  <span class="number">0x2000000</span>,       <span class="number">0x10000</span> &#125;,</span><br><span class="line">    [VIRT_ACLINT_SSWI] =  &#123;  <span class="number">0x2F00000</span>,        <span class="number">0x4000</span> &#125;,</span><br><span class="line">    [VIRT_PCIE_PIO] =     &#123;  <span class="number">0x3000000</span>,       <span class="number">0x10000</span> &#125;,</span><br><span class="line">    [VIRT_PLATFORM_BUS] = &#123;  <span class="number">0x4000000</span>,     <span class="number">0x2000000</span> &#125;,</span><br><span class="line">    <span class="comment">// 下面這行</span></span><br><span class="line">    [VIRT_PLIC] =         &#123;  <span class="number">0xc000000</span>, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * <span class="number">2</span>) &#125;,</span><br><span class="line">    [VIRT_APLIC_M] =      &#123;  <span class="number">0xc000000</span>, APLIC_SIZE(VIRT_CPUS_MAX) &#125;,</span><br><span class="line">    [VIRT_APLIC_S] =      &#123;  <span class="number">0xd000000</span>, APLIC_SIZE(VIRT_CPUS_MAX) &#125;,</span><br><span class="line">    [VIRT_UART0] =        &#123; <span class="number">0x10000000</span>,         <span class="number">0x100</span> &#125;,</span><br><span class="line">    [VIRT_VIRTIO] =       &#123; <span class="number">0x10001000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    [VIRT_FW_CFG] =       &#123; <span class="number">0x10100000</span>,          <span class="number">0x18</span> &#125;,</span><br><span class="line">    [VIRT_FLASH] =        &#123; <span class="number">0x20000000</span>,     <span class="number">0x4000000</span> &#125;,</span><br><span class="line">    [VIRT_IMSIC_M] =      &#123; <span class="number">0x24000000</span>, VIRT_IMSIC_MAX_SIZE &#125;,</span><br><span class="line">    [VIRT_IMSIC_S] =      &#123; <span class="number">0x28000000</span>, VIRT_IMSIC_MAX_SIZE &#125;,</span><br><span class="line">    [VIRT_PCIE_ECAM] =    &#123; <span class="number">0x30000000</span>,    <span class="number">0x10000000</span> &#125;,</span><br><span class="line">    [VIRT_PCIE_MMIO] =    &#123; <span class="number">0x40000000</span>,    <span class="number">0x40000000</span> &#125;,</span><br><span class="line">    [VIRT_DRAM] =         &#123; <span class="number">0x80000000</span>,           <span class="number">0x0</span> &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Priority"><a href="#Priority" class="headerlink" title="Priority"></a>Priority</h3><p>至於 PLIC 有哪些 Programmable 的暫存器呢? 剛剛有提到 PLIC 的功能是根據中斷的優先級來篩選一個中斷進來，因此每個中斷源的優先級我們是可以單獨進行設定的：</p>
+<ul>
+<li>可以透過 Priority 這個暫存器來設定，他 MMIO 的記憶體映射位址為 <code>Base + (InterruptID*4)</code></li>
+<li>設定的優先級的的值會是一個數字，介於 0~7 之間<ul>
+<li>0 表示禁用此中斷源</li>
+<li>1 最低</li>
+<li>7 最高</li>
+</ul>
+</li>
+<li>如果優先級相同，則根據中斷源的 ID 篩選，ID 較小的優先值較高</li>
+</ul>
+<h3 id="Pending"><a href="#Pending" class="headerlink" title="Pending"></a>Pending</h3><p>下一個暫存器是 Pending，這個暫存器可以讓我們知道某一個中斷源是不是發生了</p>
+<ul>
+<li>每個 PLIC 有兩個 Pending</li>
+<li>一個 Pending 有 32 bit<ul>
+<li>每一個 bit 代表一個中斷源</li>
+<li>0 表示沒有中斷發生，1 表示該中斷源發生了中斷</li>
+</ul>
+</li>
+<li>MMIO 的記憶體映射位址為 <code>BASE + 0x1000 + (InterruptID/32)</code></li>
+<li>Pending 暫存器可讀也可寫<ul>
+<li>可以利用 claim 清 0</li>
+</ul>
+</li>
+<li>第一個 Pending 的第 0 位永遠為 0</li>
+</ul>
+<h3 id="Enable"><a href="#Enable" class="headerlink" title="Enable"></a>Enable</h3><p>我們也可以將中斷源設為關閉的，使用的是 Enable 暫存器</p>
+<ul>
+<li>一個 Hart 有兩個 Enable 暫存器<ul>
+<li>用於針對該 Hart 啟動或關閉某路的中斷源</li>
+</ul>
+</li>
+<li>一個 Enable 有 32 bit<ul>
+<li>每一個 bit 代表一個中斷源</li>
+<li>1 表示 enable 此中斷源，反之則表示關閉了該中斷源</li>
+</ul>
+</li>
+<li>MMIO 的記憶體映射位址為 <code>BASE + 0x2000 + (hart*0x80)</code></li>
+</ul>
+<h3 id="Threshold"><a href="#Threshold" class="headerlink" title="Threshold"></a>Threshold</h3><p>用來針對某個 Hart 設置中斷源優先級的閥值，如果優先級小於等於這個閥值的話，就算發生了中斷也會被扔掉</p>
+<ul>
+<li>每個 Hart 有一個 Threshold</li>
+<li>設為 0 表示接受所有中斷源上發生的中斷</li>
+<li>設為 7 表示丟棄所有中斷源上的中斷</li>
+<li>MMIO 的記憶體映射位址為 <code>BASE + 0x200000 + (hart*0x1000)</code></li>
+</ul>
+<h3 id="Claim-Complete"><a href="#Claim-Complete" class="headerlink" title="Claim&#x2F;Complete"></a>Claim&#x2F;Complete</h3><ul>
+<li>Claim 和 Complete 是同一個暫存器，每個 Hart 有一個</li>
+<li>對這個暫存器進行讀操作稱為 Claim，即獲取當前發生的最高優先級的中斷源 ID<ul>
+<li>Claim 成功後會清除對應的 Pending 位</li>
+</ul>
+</li>
+<li>對這個暫存器進行寫操作稱為 Complete，用來通知 PLIC 對該路中斷的處理已經結束</li>
+</ul>
+<h3 id="PLIC-操作流程"><a href="#PLIC-操作流程" class="headerlink" title="PLIC 操作流程"></a>PLIC 操作流程</h3><p>這邊通過一張圖來了解一下設置這些暫存器到底起到了什麼作用</p>
+<p><img src="https://hackmd.io/_uploads/HJye1ls_6.png" alt="image"></p>
+<p>左方的這個大正方形是一個 PLIC，上面接了兩個中斷源進來，右邊接了兩個 CPU 出去</p>
+<p>這個是用來設置中斷源優先級的：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/ryvOJxjdp.png" alt="image"></p>
+</center>
+    
+<p>這個是用來設定是否要啟用此中斷源的：</p>
+<center>
+    
+<p><img src="https://hackmd.io/_uploads/BJ651ejda.png" alt="image"></p>
+</center>
+    
+<p>這個用來設定中斷源的閥值：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/SkqRJxouT.png" alt="image"></p>
+</center>
+
+<p>這個是 Pending，用來判斷中斷是不是發生了：</p>
+<center>
+    
+<p><img src="https://hackmd.io/_uploads/ryszxxidT.png" alt="image"></p>
+</center>
+
+<p>這個是 Claim&#x2F;Complete：</p>
+<center>
+    
+<p><img src="https://hackmd.io/_uploads/ryJBglodT.png" alt="image"></p>
+</center>
+
+<h3 id="UART-的例子"><a href="#UART-的例子" class="headerlink" title="UART 的例子"></a>UART 的例子</h3><p>前面我們用 UART 實現了一個字串的輸出，那這邊我們可以利用中斷與 UART 實現一個字串的輸入</p>
+<p>原理是 UART 會接到我們的本機上，我們鍵盤敲一個字後會通知本機，本機再通過 UART 發送一個中斷給 PLIC，如此一來就可以讀一個字符了，然後在通過前面實作的字串輸出，輸出到我們螢幕上</p>
+<p>首先要初始化 plic：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">plic_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> hart = r_tp();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * Set priority for UART0.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Each PLIC interrupt source can be assigned a priority by writing </span></span><br><span class="line"><span class="comment">     * to its 32-bit memory-mapped priority register.</span></span><br><span class="line"><span class="comment">     * The QEMU-virt (the same as FU540-C000) supports 7 levels of priority. </span></span><br><span class="line"><span class="comment">     * A priority value of 0 is reserved to mean &quot;never interrupt&quot; and </span></span><br><span class="line"><span class="comment">     * effectively disables the interrupt. </span></span><br><span class="line"><span class="comment">     * Priority 1 is the lowest active priority, and priority 7 is the highest. </span></span><br><span class="line"><span class="comment">     * Ties between global interrupts of the same priority are broken by </span></span><br><span class="line"><span class="comment">     * the Interrupt ID; interrupts with the lowest ID have the highest </span></span><br><span class="line"><span class="comment">     * effective priority.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    *(<span class="type">uint32_t</span>*)PLIC_PRIORITY(UART0_IRQ) = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Enable UART0</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Each global interrupt can be enabled by setting the corresponding </span></span><br><span class="line"><span class="comment">     * bit in the enables registers.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    *(<span class="type">uint32_t</span>*)PLIC_MENABLE(hart)= (<span class="number">1</span> &lt;&lt; UART0_IRQ);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * Set priority threshold for UART0.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * PLIC will mask all interrupts of a priority less than or equal to threshold.</span></span><br><span class="line"><span class="comment">     * Maximum threshold is 7.</span></span><br><span class="line"><span class="comment">     * For example, a threshold value of zero permits all interrupts with</span></span><br><span class="line"><span class="comment">     * non-zero priority, whereas a value of 7 masks all interrupts.</span></span><br><span class="line"><span class="comment">     * Notice, the threshold is global for PLIC, not for each interrupt source.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    *(<span class="type">uint32_t</span>*)PLIC_MTHRESHOLD(hart) = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* enable machine-mode external interrupts. */</span></span><br><span class="line">    w_mie(r_mie() | MIE_MEIE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* enable machine-mode global interrupts. */</span></span><br><span class="line">    w_mstatus(r_mstatus() | MSTATUS_MIE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意寫 mie、mstatus 的方法是將原本的值先讀出來，然後再與我們要設置的 bit 做 bitwise or，這樣就可以保證不會改到原本的設定了</p>
+<p>對於 trap 來說，<code>trap_handler</code> 內我們就在外部中斷的部份加上 handler：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">reg_t</span> <span class="title function_">trap_handler</span><span class="params">(<span class="type">reg_t</span> epc, <span class="type">reg_t</span> cause)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">reg_t</span> return_pc = epc;</span><br><span class="line">    <span class="type">reg_t</span> cause_code = cause &amp; <span class="number">0xfff</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cause &amp; <span class="number">0x80000000</span>) &#123;</span><br><span class="line">        <span class="comment">/* Asynchronous trap - interrupt */</span></span><br><span class="line">        <span class="keyword">switch</span> (cause_code) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;software interruption!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">7</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;timer interruption!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">11</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;external interruption!\n&quot;</span>);</span><br><span class="line">            external_interrupt_handler();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            uart_puts(<span class="string">&quot;unknown async exception!\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* Synchronous trap - exception */</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Sync exceptions!, code = %d\n&quot;</span>, cause_code);</span><br><span class="line">        panic(<span class="string">&quot;OOPS! What can I do!&quot;</span>);</span><br><span class="line">        <span class="comment">//return_pc += 4;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> return_pc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>cause_code</code> 的數字含意見下表，前面也有貼過：</p>
+<p><img src="https://hackmd.io/_uploads/rywiz3cu6.png" alt="image"></p>
+<p><code>external_interrupt_handler</code> 的定義如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">external_interrupt_handler</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> irq = plic_claim();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (irq == UART0_IRQ)&#123;</span><br><span class="line">        uart_isr();</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (irq) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;unexpected interrupt irq = %d\n&quot;</span>, irq);</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="keyword">if</span> (irq) &#123;</span><br><span class="line">        plic_complete(irq);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先通過 <code>plic_claim</code> 得到中斷源的 id，因為我們這邊處理的是 UART，因此就加上一個 UART 的處理函式，最後再加上一個 complete 函式通知處理完了</p>
+<p>UART 的處理函式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * handle a uart interrupt, raised because input has arrived, called from trap.c.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">uart_isr</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> c = uart_getc();</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            uart_putc((<span class="type">char</span>)c);</span><br><span class="line">            uart_putc(<span class="string">&#x27;\n&#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基本上就是讀進來然後輸出出去</p>
+<p>然後前面有寫過 UART 的初始化函式，這邊要在最後面加上兩行，把 Interrupt 開起來：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">uart_init</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* disable interrupts. */</span></span><br><span class="line">    uart_write_reg(IER, <span class="number">0x00</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * enable receive interrupts.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">uint8_t</span> ier = uart_read_reg(IER);</span><br><span class="line">    uart_write_reg(IER, ier | (<span class="number">1</span> &lt;&lt; <span class="number">0</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最後這兩行是將讀資料的 Interrupt 給打開</p>
+<h2 id="timer-interrupt"><a href="#timer-interrupt" class="headerlink" title="timer interrupt"></a>timer interrupt</h2><p>一個 Hart 會有三個 Interrupt 的引腳，剛剛講的屬於 External Interrupt，這邊來講 Timer Interrupt</p>
+<p><img src="https://hackmd.io/_uploads/ryKuHM2da.png" alt="image"></p>
+<p>Timer Interrupt 屬於本地中斷，這代表他不是由外部設備發起的，而是由一個叫做 CLINT 的設備發出來的，其全名為 Core Local Interrupt，主要負責產生 software interrupt 與 timer interrupt</p>
+<p>要訪問他一樣要透過定義好的暫存器，一樣是用 MMIO 的方式，QEMU 的定義如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> MemMapEntry virt_memmap[] = &#123;</span><br><span class="line">    [VIRT_DEBUG] =        &#123;        <span class="number">0x0</span>,         <span class="number">0x100</span> &#125;,</span><br><span class="line">    [VIRT_MROM] =         &#123;     <span class="number">0x1000</span>,        <span class="number">0xf000</span> &#125;,</span><br><span class="line">    [VIRT_TEST] =         &#123;   <span class="number">0x100000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    [VIRT_RTC] =          &#123;   <span class="number">0x101000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    <span class="comment">// 下面這行</span></span><br><span class="line">    [VIRT_CLINT] =        &#123;  <span class="number">0x2000000</span>,       <span class="number">0x10000</span> &#125;,</span><br><span class="line">    [VIRT_ACLINT_SSWI] =  &#123;  <span class="number">0x2F00000</span>,        <span class="number">0x4000</span> &#125;,</span><br><span class="line">    [VIRT_PCIE_PIO] =     &#123;  <span class="number">0x3000000</span>,       <span class="number">0x10000</span> &#125;,</span><br><span class="line">    [VIRT_PLATFORM_BUS] = &#123;  <span class="number">0x4000000</span>,     <span class="number">0x2000000</span> &#125;,</span><br><span class="line">    [VIRT_PLIC] =         &#123;  <span class="number">0xc000000</span>, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * <span class="number">2</span>) &#125;,</span><br><span class="line">    [VIRT_APLIC_M] =      &#123;  <span class="number">0xc000000</span>, APLIC_SIZE(VIRT_CPUS_MAX) &#125;,</span><br><span class="line">    [VIRT_APLIC_S] =      &#123;  <span class="number">0xd000000</span>, APLIC_SIZE(VIRT_CPUS_MAX) &#125;,</span><br><span class="line">    [VIRT_UART0] =        &#123; <span class="number">0x10000000</span>,         <span class="number">0x100</span> &#125;,</span><br><span class="line">    [VIRT_VIRTIO] =       &#123; <span class="number">0x10001000</span>,        <span class="number">0x1000</span> &#125;,</span><br><span class="line">    [VIRT_FW_CFG] =       &#123; <span class="number">0x10100000</span>,          <span class="number">0x18</span> &#125;,</span><br><span class="line">    [VIRT_FLASH] =        &#123; <span class="number">0x20000000</span>,     <span class="number">0x4000000</span> &#125;,</span><br><span class="line">    [VIRT_IMSIC_M] =      &#123; <span class="number">0x24000000</span>, VIRT_IMSIC_MAX_SIZE &#125;,</span><br><span class="line">    [VIRT_IMSIC_S] =      &#123; <span class="number">0x28000000</span>, VIRT_IMSIC_MAX_SIZE &#125;,</span><br><span class="line">    [VIRT_PCIE_ECAM] =    &#123; <span class="number">0x30000000</span>,    <span class="number">0x10000000</span> &#125;,</span><br><span class="line">    [VIRT_PCIE_MMIO] =    &#123; <span class="number">0x40000000</span>,    <span class="number">0x40000000</span> &#125;,</span><br><span class="line">    [VIRT_DRAM] =         &#123; <span class="number">0x80000000</span>,           <span class="number">0x0</span> &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>接下來看定義好的暫存器</p>
+<h3 id="mtime"><a href="#mtime" class="headerlink" title="mtime"></a>mtime</h3><p>這是一個 real-time counter，實際上就是一個由石英振盪器觸發的時鐘，會按照一個固定的頻率遞增</p>
+<ul>
+<li>全局唯一</li>
+<li>64 bit</li>
+<li>RESET 的時候，硬體會自動將 mtime 初始化為 0</li>
+<li>MMIO 的位址為 <code>BASE + 0xbff8</code></li>
+</ul>
+<h3 id="mtimecmp"><a href="#mtimecmp" class="headerlink" title="mtimecmp"></a>mtimecmp</h3><ul>
+<li>timer comapre register</li>
+<li>每個 Hart 一個</li>
+<li>64 bit</li>
+<li>RESET 的時候硬體「不會」設定 mtimecmp 的值，需要我們手動設</li>
+<li>MMIO 的位址為 <code>BASE + 0x4000 + (hart*8)</code></li>
+</ul>
+<p>下面是一個簡單的 mtimecmp 設定函式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// macro in platform.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CLINT_MTIMECMP(hartid) (CLINT_BASE + 0x4000 + 8 * (hartid))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* load timer interval(in ticks) for next timer interrupt.*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">timer_load</span><span class="params">(<span class="type">int</span> interval)</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="comment">/* each CPU has a separate source of timer interrupts. */</span></span><br><span class="line">    <span class="type">int</span> id = r_mhartid();</span><br><span class="line">	</span><br><span class="line">    *(<span class="type">uint64_t</span>*)CLINT_MTIMECMP(id) = *(<span class="type">uint64_t</span>*)CLINT_MTIME + interval;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>interval</code> 是想要間隔的數，例如想要間隔一秒鐘，那 <code>interval</code> 就是 1</p>
+<h3 id="MSIP"><a href="#MSIP" class="headerlink" title="MSIP"></a>MSIP</h3><p>其他還有一些這裡不會用到的，跟 software interrupt 相關的暫存器，這邊也一起紀錄一下</p>
+<ul>
+<li>每個 Hart 有一個</li>
+<li>32 bit<ul>
+<li>實際上只用到了最低位</li>
+<li>高 31 位不能用</li>
+</ul>
+</li>
+<li>最低位映射到 <code>mip.MSIP</code><ul>
+<li>當我們一寫 MSIP 的最低位時，會觸發軟中斷，<code>mip.MSIP</code> 也會自動設為 1<ul>
+<li>需要將 MSIP 再寫入 0，對中斷進行回應，否則此軟中斷會一直發生</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>MMIO 的位址為 <code>BASE + (4*hart)</code></li>
+</ul>
+<h3 id="CLINT-Time-Interrupt"><a href="#CLINT-Time-Interrupt" class="headerlink" title="CLINT Time Interrupt"></a>CLINT Time Interrupt</h3><p>mtime 會按照一定的頻率不停地增加，而 CLINT 會去判斷 mtime，當其每增加一個值的時候，他會去確認 <code>mtime</code> 是否大於等於 <code>mtimecmp</code>，如果為真，那麼 CLINT 就會產生一個 timer interrupt</p>
+<p>注意這個中斷只會產生一次，在 timer interrupt 發生後，Hart 會設置 <code>mip.MTIP</code>，因此如果想要產生一個週期性的中斷的話，需要在每次處理完中斷後，清除 <code>mip.MTIP</code> 並設定新的值進去</p>
+<p>另外記得要 enable timer interrupt：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// macro in riscv.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MIE_MTIE (1 &lt;&lt; 7)  <span class="comment">// timer</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* enable machine-mode timer interrupts. */</span></span><br><span class="line">w_mie(r_mie() | MIE_MTIE);</span><br></pre></td></tr></table></figure>
+
+<p>所以整個流程是</p>
+<ol>
+<li>硬體初始化 mtime 為 0</li>
+<li>我們將 mtimecmp 設定好，加上 interval</li>
+<li>enable timer interrupt</li>
+<li>等待 timer interrupt</li>
+<li>觸發 timer interrupt</li>
+<li>執行 timer interrupt</li>
+<li>將 mtimecmp 加上 interval</li>
+<li>回到 4.</li>
+</ol>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>OS 裡面的時間管理就是利用硬體的 time counter 完成的</p>
+<ul>
+<li>在 OS 中，一個時間單位為一個 tick</li>
+<li>tick 的單位由硬體的 time counter 週期決定<ul>
+<li>通常為 1~100 ms</li>
+</ul>
+</li>
+<li>tick 週期越小，OS 的精度越高<ul>
+<li>但相對的開銷越大(因為 Interrupt 數量比較多)</li>
+</ul>
+</li>
+<li>OS 中通常會維護一個自己的 tick 值，紀錄系統啟動到現在發生的 tick 總數</li>
+</ul>
+<h2 id="Preemtive-Multitasking"><a href="#Preemtive-Multitasking" class="headerlink" title="Preemtive Multitasking"></a>Preemtive Multitasking</h2><p>雖然協作式的多任務實作比較簡單，但缺點也很明顯，需要使用者自己去放棄 CPU 的使用，進而衍生出不少的問題，因此已經被慢慢淘汰掉了</p>
+<p>所以我們這邊就來實作搶占式的多任務，首先一樣會有兩個 Task A 和 B：</p>
+<p><img src="https://hackmd.io/_uploads/HJI7rrhdT.png" alt="image"></p>
+<p>可以看見因為式搶占式的多任務，因此 Task 中不會有放棄 CPU 的這個指令</p>
+<p>而這邊實作的方法是利用 timer，讓中斷週期性的發生，當 timer interrupt 發生時去進行 schedule</p>
+<p>因此 trap 發生時要做的事為</p>
+<ol>
+<li>確認是否為 Timer Interrupt</li>
+<li>根據結果去執行對應 handler<br>2-1. 如果不是 Timer Interrupt，則按原本 Trap 的方式處理<br>2-2. 如果是 Timer Interrupt，呼叫 <code>switch_to</code><ul>
+<li><code>switch_to</code><ul>
+<li>將目前的 context 資訊存起來</li>
+<li>切換 context</li>
+<li>將下一個 context 資訊載入 CPU</li>
+</ul>
+</li>
+<li>另外還要維護時鐘</li>
+</ul>
+</li>
+<li>mret</li>
+</ol>
+<p>中斷發生的時候，按照前面的設計，會去走 <code>trap_vector</code> 這個入口，裡面會去呼叫 <code>trap_handler</code></p>
+<p>而 <code>trap_handler</code> 會利用 <code>cause_code</code> 來去看是哪一個中斷發生了，並呼叫對應的 handler</p>
+<p>因此我們這邊要在 <code>timer_handler</code> 內部呼叫 <code>schedule</code>，而 <code>schedule</code> 內部會再呼叫 <code>switch_to</code> 這個函式</p>
+<p>而相關的資料結構也要做一些調整，因為前面寫協作式多任務的時候不是通過 mret，而是通過 <code>return</code> 來實現的</p>
+<p>為什麼可以這樣做呢? 因為當時當作一個正常的函式來實作，用了 <code>ra</code> 暫存器，但這邊我們應該要使用 <code>mepc</code> 才可以從中斷裡面返回</p>
+<p>因此這邊每個 context 裡面也需要維護一個自己的 <code>mepc</code>，因此在 <code>struct context</code> 內新增一個 member 叫 <code>pc</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* task management */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">context</span> &#123;</span></span><br><span class="line">    <span class="comment">/* ignore x0 */</span></span><br><span class="line">    <span class="type">reg_t</span> ra;</span><br><span class="line">    <span class="type">reg_t</span> sp;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="type">reg_t</span> t6;</span><br><span class="line">    <span class="comment">// upon is trap frame</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// save the pc to run in next schedule cycle</span></span><br><span class="line">    <span class="type">reg_t</span> pc; <span class="comment">// offset: 31*4 = 124</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>另外在 <code>trap_vector</code> 和 <code>switch_to</code> 內也要多加一些邏輯：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># interrupts and exceptions while in machine mode come here.</span><br><span class="line">.globl trap_vector</span><br><span class="line"># the trap vector base address must always be aligned on a 4-byte boundary</span><br><span class="line">.balign 4</span><br><span class="line">trap_vector:</span><br><span class="line">    # save context(registers).</span><br><span class="line">    csrrw	t6, mscratch, t6	# swap t6 and mscratch</span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    # save mepc to context of current task</span><br><span class="line">    csrr	a0, mepc</span><br><span class="line">    sw	a0, 124(t5)</span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line">    </span><br><span class="line">    # call the C trap handler in trap.c</span><br><span class="line">    csrr	a0, mepc</span><br><span class="line">    csrr	a1, mcause</span><br><span class="line">    call	trap_handler</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    # return to whatever we were doing before trap.</span><br><span class="line">    mret</span><br></pre></td></tr></table></figure>
+
+<p>這邊就只是多把 mepc 也保存到 context 內</p>
+<p>而 <code>switch_to</code> 則是要多把 mepc 載入到 CPU，並且原本 save context 的邏輯因為在上面做過了，所以可以刪掉了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># void switch_to(struct context *next);</span></span><br><span class="line"># a0: pointer to the context of the next task</span><br><span class="line">.globl switch_to</span><br><span class="line">.balign <span class="number">4</span></span><br><span class="line">switch_to:</span><br><span class="line">    <span class="meta"># switch mscratch to point to the context of the next task</span></span><br><span class="line">    csrw	mscratch, a0</span><br><span class="line">    </span><br><span class="line">    <span class="meta"># set mepc to the pc of the next task</span></span><br><span class="line">    lw	a1, <span class="number">124</span>(a0)</span><br><span class="line">    csrw	mepc, a1</span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    # Do actual context switching.</span><br><span class="line">    # Notice this will enable global interrupt</span><br><span class="line">    mret</span><br><span class="line"></span><br><span class="line">.end</span><br></pre></td></tr></table></figure>
+
+<p>接下來用圖來演示一下步驟：</p>
+<p><img src="https://hackmd.io/_uploads/BJOsdHhd6.png" alt="image"></p>
+<p>跟前面一樣，先初始化，並且假設第一個呼叫的任務為 A：</p>
+<p><img src="https://hackmd.io/_uploads/S1U1orn_a.png" alt="image"></p>
+<p>之後就開始執行了，因此 PC 會跟著改變：</p>
+<p><img src="https://hackmd.io/_uploads/ByQt3H3_6.png" alt="image"></p>
+<p>此時 timer interrupt 發生了，因此將 <code>i+2</code> 存入 <code>mepc</code>，並開始執行 trap 處理函式，首先要保存 context，因此將 <code>mepc</code> 存入 <code>pc</code>：</p>
+<p><img src="https://hackmd.io/_uploads/rkeToBnd6.png" alt="image"></p>
+<p>接著切換 context：</p>
+<p><img src="https://hackmd.io/_uploads/rk5CsHnd6.png" alt="image"></p>
+<p>然後載入 B 的 context：</p>
+<p><img src="https://hackmd.io/_uploads/SkdmnB3dp.png" alt="image"></p>
+<p>最後執行 <code>mret</code> 返回，進到 Task B：</p>
+<p><img src="https://hackmd.io/_uploads/rksBnrn_a.png" alt="image"></p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">June 17th 2023, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">March 21st 2024, 6:14:00 am</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/" title="礦坑系列 ── Indirect through null pointer">
+                    <div class="nextTitle">礦坑系列 ── Indirect through null pointer</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2023/01/09/security/PE_file_format/" title="PE file format">
+                    <div class="prevTitle">PE file format</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RVOS-OSDI-%E7%AD%86%E8%A8%98"><span class="toc-number">1.</span> <span class="toc-text">RVOS OSDI 筆記</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84-RISC-V-%E7%AD%86%E8%A8%98"><span class="toc-number">2.</span> <span class="toc-text">常用的 RISC-V 筆記</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%9E%B6%E6%A7%8B"><span class="toc-number">2.1.</span> <span class="toc-text">基本架構</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#label-%E6%A8%99%E7%B1%A4"><span class="toc-number">2.1.1.</span> <span class="toc-text">label(標籤)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#operation"><span class="toc-number">2.1.2.</span> <span class="toc-text">operation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E7%9A%84%E6%93%8D%E4%BD%9C%E5%B0%8D%E8%B1%A1"><span class="toc-number">2.2.</span> <span class="toc-text">指令的操作對象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E7%B7%A8%E7%A2%BC%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text">指令編碼格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E8%A1%93%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Arithmetic-Instruction"><span class="toc-number">2.4.</span> <span class="toc-text">算術運算指令(Arithmetic Instruction)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ADD"><span class="toc-number">2.4.1.</span> <span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SUB"><span class="toc-number">2.4.2.</span> <span class="toc-text">SUB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ADDI-ADD-Immediate"><span class="toc-number">2.4.3.</span> <span class="toc-text">ADDI (ADD Immediate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LUI-Load-Upper-Immediate"><span class="toc-number">2.4.4.</span> <span class="toc-text">LUI (Load Upper Immediate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AUIPC"><span class="toc-number">2.4.5.</span> <span class="toc-text">AUIPC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction"><span class="toc-number">2.4.6.</span> <span class="toc-text">相關的 pseudo-instruction</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NEG"><span class="toc-number">2.4.6.1.</span> <span class="toc-text">NEG</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MV"><span class="toc-number">2.4.6.2.</span> <span class="toc-text">MV</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LI-Load-Immediate"><span class="toc-number">2.4.6.3.</span> <span class="toc-text">LI (Load Immediate)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LA-Load-Address"><span class="toc-number">2.4.6.4.</span> <span class="toc-text">LA (Load Address)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NOP-%E7%A9%BA%E6%8C%87%E4%BB%A4"><span class="toc-number">2.4.6.5.</span> <span class="toc-text">NOP (空指令)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%8F%E8%BC%AF%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Logical-Instructions"><span class="toc-number">2.5.</span> <span class="toc-text">邏輯運算指令 (Logical Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AND"><span class="toc-number">2.5.1.</span> <span class="toc-text">AND</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OR"><span class="toc-number">2.5.2.</span> <span class="toc-text">OR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XOR"><span class="toc-number">2.5.3.</span> <span class="toc-text">XOR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ANDI"><span class="toc-number">2.5.4.</span> <span class="toc-text">ANDI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ORI"><span class="toc-number">2.5.5.</span> <span class="toc-text">ORI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XORI"><span class="toc-number">2.5.6.</span> <span class="toc-text">XORI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-1"><span class="toc-number">2.5.7.</span> <span class="toc-text">相關的 pseudo-instruction</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NOT"><span class="toc-number">2.5.7.1.</span> <span class="toc-text">NOT</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A7%BB%E4%BD%8D%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Shifting-Instructions"><span class="toc-number">2.6.</span> <span class="toc-text">移位運算指令 (Shifting Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SLL-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB"><span class="toc-number">2.6.1.</span> <span class="toc-text">SLL (邏輯左移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRL-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB"><span class="toc-number">2.6.2.</span> <span class="toc-text">SRL (邏輯右移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SLLI-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.3.</span> <span class="toc-text">SLLI (邏輯左移常數)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRLI-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.4.</span> <span class="toc-text">SRLI (邏輯右移常數)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRA-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB"><span class="toc-number">2.6.5.</span> <span class="toc-text">SRA (算術右移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRAI-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.6.</span> <span class="toc-text">SRAI (算術右移常數)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E8%AE%80%E5%AF%AB%E6%8C%87%E4%BB%A4-Load-and-Store-Instructions"><span class="toc-number">2.7.</span> <span class="toc-text">記憶體讀寫指令 (Load and Store Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LB"><span class="toc-number">2.7.1.</span> <span class="toc-text">LB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LBU"><span class="toc-number">2.7.2.</span> <span class="toc-text">LBU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LH"><span class="toc-number">2.7.3.</span> <span class="toc-text">LH</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LHU"><span class="toc-number">2.7.4.</span> <span class="toc-text">LHU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LW"><span class="toc-number">2.7.5.</span> <span class="toc-text">LW</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SB"><span class="toc-number">2.7.6.</span> <span class="toc-text">SB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SH"><span class="toc-number">2.7.7.</span> <span class="toc-text">SH</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SW"><span class="toc-number">2.7.8.</span> <span class="toc-text">SW</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E6%8C%87%E4%BB%A4-Conditional-Branch-Instructions"><span class="toc-number">2.8.</span> <span class="toc-text">分支指令 (Conditional Branch Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BEQ"><span class="toc-number">2.8.1.</span> <span class="toc-text">BEQ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BNE"><span class="toc-number">2.8.2.</span> <span class="toc-text">BNE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLT"><span class="toc-number">2.8.3.</span> <span class="toc-text">BLT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLTU"><span class="toc-number">2.8.4.</span> <span class="toc-text">BLTU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGE"><span class="toc-number">2.8.5.</span> <span class="toc-text">BGE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGEU"><span class="toc-number">2.8.6.</span> <span class="toc-text">BGEU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-2"><span class="toc-number">2.8.7.</span> <span class="toc-text">相關的 pseudo-instruction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLE"><span class="toc-number">2.8.8.</span> <span class="toc-text">BLE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLEU"><span class="toc-number">2.8.9.</span> <span class="toc-text">BLEU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGT"><span class="toc-number">2.8.10.</span> <span class="toc-text">BGT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGTU"><span class="toc-number">2.8.11.</span> <span class="toc-text">BGTU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BEQZ"><span class="toc-number">2.8.12.</span> <span class="toc-text">BEQZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BNEZ"><span class="toc-number">2.8.13.</span> <span class="toc-text">BNEZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLTZ"><span class="toc-number">2.8.14.</span> <span class="toc-text">BLTZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLEZ"><span class="toc-number">2.8.15.</span> <span class="toc-text">BLEZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGTZ"><span class="toc-number">2.8.16.</span> <span class="toc-text">BGTZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGEZ"><span class="toc-number">2.8.17.</span> <span class="toc-text">BGEZ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%A1%E6%A2%9D%E4%BB%B6%E8%B7%B3%E8%BD%89-Unconditional-Jump-Instructions"><span class="toc-number">2.9.</span> <span class="toc-text">無條件跳轉 (Unconditional Jump Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JAL-Jump-And-Link"><span class="toc-number">2.9.1.</span> <span class="toc-text">JAL (Jump And Link)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JALR-Jump-And-Link-Register"><span class="toc-number">2.9.2.</span> <span class="toc-text">JALR (Jump And Link Register)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OS-Development"><span class="toc-number">3.</span> <span class="toc-text">OS Development</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%80%E5%8F%96-CSR"><span class="toc-number">3.1.</span> <span class="toc-text">讀取 CSR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A-UART"><span class="toc-number">3.2.</span> <span class="toc-text">設定 UART</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E7%AE%A1%E7%90%86"><span class="toc-number">3.3.</span> <span class="toc-text">記憶體管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#multitask-and-context-switch"><span class="toc-number">3.4.</span> <span class="toc-text">multitask and context switch</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#multitask"><span class="toc-number">3.4.1.</span> <span class="toc-text">multitask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-of-multitask"><span class="toc-number">3.4.2.</span> <span class="toc-text">type of multitask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cooperative-Multitasking"><span class="toc-number">3.4.3.</span> <span class="toc-text">Cooperative Multitasking</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trap-Exception"><span class="toc-number">3.5.</span> <span class="toc-text">Trap &amp; Exception</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%95%B0%E5%B8%B8%E6%8E%A7%E5%88%B6%E6%B5%81-Exceptional-Control-Flow"><span class="toc-number">3.5.1.</span> <span class="toc-text">異常控制流(Exceptional Control Flow)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Machine-mode-%E4%B8%8B%E7%9A%84-CSR"><span class="toc-number">3.5.2.</span> <span class="toc-text">Machine mode 下的 CSR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtvec-Machine-Trap-Vector-Base-Address"><span class="toc-number">3.5.3.</span> <span class="toc-text">mtvec (Machine Trap-Vector Base-Address)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mepc-Machine-Exception-Program-Counter"><span class="toc-number">3.5.4.</span> <span class="toc-text">mepc (Machine Exception Program Counter)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mcause-Machine-Cause"><span class="toc-number">3.5.5.</span> <span class="toc-text">mcause (Machine Cause)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtval-Machine-Trap-Value"><span class="toc-number">3.5.6.</span> <span class="toc-text">mtval (Machine Trap Value)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mstatus-Machine-Status"><span class="toc-number">3.5.7.</span> <span class="toc-text">mstatus (Machine Status)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trap-%E8%99%95%E7%90%86%E6%B5%81%E7%A8%8B"><span class="toc-number">3.6.</span> <span class="toc-text">Trap 處理流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Trap-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.6.1.</span> <span class="toc-text">Trap 初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#top-half"><span class="toc-number">3.6.2.</span> <span class="toc-text">top half</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bottom-half"><span class="toc-number">3.6.3.</span> <span class="toc-text">Bottom half</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%9E-Trap-%E8%BF%94%E5%9B%9E"><span class="toc-number">3.6.4.</span> <span class="toc-text">從 Trap 返回</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interrupt"><span class="toc-number">3.7.</span> <span class="toc-text">Interrupt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Interrupt-%E5%88%86%E9%A1%9E"><span class="toc-number">3.7.1.</span> <span class="toc-text">Interrupt 分類</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mie-%E8%88%87-mip"><span class="toc-number">3.7.2.</span> <span class="toc-text">mie 與 mip</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PLIC"><span class="toc-number">3.7.3.</span> <span class="toc-text">PLIC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Priority"><span class="toc-number">3.7.4.</span> <span class="toc-text">Priority</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pending"><span class="toc-number">3.7.5.</span> <span class="toc-text">Pending</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable"><span class="toc-number">3.7.6.</span> <span class="toc-text">Enable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Threshold"><span class="toc-number">3.7.7.</span> <span class="toc-text">Threshold</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claim-Complete"><span class="toc-number">3.7.8.</span> <span class="toc-text">Claim&#x2F;Complete</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PLIC-%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.7.9.</span> <span class="toc-text">PLIC 操作流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UART-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-number">3.7.10.</span> <span class="toc-text">UART 的例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#timer-interrupt"><span class="toc-number">3.8.</span> <span class="toc-text">timer interrupt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mtime"><span class="toc-number">3.8.1.</span> <span class="toc-text">mtime</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtimecmp"><span class="toc-number">3.8.2.</span> <span class="toc-text">mtimecmp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MSIP"><span class="toc-number">3.8.3.</span> <span class="toc-text">MSIP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CLINT-Time-Interrupt"><span class="toc-number">3.8.4.</span> <span class="toc-text">CLINT Time Interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-number">3.8.5.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Preemtive-Multitasking"><span class="toc-number">3.9.</span> <span class="toc-text">Preemtive Multitasking</span></a></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 39
+        </div>
+        <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

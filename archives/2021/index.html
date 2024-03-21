@@ -204,6 +204,19 @@
     <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
     <!-- algolia -->
     
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
     <!-- 百度统计  -->
     
     <!-- Google tag (gtag.js) -->
@@ -434,31 +447,31 @@
             
         
         <article class="index-post">
-            <a class="abstract-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">
+            <a class="abstract-title" href="/2021/12/20/OS/OS-Structure/">
                 
-                <span class="abstract-title-text">礦坑系列 ── std::function</span>
+                <span class="abstract-title-text">Ch2 OS Structure</span>
             </a>
             <div class="abstract-content">
-                 礦坑系列 ── std::function 
+                Ch2 OS StructureOS ServicesOS 就在幫 user 做事，有很多事一定要 OS 才能做，所以我們稱 OS 為 services
+User InterfaceInterface 大家應該都很熟悉，其實只分兩個：
 
-礦坑系列首頁：首頁
-hackmd 版首頁：首頁
-前言std::function 是 C++11 時加入的東西，它基本上是一個類型模板(Class Template)，目的是對可呼叫物件進行包裝，用起來會像是函式指標那樣，但用途更為廣泛，只要是可使用複製建構的可呼叫物件都可以使用，像是函式、lambda、std::bind、Functor(function object) 等等。
-包裝起來的可呼叫物件我們稱它為 target，如果一個 std::function 還沒包裝任何物件，也就是沒有 target，我們稱它為空(empty)，此時我...
+CLI (Command Line Interface)
+  下指令的介面，下的指令其實不是直接到 OS 手上，這個下指令的介面是一個程式，在 OS 的世界裡我們通稱為 Shell，常見的 shell 有 CShell、Bash。
+  多了這一層，這一個介面的原因是一台電腦可能不只有一個使用者，每個使用者的習慣都不同，下 command 的方法可能也都不...
             </div>
             <!-- read more -->
             
             <div class="abstract-post-meta">
                 <!-- date -->
                 <div class="abstract-date" title="Last updated: 2024/03/21">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/06/12</span>
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/12/20</span>
                 </div>
                 <!-- tags -->
                 
                     <div class= abstract-tags >
     
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="OS">OS</a>
     
 </div>
 
@@ -474,32 +487,28 @@ hackmd 版首頁：首頁
             
         
         <article class="index-post">
-            <a class="abstract-title" href="/2021/05/14/Cpp-Miner/README/">
+            <a class="abstract-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">
                 
-                <span class="abstract-title-text">礦坑系列 ── 序</span>
+                <span class="abstract-title-text">The mind behind Linux 筆記 &amp; 心得</span>
             </a>
             <div class="abstract-content">
-                 礦坑系列 ── 序 
-
-礦坑系列首頁：首頁
-hackmd 版首頁：首頁
-文章一覽：連結
-前言 這是一本介紹 Modern C++ 與一些 C++ 深度解析的書，從我的 hackmd 搬運而來，你可以從這裡看見文章一覽。 如果您是 C++ 新手，我會建議您先去看 Miner Tutorial 的部分，裡面對初學者會學到的東西做了簡單的介紹，可以幫助大家理解、回憶一些基礎知識，同時可以讓你習慣本書風格。
-讀著讀著便來到了 Modern C++，語法和文法比以往的 C、C++03 複雜很多，而且在找文章閱讀時發現網路上中文的資源其實沒有想像中的多，受到 Jserv 老師「你所不知道的 C 語...
+                The mind behind Linux 筆記 &amp; 心得前言Linus Torvalds 在 2016 年的 TED interview 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程。
+於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 felipec 的 github 與 Jserv 老師的解釋。
+若文章內容有謬誤，或您有什麼建議，都很歡迎私訊...
             </div>
             <!-- read more -->
             
             <div class="abstract-post-meta">
                 <!-- date -->
-                <div class="abstract-date" title="Last updated: 2024/03/20">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/05/14</span>
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/12/15</span>
                 </div>
                 <!-- tags -->
                 
                     <div class= abstract-tags >
     
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="miscellaneous">miscellaneous</a>
     
 </div>
 
@@ -515,31 +524,33 @@ hackmd 版首頁：首頁
             
         
         <article class="index-post">
-            <a class="abstract-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">
+            <a class="abstract-title" href="/2021/12/10/OS/Introduction/">
                 
-                <span class="abstract-title-text">礦坑系列 ── 值類別 Value Categoraries</span>
+                <span class="abstract-title-text">Ch1 基礎概論</span>
             </a>
             <div class="abstract-content">
-                 礦坑系列 ── 值類別 Value Categoraries 
-礦坑系列首頁：首頁
+                Ch1 基礎概論什麼是作業系統?Introduction「作業系統（英語：Operating System，縮寫：OS）是一組主管並控制電腦操作、運用和執行硬體、軟體資源和提供公共服務來組織使用者互動的相互關聯的系統軟體程式」── wiki
+簡單來說就是一個管理電腦的系統程式，是使用者和電腦硬體的介面 (interface)。
+Computer System整個電腦系統主要可以分成四個部分：硬體、作業系統、應用程式和使用者，這邊先對它們做個簡單的介紹，但這些不是定義，只是一個描述
 
-hackmd 版首頁：首頁
-前言原本想說要一個禮拜寫一篇礦坑，結果發現這種文都要花很多的時間，好像一篇一個月就差不多了XD 這篇文章特別感謝 Kris van Rens，我寫信問了他許多問題，他也很耐心的回答我XD 文章內容有許多部份都參考了他的講稿，他也提供了授權給我，真ㄉ是太感謝了XD
-移動語意是 C++11 新增的一個特性，主要是針對物件導向來做的優化，以淺複製(shallow copy) 代替了深複製(deep copy)。另外，由於移動語意的出現，使原先 C++ 的文法分的更加詳細了，讓編譯...
+使用者(User)
+  使用者可以是人、機器或其他的電腦，只要是可以操控這台電腦的都可以算
+
+應用程式(A...
             </div>
             <!-- read more -->
             
             <div class="abstract-post-meta">
                 <!-- date -->
-                <div class="abstract-date" title="Last updated: 2024/03/20">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/04/27</span>
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/12/10</span>
                 </div>
                 <!-- tags -->
                 
                     <div class= abstract-tags >
     
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="OS">OS</a>
     
 </div>
 
@@ -555,26 +566,268 @@ hackmd 版首頁：首頁
             
         
         <article class="index-post">
-            <a class="abstract-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">
+            <a class="abstract-title" href="/2021/12/10/OS/README/">
                 
-                <span class="abstract-title-text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</span>
+                <span class="abstract-title-text">作業系統 ── 序</span>
             </a>
             <div class="abstract-content">
-                 
+                作業系統 ── 序前言這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統。
+課程網址：10501 資訊工程學系 作業系統
+影片 YT 連結：【10510周志遠教授：作業系統】
+課本：Operating System Concepts, 9th Edition, International Student Version
+課堂講義：【周志遠教授作業系統講義】
+如果我有另外補充什麼，參考資料都會列在文章下方。
+然後這邊推一下 Jserv 的兩篇回文：
+1. [問卦] 作業系統是不是理科最簡單科目
+2. [問卦] 精通數位邏輯對Coding有什麼幫助？
+雖然我自己非常喜歡作業系統與編譯器...
             </div>
             <!-- read more -->
             
             <div class="abstract-post-meta">
                 <!-- date -->
-                <div class="abstract-date" title="Last updated: 2024/03/20">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/04/01</span>
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/12/10</span>
                 </div>
                 <!-- tags -->
                 
                     <div class= abstract-tags >
     
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="OS">OS</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">
+                
+                <span class="abstract-title-text">ROS Tutorial Introduction</span>
+            </a>
+            <div class="abstract-content">
+                ROS Tutorial Introduction此篇為中央大學數學系上課所用的 ROS 教材，若非修課生，Demo 部分需要注意一下自己的機器人設定。 原文放在 hackmd 上，我會不定期更新過來，若發現教材有誤，歡迎到 hackmd 上修改，或是可以發 issue 給我。
+什麼是 ROS?ROS 全名叫 Robot Operating System，但它其實是一種中介軟體(Middleware)，妳也可以說它是一個軟體框架(Software Framework)，所以他是一種抽象化的概念，不是應用程式，也不是作業系統。
+那它主要會幫我們連結各個軟體和零件之間的溝通，並且會提供一些 ...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/11/17</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="ROS">ROS</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/11/15/numerical_algebra/Power-Method/">
+                
+                <span class="abstract-title-text">Power Method</span>
+            </a>
+            <div class="abstract-content">
+                9.3 Power MethodExample看一下費波那契數列 $F_n &#x3D; F_{n-1} + F_{n-2}$，這個數列長 ${0,1,1,2,3,5,8,13,21,34,\ …}$，我們可以透過矩陣來重寫這個數列：
+
+在這個例子裏面，我們觀察到 eigenvector、eigenvalue 跟長期的外顯行為有關。
+Example看第二個例子，假設這邊有四個網頁，然後我們常像這樣去瀏覽她：
+
+那麼就會有一個機率矩陣：
+
+Thm dominant eigenvalue
+Prop Power Method假設 $A \in \mathbb{R}^{n \times n}$ ...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/11/15</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="numerical_algebra">numerical_algebra</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">
+                
+                <span class="abstract-title-text">Linear Algebra and Eigenvalues</span>
+            </a>
+            <div class="abstract-content">
+                9.1 Linear Algebra and EigenvaluesGershgorin circle給定一個 $A\in \mathbb{R}^{n\times n}$ 矩陣，$R_i$ 記為一個在複數平面上的圓，圓心是 $a_{ii}$，半徑是 $\Sigma_{j&#x3D;1,\ i\neq j}^n \ |a_{ij}|$，也就是同一個 row 裡面除了圓心以外的其他元素的總和，所以
+$R_i &#x3D; {\ z \in \mathbb{C}\ | \ |z - a_{ii}|\ \leq\ \Sigma_{j&#x3D;1,\ i\neq j}^n \ |a_{ij}|\...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/11/07</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="numerical_algebra">numerical_algebra</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">
+                
+                <span class="abstract-title-text">最小平方逼近多項式(Polynomials of Least square)</span>
+            </a>
+            <div class="abstract-content">
+                8.2 最小平方逼近多項式(Polynomials of Least square)目的我們想要用一個多項式來逼近另一個 function $f\in C[a,b]$，這個多項式我們寫成 
+$Pn(x) &#x3D; a_0 + a_1x^1 +\ …\ + a_kx^k &#x3D; \Sigma_{k&#x3D;0}^n a_kx^k$
+這樣的話 least square error，或一開始的 LDA 的 error 就會長 $f(x) - Pn(x)$，那一樣，我們要找到 $a_0,a_1,\ …\ ,a_n$ 來最小化 $E$：
+
+推導而我們要最小化這個 $E$ 就要用到 gr...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/11/07</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="numerical_algebra">numerical_algebra</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/11/06/numerical_algebra/Least-Squares/">
+                
+                <span class="abstract-title-text">Least Squares</span>
+            </a>
+            <div class="abstract-content">
+                8.1 Least Squares最小絕對偏差法 Least absolute deviation假設現在給你這些點
+(圖源：wiki )
+我們沒辦法用一條直線來通過這些全部的點，但我們可以像這樣找到誤差最小的直線：
+(圖源：wiki )
+這條直線可以幫助我們預測資料的方向。
+假設 $a_1x_i + a_0$ 是這條直線上的第 i 個值，$y_i$ 是第 i 個給定的 y 值(原本的 y 值)，我們期望誤差最小，所以我們想要找到 $a_0$、$a_1$ 最小化這個式子：
+$E_\infty(a_0, a_1) &#x3D; max_{1 \leq i \leq 10}{|\ y_i -...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/11/06</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="numerical_algebra">numerical_algebra</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">
+                
+                <span class="abstract-title-text">Conjugate Gradient Method</span>
+            </a>
+            <div class="abstract-content">
+                7.5 Conjugate Gradient MethodConjugate Gradient Method這邊我們一樣考慮解 $A\vec x &#x3D; \vec b$，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多
+$\alpha$ 要選來 minimize $\Phi(\vec x^{(k)})$，因為我們希望它越小越好，前面的 Gradient Method 裡面 $\vec p^{(k-1)}$ 是用 gradient 來做的，但這邊我們不用這個方法。
+我們先看 $\alpha$...
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2024/03/21">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/10/31</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="numerical_algebra">numerical_algebra</a>
     
 </div>
 
@@ -584,6 +837,10 @@ hackmd 版首頁：首頁
         <div class="index-post-divider"></div>
     
     <!-- paginator  -->
+    
+        <nav class="page-nav">
+            <span class="page-number current">1</span><a class="page-number" href="/archives/2021/page/2/">2</a><a class="extend next" rel="next" href="/archives/2021/page/2/">NEXT &gt;</a>
+        </nav>
     
 </main>
 
@@ -781,7 +1038,324 @@ hackmd 版首頁：首頁
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -898,9 +1472,13 @@ hackmd 版首頁：首頁
     
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 18
+        Total : 39
         </div>
         <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
         
     </div>
     
@@ -914,8 +1492,38 @@ hackmd 版首頁：首頁
             
         
         <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
             <span class="archive-post-date">08/12</span>
             <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
         </li>
     
         
@@ -1006,6 +1614,12 @@ hackmd 版首頁：首頁
         </li>
     
         
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
             
             
                 
@@ -1014,6 +1628,96 @@ hackmd 版首頁：首頁
             <div class="archive-year"> 2021 </div>
             <ul class="year-list">
             
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
         
         <li class="archive-post-item">
             <span class="archive-post-date">06/12</span>
@@ -1049,9 +1753,49 @@ hackmd 版首頁：首頁
                 C++ Miner
             </span>
         
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
             <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
                 <span class="iconfont-archer">&#xe606;</span>
                 C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
             </span>
         
             <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
@@ -1073,6 +1817,41 @@ hackmd 版首頁：首頁
         <span class="sidebar-category-name" data-categories="C++ Miner">
             <span class="iconfont-archer">&#xe60a;</span>
             C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
         </span>
     
     </div>
@@ -1107,6 +1886,28 @@ hackmd 版首頁：首頁
         <!-- fancybox -->
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
         <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
         
         <!-- busuanzi -->
         

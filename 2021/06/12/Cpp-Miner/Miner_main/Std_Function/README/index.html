@@ -28,7 +28,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://walfiegif.files.wordpress.com/2021/02/out-transparent-3.gif?w=875">
 <meta property="article:published_time" content="2021-06-12T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-21T01:20:01.566Z">
+<meta property="article:modified_time" content="2024-03-21T10:30:14.176Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="C++ Miner">
 <meta name="twitter:card" content="summary">
@@ -209,6 +209,19 @@
     <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
     <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
     <!-- algolia -->
+    
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
     
     <!-- 百度统计  -->
     
@@ -612,7 +625,7 @@
 <li><p>operator bool</p>
 <p>  <code>std::function</code> 的 operator bool 會檢查 <code>*this</code> 的 target 是否為空，如果非空就回傳 true，如果是空的就回傳 false。</p>
 <p>  例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">checkFunc</span><span class="params">( std::function&lt;<span class="type">void</span>()&gt; &amp;func )</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 利用 operator bool 來確認 std::function 是否為空。</span></span><br><span class="line">    <span class="keyword">if</span> ( func ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Function is not empty!\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Function is empty. Nothing to do.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; f1;</span><br><span class="line">    <span class="function">std::function&lt;<span class="title">void</span><span class="params">()</span>&gt; <span class="title">f2</span><span class="params">( sampleFunction )</span></span>;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;f1: &quot;</span>;</span><br><span class="line">    <span class="built_in">checkFunc</span>( f1 );    <span class="comment">// std::function 為空，進入 else</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;f2: &quot;</span>;</span><br><span class="line">    <span class="built_in">checkFunc</span>( f2 );    <span class="comment">// std::function 非空，進入 if</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">checkFunc</span><span class="params">( std::function&lt;<span class="type">void</span>()&gt; &amp;func )</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 利用 operator bool 來確認 std::function 是否為空。</span></span><br><span class="line">  <span class="keyword">if</span> ( func ) &#123;</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;Function is not empty!\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;Function is empty. Nothing to do.\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::function&lt;<span class="type">void</span>()&gt; f1;</span><br><span class="line">  <span class="function">std::function&lt;<span class="title">void</span><span class="params">()</span>&gt; <span class="title">f2</span><span class="params">( sampleFunction )</span></span>;</span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;f1: &quot;</span>;</span><br><span class="line">  <span class="built_in">checkFunc</span>( f1 );    <span class="comment">// std::function 為空，進入 else</span></span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;f2: &quot;</span>;</span><br><span class="line">  <span class="built_in">checkFunc</span>( f2 );    <span class="comment">// std::function 非空，進入 if</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>operator()</p>
 <blockquote>
@@ -620,10 +633,10 @@
 </blockquote>
 <p>  <code>std::function</code> 的 operator() 會傳入參數，呼叫儲存的 callable object。</p>
 <p>  例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call</span><span class="params">( std::function&lt;<span class="type">int</span>()&gt; f )</span>    <span class="comment">// std::function 可以 passed by value</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">f</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">normal_function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">42</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">1</span>;</span><br><span class="line">    std::function&lt;<span class="type">int</span>()&gt; f = [&amp;n]() &#123; <span class="keyword">return</span> n; &#125;;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">    n = <span class="number">2</span>;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">    f = normal_function;</span><br><span class="line">    <span class="built_in">call</span>( f );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">call</span><span class="params">( std::function&lt;<span class="type">int</span>()&gt; f )</span>    <span class="comment">// std::function 可以 passed by value</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="built_in">f</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">normal_function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">42</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="type">int</span> n = <span class="number">1</span>;</span><br><span class="line">  std::function&lt;<span class="type">int</span>()&gt; f = [&amp;n]() &#123; <span class="keyword">return</span> n; &#125;;</span><br><span class="line">  <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">  n = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">call</span>( f );</span><br><span class="line"></span><br><span class="line">  f = normal_function;</span><br><span class="line">  <span class="built_in">call</span>( f );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>swap<br>  語法： <code>fn.swap(目標)</code><br>  作用： 交換所存的 callable object<br>  例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;fn 1\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;fn 2\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; s1&#123; fn1 &#125;;</span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; s2&#123; fn2 &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn1 \n fn2</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;&quot;</span> ), s1.<span class="built_in">swap</span>( s2 );</span><br><span class="line"></span><br><span class="line">    <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn2 \n fn1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;fn 1\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;fn 2\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::function&lt;<span class="type">void</span>()&gt; s1&#123; fn1 &#125;;</span><br><span class="line">  std::function&lt;<span class="type">void</span>()&gt; s2&#123; fn2 &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn1 \n fn2</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>( <span class="string">&quot;&quot;</span> ), s1.<span class="built_in">swap</span>( s2 );</span><br><span class="line"></span><br><span class="line">  <span class="built_in">s1</span>(), <span class="built_in">s2</span>(); <span class="comment">// fn2 \n fn1</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>target_type</p>
 <blockquote>
@@ -631,14 +644,14 @@
 </blockquote>
 <p>  回傳儲存的 target 的 <code>typeid</code></p>
 <p>  例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123; <span class="keyword">return</span> -a; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">g</span><span class="params">( <span class="type">double</span> )</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// fn1 and fn2 have the same type, but their targets do not</span></span><br><span class="line">    <span class="function">std::function&lt;<span class="title">int</span><span class="params">( <span class="type">int</span> )</span>&gt; <span class="title">fn1</span><span class="params">( f )</span>,</span></span><br><span class="line"><span class="function">                              <span class="title">fn2</span><span class="params">( []( <span class="type">int</span> a ) &#123; <span class="keyword">return</span> -a; &#125; )</span></span>;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; fn1.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>    <span class="comment">// PFiiE</span></span><br><span class="line">              &lt;&lt; fn2.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// Z4mainEUliE_</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// since C++17 deduction guides (CTAD) can avail</span></span><br><span class="line">    std::cout &lt;&lt; std::function&#123; g &#125;.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// PFvdE</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span> a )</span> </span>&#123; <span class="keyword">return</span> -a; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">g</span><span class="params">( <span class="type">double</span> )</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// fn1 and fn2 have the same type, but their targets do not</span></span><br><span class="line">  <span class="function">std::function&lt;<span class="title">int</span><span class="params">( <span class="type">int</span> )</span>&gt; <span class="title">fn1</span><span class="params">( f )</span>,</span></span><br><span class="line"><span class="function">                            <span class="title">fn2</span><span class="params">( []( <span class="type">int</span> a ) &#123; <span class="keyword">return</span> -a; &#125; )</span></span>;</span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; fn1.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>    <span class="comment">// PFiiE</span></span><br><span class="line">            &lt;&lt; fn2.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// Z4mainEUliE_</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// since C++17 deduction guides (CTAD) can avail</span></span><br><span class="line">  std::cout &lt;&lt; std::function&#123; g &#125;.<span class="built_in">target_type</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;    <span class="comment">// PFvdE</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>target</p>
   <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> T &gt;</span></span><br><span class="line"><span class="function">T* <span class="title">target</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;    <span class="comment">// (1)</span></span><br><span class="line"><span class="comment">//----------------------------------//</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> T &gt;</span></span><br><span class="line"><span class="function"><span class="type">const</span> T* <span class="title">target</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span>    <span class="comment">// (2)</span></span></span><br></pre></td></tr></table></figure>
 
 <p>  如果 <code>target_type() == typeid(T)</code>，回傳一個指向儲存的 target 的 pointer，否則回傳一個 null pointer。</p>
 <p>  例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;calling f&quot;</span> );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">g</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;calling g&quot;</span> );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="built_in">puts</span>( <span class="string">&quot;calling ssample Function&quot;</span> );</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">( <span class="type">const</span> std::function&lt;<span class="type">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt; &amp;arg )</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;test function: &quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> ( arg.target&lt;std::plus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is plus\n&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> ( arg.target&lt;std::minus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is minus\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">int</span> ( *<span class="type">const</span> *ptr )( <span class="type">int</span>, <span class="type">int</span> ) = arg.<span class="built_in">target</span>&lt;<span class="built_in">int</span> ( * )( <span class="type">int</span>, <span class="type">int</span> )&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == f ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is the function f\n&quot;</span>;</span><br><span class="line">        ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == g ) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;it is the function g\n&quot;</span>;</span><br><span class="line">        ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">plus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">minus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( f ) );</span><br><span class="line">    <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( g ) );</span><br><span class="line"></span><br><span class="line">       std::function&lt;<span class="type">void</span>()&gt; fn = sampleFunction;</span><br><span class="line"></span><br><span class="line">       <span class="built_in">void</span> ( **fn_ptr )() = fn.<span class="built_in">target</span>&lt;<span class="built_in">void</span> ( * )()&gt;();</span><br><span class="line">       ( *fn_ptr )();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>( <span class="string">&quot;calling f&quot;</span> );</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">g</span><span class="params">( <span class="type">int</span>, <span class="type">int</span> )</span> </span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>( <span class="string">&quot;calling g&quot;</span> );</span><br><span class="line">  <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">sampleFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">puts</span>( <span class="string">&quot;calling ssample Function&quot;</span> );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">( <span class="type">const</span> std::function&lt;<span class="type">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt; &amp;arg )</span> </span>&#123;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;test function: &quot;</span>;</span><br><span class="line">  <span class="keyword">if</span> ( arg.target&lt;std::plus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;it is plus\n&quot;</span>;</span><br><span class="line">  <span class="keyword">if</span> ( arg.target&lt;std::minus&lt;<span class="type">int</span>&gt;&gt;() )</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;it is minus\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">int</span> ( *<span class="type">const</span> *ptr )( <span class="type">int</span>, <span class="type">int</span> ) = arg.<span class="built_in">target</span>&lt;<span class="built_in">int</span> ( * )( <span class="type">int</span>, <span class="type">int</span> )&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == f ) &#123;</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;it is the function f\n&quot;</span>;</span><br><span class="line">      ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> ( ptr &amp;&amp; *ptr == g ) &#123;</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;it is the function g\n&quot;</span>;</span><br><span class="line">      ( *ptr )( <span class="number">1</span>, <span class="number">1</span> );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">plus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">  <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( std::<span class="built_in">minus</span>&lt;<span class="type">int</span>&gt;() ) );</span><br><span class="line">  <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( f ) );</span><br><span class="line">  <span class="built_in">test</span>( std::<span class="built_in">function</span>&lt;<span class="built_in">int</span>( <span class="type">int</span>, <span class="type">int</span> )&gt;( g ) );</span><br><span class="line"></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; fn = sampleFunction;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">void</span> ( **fn_ptr )() = fn.<span class="built_in">target</span>&lt;<span class="built_in">void</span> ( * )()&gt;();</span><br><span class="line">    ( *fn_ptr )();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="Deduction-Guides-模板推導指引"><a href="#Deduction-Guides-模板推導指引" class="headerlink" title="Deduction Guides 模板推導指引"></a>Deduction Guides 模板推導指引</h2><p>在 C++17 時有個叫 CTAD 的東西出現了，不知道的朋友可以先到 <a href = "https://en.cppreference.com/w/cpp/language/class_template_argument_deduction" class = "pinklink">cppreference</a> 上看，或看一下 <a href = "https://tjsw.medium.com/%E6%BD%AE-c-17-class-template-argument-deduction-%E5%92%8C-deduction-guide-%E9%A1%9E%E5%88%A5%E6%A8%A3%E7%89%88%E5%8F%83%E6%95%B8%E6%8E%A8%E5%B0%8E-70cc36307a42" class = "pinklink">TSJW的文章</a>。</p>
 <p>簡單來說就是讓模板自己推定型態的技術，舉個例子：<code>std::vector&lt;int&gt; vec = &#123;5&#125;;</code> 可以寫成 <code>std::vector vec = &#123;5&#125;;</code> 這樣，int 可以由編譯器推導出來。雖然看起來好像很簡單，但後面牽扯到的東西挺多的，像是自訂的型態等等，這邊不討論太多，因為不是今天的主題</p>
@@ -733,7 +746,7 @@
             <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
             <p>原文連結：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/</a>
             <p>發布日期：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">June 12th 2021, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">March 21st 2024, 1:20:01 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">March 21st 2024, 10:30:14 am</a>
             <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
         </div>
     
@@ -742,8 +755,8 @@
         <li class="next">
             
                 <div class="nextSlogan">Next Post</div>
-                <a href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/" title="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置">
-                    <div class="nextTitle">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</div>
+                <a href="/2021/09/19/numerical_algebra/Norm/" title="Norm">
+                    <div class="nextTitle">Norm</div>
                 </a>
             
         </li>
@@ -1000,7 +1013,324 @@
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -1117,9 +1447,13 @@
     
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 18
+        Total : 39
         </div>
         <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
         
     </div>
     
@@ -1133,8 +1467,38 @@
             
         
         <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
             <span class="archive-post-date">08/12</span>
             <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
         </li>
     
         
@@ -1225,6 +1589,12 @@
         </li>
     
         
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
             
             
                 
@@ -1233,6 +1603,96 @@
             <div class="archive-year"> 2021 </div>
             <ul class="year-list">
             
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
         
         <li class="archive-post-item">
             <span class="archive-post-date">06/12</span>
@@ -1268,9 +1728,49 @@
                 C++ Miner
             </span>
         
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
             <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
                 <span class="iconfont-archer">&#xe606;</span>
                 C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
             </span>
         
             <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
@@ -1292,6 +1792,41 @@
         <span class="sidebar-category-name" data-categories="C++ Miner">
             <span class="iconfont-archer">&#xe60a;</span>
             C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
         </span>
     
     </div>
@@ -1326,6 +1861,28 @@
         <!-- fancybox -->
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
         <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
         
         <!-- busuanzi -->
         

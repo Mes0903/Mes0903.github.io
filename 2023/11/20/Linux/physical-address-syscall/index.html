@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="前言這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點 這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳 因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page tabl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="實作一個回傳物理位址的系統呼叫">
+<meta property="og:url" content="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="前言這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點 這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳 因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page tabl">
+<meta property="og:locale">
+<meta property="og:image" content="https://hackmd.io/_uploads/S13PsdmmT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1sFiumQp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkopsuQQT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJz8IA4XT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryin_pmQa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rkEPEJtNT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJDhSyY4T.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1x4HSM8p.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Hks4SrfUa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SkzZ6kzIa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/HyMiUkFVT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S196vktET.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rJfCO1KNa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/B1GftyYV6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/BJRQt1Y4a.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rkOUKEG8T.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SyCr2-KET.png">
+<meta property="article:published_time" content="2023-11-20T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-21T05:28:32.222Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hackmd.io/_uploads/S13PsdmmT.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/Ina.ico">
+    
+    <title>實作一個回傳物理位址的系統呼叫 · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">實作一個回傳物理位址的系統呼叫</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                實作一個回傳物理位址的系統呼叫
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Linux">Linux</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">347</span>閱讀時長: <span class="post-count reading-time">1 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2023/11/20</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點</p>
+<p>這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳</p>
+<p>因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table</p>
+<p>測試的環境如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OS: Ubuntu 22.04</span><br><span class="line">ARCH: X86_64</span><br><span class="line">Source Version: 6.6</span><br></pre></td></tr></table></figure>
+
+<p>但因為是用 QEMU 跑，照理說應該不太會有環境的問題</p>
+<h1 id="Build-Linux-Kernel"><a href="#Build-Linux-Kernel" class="headerlink" title="Build Linux Kernel"></a>Build Linux Kernel</h1><p>首先要先把 kernel Build 起來，這邊有錄一個 Demo 的影片：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=6j7QreGqAmY">Linux HW1 Demo</a></p>
+<blockquote>
+<p>下面的範例 code 跟影片中的 code 有些許不一樣，但操作起來的步驟是一樣的</p>
+</blockquote>
+<p>先下載 kernel 的 source code：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># download the kernel code</span></span><br><span class="line">wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.6.tar.xz</span><br><span class="line">tar -xvf linux-6.6.tar.xz</span><br><span class="line"><span class="built_in">cd</span> linux-6.6</span><br><span class="line"><span class="comment"># Install required dependencies</span></span><br><span class="line">sudo apt update &amp;&amp; sudo apt install make gcc libncurses-dev flex bison</span><br><span class="line">make allnoconfig</span><br></pre></td></tr></table></figure>
+
+<p>接著將 config 設定好</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Initialize kernel config</span></span><br><span class="line">make menuconfig</span><br><span class="line">64-bit kernel -&gt; Enable</span><br><span class="line">Executable file formats -&gt; Enable all</span><br><span class="line">Device Drivers &gt; Character devices &gt; Serial drivers and 8250/16550 and compatible serial support -&gt; Enable</span><br><span class="line">Device Drivers &gt; Character devices &gt; Console on 8250/16550 and compatible serial port -&gt; Enable</span><br><span class="line">General Setup &gt; Initial RAM filesystem and RAM disk (initramfs/initrd) support -&gt; Enable</span><br><span class="line">Process <span class="built_in">type</span> and features -&gt; Linux guest support -&gt; Support <span class="keyword">for</span> running PVH guests -&gt; Enable</span><br></pre></td></tr></table></figure>
+
+<p>下面是輸入 <code>make menuconfig</code> 後會出現的選單，把上面列出來的選項都勾起來：</p>
+<p><img src="https://hackmd.io/_uploads/S13PsdmmT.png" alt="image.png"><br><img src="https://hackmd.io/_uploads/r1sFiumQp.png" alt="image.png"><br><img src="https://hackmd.io/_uploads/SkopsuQQT.png" alt="image.png"><br><img src="https://hackmd.io/_uploads/SJz8IA4XT.png" alt="image.png"></p>
+<!--
+Cryptographic API -> Certificates for signature checking
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">File name or PKCS#11 URI of module signing key -&gt; 改為空值</span><br><span class="line">Additional X.509 keys for default system keyring -&gt; 改為空值</span><br><span class="line">Provide system-wide ring of blacklisted keys -&gt; unselect</span><br></pre></td></tr></table></figure>
+
+<p>–&gt;</p>
+<p>然後開始編譯 kernel </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Install required dependencies</span></span><br><span class="line">sudo apt install libssl-dev libelf-dev</span><br><span class="line">make -j &lt;num_cpu&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Build-Root-FS"><a href="#Build-Root-FS" class="headerlink" title="Build Root FS"></a>Build Root FS</h1><p>由於 kernel 只寫好的 filesystem 的運作邏輯，例如要如何操作 ext4 的 filesystem，filesystem 本體是需要我們自己 mount 進去 kernel 的</p>
+<p>這邊我們使用 busybox，它提供了一些常用的指令，像是 <code>cd</code> 和 <code>ls</code> 等等</p>
+<p>首先下載 busybox 並編譯：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://busybox.net/downloads/busybox-1.36.1.tar.bz2</span><br><span class="line">tar -xf busybox-1.36.1.tar.bz2</span><br><span class="line"><span class="built_in">cd</span> busybox-1.36.1</span><br><span class="line">make menuconfig <span class="comment"># Select build static binary</span></span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p>接著要製作等等要 mount 進 kernel 的 filesystem 本體，就是幾個簡單的資料夾</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> _install</span><br><span class="line"><span class="built_in">mkdir</span> -p lib lib64 proc sys etc etc/init.d</span><br><span class="line"><span class="built_in">cat</span> &gt; ./etc/init.d/rcS &lt;&lt; <span class="string">EOF</span></span><br><span class="line"><span class="string">#!/bin/sh</span></span><br><span class="line"><span class="string"># Mount the /proc and /sys filesystems</span></span><br><span class="line"><span class="string">mount -t proc none /proc</span></span><br><span class="line"><span class="string">mount -t sysfs none /sys</span></span><br><span class="line"><span class="string"># Populate /dev</span></span><br><span class="line"><span class="string">/sbin/mdev -s</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">chmod</span> +x etc/init.d/rcS</span><br><span class="line">find . | cpio -o --format=newc | gzip &gt; ../../linux-6.6/rootfs.img.gz</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://hackmd.io/_uploads/ryin_pmQa.png" alt="image.png"></p>
+<h2 id="Run-Kernel"><a href="#Run-Kernel" class="headerlink" title="Run Kernel"></a>Run Kernel</h2><p>可以先簡單測一下 kernel 能不跑得起來</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install qemu qemu-kvm</span><br><span class="line">qemu-system-x86_64 -kernel vmlinux -nographic -initrd rootfs.img.gz -append <span class="string">&quot;root=/dev/ram rdinit=/sbin/init console=ttyS0&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>沒問題的話我們就開始新增 system call 了</p>
+<h1 id="Add-System-Call"><a href="#Add-System-Call" class="headerlink" title="Add System Call"></a>Add System Call</h1><h2 id="修改-syscall-64-tbl"><a href="#修改-syscall-64-tbl" class="headerlink" title="修改 syscall_64.tbl"></a>修改 <code>syscall_64.tbl</code></h2><p>首先我們要新增自己的 system call，打開 <code>arch/x86/entry/syscalls/syscall_64.tbl</code></p>
+<p>在第 377 行後面新增我們自己的 system call：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">454 common  my_get_physical_addresses   sys_my_get_physical_addresses   </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://hackmd.io/_uploads/rkEPEJtNT.png" alt="image"></p>
+<p>這行有四個部分，每項之間由空白或 tab 隔開，它們代表的意義是：</p>
+<ul>
+<li><code>454</code><br>  system call number，在使用系統呼叫時要使用這個數字</li>
+<li><code>common</code><br>  支援的 ABI，    只能是 <code>64</code>、<code>x32</code> 或 <code>common</code>，分別表示「只支援 amd64」、「只支援 x32」或「都支援」</li>
+<li><code>my_get_physical_addresses</code><br>  system call 的名字</li>
+<li><code>sys_my_get_physical_addresses</code><br>  system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來代表 system call 的實作</li>
+</ul>
+<p><code>syscall_64.tbl</code> 這個檔案會在 compile 階段被讀取後轉為 header file</p>
+<p>檔案位於 <code>arch/x86/include/generated/asm/syscalls_64.h</code>：</p>
+<p><img src="https://hackmd.io/_uploads/BJDhSyY4T.png" alt="image"></p>
+<h2 id="實作自己的-system-call"><a href="#實作自己的-system-call" class="headerlink" title="實作自己的 system call"></a>實作自己的 system call</h2><p>接下來要新增對應的 system call 實作，我們這裡要實作的是回傳 physical address 的 system call，所以先講一下要怎麼做到這件事</p>
+<p>在 Linux 內部的記憶體地址映射過程為邏輯地址 –&gt; 線性地址–&gt; 實體地址 (PA)，實體地址最簡單：在匯流排中傳輸的數位信號，而線性地址和邏輯地址所表示的意涵則是種轉換規則，線性地址規則如下：</p>
+<center>
+    
+<p><img src="https://hackmd.io/_uploads/S1x4HSM8p.png" alt="image"></p>
+</center>
+
+<p>這部分由 MMU 完成，其中在 IA32 架構下，涉及到主要的暫存器有 CR0, CR3。機器指令中出現的是邏輯地址，邏輯地址規則如下：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/Hks4SrfUa.png" alt="image"></p>
+</center>
+
+<p>在 Linux 中的邏輯地址對應於線性地址，也就是說 Intel 為了相容過往架構，把硬體設計搞得很複雜，Linux 核心的實作則予以簡化，並且在支援其他處理器架構時，儘量保持該原則。</p>
+<h3 id="page-in-linux"><a href="#page-in-linux" class="headerlink" title="page in linux"></a>page in linux</h3><p>page 在 v6.6.5 linux 中定義在 <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/linux/v6.6.5/source/include/linux/mm_types.h#L74">mm_type.h</a> 的第 74 行：</p>
+<p>::::: spoiler <span class = "yellow"><code>struct page</code> definition</span></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">page</span> &#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;		<span class="comment">/* Atomic flags, some possibly</span></span><br><span class="line"><span class="comment">					 * updated asynchronously */</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Five words (20/40 bytes) are available in this union.</span></span><br><span class="line"><span class="comment">	 * WARNING: bit 0 of the first word is used for PageTail(). That</span></span><br><span class="line"><span class="comment">	 * means the other users of this union MUST NOT use the bit to</span></span><br><span class="line"><span class="comment">	 * avoid collision and false-positive PageTail().</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">union</span> &#123;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* Page cache and anonymous pages */</span></span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @lru: Pageout list, eg. active_list protected by</span></span><br><span class="line"><span class="comment">			 * lruvec-&gt;lru_lock.  Sometimes used as a generic list</span></span><br><span class="line"><span class="comment">			 * by the page owner.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> lru;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* Or, for the Unevictable &quot;LRU list&quot; slot */</span></span><br><span class="line">				<span class="keyword">struct</span> &#123;</span><br><span class="line">					<span class="comment">/* Always even, to negate PageTail */</span></span><br><span class="line">					<span class="type">void</span> *__filler;</span><br><span class="line">					<span class="comment">/* Count page&#x27;s or folio&#x27;s mlocks */</span></span><br><span class="line">					<span class="type">unsigned</span> <span class="type">int</span> mlock_count;</span><br><span class="line">				&#125;;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* Or, free page */</span></span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> buddy_list;</span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> pcp_list;</span><br><span class="line">			&#125;;</span><br><span class="line">			<span class="comment">/* See page-flags.h for PAGE_MAPPING_FLAGS */</span></span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">address_space</span> *mapping;</span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="type">pgoff_t</span> index;		<span class="comment">/* Our offset within mapping. */</span></span><br><span class="line">				<span class="type">unsigned</span> <span class="type">long</span> share;	<span class="comment">/* share count for fsdax */</span></span><br><span class="line">			&#125;;</span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @private: Mapping-private opaque data.</span></span><br><span class="line"><span class="comment">			 * Usually used for buffer_heads if PagePrivate.</span></span><br><span class="line"><span class="comment">			 * Used for swp_entry_t if PageSwapCache.</span></span><br><span class="line"><span class="comment">			 * Indicates order in the buddy system if PageBuddy.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> <span class="keyword">private</span>;</span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* page_pool used by netstack */</span></span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @pp_magic: magic value to avoid recycling non</span></span><br><span class="line"><span class="comment">			 * page_pool allocated pages.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> pp_magic;</span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">page_pool</span> *pp;</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> _pp_mapping_pad;</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> dma_addr;</span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="comment">/**</span></span><br><span class="line"><span class="comment">				 * dma_addr_upper: might require a 64-bit</span></span><br><span class="line"><span class="comment">				 * value on 32-bit architectures.</span></span><br><span class="line"><span class="comment">				 */</span></span><br><span class="line">				<span class="type">unsigned</span> <span class="type">long</span> dma_addr_upper;</span><br><span class="line">				<span class="comment">/**</span></span><br><span class="line"><span class="comment">				 * For frag page support, not supported in</span></span><br><span class="line"><span class="comment">				 * 32-bit architectures with 64-bit DMA.</span></span><br><span class="line"><span class="comment">				 */</span></span><br><span class="line">				<span class="type">atomic_long_t</span> pp_frag_count;</span><br><span class="line">			&#125;;</span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* Tail pages of compound page */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> compound_head;	<span class="comment">/* Bit zero is set */</span></span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* ZONE_DEVICE pages */</span></span><br><span class="line">			<span class="comment">/** @pgmap: Points to the hosting device page map. */</span></span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">dev_pagemap</span> *pgmap;</span><br><span class="line">			<span class="type">void</span> *zone_device_data;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * ZONE_DEVICE private pages are counted as being</span></span><br><span class="line"><span class="comment">			 * mapped so the next 3 words hold the mapping, index,</span></span><br><span class="line"><span class="comment">			 * and private fields from the source anonymous or</span></span><br><span class="line"><span class="comment">			 * page cache page while the page is migrated to device</span></span><br><span class="line"><span class="comment">			 * private memory.</span></span><br><span class="line"><span class="comment">			 * ZONE_DEVICE MEMORY_DEVICE_FS_DAX pages also</span></span><br><span class="line"><span class="comment">			 * use the mapping, index, and private fields when</span></span><br><span class="line"><span class="comment">			 * pmem backed DAX files are mapped.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/** @rcu_head: You can use this to free a page by RCU. */</span></span><br><span class="line">		<span class="keyword">struct</span> <span class="title class_">rcu_head</span> rcu_head;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">union</span> &#123;		<span class="comment">/* This union is 4 bytes in size. */</span></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * If the page can be mapped to userspace, encodes the number</span></span><br><span class="line"><span class="comment">		 * of times this page is referenced by a page table.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">atomic_t</span> _mapcount;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * If the page is neither PageSlab nor mappable to userspace,</span></span><br><span class="line"><span class="comment">		 * the value stored here may help determine what this page</span></span><br><span class="line"><span class="comment">		 * is used for.  See page-flags.h for a list of page types</span></span><br><span class="line"><span class="comment">		 * which are currently stored here.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">unsigned</span> <span class="type">int</span> page_type;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Usage count. *DO NOT USE DIRECTLY*. See page_ref.h */</span></span><br><span class="line">	<span class="type">atomic_t</span> _refcount;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_MEMCG</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> memcg_data;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * On machines where all RAM is mapped into kernel address space,</span></span><br><span class="line"><span class="comment">	 * we can simply calculate the virtual address. On machines with</span></span><br><span class="line"><span class="comment">	 * highmem some memory is mapped into kernel virtual memory</span></span><br><span class="line"><span class="comment">	 * dynamically, so we need a place to store that address.</span></span><br><span class="line"><span class="comment">	 * Note that this field could be 16 bits on x86 ... ;)</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * Architectures with slow multiplication can define</span></span><br><span class="line"><span class="comment">	 * WANT_PAGE_VIRTUAL in asm/page.h</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(WANT_PAGE_VIRTUAL)</span></span><br><span class="line">	<span class="type">void</span> *<span class="keyword">virtual</span>;			<span class="comment">/* Kernel virtual address (NULL if</span></span><br><span class="line"><span class="comment">					   not kmapped, ie. highmem) */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* WANT_PAGE_VIRTUAL */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_KMSAN</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * KMSAN metadata for this page:</span></span><br><span class="line"><span class="comment">	 *  - shadow page: every bit indicates whether the corresponding</span></span><br><span class="line"><span class="comment">	 *    bit of the original page is initialized (0) or not (1);</span></span><br><span class="line"><span class="comment">	 *  - origin page: every 4 bytes contain an id of the stack trace</span></span><br><span class="line"><span class="comment">	 *    where the uninitialized value was created.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">page</span> *kmsan_shadow;</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">page</span> *kmsan_origin;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> LAST_CPUPID_NOT_IN_PAGE_FLAGS</span></span><br><span class="line">	<span class="type">int</span> _last_cpupid;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125; _struct_page_alignment;</span><br></pre></td></tr></table></figure>
+<p>:::::</p>
+<p>有關 <code>list_head</code> 的解說可以閱讀 <a target="_blank" rel="noopener" href="https://hackmd.io/@sysprog/c-linked-list">你所不知道的 C 語言: linked list 和非連續記憶體</a>。</p>
+<p>struct page 本身就會佔有一定的記憶體空間，而在 <a target="_blank" rel="noopener" href="https://lwn.net/Articles/335768/">How many page flags do we really have?</a> 一文中有提到，於一個 4GB 的系統中將會有一百萬個 page 結構體實例，因此 struct page 內的每一個 byte 都需要做嚴格的把控</p>
+<p>為了減少 struct page 本身使用的記憶體空間，設計上使用了 union，整個 struct page 使用了兩個大的 union 以節省記憶體空間</p>
+<p>struct 的詳細內容可以看看這篇：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/573338379">linux内核那些事之struct page</a></p>
+<p>或是查一下 struct page 應該就蠻多不錯的文章可以看了</p>
+<h3 id="page-table-in-linux"><a href="#page-table-in-linux" class="headerlink" title="page table in linux"></a>page table in linux</h3><p>一般來說，x86 的架構使用 2-level 的 page table(10-10-12)，而 x86-64 的架構則使用 4-level(9-9-9-9-12) 或 5-level(<code>pgd_t</code> 和 <code>pud_t</code> 間多了一層 <code>p4d_t</code>) 的 page table，但也有 3-level 的，這可以透過 config 內的 <code>CONFIG_PGTABLE_LEVELS</code> 設定，基本上是 base on 處理器架構在設定的</p>
+<p>以下是一個 4-level page table 的例子：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/SkzZ6kzIa.png" alt="image"></p>
+<p>圖源：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/QiQi-Robotics/p/15630380.html">關於Linux記憶體尋址與頁表處理的一些細節</a><br>(圖很小，可以用新分頁打開來看一下)</p>
+</center>
+
+<p>每一個 Process 都會有自己的 Page Table，存在它自己的 kernel space，Page table 的 Base address 會被存在 CR3 裡面，這是一個 register，又被稱為 PDBR(page directory base register)，存的是實體位址，但 <code>task_struct-&gt;mm-&gt;pgd</code> 內儲存的則是 Process Global Directory 的虛擬位址</p>
+<p>在 context switch 發生時，CR3 會載入新的 Process 的 Page Table，而將值寫入 CR3 時系統會自動刷新 TLB 的內容</p>
+<p>因此要做虛擬位址與實體位址的轉換，只需要照著 Page Table 一層一層查下去就好，也就是 <code>pgd_t</code> -&gt; <code>p4d_t</code> -&gt; <code>pud_t</code> -&gt; <code>pmd_t</code> -&gt; <code>pte_t</code> 這樣查下去</p>
+<p>查表的話可以使用對應的 function 來查，例如我要使用 <code>pgd_t</code> 查 <code>p4d_t</code>，那我可以這樣寫：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pgd_t</span> *pgd;</span><br><span class="line"><span class="type">p4d_t</span> *p4d;</span><br><span class="line"></span><br><span class="line">pgd = pgd_offset(current-&gt;mm, vaddr);</span><br><span class="line">p4d = p4d_offset(pgd, vaddr);</span><br></pre></td></tr></table></figure>
+
+<p>要用 <code>p4d_t</code> 查 <code>pud_t</code> 同理：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pud_t</span> *pud;</span><br><span class="line">pud = pud_offset(p4d, vaddr);</span><br></pre></td></tr></table></figure>
+
+<p>我們可以看一下這些 offset function 的實作，以 v6.6.5 為例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/pgtable.h line 91</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> pte_offset_kernel</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">pte_t</span> *<span class="title function_">pte_offset_kernel</span><span class="params">(<span class="type">pmd_t</span> *pmd, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> (<span class="type">pte_t</span> *)pmd_page_vaddr(*pmd) + pte_index(address);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> pte_offset_kernel pte_offset_kernel</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// include/linux/pgtable.h line 119</span></span><br><span class="line"><span class="comment">/* Find an entry in the second-level page table.. */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> pmd_offset</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">pmd_t</span> *<span class="title function_">pmd_offset</span><span class="params">(<span class="type">pud_t</span> *pud, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> pud_pgtable(*pud) + pmd_index(address);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> pmd_offset pmd_offset</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> pud_offset</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">pud_t</span> *<span class="title function_">pud_offset</span><span class="params">(<span class="type">p4d_t</span> *p4d, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> p4d_pgtable(*p4d) + pud_index(address);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> pud_offset pud_offset</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">pgd_t</span> *<span class="title function_">pgd_offset_pgd</span><span class="params">(<span class="type">pgd_t</span> *pgd, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> (pgd + pgd_index(address));</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>基本上就和上面的圖一樣，找到對應的 Directory，加上對應的 index，如此一層層下去</p>
+<p><code>p4d</code> 比較特別，只有在特定的架構上有實作，如 <code>arch/x86/include/asm/pgtable.h</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* to find an entry in a page-table-directory. */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">p4d_t</span> *<span class="title function_">p4d_offset</span><span class="params">(<span class="type">pgd_t</span> *pgd, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (!pgtable_l5_enabled())</span><br><span class="line">		<span class="keyword">return</span> (<span class="type">p4d_t</span> *)pgd;</span><br><span class="line">	<span class="keyword">return</span> (<span class="type">p4d_t</span> *)pgd_page_vaddr(*pgd) + p4d_index(address);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般的架構下參數傳進去會直接被 return：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/asm-generic/pgtable-nop4d.h line 35</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">p4d_t</span> *<span class="title function_">p4d_offset</span><span class="params">(<span class="type">pgd_t</span> *pgd, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> (<span class="type">p4d_t</span> *)pgd;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是說 <code>pgd == p4d</code> </p>
+<p>而當在 3-level 的硬體架構上，則沒有 <code>pud</code> 與 <code>p4d</code>，因此參數傳進 <code>pud_offset</code> 也是會直接被 return：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/asm-generic/pgtable-nopud.h line 42</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">pud_t</span> *<span class="title function_">pud_offset</span><span class="params">(<span class="type">p4d_t</span> *p4d, <span class="type">unsigned</span> <span class="type">long</span> address)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> (<span class="type">pud_t</span> *)p4d;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> pud_offset pud_offset</span></span><br></pre></td></tr></table></figure>
+
+<p>也就是 <code>pgd == p4d == pud</code>，其他的也是同理</p>
+<h3 id="開始實作-system-call"><a href="#開始實作-system-call" class="headerlink" title="開始實作 system call"></a>開始實作 system call</h3><p>打開 <code>include/linux/syscalls.h</code></p>
+<p>在第 942 行後新增</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">asmlinkage <span class="type">long</span> <span class="title function_">sys_my_get_physical_addresses</span><span class="params">(<span class="type">void</span> *)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://hackmd.io/_uploads/HyMiUkFVT.png" alt="image"></p>
+<p>新增一個檔案叫 <code>project1.c</code>，路徑是 <code>kernel/project1.c</code></p>
+<p>:::::spoiler <span class = "yellow">範例 code</span></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/syscalls.h&gt;</span></span></span><br><span class="line"><span class="comment">// #define DEBUG</span></span><br><span class="line"></span><br><span class="line">SYSCALL_DEFINE1(my_get_physical_addresses, <span class="type">void</span> *, addr_p)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> vaddr = (<span class="type">unsigned</span> <span class="type">long</span>)addr_p;</span><br><span class="line">	<span class="type">pgd_t</span> *pgd;</span><br><span class="line">	<span class="type">p4d_t</span> *p4d;</span><br><span class="line">	<span class="type">pud_t</span> *pud;</span><br><span class="line">	<span class="type">pmd_t</span> *pmd;</span><br><span class="line">	<span class="type">pte_t</span> *pte;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> paddr = <span class="number">0</span>;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> page_addr = <span class="number">0</span>;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> page_offset = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	pgd = pgd_offset(current-&gt;mm, vaddr);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;pgd_val = 0x%lx\n&quot;</span>, pgd_val(*pgd));</span><br><span class="line">	printk(<span class="string">&quot;pgd_index = %lu\n&quot;</span>, pgd_index(vaddr));</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="keyword">if</span> (pgd_none(*pgd)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;not mapped in pgd\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	p4d = p4d_offset(pgd, vaddr);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;p4d_val = 0x%lx\n&quot;</span>, p4d_val(*p4d));</span><br><span class="line">	printk(<span class="string">&quot;p4d_index = %lu\n&quot;</span>, p4d_index(vaddr));</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="keyword">if</span> (p4d_none(*p4d)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;not mapped in p4d\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	pud = pud_offset(p4d, vaddr);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;pud_val = 0x%lx\n&quot;</span>, pud_val(*pud));</span><br><span class="line">	printk(<span class="string">&quot;pud_index = %lu\n&quot;</span>, pud_index(vaddr));</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="keyword">if</span> (pud_none(*pud)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;not mapped in pud\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	pmd = pmd_offset(pud, vaddr);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;pmd_val = 0x%lx\n&quot;</span>, pmd_val(*pmd));</span><br><span class="line">	printk(<span class="string">&quot;pmd_index = %lu\n&quot;</span>, pmd_index(vaddr));</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="keyword">if</span> (pmd_none(*pmd)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;not mapped in pmd\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	pte = pte_offset_kernel(pmd, vaddr);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;pte_val = 0x%lx\n&quot;</span>, pte_val(*pte));</span><br><span class="line">	printk(<span class="string">&quot;pte_index = %lu\n&quot;</span>, pte_index(vaddr));</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="keyword">if</span> (pte_none(*pte)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;not mapped in pte\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Page frame physical address mechanism | offset */</span></span><br><span class="line">	page_addr = pte_val(*pte) &amp; PAGE_MASK;</span><br><span class="line">	page_offset = vaddr &amp; ~PAGE_MASK;</span><br><span class="line">	paddr = page_addr | page_offset;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">	printk(<span class="string">&quot;page_addr = %lx, page_offset = %lx\n&quot;</span>, page_addr, page_offset);</span><br><span class="line">	printk(<span class="string">&quot;vaddr = %lx, paddr = %lx\n&quot;</span>, vaddr, paddr);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> paddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>:::::</p>
+<blockquote>
+<p><code>virt_to_phys</code> 只能轉 kernel space 的 virtual address，因此必須從頭用 page table 查找</p>
+</blockquote>
+<p>接下來要把這個檔案新增到 makefile 裡面，修改 <code>kernel/Makefile</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">obj-y     = fork.o exec_domain.o panic.o \</span><br><span class="line">	    cpu.o exit.o softirq.o resource.o \</span><br><span class="line">	    sysctl.o capability.o ptrace.o user.o \</span><br><span class="line">	    signal.o sys.o umh.o workqueue.o pid.o task_work.o \</span><br><span class="line">	    extable.o params.o \</span><br><span class="line">	    kthread.o sys_ni.o nsproxy.o \</span><br><span class="line">	    notifier.o ksysfs.o cred.o reboot.o \</span><br><span class="line">	    async.o range.o smpboot.o ucount.o regset.o ksyms_common.o \</span><br><span class="line">	    project1.o</span><br></pre></td></tr></table></figure>
+
+<h1 id="Build-Test-Binary"><a href="#Build-Test-Binary" class="headerlink" title="Build Test Binary"></a>Build Test Binary</h1><p>接下來要寫一個 user program 來使用這個 system call，在 kernel 資料夾的外面新增一個檔案叫 <code>project1.c</code></p>
+<p><img src="https://hackmd.io/_uploads/S196vktET.png" alt="image"></p>
+<p>:::::spoiler <span class = "yellow">範例 code</span></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span> <span class="comment">/* Definition of SYS_* constants */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">void</span> *<span class="title function_">func1</span><span class="params">(<span class="type">void</span> *)</span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">void</span> *<span class="title function_">func2</span><span class="params">(<span class="type">void</span> *)</span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">my_get_physical_addresses</span><span class="params">(<span class="type">void</span> *vaddr)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> syscall(<span class="number">454</span>, vaddr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">data_</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">int</span> id;</span><br><span class="line">  <span class="type">char</span> name[<span class="number">16</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">data_</span> <span class="title">sdata</span>;</span></span><br><span class="line"><span class="type">static</span> __thread sdata tx; <span class="comment">// thread local variable</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">123</span>; <span class="comment">// global variable</span></span><br><span class="line"><span class="type">int</span> *c;      <span class="comment">// heap variable</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hello</span><span class="params">(<span class="type">int</span> pid)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> b = <span class="number">10</span>; <span class="comment">// local variable</span></span><br><span class="line"></span><br><span class="line">  b = b + pid;</span><br><span class="line">  <span class="comment">// global variable</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: In thread %d, the value of global variable a is %d, the offset of the logical address of a is %p\n&quot;</span>, pid, pid, a, &amp;a);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of global variable a is %p\n&quot;</span>, pid, my_get_physical_addresses(&amp;a));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// local variable</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the value of local variable b is %d, the offset of the logical address of b is %p\n&quot;</span>, pid, b, &amp;b);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of local variable b is %p\n&quot;</span>, pid, my_get_physical_addresses(&amp;b));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// heap variable</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the value of heap variable c is %d, the offset of the logical address of c is %p\n&quot;</span>, pid, *c, c);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of heap variable c is %p\n&quot;</span>, pid, my_get_physical_addresses(c));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// thread local variable</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of thread local variable tx is %p\n&quot;</span>, pid, &amp;tx);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of thread local variable tx is %p\n&quot;</span>, pid, my_get_physical_addresses(&amp;tx));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// function</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of function hello is %p\n&quot;</span>, pid, hello);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of function hello is %p\n&quot;</span>, pid, my_get_physical_addresses(hello));</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of function func1 is %p\n&quot;</span>, pid, func1);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of function func1 is %p\n&quot;</span>, pid, my_get_physical_addresses(func1));</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of function func2 is %p\n&quot;</span>, pid, func2);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of function func2 is %p\n&quot;</span>, pid, my_get_physical_addresses(func2));</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of function main is %p\n&quot;</span>, pid, main);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of function main is %p\n&quot;</span>, pid, my_get_physical_addresses(main));</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// library function</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the offset of the logical address of library function printf is %p\n&quot;</span>, pid, <span class="built_in">printf</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: the physical address of library function printf is %p\n&quot;</span>, pid, my_get_physical_addresses(<span class="built_in">printf</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">char</span> *p = (<span class="type">char</span> *)arg;</span><br><span class="line">  <span class="type">int</span> pid;</span><br><span class="line">  pid = syscall(__NR_gettid);</span><br><span class="line">  tx.id = pid;</span><br><span class="line">  <span class="built_in">strcpy</span>(tx.name, p);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: I am thread with ID %d executing func1().\n&quot;</span>, pid, pid);</span><br><span class="line">  hello(pid);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">func2</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">char</span> *p = (<span class="type">char</span> *)arg;</span><br><span class="line">  <span class="type">int</span> pid;</span><br><span class="line">  pid = syscall(__NR_gettid);</span><br><span class="line">  tx.id = pid;</span><br><span class="line">  <span class="built_in">strcpy</span>(tx.name, p);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: I am thread with ID %d executing func2().\n&quot;</span>, pid, pid);</span><br><span class="line">  hello(pid);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">pthread_t</span> id[<span class="number">2</span>];</span><br><span class="line">  <span class="type">char</span> p[<span class="number">2</span>][<span class="number">16</span>];</span><br><span class="line">  c = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">  *c = <span class="number">456</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">strcpy</span>(p[<span class="number">0</span>], <span class="string">&quot;Thread1&quot;</span>);</span><br><span class="line">  pthread_create(&amp;id[<span class="number">0</span>], <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)p[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">strcpy</span>(p[<span class="number">1</span>], <span class="string">&quot;Thread2&quot;</span>);</span><br><span class="line">  pthread_create(&amp;id[<span class="number">1</span>], <span class="literal">NULL</span>, func2, (<span class="type">void</span> *)p[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> pid;</span><br><span class="line">  pid = syscall(__NR_gettid);</span><br><span class="line">  tx.id = pid;</span><br><span class="line">  <span class="built_in">strcpy</span>(tx.name, <span class="string">&quot;MAIN&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;[PID %d]: I am main thread with ID %d.\n&quot;</span>, pid, pid);</span><br><span class="line">  hello(pid);</span><br><span class="line"></span><br><span class="line">  pthread_join(id[<span class="number">0</span>], <span class="literal">NULL</span>);</span><br><span class="line">  pthread_join(id[<span class="number">1</span>], <span class="literal">NULL</span>);</span><br><span class="line">  <span class="built_in">free</span>(c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>:::::</p>
+<p>然後編譯它</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -static project1.c -o project1</span><br></pre></td></tr></table></figure>
+
+<p>然後將這個執行檔複製到 <code>busybox-1.36.1/_install</code> 內，並重新製作 image：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> busybox-1.36.1/_install</span><br><span class="line"><span class="built_in">cp</span> ../../project1 .</span><br><span class="line">find . | cpio -o --format=newc | gzip &gt; ../../linux-6.6/rootfs.img.gz</span><br></pre></td></tr></table></figure>
+
+<h1 id="Run-User-Program"><a href="#Run-User-Program" class="headerlink" title="Run User Program"></a>Run User Program</h1><p>到 <code>linux-6.6</code> 下再執行一次 qemu：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> linux-6.6</span><br><span class="line">qemu-system-x86_64 -kernel vmlinux -nographic -initrd rootfs.img.gz -append <span class="string">&quot;root=/dev/ram rdinit=/sbin/init console=ttyS0&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://hackmd.io/_uploads/rJfCO1KNa.png" alt="image"></p>
+<p>按 enter 可以開始下指令，可以先 <code>ls</code> 看看：</p>
+<p><img src="https://hackmd.io/_uploads/B1GftyYV6.png" alt="image"></p>
+<p>這裡面就有我們編譯好的執行檔了，直接執行它：</p>
+<p><img src="https://hackmd.io/_uploads/BJRQt1Y4a.png" alt="image"></p>
+<h2 id="輸出："><a href="#輸出：" class="headerlink" title="輸出："></a>輸出：</h2><p>:::::spoiler <span class = "yellow">輸出</span></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">[PID 26]: I am thread with ID 26 executing func1().</span><br><span class="line">[PID 26]: In thread 26, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 26]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 26]: the value of <span class="built_in">local</span> variable b is 36, the offset of the logical address of b is 0x7fd051a94194</span><br><span class="line">[PID 25]: I am main thread with ID 25.</span><br><span class="line">[PID 27]: I am thread with ID 27 executing func2().</span><br><span class="line">[PID 27]: In thread 27, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 27]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 27]: the value of <span class="built_in">local</span> variable b is 37, the offset of the logical address of b is 0x7fd051293194</span><br><span class="line">[PID 27]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017bd194</span><br><span class="line">[PID 27]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 27]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 27]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0x7fd0512935e0</span><br><span class="line">[PID 25]: In thread 25, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 25]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 25]: the value of <span class="built_in">local</span> variable b is 35, the offset of the logical address of b is 0x7ffe9eda32f4</span><br><span class="line">[PID 25]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017c12f4</span><br><span class="line">[PID 25]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 25]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 25]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0xffd360</span><br><span class="line">[PID 26]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017bf194</span><br><span class="line">[PID 26]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 26]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 26]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0x7fd051a945e0</span><br><span class="line">[PID 26]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017bf5e0</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 27]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017bd5e0</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 27]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 25]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017cb360</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 25]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 27]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 26]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 26]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br><span class="line">[PID 25]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br></pre></td></tr></table></figure>
+<p>:::::</p>
+<p>::::: spoiler <span class = "yellow">將順序手動整理後的版本：</span></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">[PID 26]: I am thread with ID 26 executing func1().</span><br><span class="line">[PID 26]: In thread 26, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 26]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 26]: the value of <span class="built_in">local</span> variable b is 36, the offset of the logical address of b is 0x7fd051a94194</span><br><span class="line">[PID 26]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017bf194</span><br><span class="line">[PID 26]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 26]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 26]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0x7fd051a945e0</span><br><span class="line">[PID 26]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017bf5e0</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 26]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 26]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 26]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 26]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br><span class="line">=====================================================================================================================</span><br><span class="line">[PID 27]: I am thread with ID 27 executing func2().</span><br><span class="line">[PID 27]: In thread 27, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 27]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 27]: the value of <span class="built_in">local</span> variable b is 37, the offset of the logical address of b is 0x7fd051293194</span><br><span class="line">[PID 27]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017bd194</span><br><span class="line">[PID 27]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 27]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 27]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0x7fd0512935e0</span><br><span class="line">[PID 27]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017bd5e0</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 27]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 27]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 27]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 27]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br><span class="line">=====================================================================================================================</span><br><span class="line">[PID 25]: I am main thread with ID 25.</span><br><span class="line">[PID 25]: In thread 25, the value of global variable a is 123, the offset of the logical address of a is 0x4e0110</span><br><span class="line">[PID 25]: the physical address of global variable a is 0x80000000017d9110</span><br><span class="line">[PID 25]: the value of <span class="built_in">local</span> variable b is 35, the offset of the logical address of b is 0x7ffe9eda32f4</span><br><span class="line">[PID 25]: the physical address of <span class="built_in">local</span> variable b is 0x80000000017c12f4</span><br><span class="line">[PID 25]: the value of heap variable c is 456, the offset of the logical address of c is 0xffe770</span><br><span class="line">[PID 25]: the physical address of heap variable c is 0x80000000017c0770</span><br><span class="line">[PID 25]: the offset of the logical address of thread <span class="built_in">local</span> variable tx is 0xffd360</span><br><span class="line">[PID 25]: the physical address of thread <span class="built_in">local</span> variable tx is 0x80000000017cb360</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> hello is 0x4017ed</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> hello is 0x25eb7ed</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> func1 is 0x401af7</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> func1 is 0x25ebaf7</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> func2 is 0x401b78</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> func2 is 0x25ebb78</span><br><span class="line">[PID 25]: the offset of the logical address of <span class="keyword">function</span> main is 0x401bf9</span><br><span class="line">[PID 25]: the physical address of <span class="keyword">function</span> main is 0x25ebbf9</span><br><span class="line">[PID 25]: the offset of the logical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x40bbb0</span><br><span class="line">[PID 25]: the physical address of library <span class="keyword">function</span> <span class="built_in">printf</span> is 0x25f5bb0</span><br></pre></td></tr></table></figure>
+
+<p>:::::</p>
+<p>整理成表格</p>
+<ul>
+<li><p>logical address：</p>
+<table>
+<thead>
+<tr>
+<th>identifier &#x2F; logical address</th>
+<th>main thread</th>
+<th>thread 1</th>
+<th>thread 2</th>
+<th>位址一樣</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>global variable <code>a</code></td>
+<td>0x4e0110</td>
+<td>0x4e0110</td>
+<td>0x4e0110</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>local variable <code>b</code></td>
+<td>0x7ffe9eda32f4</td>
+<td>0x7fd051a94194</td>
+<td>0x7fd051293194</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>heap variable <code>c</code></td>
+<td>0xffe770</td>
+<td>0xffe770</td>
+<td>0xffe770</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>thread local variable <code>tx</code></td>
+<td>0xffd360</td>
+<td>0x7fd051a945e0</td>
+<td>0x7fd0512935e0</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>logical address of function <code>hello</code></td>
+<td>0x4017ed</td>
+<td>0x4017ed</td>
+<td>0x4017ed</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>func1</code></td>
+<td>0x401af7</td>
+<td>0x401af7</td>
+<td>0x401af7</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>func2</code></td>
+<td>0x401b78</td>
+<td>0x401b78</td>
+<td>0x401b78</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>main</code></td>
+<td>0x401bf9</td>
+<td>0x401bf9</td>
+<td>0x401bf9</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of library function <code>printf</code></td>
+<td>0x40bbb0</td>
+<td>0x40bbb0</td>
+<td>0x40bbb0</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>physical address：</p>
+<table>
+<thead>
+<tr>
+<th>identifier &#x2F; physical address</th>
+<th>main thread</th>
+<th>thread 1</th>
+<th>thread 2</th>
+<th>位址一樣</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>global variable <code>a</code></td>
+<td>0x80000000017d9110</td>
+<td>0x80000000017d9110</td>
+<td>0x80000000017d9110</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>local variable <code>b</code></td>
+<td>0x80000000017c12f4</td>
+<td>0x80000000017bf194</td>
+<td>0x80000000017bd194</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>heap variable <code>c</code></td>
+<td>0x80000000017c0770</td>
+<td>0x80000000017c0770</td>
+<td>0x80000000017c0770</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>thread local variable <code>tx</code></td>
+<td>0x80000000017cb360</td>
+<td>0x80000000017bf5e0</td>
+<td>0x80000000017bd5e0</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>logical address of function <code>hello</code></td>
+<td>0x25eb7ed</td>
+<td>0x25eb7ed</td>
+<td>0x25eb7ed</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>func1</code></td>
+<td>0x25ebaf7</td>
+<td>0x25ebaf7</td>
+<td>0x25ebaf7</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>func2</code></td>
+<td>0x25ebb78</td>
+<td>0x25ebb78</td>
+<td>0x25ebb78</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of function <code>main</code></td>
+<td>0x25ebbf9</td>
+<td>0x25ebbf9</td>
+<td>0x25ebbf9</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>logical address of library function <code>printf</code></td>
+<td>0x25f5bb0</td>
+<td>0x25f5bb0</td>
+<td>0x25f5bb0</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<p>hackmd 的排版讓表格不太好看，所以這邊截一下圖：</p>
+<p><img src="https://hackmd.io/_uploads/rkOUKEG8T.png" alt="image"></p>
+<p>把 memory layout 簡單畫出來：</p>
+<p><img src="https://hackmd.io/_uploads/SyCr2-KET.png" alt="image"></p>
+<p>字很醜不好意思</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.austint.in/2022/01/16/run-and-debug-linux-kernel-in-qemu-vm.html">Linux kernel on QEMU</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.subrat.info/build-kernel-and-userspace/">Minimal kernel on QEMU</a></li>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/debuti/43e9104ae9eb59bdbb8b664c4fcf6839">embed linux bootstrap</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.kernel.org/admin-guide/initrd.html">initrd</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/gorman/html/understand/understand006.html">Page table</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/642419727">Get physical memory</a></li>
+<li><a target="_blank" rel="noopener" href="https://hackmd.io/@ppodds/SkezlfZX6">ppodds Linux Kernel Project 1</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/573338379">linux内核那些事之struct page</a></li>
+<li><a target="_blank" rel="noopener" href="https://member.adl.tw/ernieshu/syscall_3_14_4.html">How to Add a System Call</a></li>
+<li><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/379230/how-many-page-table-levels-does-linux-kernel-use-4-or-5">How many page table levels does Linux kernel use? 4 or 5?</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/QiQi-Robotics/p/15630380.html">關於Linux記憶體尋址與頁表處理的一些細節</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1622986?fbclid=IwAR3aLMPWaomBgeDYcXU60-Xz0wgMRPLdB9iNndphbnCDnxqC0EXAC6iNsG4">學習ARM64頁表轉換流程</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/freelancer-leon/notes/blob/master/kernel/mm/mm_pagetable.md?fbclid=IwAR27yWHgWVyVzPwXdSjdxCaEFYiKTZW2cAMxgCDjVXIBM8e7MvAjdPmZUps">自由工作者-萊昂筆記-頁表</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.csie.ntu.edu.tw/~wcchen/asm98/asm/proj/b85506061/chap2/paging.html?fbclid=IwAR0PUt5zCou3Lyrw93VdI7w2sgM25rN0gACqivFwlBTGHUwdSFAq0w0hhvI">分頁架構</a></li>
+<li><a target="_blank" rel="noopener" href="https://hackmd.io/@sysprog/linux-memory">Linux 核心設計: 記憶體管理</a></li>
+</ul>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">November 20th 2023, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">March 21st 2024, 5:28:32 am</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2023/12/13/ROS/ROS_Install/" title="Ros Install (noetic)">
+                    <div class="nextTitle">Ros Install (noetic)</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2023/11/14/memory/sw-reram/" title="ReRAM 與 Smith-Waterman Algorithm 介紹">
+                    <div class="prevTitle">ReRAM 與 Smith-Waterman Algorithm 介紹</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Build-Linux-Kernel"><span class="toc-number">2.</span> <span class="toc-text">Build Linux Kernel</span></a></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 39
+        </div>
+        <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

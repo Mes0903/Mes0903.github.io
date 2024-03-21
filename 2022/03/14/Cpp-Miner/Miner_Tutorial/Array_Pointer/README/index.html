@@ -28,7 +28,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://i.imgur.com/lUlVnFM.png">
 <meta property="article:published_time" content="2022-03-14T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-20T23:15:38.149Z">
+<meta property="article:modified_time" content="2024-03-21T10:32:24.657Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="C++ Miner_tutorial">
 <meta name="twitter:card" content="summary">
@@ -209,6 +209,19 @@
     <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
     <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
     <!-- algolia -->
+    
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
     
     <!-- 百度统计  -->
     
@@ -528,20 +541,20 @@
 <ul>
 <li><p>noptr-declarator  </p>
 <p>  可以是任何合法的宣告器，如果沒有接初始化器，那麼陣列的元素內容會是未知的。如果 Pointer Declarator&#x2F;Reference 要作用在指標&#x2F;參考本身，而不是目標的話，那要加上括號把它們括住，例如  </p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[<span class="number">2</span>] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr  </span></span><br><span class="line">  <span class="type">int</span> arr2[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr2，但沒有初始化，內部元素可能為隨機值  </span></span><br><span class="line">  <span class="type">int</span> *p_arr[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數指標元素的陣列型態，其變數名為 p_arr，也沒有初始化  </span></span><br><span class="line">  <span class="built_in">int</span>(*p_arr2[<span class="number">2</span>])[<span class="number">2</span>] = &#123; &amp;arr, &amp;arr2 &#125;;    <span class="comment">// 一個有兩個指向 int[2] 元素的陣列型態，其變數名為 p_arr2  </span></span><br><span class="line">  <span class="built_in">int</span>(*a1)[<span class="number">2</span>] = &amp;arr;    <span class="comment">// 一個指向 int[2] 型態的指標，其變數名為 a1，指向 arr  </span></span><br><span class="line">  <span class="built_in">int</span>(&amp;a2)[<span class="number">2</span>] = arr;    <span class="comment">// 一個參考 int[2] 型態的別名，其變數名為 a2，參考 arr  </span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line"><span class="type">int</span> arr[<span class="number">2</span>] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr  </span></span><br><span class="line"><span class="type">int</span> arr2[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數元素的陣列型態，其變數名為 arr2，但沒有初始化，內部元素可能為隨機值  </span></span><br><span class="line"><span class="type">int</span> *p_arr[<span class="number">2</span>];    <span class="comment">// 一個有兩個整數指標元素的陣列型態，其變數名為 p_arr，也沒有初始化  </span></span><br><span class="line"><span class="built_in">int</span>(*p_arr2[<span class="number">2</span>])[<span class="number">2</span>] = &#123; &amp;arr, &amp;arr2 &#125;;    <span class="comment">// 一個有兩個指向 int[2] 元素的陣列型態，其變數名為 p_arr2  </span></span><br><span class="line"><span class="built_in">int</span>(*a1)[<span class="number">2</span>] = &amp;arr;    <span class="comment">// 一個指向 int[2] 型態的指標，其變數名為 a1，指向 arr  </span></span><br><span class="line"><span class="built_in">int</span>(&amp;a2)[<span class="number">2</span>] = arr;    <span class="comment">// 一個參考 int[2] 型態的別名，其變數名為 a2，參考 arr  </span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <p>  這個部分基本上就是你陣列的變數名，視情況會再加上其他你需要的東西，讀的方法是從右至左，以 <code>int *p_arr[2]</code> 來說，<code>int</code> 屬於 type specifier，<code>*p_arr[2]</code> 屬於 declarator。  </p>
 <p>  另外補充一點，Array 無法使用 assignment，也不能 copy，因為 array type 的物件無法一次修改全部的元素，也就是說像這樣是不行的：  </p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> a[<span class="number">3</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;, b[<span class="number">3</span>] = &#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span> &#125;;  </span><br><span class="line">  <span class="type">int</span> c[<span class="number">3</span>] = a;    <span class="comment">// error: array must be initialized with a brace-enclosed initializer  </span></span><br><span class="line">  a = b;    <span class="comment">// error: invalid array assignment  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line"><span class="type">int</span> a[<span class="number">3</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;, b[<span class="number">3</span>] = &#123; <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span> &#125;;  </span><br><span class="line"><span class="type">int</span> c[<span class="number">3</span>] = a;    <span class="comment">// error: array must be initialized with a brace-enclosed initializer  </span></span><br><span class="line">a = b;    <span class="comment">// error: invalid array assignment  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 </li>
 <li><p>expr  </p>
 <p>  一個可以轉換為 <code>const std::size_t</code> 型態的表達式，<span class = "yellow">必須大於 0</span>，<code>std::size_t</code> 你可以把它想像成一個正整數，專門拿來表示大小。  </p>
 <p>  這個部分基本上是你陣列元素的數目，所以需要大於 0，且如果不是使用動態配置，那麼需要是個<span class = "yellow">編譯時期就能算出的值</span>，所以才會說需要是一個 constant expression，例如：  </p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> i = <span class="number">40</span>;    <span class="comment">// i 不是 constant expression  </span></span><br><span class="line">  <span class="type">const</span> <span class="type">int</span> ci = <span class="number">40</span>;    <span class="comment">// ci 是 constant expression  </span></span><br><span class="line">  <span class="type">int</span> arr[i];    <span class="comment">// error，i 不是 constant expression  </span></span><br><span class="line">  <span class="type">int</span> arr2[ci];    <span class="comment">// ok  </span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line"><span class="type">int</span> i = <span class="number">40</span>;    <span class="comment">// i 不是 constant expression  </span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> ci = <span class="number">40</span>;    <span class="comment">// ci 是 constant expression  </span></span><br><span class="line"><span class="type">int</span> arr[i];    <span class="comment">// error，i 不是 constant expression  </span></span><br><span class="line"><span class="type">int</span> arr2[ci];    <span class="comment">// ok  </span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <p>  上面這段 code 你可能可以編譯成功，這是因為有些編譯器有幫忙做特殊的處理，像是先在 stack 上分配一些空間之類的，但這種 code 換個編譯器可能就不會過了，這種拿非編譯時期的值拿來當作其大小的陣列叫做 VLA(variable-length array)，有興趣的可以看看。  </p>
 <p>  如果你沒有寫 expression，那就需要有初始化器，此時編譯器會幫忙從初始化器推算出陣列的元素個數，例如：  </p>
-  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;  </span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line"><span class="type">int</span> arr[] = &#123; <span class="number">1</span>, <span class="number">2</span> &#125;;  </span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <p>  這裡的 <code>arr</code> 是個整數的陣列，編譯器會幫忙推算出陣列有兩個元素。  </p>
 <blockquote>
@@ -721,7 +734,7 @@
             <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
             <p>原文連結：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/</a>
             <p>發布日期：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">March 14th 2022, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">March 20th 2024, 11:15:38 pm</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">March 21st 2024, 10:32:24 am</a>
             <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
         </div>
     
@@ -988,7 +1001,324 @@
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -1105,9 +1435,13 @@
     
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 18
+        Total : 39
         </div>
         <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
         
     </div>
     
@@ -1121,8 +1455,38 @@
             
         
         <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
             <span class="archive-post-date">08/12</span>
             <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
         </li>
     
         
@@ -1213,6 +1577,12 @@
         </li>
     
         
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
             
             
                 
@@ -1221,6 +1591,96 @@
             <div class="archive-year"> 2021 </div>
             <ul class="year-list">
             
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
         
         <li class="archive-post-item">
             <span class="archive-post-date">06/12</span>
@@ -1256,9 +1716,49 @@
                 C++ Miner
             </span>
         
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
             <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
                 <span class="iconfont-archer">&#xe606;</span>
                 C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
             </span>
         
             <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
@@ -1280,6 +1780,41 @@
         <span class="sidebar-category-name" data-categories="C++ Miner">
             <span class="iconfont-archer">&#xe60a;</span>
             C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
         </span>
     
     </div>
@@ -1314,6 +1849,28 @@
         <!-- fancybox -->
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
         <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
         
         <!-- busuanzi -->
         

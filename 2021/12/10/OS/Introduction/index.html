@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mes">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Mes">
+    
+        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
+    
+    <meta name="description" content="">
+    <meta name="description" content="Ch1 基礎概論什麼是作業系統?Introduction「作業系統（英語：Operating System，縮寫：OS）是一組主管並控制電腦操作、運用和執行硬體、軟體資源和提供公共服務來組織使用者互動的相互關聯的系統軟體程式」── wiki 簡單來說就是一個管理電腦的系統程式，是使用者和電腦硬體的介面 (interface)。 Computer System整個電腦系統主要可以分成四個部分：硬體、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ch1 基礎概論">
+<meta property="og:url" content="https://mes0903.github.io/2021/12/10/OS/Introduction/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="Ch1 基礎概論什麼是作業系統?Introduction「作業系統（英語：Operating System，縮寫：OS）是一組主管並控制電腦操作、運用和執行硬體、軟體資源和提供公共服務來組織使用者互動的相互關聯的系統軟體程式」── wiki 簡單來說就是一個管理電腦的系統程式，是使用者和電腦硬體的介面 (interface)。 Computer System整個電腦系統主要可以分成四個部分：硬體、">
+<meta property="og:locale">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/General_Purpose_Operating_Systems.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Organization.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Operations.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Timeline.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Interrupt_Driven_IO.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Signal.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Trap.jpg?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Storage_Device_Hierarchy.png?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Disk_Mechanism.png?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Caching.png?raw=true">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Dual_mode.png?raw=true">
+<meta property="article:published_time" content="2021-12-10T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-21T10:05:45.420Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="OS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/General_Purpose_Operating_Systems.jpg?raw=true">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/Ina.ico">
+    
+    <title>Ch1 基礎概論 · Mes&#39;s Studio</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+        <script>
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                applicationID: 'JNI49E87OH',
+                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
+                indexName: 'MesBlog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Mes's Studio</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">Mes&#39;s Studio</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">Ch1 基礎概論</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                Ch1 基礎概論
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="OS">OS</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                    <div class="post-intro-read">
+                        <span>字數: <span class="post-count word-count">6.8k</span>閱讀時長: <span class="post-count reading-time">25 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2021/12/10</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="Ch1-基礎概論"><a href="#Ch1-基礎概論" class="headerlink" title="Ch1 基礎概論"></a>Ch1 基礎概論</h1><h2 id="什麼是作業系統"><a href="#什麼是作業系統" class="headerlink" title="什麼是作業系統?"></a>什麼是作業系統?</h2><h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>「作業系統（英語：Operating System，縮寫：OS）是一組主管並控制電腦操作、運用和執行硬體、軟體資源和提供公共服務來組織使用者互動的相互關聯的系統軟體程式」── <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F">wiki</a></p>
+<p>簡單來說就是一個管理電腦的系統程式，是使用者和電腦硬體的介面 (interface)。</p>
+<h3 id="Computer-System"><a href="#Computer-System" class="headerlink" title="Computer System"></a>Computer System</h3><p>整個電腦系統主要可以分成四個部分：硬體、作業系統、應用程式和使用者，這邊先對它們做個簡單的介紹，但這些不是定義，只是一個描述</p>
+<ul>
+<li><p>使用者(User)</p>
+<p>  使用者可以是人、機器或其他的電腦，只要是可以操控這台電腦的都可以算</p>
+</li>
+<li><p>應用程式(Application)</p>
+<p>  能幫助使用者解決問題的軟體都可以算，像是 Browser、Compiler 或一般的 Text Editor 都算</p>
+</li>
+<li><p>硬體(Hardware)</p>
+<p>  能夠拿來給我們操作，做運算的硬體，因此硬體在 OS 這邊我們習慣稱它們回資源 (resources)，我們不在意它是透過哪種硬體提供的，只在意它能夠提供哪種資源，可以怎麼運用它</p>
+</li>
+<li><p>作業系統(Operating System)</p>
+<p>  能夠幫助我們「控制(control)」和「協調(coordinate)」資源的系統軟體。</p>
+<p>  控制(control) 指的大概就是 Device Driver，能夠幫助我們去控制硬體的，重點在協調(coordinate)，怎麼樣去協調使用者，分配資源，是 OS 裡面比較複雜的部份。</p>
+<p>  因此我們也可以說 OS 是幫忙分配資源的軟體(resource allocator)，像是 memory management 會幫忙分配記憶體，file system 會幫忙分配 disk block 等等</p>
+<p>  因此 OS 比較常見的定義是一個 resource allocator 和 control program，我們也稱它為 kernel，是一個在電腦內部隨時都在執行的程式，前面兩個名詞可以不用特定去記，因為只是一個比較常見的定義，但其實沒有很確切的定義 OS 是什麼，<span class="yellow">但 kernel 這個名詞很重要，要記一下</span>。</p>
+</li>
+</ul>
+<p>因此作業系統就會有一些 for virtual resource 的 API 可以使用，這些 API 我們也常稱它為 system call，<span class="yellow">這些 API 是 user 與 resource 間唯一的 interface</span>。</p>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>我們看一個例子：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/General_Purpose_Operating_Systems.jpg?raw=true" alt="General_Purpose_Operating_Systems"></p>
+<p>最下面是硬體，上面則是我們寫的程式，程式大致上可以分成「和作業系統相關的」與「和作業系統無關的」，也就是圖上的 user mode 與 kernel mode，這在後面的章節會再提更多。</p>
+<p>Device Driver 也算 OS 的一部份，把它抽出來是因為它是可以一直更新、抽換的；Driver 上面就會有 OS 的主要部分，也就是如何管理 memory、cpu 等等的軟體，這個軟體會提供一些 API，也就是前面提到的 System call，OS 會把它包起來成 System library，讓我們使用。</p>
+<p>我們寫完 Program 後要先 Compile，然後透過 Linker 把這些 Compile 完的 <code>.o</code> 檔 link 在一起，代表我們要去使用別人 implement 好的 Program，因此他不會只 link 我們 include 的那些 library，也一定會 link System library，link 完後才成為一個能執行的執行檔。</p>
+<p>以 <code>printf</code> 來舉例，我們要印出東西在終端機上，這個動作不會是 C library 去做，而是 OS 去做的，需要呼叫到 system call，可能不是直接呼叫，但一定間接會呼叫到它，所以一定要 link System library，等到後面講 system call 時會更清楚。</p>
+<p>因此這個過程中我們會先呼叫 <code>printf</code>，然後會呼叫到 system call，再去呼叫到 driver 這樣一層一層下去。</p>
+<h3 id="Goals-of-an-Operating-System"><a href="#Goals-of-an-Operating-System" class="headerlink" title="Goals of an Operating System"></a>Goals of an Operating System</h3><p>OS 主要的考量、需求有二：</p>
+<ol>
+<li><p>方便<br> 尤其是越接近使用者的產品，方便性越重要。</p>
+</li>
+<li><p>效率<br> 如果執行一些比較複雜的程式，像是遊戲，或是你要算什麼東西的時候，就希望它效率會快一點，換句話說就是 performance 要好一點。</p>
+</li>
+</ol>
+<p>而這兩點是 trade-off 的，因為「方便」是給 user 的，一定會多加到一些東西，所以速度就會慢下來，因此就看怎麼設計怎麼取捨。</p>
+<h3 id="Modern-Operating-Systems"><a href="#Modern-Operating-Systems" class="headerlink" title="Modern Operating Systems"></a>Modern Operating Systems</h3><p>這邊列幾個常見的 OS：</p>
+<ul>
+<li><p>x86 platform</p>
+<ul>
+<li><p>Linux<br>  像是 CentOS、Redhat、Ubuntu 等等的，大型的系統還是會選擇 Linux，主要是因為它是 open source 的。</p>
+</li>
+<li><p>Windows<br>  這就是一般使用者比較熟系的 OS。</p>
+</li>
+</ul>
+</li>
+<li><p>PowerPC platform</p>
+<p>  如 Mac OS。</p>
+</li>
+<li><p>Smartphone Mobile OS</p>
+<p>  如 Android、iOS、Windows10 Mobile、Ubuntu Touch 等等。</p>
+</li>
+<li><p>Embedded OS (嵌入式系統)</p>
+<p>  Embedded 的範圍非常廣泛，像是物聯網上面的 Device 形形色色，因此在上面的 OS 就需要非常有彈性，且能夠調整，但當然也有一些 OS 是綁在那個硬體上的。</p>
+<p>  如 Raspberry Pi、Xbox 等等</p>
+</li>
+</ul>
+<h2 id="Computer-System-Organization"><a href="#Computer-System-Organization" class="headerlink" title="Computer-System Organization"></a>Computer-System Organization</h2><p>知道了 OS 的定位、角色之後就要開始講它到底是如何運作的了。</p>
+<p>電腦系統有很多不同的 Hardware，我們需要把它串起來，你把主機打開來可以看見它有 bus、線，而作業系統的目的就是要控制、協調這些硬體的使用，可以看看下面這張圖：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Organization.jpg?raw=true" alt="Computer_System_Organization"></p>
+<p>簡單來說就會長上圖最下面那樣，執行程式時 instruction 是 run 在 cpu 上的，需要用到的 data 會在 memory 裡面，最後可能寫到某個 Device 上面，看要儲存還是輸出之類的，這些是 control 的部分。</p>
+<p>而 coordinate 部份的問題是今天可能有很多程式，OS 需要讓它們能夠同時執行在這台電腦上而不出錯，像是 A Process 不能去修改到 B Process 的資料之類的。</p>
+<h3 id="Computer-System-Operations"><a href="#Computer-System-Operations" class="headerlink" title="Computer-System Operations"></a>Computer-System Operations</h3><p>這是一個 OS 基本運作的例子：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Operations.jpg?raw=true" alt="Computer_System_Operations"></p>
+<p>這邊 Cpu 想對一個 I&#x2F;O Device，像是 Disk 做動作，例如讀寫資料。</p>
+<p>如果 Cpu 想要把資料寫過去，那它會需要一個 Device Controller，這是一個硬體，它是一個最 low-level 能夠控制 Device(例如 Disk 的磁頭轉動) 的硬體，每個 Device Controller 會負責自己特定的 Device。</p>
+<p>而因為資料需要在 Device Controller 上流動，因此 Device Controller 一定會有 buffer，資料會先寫到這上面再寫出去，因為 I&#x2F;O Device 相較於 cpu 很慢，如果沒有這個 Buffer，代表我們要直接把資料從 Device 上 Copy 到 Memory 裡，這個需要很久，因此 cpu 一定會 idle。</p>
+<p>而為了要透過 buffer 去讀寫，Device Controller 就會需要有 Status Register 和 Data Register 來控制 Device Controller。 Status Register 會告訴它現在是 busy 還是 idle；Data Register 則可以想像成另一個 buffer，我們先很快寫到 Register 上，再寫到 buffer。</p>
+<p>因此在讀資料時，I&#x2F;O Device 需要先和 Device Controller 做 I&#x2F;O，跟 cpu 無關，但是後面因為 memory 是 cpu 在使用的，所以後半段的操作就需要 cpu 去下指令操作。</p>
+<h3 id="Busy-Waiting"><a href="#Busy-Waiting" class="headerlink" title="Busy Waiting"></a>Busy Waiting</h3><p>那麼 cpu 那邊要怎麼控制呢? 一個早期大家想到的最簡單的方法就是 Busy Waiting，完全由 cpu 來控制，這邊舉個簡單的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> OUT_CHAR 0x1000    <span class="comment">// device data register</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OUT_STATUS 0x1001    <span class="comment">// device status register</span></span></span><br><span class="line"></span><br><span class="line">current_char = mystring;</span><br><span class="line"><span class="keyword">while</span> ( *current_char != <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line">    poke( OUT_CHAR, *current_char );</span><br><span class="line">    <span class="keyword">while</span> ( peek( OUT_STATUS ) != <span class="number">0</span> );    <span class="comment">// busy waiting</span></span><br><span class="line">    current_char++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們想要把一串字串寫到 I&#x2F;O Device 上，因為 buffer 空間大小的關係，且 cpu、memory 那邊的速度遠快於 I&#x2F;O Device 的速度，因此我們不可能一次把全部的資料塞進 buffer，或像 streaming 那樣資料不停的流動，所以 Busy Waiting 的方式就是，如果 buffer 寫滿了，就等到 buffer 寫到 Disk 上，清空後再寫下一批。</p>
+<p>所以 cpu 這邊的 code</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> ( *current_char != <span class="string">&#x27;\0&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>是在判斷字串結束了沒，<code>poke</code> 是把值寫到 buffer，而我們在寫的時候，因為怕 buffer 還沒清空，是 busy 的狀態，所以會需要一個 while loop 去看 Status Register 的值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> ( peek( OUT_STATUS ) != <span class="number">0</span> );    <span class="comment">// busy waiting</span></span><br></pre></td></tr></table></figure>
+
+<p>如果是 busy 的，就停在那邊等，所以才叫 Busy Waiting；當值不等於 <code>0</code> 時，代表已經沒事了，就可以換下一個字了。</p>
+<p>因此整個做 I&#x2F;O 的時間並不是真正在寫的時間，中間有花一段時間在等 buffer 清空，也就是 cpu 有某種程度的 idle。</p>
+<p>如果我們是這樣做 I&#x2F;O 的，那整個效率就會很差，因為 I&#x2F;O 和 cpu 並沒有 overlap，一個程式在做 I&#x2F;O 的時候仍會霸佔住 cpu。</p>
+<h3 id="Interrupt"><a href="#Interrupt" class="headerlink" title="Interrupt"></a>Interrupt</h3><p>因為 Busy waiting 非常沒有效率，在檢查是否為 busy 時 cpu 沒法做其他的事，會整個卡在那邊，也因此會很難同時處理多個 I&#x2F;O。</p>
+<p>所以就有另外一個方式叫做 Interrupt，這是一種 event driven 的架構。</p>
+<p>所謂的 Interrupt 就如其名，可以改變 cpu 控制的 flow，也就是說 cpu 可能正在執行某段程式碼，但妳可以透過 Interrupt 把他打斷，叫他去做另一件事情。</p>
+<p>用這張圖來看：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Timeline.jpg?raw=true" alt="Timeline"></p>
+<p>假設有了 Interrupt，對於 I&#x2F;O 而言就會像圖上這樣。cpu 在高電位代表他正在做他該做的事，在低電位代表他去處理別的程式的事情；而 I&#x2F;O 則是反過來的，高電位代表 idle，低電位代表正在傳輸，而且花的時間可能會很長。</p>
+<p>因此我們原本的程式與資料傳遞可以同時執行，而當資料傳遞結束時，就有點像 buffer 滿了，這時要搬到 memory，就需要 cpu 來幫忙，因此 I&#x2F;O 那邊會發出一個 Interrupt，把原本 cpu 執行的程式先打斷，讓它切到要做 I&#x2F;O 的那個 subroutine 去處理搬資料的工作，結束後 cpu 再回去執行剛剛被打斷的程式。</p>
+<p>整個核心概念就是，cpu 可以先做自己的事，當有需要 OS 來做事時，可以隨時透過 Interrupt 把 cpu 從 user 的程式切換到 OS 的程式，去做現在整個電腦系統比較需要做的事，且做完後能夠回去繼續做自己的事。</p>
+<p>那我們來看個例子，情境是使用者要執行 <code>scanf</code>，而最終當然會到最底層去 call 到 driver：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Interrupt_Driven_IO.jpg?raw=true" alt="Interrupt_Driven_IO"></p>
+<p>一開始 cpu 會下指令給 controller，讓它開始搬資料，cpu 可能還會給個 byte 的長度，像是 100 bytes，然後 controller 搬完後再去通知 cpu。</p>
+<p>所以 I&#x2F;O Controller 就會開始搬資料，搬完後會送一個 Interrupt 出去。在這過程 cpu 可能會切換到別的程式，以 scanf 來說，當 A 程式執行到這行時就會停在這裡等使用者輸入，此時 cpu 就會切換到 B 程式之類的去做其他事。</p>
+<p>當 cpu 收到 Controller 的 Interrupt 時，就會打斷剛剛執行的程式，確認 A 的 scanf 做完了，然後看看要接著執行 A 還是繼續做 B，看 cpu 的 scheduling 怎麼決定，它可能會但總之它會知道 A 的 I&#x2F;O 已經做完了。</p>
+<p>所以回到圖裡，cpu 接到 Interrupt 後，會有一個 interrupt handler 先去確認剛剛 I&#x2F;O 的動作已經做完了，然後看要把原本的程式啟動起來，或是把它的狀態改成可執行之類的。</p>
+<p>以上面那個例子來說就是把 B 打斷，然後把 A 的樣子弄成 I&#x2F;O 剛做完的狀態，這樣子 A 跟 B 就都可以繼續執行了。</p>
+<p>所以接下來就可以回復正常，通常會是繼續做 B，但也有可能 A 是個 Priority 很高的程式，所以當 A 的 I&#x2F;O 一執行完後他就馬上接著做 A 後面的事了。 </p>
+<p>可以看見這種 event driven 的設計就不會浪費 cpu 了，但上面那個只是一種 Interrupt 的流程，妳還有很多其他的方式可以 trigger Interrupt，像是移動滑鼠，按鍵盤之類的。</p>
+<p>所以 Interrupt 還有分硬體，軟體發出的兩種，由<span class = "yellow">硬體</span>發出的我們叫它 「<span class = "yellow">signal</span>」；而軟體的話還有兩種情況，一種是非預期的，這種就叫它<span class = "yellow">「error」</span>，當程式有錯誤時，就會丟出一個 Interrupt，程式就不會繼續執行下去，program counter 會換到 recovery 的部分，OS 會有 Interrupt handler 去處理這部分的問題。</p>
+<p>另一種就是 <span class = "yellow">system call</span>，system call 與一般的 function call 最大的差別就是 system call 一定是透過 Interrupt 來處理的，比如我們 call 了一個 <code>write up to screen</code>，這時它會丟一個 Interrupt 出來，然後 OS 會看這是對應到哪個 subroutine，再去做處理，處理完再去通知它已經處理好了。</p>
+<p>所以 system call 是間接被處理的，要間接處理的原因是我們需要區分程式這個 function call 是 OS 的 function call 還是是 user 的 function call，因為 OS 的一定要透過 Interrupt，這個過程 OS 就可以去檢查這是不是有效的 Interrupt，有效的 Interrupt 都有被定義好，不能被繞過去。</p>
+<p>而我們把 error 與 system call，也就是軟體送出的 Interrupt，統稱為 <span class = "yellow">trap</span>。</p>
+<h3 id="Hardware-Interrupt-Signal"><a href="#Hardware-Interrupt-Signal" class="headerlink" title="Hardware Interrupt (Signal)"></a>Hardware Interrupt (Signal)</h3><p>那我們現在來仔細看一下他的流程，首先是 Signal：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Signal.jpg?raw=true" alt="Signal"></p>
+<p>這整條是 memory，下面的是 user 的 Program，上面的是 OS。 </p>
+<p>本來我們在執行某個程式，突然有個 Signal 進來，像是前面提到的滑鼠移動，這時就會打斷正在執行的程式，然後 OS 會偵測到這個 Interrupt，此時 OS 會先去看一個東西叫 Interrupt vector，這是一個 array of function pointer，這個 array 裡面放了所有定義好的 Signal 的函式指標。</p>
+<p>OS 收到的 Signal 會有一個 Signal number，然後 OS 再透過這個 number 去看是對應到哪個 function call。</p>
+<p>所以當妳在裝 Driver 的時候，妳的 Device 會插到電腦的某個 port，這個 port 是已經燒死的，有一個 Signal number，會對應到某個欄位，而妳把 Driver 裝進去時就會 Override 這個欄位，如此一來妳的 Device 發出 Signal 後就會去執行對應的程式碼了。</p>
+<p>拿到 function pointer 後，它就可以被重新導向那個 function 裡面去做應該做的事，這個處理 service function call 的流程我們叫它 Interrupt Service Routine (ISR)。</p>
+<p>最後還要 return 回原本正在執行的程式，所以當初發出 Interrupt 時其實會記錄當初 interrupted instruction 的 address，也就是 program counter 的位址，所以他 restore 後就可以知道等等要從哪裡繼續開始。</p>
+<p>妳可以發現 Interrupt vector 的大小是固定的，因為它是跟 Hardware 綁在一起的，妳一個主機板買來它就有固定的 Signal handler number，妳只能替換掉裡面的東西。</p>
+<h3 id="Software-Interrupt-Trap"><a href="#Software-Interrupt-Trap" class="headerlink" title="Software Interrupt (Trap)"></a>Software Interrupt (Trap)</h3><p>接下來是 Trap，一樣看一下它的流程：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Trap.jpg?raw=true" alt="Trap"></p>
+<p>跟前面不一樣的是，Trap 是 Program 主動需要 OS 幫忙的，所以會是一個 program 裡用了某個 system call，或是寫了某些不合法的操作，像是訪問了陣列大小以外的元素，或某個數字除以 0 了，造成 OS 需要來幫你處理後續。</p>
+<p>但整體流程跟 Signal 差不多，發出 Interrupt 後一樣會記錄 program counter 的位址。不過要注意，Trap 和 Signal 仍然是不同的，所以處理時是進到不同的 function 裡。</p>
+<p>而妳可能會注意到這邊不是用 array 來操作，而是 <code>switch case</code>，因為這是 software 發出的，所以有無限的可能性，只要妳能定義好那些 system call 就可以實現，所以這個數量並沒有被限制，因此在實作上就會變 switch case。</p>
+<p>但總之一樣會有個 number，讓它可以去查是對應哪個 function call，並去執行那個 routine，然後再回到剛剛被打斷的 Process。</p>
+<h3 id="補充"><a href="#補充" class="headerlink" title="補充"></a>補充</h3><p>妳可能會想到當我 Interrupt Service Routine 執行到一半時又收到 Interrupt 怎麼辦？ 這樣的話會不斷不斷被打斷，如此一來就會需要紀錄很多的資訊，像前面提到的 program counter 的位址，完成後才能回到上一個狀態，間接成本就會很高。</p>
+<p>尤其是到後面，兩個 Process 不斷的在切換時，就會有 Synchronization 的問題出現，要解決這問題就會浪費很多時間，但 OS 的速度需要很快，不然你會感覺電腦很當，一移動滑鼠，滑鼠就要動。</p>
+<p>所以比較單純的作業系統，一旦 Interrupt 產生，它會 Diabled Interrupt，也就是後面的 Interrupt 它都當作沒看見，這樣就可以跳開 Synchronization 的問題。</p>
+<p>所以 Interrupt 是可以被 mask 掉的，會有 High Priority 與 Low Priority 的 Interrupt，當 High Priority 的 Interrupt 正在被執行時，Low Priority 的 Interrupt 全部會被無視，所以有時候妳動滑鼠就會沒反應，因為它可能卡在某個 routine 裡面。</p>
+<h2 id="Storage-Device-Hierarchy"><a href="#Storage-Device-Hierarchy" class="headerlink" title="Storage-Device Hierarchy"></a>Storage-Device Hierarchy</h2><p>接下來要講電腦資料讀取的基本方式，大家應該都很熟悉了，電腦資料在儲存其實是一個 Hierarchy 的架構：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Storage_Device_Hierarchy.png?raw=true" alt="Storage_Device_Hierarchy"></p>
+<p>上面三個分別為暫存器、快取、主記憶體，而後面的則統稱為次級儲存裝置 (Secondary Storage)。 越上層的速度越快，容量越小，反之越下層的速度越慢，但容量越大，價格也比較便宜。</p>
+<p>這些只是傳統上的分類，現在有很多新的裝置會插在中間，但一樣可以用速度、價格、容量、揮發性(Volatility) 來看。</p>
+<h3 id="Main-memory"><a href="#Main-memory" class="headerlink" title="Main memory"></a>Main memory</h3><p>儲存這邊最重要的一個分隔點就是主記憶體，主記憶體是 cpu 能直接訪問的最後一層了，它上面可以有很多層，像是 register、cache，看妳怎麼設計，但這些都只是 copy 而已，最後這些資料還是已主記憶體上的資料為主。</p>
+<p>它主要的技術就是 Random Access Memory(RAM)，可以分為兩種：</p>
+<ol>
+<li><p>DRAM (Dynamic RAM)</p>
+<ul>
+<li><p>只需要一個 transistor</p>
+</li>
+<li><p>需要的 power 比較少</p>
+</li>
+<li><p>速度比較慢，也就是一般的 main memory</p>
+</li>
+<li><p>access 的速度大概 &gt;&#x3D; 30 ns</p>
+<p>  這個主要是 access memory 的 bus 的差別，所以買的時候才會有 DDR 幾，memory bus 是什麼的差別。</p>
+<p>  因為電腦有很多的 core，大家都搶著來這裡讀資料，所以就會有不同的 protocol，不同的方式去把 channel 打開，就會影響到速度，而 RAM 的速度大概就是那樣，沒差很多。</p>
+</li>
+</ul>
+</li>
+<li><p>SRAM (Static RAM)</p>
+<ul>
+<li><p>需要 6 個 transistor</p>
+</li>
+<li><p>需要較多的 power</p>
+</li>
+<li><p>access 的速度大概在 10ns ~ 30ns 間</p>
+</li>
+<li><p>通常用在 cache memory</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>另外 RAM 有一個特性就是讀取任何位置的資料，時間都是一樣的，後面會講到 Disk，就不是這樣的了。</p>
+<p>大部分的這些 solution 都有 trade-off，畢竟如果有一個完美的方案那就不用再去分這兩個了，而上面這些只是大概提一下，不用特別去記，畢竟比較跟 OS 無關。</p>
+<h3 id="Secondary-Storage"><a href="#Secondary-Storage" class="headerlink" title="Secondary Storage"></a>Secondary Storage</h3><p>而主記憶體以下的統稱為 Secondary Storage，如果妳想讓 cpu 讀它，必須要先把它搬到主記憶體才能讀，所以會比較慢。</p>
+<p>所以 Real time 的系統不會有 Secondary Storage，不然還要在那邊搬移，太花時間了，它需要立刻就可以 access。</p>
+<p>通常 Secondary Storage 的容量會比較大，且是 nonvolatile 的，也就是說斷電後資料還會存著，不會消失。</p>
+<p>常見的就是 HDD 和 SSD 那些的。</p>
+<p>這邊看一下 Disk，他不是電子式而是機械式的，它會有讀寫的手臂，手臂上面有很多磁頭可以同時讀寫多個磁盤，磁盤有很多個，可以旋轉：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Disk_Mechanism.png?raw=true" alt="Disk_Mechanism"></p>
+<p>所以可以看見讀取的速度和資料在哪裡就有關係了，如果資料剛好在磁頭的對面，妳就需要轉半圈才會讀到，這樣就會有多一個 access 的時間。</p>
+<p>而 SSD 就是電子式的，且讀取速度與資料在哪裡也沒什麼關係，所以速度才會比較快，但如果是讀取連續的資料，那 SSD 與 HDD 其實不會差太多，SSD 是贏在資料跳來跳去的狀況。</p>
+<h3 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h3><p>而電腦的資料通常最終會儲存在最慢的 Device 裡面，因此我們會把資料 copy 到比較快的 Device 上面，用到的頻率越高，我們就會把它存到越上層，所以才會需要有 L1、L2、L3 的 Cache，加速 cpu 的計算：</p>
+<p><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Caching.png?raw=true" alt="Caching"></p>
+<p>注意是 copy，不是搬移，如果是搬移，我們不稱它為 Cache。且 Copy 過去的資料是暫時性的資料，我們可以隨時砍掉它且不應該造成儲存資料的遺失。</p>
+<p>所以 cpu 要資料時會先去 register 找，沒有的話再往下一層找；但讀回來的時候會被 Cache 住，所以會需要 cpoy 它，因此會比沒有 Cache 還慢。</p>
+<p>主要的想法就是把常用的東西先存起來，如果只單看一次，有 Cache 機制會比較慢，因為還要一層一層檢查，然後還要 copy 資料，但一旦 Cache 好後再去使用這個資料就會非常快。</p>
+<p>也因此有些系統是沒有 Cache 的，看妳怎麼設計，一個例子是處理巨量資料的系統，因為資料量非常大，所以一定是掃過一遍就丟掉，不可能在這邊來來回回檢查，且資料很有可能大到 memory 都塞不下，這種狀況下 Cache 就沒意義了。</p>
+<h3 id="Coherency-and-Consistency-Issue"><a href="#Coherency-and-Consistency-Issue" class="headerlink" title="Coherency and Consistency Issue"></a>Coherency and Consistency Issue</h3><p>Cache 的定義是 Copy，只是個分身，不能跟本尊不同，如果不同，就會有 Coherency 的問題，也就是不一致性。</p>
+<p>所謂的不一致性指的是如果我們 copy 到上層後對上層的資料做了修改，像是對 Cache 的資料做了修改但還沒更新 memory 那邊的資料，這時候兩邊的資料內容就不一樣。</p>
+<p>這種情況其實沒關係，妳只需要保證電腦使用者看到的都是最上層，最新的資料內容就可以了，重點就是讓 user 看到一致的資料內容。</p>
+<p>因此如果今天妳的 Data 只有被一個 Process 訪問，那其實不會有什麼問題，妳再慢更新後面的資料也沒關係；但如果今天有很多個 Process 在 share 同一段 memory content，那就會有問題了，在分散式系統裡面這也是一個很重要的議題，因為還牽扯到了網路。</p>
+<h2 id="Hardware-Protection"><a href="#Hardware-Protection" class="headerlink" title="Hardware Protection"></a>Hardware Protection</h2><p>Protection 指的不是 Security，而是指很多程式、使用者同時在使用電腦時不會影響到對方，像是如果 A 程式 crash 了，B 程式應該也要能繼續跑；或是指某個程式只能使用某段 memory content，不能不通過 OS 就去使用到別人的 memory，諸如此類的。</p>
+<h3 id="Dual-Mode-Operation"><a href="#Dual-Mode-Operation" class="headerlink" title="Dual-Mode Operation"></a>Dual-Mode Operation</h3><p>前面在講的時候都有把 OS 與 User 分開，有些動作只有 OS 能做，那要怎麼區分 User 與 OS? 在最底層，Hardware 必須進來，因為 Hardware 是很難被修改，東西已經燒在上面的，所以 Hardware 可以做一些最基本的 Protection。</p>
+<p>而 Software 利用 Hardware support 來做一些事情，所以 Software 方面至少會有兩種 mode：</p>
+<ol>
+<li><p>User mode</p>
+<p> 來自於 OS 以外的 Program 都屬於 User mode</p>
+</li>
+<li><p>Monitor mode (kernel mode)</p>
+<p> 來自於 OS 的 Program，在這個 mode 下執行的程式一定是 OS 的程式碼，但可能是使用者透過 system call 來讓 OS 做的。</p>
+</li>
+</ol>
+<p>這兩個 mode 在可能就是一個 bit(0 or 1)，我們前面提過，OS 要做任何事都是透過 system call，而 system call 需要透過 Interrupt。</p>
+<center><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Dual_mode.png?raw=true"></center><br>
+
+<p>平常某個 Program 在執行時是在 User mode 底下，而當它送 Interrupt 出來後那個 bit 就會 flip，進到 kernel mode，因為只要一發 Interrupt 就代表你 call 了 system call，而 system call 就會執行 OS 的程式。</p>
+<p>因此 Interrupt 還有一個很重要的意義就是 Program 會從 User mode 切換到 Kernel mode，等到 OS 做完，return 到 User Program 時，那個 bit 才會 flip 回來。</p>
+<h3 id="Privileged-instructions"><a href="#Privileged-instructions" class="headerlink" title="Privileged instructions"></a>Privileged instructions</h3><p>那我們就可以透過這個機制來保護電腦，今天我們要做任何事都要透過 instruction，如果某個 instruction 會影響到其他人，我們就會要求他一定要透過 OS，這個是 instruction 在設計的時候就寫死的，也就是它有一個 set 叫做 Privileged instructions。</p>
+<p>所謂的 Privileged instructions 必須在 kernel mode 才能執行，你 User 也可以送這個 instruction 給 cpu，但 cpu 在執行的時候會去 check 前面提到的那個 bit，而當 cpu 看到你現在那個 bit 代表的是 User mode，它就不會繼續執行，直接丟一個 error 出來讓 OS 處理。</p>
+<p>所以 User 需要透過 system call 才能讓 OS 幫忙做事，這樣 OS 就可以完全 control 哪些動作能做哪寫不能。</p>
+<h3 id="I-O-Protection"><a href="#I-O-Protection" class="headerlink" title="I&#x2F;O Protection"></a>I&#x2F;O Protection</h3><p>那接下來我們就要看怎麼去保護電腦，首先是 I&#x2F;O 方面，而與 I&#x2F;O 有關的 instruction <span class = "yellow">全都都需要保護</span>，因為 I&#x2F;O 的資源是 share 的，像是螢幕輸出，都時同一個螢幕，硬碟儲存也是同一顆硬碟。 </p>
+<p>如果沒有限制需要 kernel mode 才能進行 I&#x2F;O，那別人就可以亂更改你的 Device，整個系統就會亂掉。</p>
+<p>但這樣其實還是有一些漏洞，沒法繞過 I&#x2F;O，但還是可以繞 memory，像是透過合法的 I&#x2F;O 流程去修改原本應該要執行的函式，讓它執行我們想要做的事這類的，有在打 CTF 的應該很熟。</p>
+<h3 id="Memory-Protection"><a href="#Memory-Protection" class="headerlink" title="Memory Protection"></a>Memory Protection</h3><p>所以更重要的還是保護 memory，首先當然 Interrupt vector 不能被改，然後就是別人的 Data 不能被修改這類的。</p>
+<p>保護的方式其實很簡單，就是紀錄兩個 register，這樣就有一個區間給 memory 使用，超過這個區間的 memory 就不屬於這個 Process。</p>
+<p>邏輯上這是一個連續空間，所以我們需要的兩個 register 分別為 Base register 與 Limit register，前者記錄開始的位置，後者記錄 memory 區間有多長。</p>
+<p>檢查的流程大概就長這樣：</p>
+<center><img src = "https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/memory_protection.png?raw=true"></center>
+
+<p>先去檢查存取的 address 有沒有大於 base address，再去看有沒有小於 base address + limit，都通過慈可以存取 memory。</p>
+<p>要注意的是 Base register 與 Limit register 都是 register，裡面存的都是值，如果要修改這個值，這個 instruction 需要是 Privileged instructions，不然這個機制也沒用了。</p>
+<h3 id="CPU-Protection"><a href="#CPU-Protection" class="headerlink" title="CPU Protection"></a>CPU Protection</h3><p>cpu 的保護主要是要阻止一個程式可以霸佔 cpu，不讓別的程式執行，舉個例子，當我們有一個 Process 裡面有無限迴圈，我們一樣可以把它 ctrl+c 掉，不會 cpu 直接被霸佔，電腦整個當掉。</p>
+<p>而主要的方法叫做 Time sharing，會有一個 Timer 來計時，每過一段時間就會丟一個 Interrupt 出來，把原本的 Process 打斷，執行 OS 的 Scheduler，這樣每過一段時間控制權就會回到 OS，OS 再決定是不是要繼續剛剛那個 Process。</p>
+<p>而那個 Load time 到 register 的 instruction 也是 privileged instruction，只有 OS 可以調整 Timer 數的時間。</p>
+<p>第一章就到這裡，簡單介紹了整個 OS，下一章會開始進到 OS Structure。</p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2021/12/10/OS/Introduction/">https://mes0903.github.io/2021/12/10/OS/Introduction/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2021/12/10/OS/Introduction/">December 10th 2021, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2021/12/10/OS/Introduction/">March 21st 2024, 10:05:45 am</a>
+            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2021/12/15/miscellaneous/The_mind_behind_Linux/" title="The mind behind Linux 筆記 & 心得">
+                    <div class="nextTitle">The mind behind Linux 筆記 & 心得</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2021/12/10/OS/README/" title="作業系統 ── 序">
+                    <div class="prevTitle">作業系統 ── 序</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
+            
+        
+    
+        
+            
+                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
+            
+        
+    
+        
+            
+                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Ch1-%E5%9F%BA%E7%A4%8E%E6%A6%82%E8%AB%96"><span class="toc-number">1.</span> <span class="toc-text">Ch1 基礎概論</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF%E4%BD%9C%E6%A5%AD%E7%B3%BB%E7%B5%B1"><span class="toc-number">1.1.</span> <span class="toc-text">什麼是作業系統?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Introduction"><span class="toc-number">1.1.1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Computer-System"><span class="toc-number">1.1.2.</span> <span class="toc-text">Computer System</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example"><span class="toc-number">1.1.3.</span> <span class="toc-text">Example</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Goals-of-an-Operating-System"><span class="toc-number">1.1.4.</span> <span class="toc-text">Goals of an Operating System</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Modern-Operating-Systems"><span class="toc-number">1.1.5.</span> <span class="toc-text">Modern Operating Systems</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Computer-System-Organization"><span class="toc-number">1.2.</span> <span class="toc-text">Computer-System Organization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Computer-System-Operations"><span class="toc-number">1.2.1.</span> <span class="toc-text">Computer-System Operations</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Busy-Waiting"><span class="toc-number">1.2.2.</span> <span class="toc-text">Busy Waiting</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Interrupt"><span class="toc-number">1.2.3.</span> <span class="toc-text">Interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hardware-Interrupt-Signal"><span class="toc-number">1.2.4.</span> <span class="toc-text">Hardware Interrupt (Signal)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Software-Interrupt-Trap"><span class="toc-number">1.2.5.</span> <span class="toc-text">Software Interrupt (Trap)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A3%9C%E5%85%85"><span class="toc-number">1.2.6.</span> <span class="toc-text">補充</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Storage-Device-Hierarchy"><span class="toc-number">1.3.</span> <span class="toc-text">Storage-Device Hierarchy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Main-memory"><span class="toc-number">1.3.1.</span> <span class="toc-text">Main memory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Secondary-Storage"><span class="toc-number">1.3.2.</span> <span class="toc-text">Secondary Storage</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Caching"><span class="toc-number">1.3.3.</span> <span class="toc-text">Caching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Coherency-and-Consistency-Issue"><span class="toc-number">1.3.4.</span> <span class="toc-text">Coherency and Consistency Issue</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hardware-Protection"><span class="toc-number">1.4.</span> <span class="toc-text">Hardware Protection</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Dual-Mode-Operation"><span class="toc-number">1.4.1.</span> <span class="toc-text">Dual-Mode Operation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Privileged-instructions"><span class="toc-number">1.4.2.</span> <span class="toc-text">Privileged instructions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#I-O-Protection"><span class="toc-number">1.4.3.</span> <span class="toc-text">I&#x2F;O Protection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory-Protection"><span class="toc-number">1.4.4.</span> <span class="toc-text">Memory Protection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU-Protection"><span class="toc-number">1.4.5.</span> <span class="toc-text">CPU Protection</span></a></li></ol></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 39
+        </div>
+        <!-- search  -->
+        
+            <div class="site-search site-search-loading popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2023 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span>
+            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/20</span>
+            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/12</span>
+            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/17</span>
+            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/09</span>
+            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span>
+            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span>
+            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/21</span>
+            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span>
+            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/28</span>
+            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/22</span>
+            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span>
+            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/25</span>
+            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span>
+            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/06</span>
+            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/20</span>
+            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/15</span>
+            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/10</span>
+            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span>
+            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span>
+            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/07</span>
+            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/06</span>
+            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/31</span>
+            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span>
+            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/13</span>
+            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span>
+            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span>
+            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span>
+            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span>
+            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/01</span>
+            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Linux">
+                <span class="iconfont-archer">&#xe606;</span>
+                Linux
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OS">
+                <span class="iconfont-archer">&#xe606;</span>
+                OS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="ROS">
+                <span class="iconfont-archer">&#xe606;</span>
+                ROS
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="memory">
+                <span class="iconfont-archer">&#xe606;</span>
+                memory
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="miscellaneous">
+                <span class="iconfont-archer">&#xe606;</span>
+                miscellaneous
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="numerical_algebra">
+                <span class="iconfont-archer">&#xe606;</span>
+                numerical_algebra
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="security">
+                <span class="iconfont-archer">&#xe606;</span>
+                security
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner-BlackMagic
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="OSDI">
+                <span class="iconfont-archer">&#xe606;</span>
+                OSDI
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
+                <span class="iconfont-archer">&#xe606;</span>
+                C++ Miner_tutorial
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="C++ Miner">
+            <span class="iconfont-archer">&#xe60a;</span>
+            C++ Miner
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="OS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            OS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="ROS">
+            <span class="iconfont-archer">&#xe60a;</span>
+            ROS
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="memory">
+            <span class="iconfont-archer">&#xe60a;</span>
+            memory
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="miscellaneous">
+            <span class="iconfont-archer">&#xe60a;</span>
+            miscellaneous
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="numerical_algebra">
+            <span class="iconfont-archer">&#xe60a;</span>
+            numerical_algebra
+        </span>
+    
+        <span class="sidebar-category-name" data-categories="security">
+            <span class="iconfont-archer">&#xe60a;</span>
+            security
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://mes0903.github.io",
+        root: siteMetaRoot,
+        author: "Mes"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+            <div class="site-search site-search-loading">
+    <div class="algolia-popup popup">
+        <div class="algolia-search">
+            <div class="algolia-search-input-icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="algolia-search-input" id="algolia-search-input"></div>
+            <div class="popup-btn-close">
+                <i class="iconfont-archer">&#xe609;</i>
+            </div>
+        </div>
+
+        <div class="algolia-results">
+            <div id="algolia-stats" class="algolia-stats"></div>
+            <div id="algolia-hits"></div>
+            <div id="algolia-pagination" class="algolia-pagination"></div>
+        </div>
+    </div>
+</div>
+
+            <script src="/scripts/search.js?v=20211217" defer></script>
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>
