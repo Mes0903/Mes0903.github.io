@@ -22,7 +22,7 @@
     <meta name="description" content="前言這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的 而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReRAM 與 Smith-Waterman Algorithm 介紹">
-<meta property="og:url" content="https://mes0903.github.io/2024/03/21/memory/sw-reram/index.html">
+<meta property="og:url" content="https://mes0903.github.io/2023/11/14/memory/sw-reram/index.html">
 <meta property="og:site_name" content="Mes&#39;s Studio">
 <meta property="og:description" content="前言這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的 而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪">
 <meta property="og:locale">
@@ -43,8 +43,8 @@
 <meta property="og:image" content="https://hackmd.io/_uploads/S1LQPG7dT.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/SJ0I_zmuT.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/Sy01Fz7_a.png">
-<meta property="article:published_time" content="2024-03-21T05:24:12.402Z">
-<meta property="article:modified_time" content="2024-03-21T12:10:20.877Z">
+<meta property="article:published_time" content="2023-11-14T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-21T12:20:52.857Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="memory">
 <meta name="twitter:card" content="summary">
@@ -376,7 +376,7 @@
                 <div class="post-intro-meta">
                     <!-- 撰写日期 -->
                     <span class="iconfont-archer post-intro-calander">&#xe676;</span>
-                    <span class="post-intro-time">2024/03/21</span>
+                    <span class="post-intro-time">2023/11/14</span>
                     <!-- busuanzi -->
                     
                         <span id="busuanzi_container_page_pv" class="busuanzi-pv">
@@ -982,9 +982,9 @@
     
         <div class="license-wrapper">
             <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
-            <p>原文連結：<a href="https://mes0903.github.io/2024/03/21/memory/sw-reram/">https://mes0903.github.io/2024/03/21/memory/sw-reram/</a>
-            <p>發布日期：<a href="https://mes0903.github.io/2024/03/21/memory/sw-reram/">March 21st 2024, 5:24:12 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2024/03/21/memory/sw-reram/">March 21st 2024, 12:10:20 pm</a>
+            <p>原文連結：<a href="https://mes0903.github.io/2023/11/14/memory/sw-reram/">https://mes0903.github.io/2023/11/14/memory/sw-reram/</a>
+            <p>發布日期：<a href="https://mes0903.github.io/2023/11/14/memory/sw-reram/">November 14th 2023, 12:00:00 am</a>
+            <p>更新日期：<a href="https://mes0903.github.io/2023/11/14/memory/sw-reram/">March 21st 2024, 12:20:52 pm</a>
             <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
         </div>
     
@@ -992,12 +992,17 @@
     <ul class="post-paginator">
         <li class="next">
             
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2023/11/20/Linux/physical-address-syscall/" title="實作一個回傳物理位址的系統呼叫">
+                    <div class="nextTitle">實作一個回傳物理位址的系統呼叫</div>
+                </a>
+            
         </li>
         <li class="previous">
             
                 <div class="prevSlogan">Previous Post</div>
-                <a href="/2023/12/13/ROS/ROS_Install/" title="Ros Install (noetic)">
-                    <div class="prevTitle">Ros Install (noetic)</div>
+                <a href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/" title="礦坑系列 ── Indirect through null pointer">
+                    <div class="prevTitle">礦坑系列 ── Indirect through null pointer</div>
                 </a>
             
         </li>
@@ -1689,8 +1694,6 @@
         
         
         
-        
-        
     
     
     
@@ -1712,21 +1715,6 @@
         
             
             
-            <div class="archive-year"> 2024 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/21</span>
-            <a class="archive-post-title" href="/2024/03/21/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
             <div class="archive-year"> 2023 </div>
             <ul class="year-list">
             
@@ -1740,6 +1728,12 @@
         <li class="archive-post-item">
             <span class="archive-post-date">11/20</span>
             <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
         </li>
     
         
