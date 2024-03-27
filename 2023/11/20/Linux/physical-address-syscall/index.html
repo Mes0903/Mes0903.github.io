@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh">
-    <!-- title -->
-
-
-    
-
-<!-- keywords -->
-
-
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="author" content="Mes">
-    <meta name="renderer" content="webkit">
-    <meta name="copyright" content="Mes">
-    
-        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
-    
-    <meta name="description" content="">
-    <meta name="description" content="前言這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點 這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳 因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page tabl">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/uploads/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Ina-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Ina-16x16.png">
+  <link rel="mask-icon" href="/uploads/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳，因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table">
 <meta property="og:type" content="article">
 <meta property="og:title" content="實作一個回傳物理位址的系統呼叫">
 <meta property="og:url" content="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/index.html">
 <meta property="og:site_name" content="Mes&#39;s Studio">
-<meta property="og:description" content="前言這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點 這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳 因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page tabl">
+<meta property="og:description" content="這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳，因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table">
 <meta property="og:locale">
 <meta property="og:image" content="https://hackmd.io/_uploads/S13PsdmmT.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/r1sFiumQp.png">
@@ -44,501 +45,269 @@
 <meta property="og:image" content="https://hackmd.io/_uploads/rkOUKEG8T.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/SyCr2-KET.png">
 <meta property="article:published_time" content="2023-11-20T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-21T12:42:50.701Z">
+<meta property="article:modified_time" content="2024-03-27T15:11:16.432Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://hackmd.io/_uploads/S13PsdmmT.png">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link rel="icon" href="/assets/Ina.ico">
-    
-    <title>實作一個回傳物理位址的系統呼叫 · Mes&#39;s Studio</title>
-    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
-/* This file is meant as a standalone workflow for
-- testing support for link[rel=preload]
-- enabling async CSS loading in browsers that do not support rel=preload
-- applying rel preload css once loaded, whether supported or not.
-*/ -->
-<script>
-    (function (w) {
-        'use strict'
-        // rel=preload support test
-        if (!w.loadCSS) {
-            w.loadCSS = function () {}
-        }
-        // define on the loadCSS obj
-        var rp = (loadCSS.relpreload = {})
-        // rel=preload feature support test
-        // runs once and returns a function for compat purposes
-        rp.support = (function () {
-            var ret
-            try {
-                ret = w.document.createElement('link').relList.supports('preload')
-            } catch (e) {
-                ret = false
-            }
-            return function () {
-                return ret
-            }
-        })()
 
-        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
-        // then change that media back to its intended value on load
-        rp.bindMediaToggle = function (link) {
-            // remember existing media attr for ultimate state, or default to 'all'
-            var finalMedia = link.media || 'all'
 
-            function enableStylesheet() {
-                link.media = finalMedia
-            }
+<link rel="canonical" href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">
 
-            // bind load handlers to enable media
-            if (link.addEventListener) {
-                link.addEventListener('load', enableStylesheet)
-            } else if (link.attachEvent) {
-                link.attachEvent('onload', enableStylesheet)
-            }
 
-            // Set rel and non-applicable media type to start an async request
-            // note: timeout allows this to happen async to let rendering continue in IE
-            setTimeout(function () {
-                link.rel = 'stylesheet'
-                link.media = 'only x'
-            })
-            // also enable media after 3 seconds,
-            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
-            setTimeout(enableStylesheet, 3000)
-        }
 
-        // loop through link elements in DOM
-        rp.poly = function () {
-            // double check this to prevent external calls from running
-            if (rp.support()) {
-                return
-            }
-            var links = w.document.getElementsByTagName('link')
-            for (var i = 0; i < links.length; i++) {
-                var link = links[i]
-                // qualify links to those with rel=preload and as=style attrs
-                if (
-                    link.rel === 'preload' &&
-                    link.getAttribute('as') === 'style' &&
-                    !link.getAttribute('data-loadcss')
-                ) {
-                    // prevent rerunning on link
-                    link.setAttribute('data-loadcss', true)
-                    // bind listeners to toggle media back
-                    rp.bindMediaToggle(link)
-                }
-            }
-        }
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/","path":"2023/11/20/Linux/physical-address-syscall/","title":"實作一個回傳物理位址的系統呼叫"}</script>
 
-        // if unsupported, run the polyfill
-        if (!rp.support()) {
-            // run once at least
-            rp.poly()
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>實作一個回傳物理位址的系統呼叫 | Mes's Studio</title>
+  
 
-            // rerun poly on an interval until onload
-            var run = w.setInterval(rp.poly, 500)
-            if (w.addEventListener) {
-                w.addEventListener('load', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            } else if (w.attachEvent) {
-                w.attachEvent('onload', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            }
-        }
 
-        // commonjs
-        if (typeof exports !== 'undefined') {
-            exports.loadCSS = loadCSS
-        } else {
-            w.loadCSS = loadCSS
-        }
-    })(typeof global !== 'undefined' ? global : this)
-</script>
 
-    <style type="text/css">
-    @font-face {
-        font-family: 'Oswald-Regular';
-        src: url("/font/Oswald-Regular.ttf");
-    }
 
-    body {
-        margin: 0;
-    }
 
-    header,
-    footer,
-    .back-top,
-    .sidebar,
-    .container,
-    .site-intro-meta,
-    .toc-wrapper {
-        display: none;
-    }
 
-    .site-intro {
-        position: relative;
-        z-index: 3;
-        width: 100%;
-        /* height: 50vh; */
-        overflow: hidden;
-    }
 
-    .site-intro-placeholder {
-        position: absolute;
-        z-index: -2;
-        top: 0;
-        left: 0;
-        width: calc(100% + 300px);
-        height: 100%;
-        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
-        background-position: center center;
-        transform: translate3d(-226px, 0, 0);
-        animation: gradient-move 2.5s ease-out 0s infinite;
-    }
 
-    @keyframes gradient-move {
-        0% {
-            transform: translate3d(-226px, 0, 0);
-        }
-        100% {
-            transform: translate3d(0, 0, 0);
-        }
-    }
-</style>
-
-    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
-    <link rel="stylesheet" href="/css/dark.css">
-    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
-    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
-    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
-    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
-    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
-    <!-- algolia -->
-    
-        <script>
-            var hits = JSON.parse('{"per_page":10}')
-            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
-
-            var algolia = {
-                applicationID: 'JNI49E87OH',
-                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
-                indexName: 'MesBlog',
-                hits: hits,
-                labels: labels
-            }
-        </script>
-    
-    <!-- 百度统计  -->
-    
-    <!-- Google tag (gtag.js) -->
-    
-
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 <!-- hexo injector head_end start -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+<!-- hexo injector head_end end --></head>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        if (typeof window.$ == undefined) {
-            console.warn('jquery load from jsdelivr failed, will load local script')
-            document.write('<script src="/lib/jquery.min.js" />')
-        }
-    </script>
-    
-        <body class="post-body">
-    
-        <!-- header -->
-        <header class="header header-mobile">
-    <!-- top read progress line -->
-    <div class="header-element">
-        <div class="read-progress"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-    <!-- sidebar menu button -->
-    <div class="header-element">
-        
-            <div class="header-sidebar-menu">
-        
-            
-                <div style="padding-left: 1px;">&#xe775;</div>
-            
-        </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">stop daydreaming, keep pursuing</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
-    <!-- header actions -->
-    <div class="header-actions">
-        <!-- theme mode switch button -->
-        <span class="header-theme-btn header-element">
-            <i class="fas fa-adjust"></i>
-        </span>
-        <!-- back to home page text -->
-        <span class="home-link header-element">
-            <a href=/>Mes's Studio</a>
-        </span>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
     </div>
-    <!-- toggle banner for post layout -->
-    
-        
-            <div class="banner">
-        
-            <div class="blog-title header-element">
-                <a href="/">Mes&#39;s Studio</a>
-            </div>
-            <div class="post-title header-element">
-                <a href="#" class="post-name">實作一個回傳物理位址的系統呼叫</a>
-            </div>
-        </div>
-    
+  </div>
+
 </header>
+        
+  
+  <aside class="sidebar">
 
-        <!-- fixed footer -->
-        <footer class="footer-fixed">
-    <!-- back to top button -->
-    <div class="footer-fixed-element">
-        
-            <div class="back-top back-top-hidden">
-        
-        
-            <div>&#xe639;</div>
-        
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Build-Linux-Kernel"><span class="nav-number">2.</span> <span class="nav-text">Build Linux Kernel</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Build-Root-FS"><span class="nav-number">3.</span> <span class="nav-text">Build Root FS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Run-Kernel"><span class="nav-number">3.1.</span> <span class="nav-text">Run Kernel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Add-System-Call"><span class="nav-number">4.</span> <span class="nav-text">Add System Call</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9-syscall-64-tbl"><span class="nav-number">4.1.</span> <span class="nav-text">修改 syscall_64.tbl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84-system-call"><span class="nav-number">4.2.</span> <span class="nav-text">實作自己的 system call</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#page-in-linux"><span class="nav-number">4.2.1.</span> <span class="nav-text">page in linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#page-table-in-linux"><span class="nav-number">4.2.2.</span> <span class="nav-text">page table in linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%96%8B%E5%A7%8B%E5%AF%A6%E4%BD%9C-system-call"><span class="nav-number">4.2.3.</span> <span class="nav-text">開始實作 system call</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Build-Test-Binary"><span class="nav-number">5.</span> <span class="nav-text">Build Test Binary</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Run-User-Program"><span class="nav-number">6.</span> <span class="nav-text">Run User Program</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BC%B8%E5%87%BA%EF%BC%9A"><span class="nav-number">6.1.</span> <span class="nav-text">輸出：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">7.</span> <span class="nav-text">References</span></a></li></ol></div>
         </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Ina.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+
+        </div>
+      </div>
     </div>
-</footer>
 
-        <!-- wrapper -->
-        <div class="wrapper">
-            <div class="site-intro" style="
-
-
-
-
-
-
-
-    height:50vh;
-
-">
     
-    <!-- 主页  -->
-    
-        
-    <!-- 404页  -->
-    
-    <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
-    <div class="site-intro-meta">
-        <!-- 标题  -->
-        <h1 class="intro-title">
-            <!-- 主页  -->
-            
-                實作一個回傳物理位址的系統呼叫
-            <!-- 404 -->
-            
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Ina.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="實作一個回傳物理位址的系統呼叫 | Mes's Studio">
+      <meta itemprop="description" content="這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳，因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          實作一個回傳物理位址的系統呼叫
         </h1>
-        <!-- 副标题 -->
-        <p class="intro-subtitle">
-            <!-- 主页副标题  -->
-            
-                
-            <!-- 404 -->
-            
-        </p>
-        <!-- 文章页 meta -->
-        
-            <div class="post-intros">
-                <!-- 文章页标签  -->
-                
-                    <div class= post-intro-tags >
-    
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="Linux">Linux</a>
-    
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-11-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-20T00:00:00+00:00">2023-11-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-03-27 15:11:16" itemprop="dateModified" datetime="2024-03-27T15:11:16+00:00">2024-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>5.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>20 mins.</span>
+    </span>
 </div>
 
-                
-                <!-- 文章字数统计 -->
-                
-                    <div class="post-intro-read">
-                        <span>字數: <span class="post-count word-count">1.1k</span>閱讀時長: <span class="post-count reading-time">4 min</span></span>
-                    </div>
-                
-                <div class="post-intro-meta">
-                    <!-- 撰写日期 -->
-                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
-                    <span class="post-intro-time">2023/11/20</span>
-                    <!-- busuanzi -->
-                    
-                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
-                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
-                            <span id="busuanzi_value_page_pv"></span>
-                        </span>
-                    
-                    <!-- 文章分享 -->
-                    <span class="share-wrapper">
-                        <span class="iconfont-archer share-icon">&#xe71d;</span>
-                        <span class="share-text">Share</span>
-                        <ul class="share-list">
-                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
-                                <div class="share-qrcode"></div>
-                            </li>
-                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
-                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
-                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
-                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
-                        </ul>
-                    </span>
-                </div>
-            </div>
-        
-    </div>
-</div>
+            <div class="post-description">這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳，因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table</div>
+        </div>
+      </header>
 
-            <script>
-  // get user agent
-  function getBrowserVersions() {
-    var u = window.navigator.userAgent
-    return {
-      userAgent: u,
-      trident: u.indexOf('Trident') > -1, //IE内核
-      presto: u.indexOf('Presto') > -1, //opera内核
-      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
-      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
-      iPad: u.indexOf('iPad') > -1, //是否为iPad
-      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
-      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
-      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
-    }
-  }
-  var browser = {
-    versions: getBrowserVersions(),
-  }
-  console.log('userAgent: ' + browser.versions.userAgent)
-
-  // callback
-  function fontLoaded() {
-    console.log('font loaded')
-    if (document.getElementsByClassName('site-intro-meta')) {
-      document
-        .getElementsByClassName('intro-title')[0]
-        .classList.add('intro-fade-in')
-      document
-        .getElementsByClassName('intro-subtitle')[0]
-        .classList.add('intro-fade-in')
-      var postIntros = document.getElementsByClassName('post-intros')[0]
-      if (postIntros) {
-        postIntros.classList.add('post-fade-in')
-      }
-    }
-  }
-
-  // UC不支持跨域，所以直接显示
-  function asyncCb() {
-    if (browser.versions.uc) {
-      console.log('UCBrowser')
-      fontLoaded()
-    } else {
-      WebFont.load({
-        custom: {
-          families: ['Oswald-Regular'],
-        },
-        loading: function () {
-          // 所有字体开始加载
-          // console.log('font loading');
-        },
-        active: function () {
-          // 所有字体已渲染
-          fontLoaded()
-        },
-        inactive: function () {
-          // 字体预加载失败，无效字体或浏览器不支持加载
-          console.log('inactive: timeout')
-          fontLoaded()
-        },
-        timeout: 5000, // Set the timeout to two seconds
-      })
-    }
-  }
-
-  function asyncErr() {
-    console.warn('script load from CDN failed, will load local script')
-  }
-
-  // load webfont-loader async, and add callback function
-  function async(u, cb, err) {
-    var d = document,
-      t = 'script',
-      o = d.createElement(t),
-      s = d.getElementsByTagName(t)[0]
-    o.src = u
-    if (cb) {
-      o.addEventListener(
-        'load',
-        function (e) {
-          cb(null, e)
-        },
-        false
-      )
-    }
-    if (err) {
-      o.addEventListener(
-        'error',
-        function (e) {
-          err(null, e)
-        },
-        false
-      )
-    }
-    s.parentNode.insertBefore(o, s)
-  }
-
-  var asyncLoadWithFallBack = function (arr, success, reject) {
-    var currReject = function () {
-      reject()
-      arr.shift()
-      if (arr.length) async(arr[0], success, currReject)
-    }
-
-    async(arr[0], success, currReject)
-  }
-
-  asyncLoadWithFallBack(
-    [
-      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
-      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
-      "/lib/webfontloader.min.js",
-    ],
-    asyncCb,
-    asyncErr
-  )
-</script>
-
-            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
-            <div class="container container-unloaded">
-                <main class="main post-page">
-    <article class="article-entry">
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點</p>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這是 2023 NCU Linux Project 1 的 Demo，Demo 完後又花了一小段時間把報告補的更完整了一點</p>
 <p>這篇文章會教大家自己新增一個 system call，其作用是將傳入的 virtual address 轉換為 physical address 後回傳</p>
 <p>因此文章中會簡單寫一下 linux 中的 page 與 page table，並帶大家簡單操作一次 page table</p>
 <p>測試的環境如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OS: Ubuntu 22.04</span><br><span class="line">ARCH: X86_64</span><br><span class="line">Source Version: 6.6</span><br></pre></td></tr></table></figure>
 
 <p>但因為是用 QEMU 跑，照理說應該不太會有環境的問題</p>
-<h1 id="Build-Linux-Kernel"><a href="#Build-Linux-Kernel" class="headerlink" title="Build Linux Kernel"></a>Build Linux Kernel</h1><p>首先要先把 kernel Build 起來，這邊有錄一個 Demo 的影片：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=6j7QreGqAmY">Linux HW1 Demo</a></p>
+<h1 id="Build-Linux-Kernel"><a href="#Build-Linux-Kernel" class="headerlink" title="Build Linux Kernel"></a>Build Linux Kernel</h1><p>首先要先把 kernel Build 起來，這邊有錄一個 Demo 的影片：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj02ajdRcmVHcUFtWQ==">Linux HW1 Demo<i class="fa fa-external-link-alt"></i></span></p>
 <blockquote>
 <p>下面的範例 code 跟影片中的 code 有些許不一樣，但操作起來的步驟是一樣的</p>
 </blockquote>
@@ -595,23 +364,23 @@
 </center>
 
 <p>在 Linux 中的邏輯地址對應於線性地址，也就是說 Intel 為了相容過往架構，把硬體設計搞得很複雜，Linux 核心的實作則予以簡化，並且在支援其他處理器架構時，儘量保持該原則。</p>
-<h3 id="page-in-linux"><a href="#page-in-linux" class="headerlink" title="page in linux"></a>page in linux</h3><p>page 在 v6.6.5 linux 中定義在 <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/linux/v6.6.5/source/include/linux/mm_types.h#L74">mm_type.h</a> 的第 74 行：</p>
+<h3 id="page-in-linux"><a href="#page-in-linux" class="headerlink" title="page in linux"></a>page in linux</h3><p>page 在 v6.6.5 linux 中定義在 <span class="exturl" data-url="aHR0cHM6Ly9lbGl4aXIuYm9vdGxpbi5jb20vbGludXgvdjYuNi41L3NvdXJjZS9pbmNsdWRlL2xpbnV4L21tX3R5cGVzLmgjTDc0">mm_type.h<i class="fa fa-external-link-alt"></i></span> 的第 74 行：</p>
 <details><summary>> (可以點開) <span class = "yellow">`struct page` definition</span> <</summary>
 
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">page</span> &#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;		<span class="comment">/* Atomic flags, some possibly</span></span><br><span class="line"><span class="comment">					 * updated asynchronously */</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Five words (20/40 bytes) are available in this union.</span></span><br><span class="line"><span class="comment">	 * WARNING: bit 0 of the first word is used for PageTail(). That</span></span><br><span class="line"><span class="comment">	 * means the other users of this union MUST NOT use the bit to</span></span><br><span class="line"><span class="comment">	 * avoid collision and false-positive PageTail().</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">union</span> &#123;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* Page cache and anonymous pages */</span></span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @lru: Pageout list, eg. active_list protected by</span></span><br><span class="line"><span class="comment">			 * lruvec-&gt;lru_lock.  Sometimes used as a generic list</span></span><br><span class="line"><span class="comment">			 * by the page owner.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> lru;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* Or, for the Unevictable &quot;LRU list&quot; slot */</span></span><br><span class="line">				<span class="keyword">struct</span> &#123;</span><br><span class="line">					<span class="comment">/* Always even, to negate PageTail */</span></span><br><span class="line">					<span class="type">void</span> *__filler;</span><br><span class="line">					<span class="comment">/* Count page&#x27;s or folio&#x27;s mlocks */</span></span><br><span class="line">					<span class="type">unsigned</span> <span class="type">int</span> mlock_count;</span><br><span class="line">				&#125;;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* Or, free page */</span></span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> buddy_list;</span><br><span class="line">				<span class="keyword">struct</span> <span class="title class_">list_head</span> pcp_list;</span><br><span class="line">			&#125;;</span><br><span class="line">			<span class="comment">/* See page-flags.h for PAGE_MAPPING_FLAGS */</span></span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">address_space</span> *mapping;</span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="type">pgoff_t</span> index;		<span class="comment">/* Our offset within mapping. */</span></span><br><span class="line">				<span class="type">unsigned</span> <span class="type">long</span> share;	<span class="comment">/* share count for fsdax */</span></span><br><span class="line">			&#125;;</span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @private: Mapping-private opaque data.</span></span><br><span class="line"><span class="comment">			 * Usually used for buffer_heads if PagePrivate.</span></span><br><span class="line"><span class="comment">			 * Used for swp_entry_t if PageSwapCache.</span></span><br><span class="line"><span class="comment">			 * Indicates order in the buddy system if PageBuddy.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> <span class="keyword">private</span>;</span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* page_pool used by netstack */</span></span><br><span class="line">			<span class="comment">/**</span></span><br><span class="line"><span class="comment">			 * @pp_magic: magic value to avoid recycling non</span></span><br><span class="line"><span class="comment">			 * page_pool allocated pages.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> pp_magic;</span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">page_pool</span> *pp;</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> _pp_mapping_pad;</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> dma_addr;</span><br><span class="line">			<span class="keyword">union</span> &#123;</span><br><span class="line">				<span class="comment">/**</span></span><br><span class="line"><span class="comment">				 * dma_addr_upper: might require a 64-bit</span></span><br><span class="line"><span class="comment">				 * value on 32-bit architectures.</span></span><br><span class="line"><span class="comment">				 */</span></span><br><span class="line">				<span class="type">unsigned</span> <span class="type">long</span> dma_addr_upper;</span><br><span class="line">				<span class="comment">/**</span></span><br><span class="line"><span class="comment">				 * For frag page support, not supported in</span></span><br><span class="line"><span class="comment">				 * 32-bit architectures with 64-bit DMA.</span></span><br><span class="line"><span class="comment">				 */</span></span><br><span class="line">				<span class="type">atomic_long_t</span> pp_frag_count;</span><br><span class="line">			&#125;;</span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* Tail pages of compound page */</span></span><br><span class="line">			<span class="type">unsigned</span> <span class="type">long</span> compound_head;	<span class="comment">/* Bit zero is set */</span></span><br><span class="line">		&#125;;</span><br><span class="line">		<span class="keyword">struct</span> &#123;	<span class="comment">/* ZONE_DEVICE pages */</span></span><br><span class="line">			<span class="comment">/** @pgmap: Points to the hosting device page map. */</span></span><br><span class="line">			<span class="keyword">struct</span> <span class="title class_">dev_pagemap</span> *pgmap;</span><br><span class="line">			<span class="type">void</span> *zone_device_data;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * ZONE_DEVICE private pages are counted as being</span></span><br><span class="line"><span class="comment">			 * mapped so the next 3 words hold the mapping, index,</span></span><br><span class="line"><span class="comment">			 * and private fields from the source anonymous or</span></span><br><span class="line"><span class="comment">			 * page cache page while the page is migrated to device</span></span><br><span class="line"><span class="comment">			 * private memory.</span></span><br><span class="line"><span class="comment">			 * ZONE_DEVICE MEMORY_DEVICE_FS_DAX pages also</span></span><br><span class="line"><span class="comment">			 * use the mapping, index, and private fields when</span></span><br><span class="line"><span class="comment">			 * pmem backed DAX files are mapped.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/** @rcu_head: You can use this to free a page by RCU. */</span></span><br><span class="line">		<span class="keyword">struct</span> <span class="title class_">rcu_head</span> rcu_head;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">union</span> &#123;		<span class="comment">/* This union is 4 bytes in size. */</span></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * If the page can be mapped to userspace, encodes the number</span></span><br><span class="line"><span class="comment">		 * of times this page is referenced by a page table.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">atomic_t</span> _mapcount;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * If the page is neither PageSlab nor mappable to userspace,</span></span><br><span class="line"><span class="comment">		 * the value stored here may help determine what this page</span></span><br><span class="line"><span class="comment">		 * is used for.  See page-flags.h for a list of page types</span></span><br><span class="line"><span class="comment">		 * which are currently stored here.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="type">unsigned</span> <span class="type">int</span> page_type;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Usage count. *DO NOT USE DIRECTLY*. See page_ref.h */</span></span><br><span class="line">	<span class="type">atomic_t</span> _refcount;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_MEMCG</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> memcg_data;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * On machines where all RAM is mapped into kernel address space,</span></span><br><span class="line"><span class="comment">	 * we can simply calculate the virtual address. On machines with</span></span><br><span class="line"><span class="comment">	 * highmem some memory is mapped into kernel virtual memory</span></span><br><span class="line"><span class="comment">	 * dynamically, so we need a place to store that address.</span></span><br><span class="line"><span class="comment">	 * Note that this field could be 16 bits on x86 ... ;)</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * Architectures with slow multiplication can define</span></span><br><span class="line"><span class="comment">	 * WANT_PAGE_VIRTUAL in asm/page.h</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(WANT_PAGE_VIRTUAL)</span></span><br><span class="line">	<span class="type">void</span> *<span class="keyword">virtual</span>;			<span class="comment">/* Kernel virtual address (NULL if</span></span><br><span class="line"><span class="comment">					   not kmapped, ie. highmem) */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* WANT_PAGE_VIRTUAL */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_KMSAN</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * KMSAN metadata for this page:</span></span><br><span class="line"><span class="comment">	 *  - shadow page: every bit indicates whether the corresponding</span></span><br><span class="line"><span class="comment">	 *    bit of the original page is initialized (0) or not (1);</span></span><br><span class="line"><span class="comment">	 *  - origin page: every 4 bytes contain an id of the stack trace</span></span><br><span class="line"><span class="comment">	 *    where the uninitialized value was created.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">page</span> *kmsan_shadow;</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">page</span> *kmsan_origin;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> LAST_CPUPID_NOT_IN_PAGE_FLAGS</span></span><br><span class="line">	<span class="type">int</span> _last_cpupid;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125; _struct_page_alignment;</span><br></pre></td></tr></table></figure>
 </details>
 
-<p>有關 <code>list_head</code> 的解說可以閱讀 <a target="_blank" rel="noopener" href="https://hackmd.io/@sysprog/c-linked-list">你所不知道的 C 語言: linked list 和非連續記憶體</a>。</p>
-<p>struct page 本身就會佔有一定的記憶體空間，而在 <a target="_blank" rel="noopener" href="https://lwn.net/Articles/335768/">How many page flags do we really have?</a> 一文中有提到，於一個 4GB 的系統中將會有一百萬個 page 結構體實例，因此 struct page 內的每一個 byte 都需要做嚴格的把控</p>
+<p>有關 <code>list_head</code> 的解說可以閱讀 <span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQHN5c3Byb2cvYy1saW5rZWQtbGlzdA==">你所不知道的 C 語言: linked list 和非連續記憶體<i class="fa fa-external-link-alt"></i></span>。</p>
+<p>struct page 本身就會佔有一定的記憶體空間，而在 <span class="exturl" data-url="aHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzMzNTc2OC8=">How many page flags do we really have?<i class="fa fa-external-link-alt"></i></span> 一文中有提到，於一個 4GB 的系統中將會有一百萬個 page 結構體實例，因此 struct page 內的每一個 byte 都需要做嚴格的把控</p>
 <p>為了減少 struct page 本身使用的記憶體空間，設計上使用了 union，整個 struct page 使用了兩個大的 union 以節省記憶體空間</p>
-<p>struct 的詳細內容可以看看這篇：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/573338379">linux内核那些事之struct page</a></p>
+<p>struct 的詳細內容可以看看這篇：<span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC81NzMzMzgzNzk=">linux内核那些事之struct page<i class="fa fa-external-link-alt"></i></span></p>
 <p>或是查一下 struct page 應該就蠻多不錯的文章可以看了</p>
 <h3 id="page-table-in-linux"><a href="#page-table-in-linux" class="headerlink" title="page table in linux"></a>page table in linux</h3><p>一般來說，x86 的架構使用 2-level 的 page table(10-10-12)，而 x86-64 的架構則使用 4-level(9-9-9-9-12) 或 5-level(<code>pgd_t</code> 和 <code>pud_t</code> 間多了一層 <code>p4d_t</code>) 的 page table，但也有 3-level 的，這可以透過 config 內的 <code>CONFIG_PGTABLE_LEVELS</code> 設定，基本上是 base on 處理器架構在設定的</p>
 <p>以下是一個 4-level page table 的例子：</p>
 <center>
 
 <p><img src="https://hackmd.io/_uploads/SkzZ6kzIa.png" alt="image"></p>
-<p>圖源：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/QiQi-Robotics/p/15630380.html">關於Linux記憶體尋址與頁表處理的一些細節</a><br>(圖很小，可以用新分頁打開來看一下)</p>
+<p>圖源：<span class="exturl" data-url="aHR0cHM6Ly93d3cuY25ibG9ncy5jb20vUWlRaS1Sb2JvdGljcy9wLzE1NjMwMzgwLmh0bWw=">關於Linux記憶體尋址與頁表處理的一些細節<i class="fa fa-external-link-alt"></i></span><br>(圖很小，可以用新分頁打開來看一下)</p>
 </center>
 
 <p>每一個 Process 都會有自己的 Page Table，存在它自己的 kernel space，Page table 的 Base address 會被存在 CR3 裡面，這是一個 register，又被稱為 PDBR(page directory base register)，存的是實體位址，但 <code>task_struct-&gt;mm-&gt;pgd</code> 內儲存的則是 Process Global Directory 的虛擬位址</p>
@@ -850,1186 +619,130 @@
 <p><img src="https://hackmd.io/_uploads/SyCr2-KET.png" alt="image"></p>
 <p>字很醜不好意思</p>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
-<li><a target="_blank" rel="noopener" href="https://blog.austint.in/2022/01/16/run-and-debug-linux-kernel-in-qemu-vm.html">Linux kernel on QEMU</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.subrat.info/build-kernel-and-userspace/">Minimal kernel on QEMU</a></li>
-<li><a target="_blank" rel="noopener" href="https://gist.github.com/debuti/43e9104ae9eb59bdbb8b664c4fcf6839">embed linux bootstrap</a></li>
-<li><a target="_blank" rel="noopener" href="https://docs.kernel.org/admin-guide/initrd.html">initrd</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/gorman/html/understand/understand006.html">Page table</a></li>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/642419727">Get physical memory</a></li>
-<li><a target="_blank" rel="noopener" href="https://hackmd.io/@ppodds/SkezlfZX6">ppodds Linux Kernel Project 1</a></li>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/573338379">linux内核那些事之struct page</a></li>
-<li><a target="_blank" rel="noopener" href="https://member.adl.tw/ernieshu/syscall_3_14_4.html">How to Add a System Call</a></li>
-<li><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/379230/how-many-page-table-levels-does-linux-kernel-use-4-or-5">How many page table levels does Linux kernel use? 4 or 5?</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/QiQi-Robotics/p/15630380.html">關於Linux記憶體尋址與頁表處理的一些細節</a></li>
-<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1622986?fbclid=IwAR3aLMPWaomBgeDYcXU60-Xz0wgMRPLdB9iNndphbnCDnxqC0EXAC6iNsG4">學習ARM64頁表轉換流程</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/freelancer-leon/notes/blob/master/kernel/mm/mm_pagetable.md?fbclid=IwAR27yWHgWVyVzPwXdSjdxCaEFYiKTZW2cAMxgCDjVXIBM8e7MvAjdPmZUps">自由工作者-萊昂筆記-頁表</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.csie.ntu.edu.tw/~wcchen/asm98/asm/proj/b85506061/chap2/paging.html?fbclid=IwAR0PUt5zCou3Lyrw93VdI7w2sgM25rN0gACqivFwlBTGHUwdSFAq0w0hhvI">分頁架構</a></li>
-<li><a target="_blank" rel="noopener" href="https://hackmd.io/@sysprog/linux-memory">Linux 核心設計: 記憶體管理</a></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmF1c3RpbnQuaW4vMjAyMi8wMS8xNi9ydW4tYW5kLWRlYnVnLWxpbnV4LWtlcm5lbC1pbi1xZW11LXZtLmh0bWw=">Linux kernel on QEMU<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuc3VicmF0LmluZm8vYnVpbGQta2VybmVsLWFuZC11c2Vyc3BhY2Uv">Minimal kernel on QEMU<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vZGVidXRpLzQzZTkxMDRhZTllYjU5YmRiYjhiNjY0YzRmY2Y2ODM5">embed linux bootstrap<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9kb2NzLmtlcm5lbC5vcmcvYWRtaW4tZ3VpZGUvaW5pdHJkLmh0bWw=">initrd<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cua2VybmVsLm9yZy9kb2MvZ29ybWFuL2h0bWwvdW5kZXJzdGFuZC91bmRlcnN0YW5kMDA2Lmh0bWw=">Page table<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC82NDI0MTk3Mjc=">Get physical memory<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQHBwb2Rkcy9Ta2V6bGZaWDY=">ppodds Linux Kernel Project 1<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC81NzMzMzgzNzk=">linux内核那些事之struct page<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9tZW1iZXIuYWRsLnR3L2Vybmllc2h1L3N5c2NhbGxfM18xNF80Lmh0bWw=">How to Add a System Call<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly91bml4LnN0YWNrZXhjaGFuZ2UuY29tL3F1ZXN0aW9ucy8zNzkyMzAvaG93LW1hbnktcGFnZS10YWJsZS1sZXZlbHMtZG9lcy1saW51eC1rZXJuZWwtdXNlLTQtb3ItNQ==">How many page table levels does Linux kernel use? 4 or 5?<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuY25ibG9ncy5jb20vUWlRaS1Sb2JvdGljcy9wLzE1NjMwMzgwLmh0bWw=">關於Linux記憶體尋址與頁表處理的一些細節<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvYXJ0aWNsZS8xNjIyOTg2P2ZiY2xpZD1Jd0FSM2FMTVBXYW9tQmdlRFljWFU2MC1YejB3Z01SUExkQjlpTm5kcGhibkNEbnhxQzBFWEFDNmlOc0c0">學習ARM64頁表轉換流程<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2ZyZWVsYW5jZXItbGVvbi9ub3Rlcy9ibG9iL21hc3Rlci9rZXJuZWwvbW0vbW1fcGFnZXRhYmxlLm1kP2ZiY2xpZD1Jd0FSMjd5V0hnV1Z5VnpQd1hkU2pkeENhRUZZaUtUWlcyY0FNeGdDRGpWWElCTThlN012QWpkUG1aVXBz">自由工作者-萊昂筆記-頁表<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuY3NpZS5udHUuZWR1LnR3L353Y2NoZW4vYXNtOTgvYXNtL3Byb2ovYjg1NTA2MDYxL2NoYXAyL3BhZ2luZy5odG1sP2ZiY2xpZD1Jd0FSMFBVdDV6Q291M0x5cnc5M1ZkSTd3MnNnTTI1ck4wZ0FDcWl2RndsQlRHSFV3ZFNGQXEwdzBoaHZJ">分頁架構<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQHN5c3Byb2cvbGludXgtbWVtb3J5">Linux 核心設計: 記憶體管理<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
 
-    </article>
-    <!-- license -->
+    </div>
+
     
-        <div class="license-wrapper">
-            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
-            <p>原文連結：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/</a>
-            <p>發布日期：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">November 20th 2023, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2023/11/20/Linux/physical-address-syscall/">March 21st 2024, 12:42:50 pm</a>
-            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
-        </div>
     
-    <!-- paginator -->
-    <ul class="post-paginator">
-        <li class="next">
-            
-                <div class="nextSlogan">Next Post</div>
-                <a href="/2023/12/13/ROS/ROS_Install/" title="Ros Install (noetic)">
-                    <div class="nextTitle">Ros Install (noetic)</div>
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/14/memory/sw-reram/" rel="prev" title="ReRAM 與 Smith-Waterman Algorithm 介紹">
+                  <i class="fa fa-angle-left"></i> ReRAM 與 Smith-Waterman Algorithm 介紹
                 </a>
-            
-        </li>
-        <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href="/2023/11/14/memory/sw-reram/" title="ReRAM 與 Smith-Waterman Algorithm 介紹">
-                    <div class="prevTitle">ReRAM 與 Smith-Waterman Algorithm 介紹</div>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/12/13/ROS/ROS_Install/" rel="next" title="Ros Install (noetic)">
+                  Ros Install (noetic) <i class="fa fa-angle-right"></i>
                 </a>
-            
-        </li>
-    </ul>
-    <!-- comment -->
-    
-        <div class="post-comment">
-            <!-- 来必力 City 版安装代码 -->
-
-
-            
-
-            
-
-            
-
-            <!-- utteranc评论 -->
-
-
-            <!-- partial('_partial/comment/changyan') -->
-            <!--PC版-->
-
-
-            
-            
-
-            
-
-        </div>
-    
-    <!-- timeliness note -->
-    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
-    
-    <!-- Mathjax -->
-    
-</main>
-
-                <!-- profile -->
-                
             </div>
-            <footer class="footer footer-unloaded">
-    <!-- social  -->
-    
-        <div class="social">
-            
-    
-        
-            
-                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
-            
-        
-    
-        
-            
-                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-            
-                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
-            
-        
-    
-        
-            
-                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
-            
-        
-    
-        
-            
-                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-
-
-        </div>
-    
-    <!-- powered by Hexo  -->
-    <div class="copyright">
-        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
-    </div>
-    <!-- website approve for Chinese user -->
-    
-    <!-- 不蒜子  -->
-    
-        <div class="busuanzi-container">
-            
-             
-                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
-            
-        </div>
-    	
-</footer>
-
-        </div>
-        <!-- toc -->
-        
-            <div class="toc-wrapper toc-wrapper-loding" style=
-
-
-
-
-
-
-
-    top:50vh;
-
->
-                <div class="toc-catalog">
-                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
-                </div>
-                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Build-Linux-Kernel"><span class="toc-number">2.</span> <span class="toc-text">Build Linux Kernel</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Build-Root-FS"><span class="toc-number">3.</span> <span class="toc-text">Build Root FS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Run-Kernel"><span class="toc-number">3.1.</span> <span class="toc-text">Run Kernel</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Add-System-Call"><span class="toc-number">4.</span> <span class="toc-text">Add System Call</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-syscall-64-tbl"><span class="toc-number">4.1.</span> <span class="toc-text">修改 syscall_64.tbl</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84-system-call"><span class="toc-number">4.2.</span> <span class="toc-text">實作自己的 system call</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#page-in-linux"><span class="toc-number">4.2.1.</span> <span class="toc-text">page in linux</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#page-table-in-linux"><span class="toc-number">4.2.2.</span> <span class="toc-text">page table in linux</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%96%8B%E5%A7%8B%E5%AF%A6%E4%BD%9C-system-call"><span class="toc-number">4.2.3.</span> <span class="toc-text">開始實作 system call</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Build-Test-Binary"><span class="toc-number">5.</span> <span class="toc-text">Build Test Binary</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Run-User-Program"><span class="toc-number">6.</span> <span class="toc-text">Run User Program</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BC%B8%E5%87%BA%EF%BC%9A"><span class="toc-number">6.1.</span> <span class="toc-text">輸出：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#References"><span class="toc-number">7.</span> <span class="toc-text">References</span></a></li></ol>
-            </div>
-        
-        <!-- sidebar -->
-        <div class="sidebar sidebar-hide">
-    <ul class="sidebar-tabs sidebar-tabs-active-0">
-        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
-        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
-        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
-    </ul>
-    <div class="sidebar-content sidebar-content-show-archive">
-        <div class="sidebar-panel-archives">
-    <!-- 在 ejs 中将 archive 按照时间排序 -->
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    
-    
-    <div class="total-and-search">
-        <div class="total-archive">
-        Total : 39
-        </div>
-        <!-- search  -->
-        
-            <div class="site-search site-search-loading popup-trigger">
-                <span class="iconfont-archer search-icon">&#xe627;</span>
-            </div>
-        
-    </div>
-    
-    <div class="post-archive">
-    
-        
-            
-            
-            <div class="archive-year"> 2023 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/13</span>
-            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/20</span>
-            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/14</span>
-            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">08/12</span>
-            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/17</span>
-            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">01/09</span>
-            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2022 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/01</span>
-            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/23</span>
-            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/21</span>
-            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/19</span>
-            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/28</span>
-            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/22</span>
-            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/14</span>
-            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/25</span>
-            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/24</span>
-            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/06</span>
-            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2021 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/20</span>
-            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/15</span>
-            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/17</span>
-            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/15</span>
-            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/06</span>
-            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/13</span>
-            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/12</span>
-            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/14</span>
-            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/27</span>
-            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/01</span>
-            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
-        </li>
-    
-    </div>
+          </div>
+    </footer>
+  </article>
 </div>
 
-        <div class="sidebar-panel-tags">
-    <div class="sidebar-tags-name">
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="Linux">
-                <span class="iconfont-archer">&#xe606;</span>
-                Linux
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OS">
-                <span class="iconfont-archer">&#xe606;</span>
-                OS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="ROS">
-                <span class="iconfont-archer">&#xe606;</span>
-                ROS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="memory">
-                <span class="iconfont-archer">&#xe606;</span>
-                memory
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="miscellaneous">
-                <span class="iconfont-archer">&#xe606;</span>
-                miscellaneous
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="numerical_algebra">
-                <span class="iconfont-archer">&#xe606;</span>
-                numerical_algebra
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="security">
-                <span class="iconfont-archer">&#xe606;</span>
-                security
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner-BlackMagic
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OSDI">
-                <span class="iconfont-archer">&#xe606;</span>
-                OSDI
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner_tutorial
-            </span>
-        
-    </div>
-    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
-    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
-        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
-    </div> 
-    <div class="sidebar-tags-list"></div>
-</div>
 
-        <div class="sidebar-panel-categories">
-    <div class="sidebar-categories-name">
-    
-        <span class="sidebar-category-name" data-categories="C++ Miner">
-            <span class="iconfont-archer">&#xe60a;</span>
-            C++ Miner
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="Linux">
-            <span class="iconfont-archer">&#xe60a;</span>
-            Linux
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="OS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            OS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="ROS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            ROS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="memory">
-            <span class="iconfont-archer">&#xe60a;</span>
-            memory
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="miscellaneous">
-            <span class="iconfont-archer">&#xe60a;</span>
-            miscellaneous
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="numerical_algebra">
-            <span class="iconfont-archer">&#xe60a;</span>
-            numerical_algebra
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="security">
-            <span class="iconfont-archer">&#xe60a;</span>
-            security
-        </span>
-    
-    </div>
-    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
-    <div class="sidebar-categories-list"></div>
+
+
+
+
 </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">162k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">9:47</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
 
     </div>
-</div>
+  </footer>
 
-        <!-- site-meta -->
-        <script>
-    var siteMetaRoot = "/"
-    if (siteMetaRoot === "undefined") {
-        siteMetaRoot = '/'
-    }
-    var siteMeta = {
-        url: "https://mes0903.github.io",
-        root: siteMetaRoot,
-        author: "Mes"
-    }
-</script>
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
-        <!-- import experimental options here -->
-        <!-- Custom Font -->
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
 
-        <!-- main func -->
-        <script src="/scripts/main.js?v=20211217"></script>
-        <!-- dark mode -->
-        <script src="/scripts/dark.js?v=20211217"></script>
-        <!-- fancybox -->
-        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
-        <!-- algolia -->
-        
-            <div class="site-search site-search-loading">
-    <div class="algolia-popup popup">
-        <div class="algolia-search">
-            <div class="algolia-search-input-icon">
-                <i class="fa fa-search"></i>
-            </div>
-            <div class="algolia-search-input" id="algolia-search-input"></div>
-            <div class="popup-btn-close">
-                <i class="iconfont-archer">&#xe609;</i>
-            </div>
-        </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
-        <div class="algolia-results">
-            <div id="algolia-stats" class="algolia-stats"></div>
-            <div id="algolia-hits"></div>
-            <div id="algolia-pagination" class="algolia-pagination"></div>
-        </div>
-    </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
-            <script src="/scripts/search.js?v=20211217" defer></script>
-        
-        <!-- busuanzi -->
-        
-            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
-        
-        <!-- CNZZ -->
-        
-        <!-- async load share.js -->
-        
-            <script src="/scripts/share.js?v=20211217" async></script>
-        
-        <!-- mermaid -->
-        
-            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
-            <script>
-                if (window.mermaid) {
-                    mermaid.initialize({theme: 'dark'});
-                }
-            </script>
-        
-    </body>
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
 </html>

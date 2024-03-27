@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh">
-    <!-- title -->
-
-
-    
-
-<!-- keywords -->
-
-
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="author" content="Mes">
-    <meta name="renderer" content="webkit">
-    <meta name="copyright" content="Mes">
-    
-        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
-    
-    <meta name="description" content="">
-    <meta name="description" content="RVOS OSDI 筆記這是我在 bilibili 上面看一門叫做「循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春」的課的筆記 課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 mini-riscv-os 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了 常用的 RISC-V 筆記基本架構一條典型的 R">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/uploads/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Ina-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Ina-16x16.png">
+  <link rel="mask-icon" href="/uploads/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="看 OSDI 網課的筆記，課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 [mini-riscv-os](https:&#x2F;&#x2F;github.com&#x2F;cccriscv&#x2F;mini-riscv-os) 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RVOS OSDI 筆記">
 <meta property="og:url" content="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/index.html">
 <meta property="og:site_name" content="Mes&#39;s Studio">
-<meta property="og:description" content="RVOS OSDI 筆記這是我在 bilibili 上面看一門叫做「循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春」的課的筆記 課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 mini-riscv-os 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了 常用的 RISC-V 筆記基本架構一條典型的 R">
+<meta property="og:description" content="看 OSDI 網課的筆記，課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 [mini-riscv-os](https:&#x2F;&#x2F;github.com&#x2F;cccriscv&#x2F;mini-riscv-os) 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了">
 <meta property="og:locale">
 <meta property="og:image" content="https://hackmd.io/_uploads/S1cMT1sw3.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/BytZakoP2.png">
@@ -76,495 +77,263 @@
 <meta property="og:image" content="https://hackmd.io/_uploads/SkdmnB3dp.png">
 <meta property="og:image" content="https://hackmd.io/_uploads/rksBnrn_a.png">
 <meta property="article:published_time" content="2023-06-17T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-21T12:13:12.243Z">
+<meta property="article:modified_time" content="2024-03-27T15:11:16.424Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="OSDI">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://hackmd.io/_uploads/S1cMT1sw3.png">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link rel="icon" href="/assets/Ina.ico">
-    
-    <title>RVOS OSDI 筆記 · Mes&#39;s Studio</title>
-    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
-/* This file is meant as a standalone workflow for
-- testing support for link[rel=preload]
-- enabling async CSS loading in browsers that do not support rel=preload
-- applying rel preload css once loaded, whether supported or not.
-*/ -->
-<script>
-    (function (w) {
-        'use strict'
-        // rel=preload support test
-        if (!w.loadCSS) {
-            w.loadCSS = function () {}
-        }
-        // define on the loadCSS obj
-        var rp = (loadCSS.relpreload = {})
-        // rel=preload feature support test
-        // runs once and returns a function for compat purposes
-        rp.support = (function () {
-            var ret
-            try {
-                ret = w.document.createElement('link').relList.supports('preload')
-            } catch (e) {
-                ret = false
-            }
-            return function () {
-                return ret
-            }
-        })()
 
-        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
-        // then change that media back to its intended value on load
-        rp.bindMediaToggle = function (link) {
-            // remember existing media attr for ultimate state, or default to 'all'
-            var finalMedia = link.media || 'all'
 
-            function enableStylesheet() {
-                link.media = finalMedia
-            }
+<link rel="canonical" href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">
 
-            // bind load handlers to enable media
-            if (link.addEventListener) {
-                link.addEventListener('load', enableStylesheet)
-            } else if (link.attachEvent) {
-                link.attachEvent('onload', enableStylesheet)
-            }
 
-            // Set rel and non-applicable media type to start an async request
-            // note: timeout allows this to happen async to let rendering continue in IE
-            setTimeout(function () {
-                link.rel = 'stylesheet'
-                link.media = 'only x'
-            })
-            // also enable media after 3 seconds,
-            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
-            setTimeout(enableStylesheet, 3000)
-        }
 
-        // loop through link elements in DOM
-        rp.poly = function () {
-            // double check this to prevent external calls from running
-            if (rp.support()) {
-                return
-            }
-            var links = w.document.getElementsByTagName('link')
-            for (var i = 0; i < links.length; i++) {
-                var link = links[i]
-                // qualify links to those with rel=preload and as=style attrs
-                if (
-                    link.rel === 'preload' &&
-                    link.getAttribute('as') === 'style' &&
-                    !link.getAttribute('data-loadcss')
-                ) {
-                    // prevent rerunning on link
-                    link.setAttribute('data-loadcss', true)
-                    // bind listeners to toggle media back
-                    rp.bindMediaToggle(link)
-                }
-            }
-        }
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/","path":"2023/06/17/OS/OSDI/risc-v_osdi/","title":"RVOS OSDI 筆記"}</script>
 
-        // if unsupported, run the polyfill
-        if (!rp.support()) {
-            // run once at least
-            rp.poly()
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RVOS OSDI 筆記 | Mes's Studio</title>
+  
 
-            // rerun poly on an interval until onload
-            var run = w.setInterval(rp.poly, 500)
-            if (w.addEventListener) {
-                w.addEventListener('load', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            } else if (w.attachEvent) {
-                w.attachEvent('onload', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            }
-        }
 
-        // commonjs
-        if (typeof exports !== 'undefined') {
-            exports.loadCSS = loadCSS
-        } else {
-            w.loadCSS = loadCSS
-        }
-    })(typeof global !== 'undefined' ? global : this)
-</script>
 
-    <style type="text/css">
-    @font-face {
-        font-family: 'Oswald-Regular';
-        src: url("/font/Oswald-Regular.ttf");
-    }
 
-    body {
-        margin: 0;
-    }
 
-    header,
-    footer,
-    .back-top,
-    .sidebar,
-    .container,
-    .site-intro-meta,
-    .toc-wrapper {
-        display: none;
-    }
 
-    .site-intro {
-        position: relative;
-        z-index: 3;
-        width: 100%;
-        /* height: 50vh; */
-        overflow: hidden;
-    }
 
-    .site-intro-placeholder {
-        position: absolute;
-        z-index: -2;
-        top: 0;
-        left: 0;
-        width: calc(100% + 300px);
-        height: 100%;
-        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
-        background-position: center center;
-        transform: translate3d(-226px, 0, 0);
-        animation: gradient-move 2.5s ease-out 0s infinite;
-    }
 
-    @keyframes gradient-move {
-        0% {
-            transform: translate3d(-226px, 0, 0);
-        }
-        100% {
-            transform: translate3d(0, 0, 0);
-        }
-    }
-</style>
-
-    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
-    <link rel="stylesheet" href="/css/dark.css">
-    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
-    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
-    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
-    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
-    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
-    <!-- algolia -->
-    
-        <script>
-            var hits = JSON.parse('{"per_page":10}')
-            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
-
-            var algolia = {
-                applicationID: 'JNI49E87OH',
-                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
-                indexName: 'MesBlog',
-                hits: hits,
-                labels: labels
-            }
-        </script>
-    
-    <!-- 百度统计  -->
-    
-    <!-- Google tag (gtag.js) -->
-    
-
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 <!-- hexo injector head_end start -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+<!-- hexo injector head_end end --></head>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        if (typeof window.$ == undefined) {
-            console.warn('jquery load from jsdelivr failed, will load local script')
-            document.write('<script src="/lib/jquery.min.js" />')
-        }
-    </script>
-    
-        <body class="post-body">
-    
-        <!-- header -->
-        <header class="header header-mobile">
-    <!-- top read progress line -->
-    <div class="header-element">
-        <div class="read-progress"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-    <!-- sidebar menu button -->
-    <div class="header-element">
-        
-            <div class="header-sidebar-menu">
-        
-            
-                <div style="padding-left: 1px;">&#xe775;</div>
-            
-        </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">stop daydreaming, keep pursuing</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
-    <!-- header actions -->
-    <div class="header-actions">
-        <!-- theme mode switch button -->
-        <span class="header-theme-btn header-element">
-            <i class="fas fa-adjust"></i>
-        </span>
-        <!-- back to home page text -->
-        <span class="home-link header-element">
-            <a href=/>Mes's Studio</a>
-        </span>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
     </div>
-    <!-- toggle banner for post layout -->
-    
-        
-            <div class="banner">
-        
-            <div class="blog-title header-element">
-                <a href="/">Mes&#39;s Studio</a>
-            </div>
-            <div class="post-title header-element">
-                <a href="#" class="post-name">RVOS OSDI 筆記</a>
-            </div>
-        </div>
-    
+  </div>
+
 </header>
+        
+  
+  <aside class="sidebar">
 
-        <!-- fixed footer -->
-        <footer class="footer-fixed">
-    <!-- back to top button -->
-    <div class="footer-fixed-element">
-        
-            <div class="back-top back-top-hidden">
-        
-        
-            <div>&#xe639;</div>
-        
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RVOS-OSDI-%E7%AD%86%E8%A8%98"><span class="nav-number">1.</span> <span class="nav-text">RVOS OSDI 筆記</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84-RISC-V-%E7%AD%86%E8%A8%98"><span class="nav-number">2.</span> <span class="nav-text">常用的 RISC-V 筆記</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%9E%B6%E6%A7%8B"><span class="nav-number">2.1.</span> <span class="nav-text">基本架構</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#label-%E6%A8%99%E7%B1%A4"><span class="nav-number">2.1.1.</span> <span class="nav-text">label(標籤)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#operation"><span class="nav-number">2.1.2.</span> <span class="nav-text">operation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E7%9A%84%E6%93%8D%E4%BD%9C%E5%B0%8D%E8%B1%A1"><span class="nav-number">2.2.</span> <span class="nav-text">指令的操作對象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E7%B7%A8%E7%A2%BC%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.3.</span> <span class="nav-text">指令編碼格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E8%A1%93%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Arithmetic-Instruction"><span class="nav-number">2.4.</span> <span class="nav-text">算術運算指令(Arithmetic Instruction)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ADD"><span class="nav-number">2.4.1.</span> <span class="nav-text">ADD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUB"><span class="nav-number">2.4.2.</span> <span class="nav-text">SUB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADDI-ADD-Immediate"><span class="nav-number">2.4.3.</span> <span class="nav-text">ADDI (ADD Immediate)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LUI-Load-Upper-Immediate"><span class="nav-number">2.4.4.</span> <span class="nav-text">LUI (Load Upper Immediate)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AUIPC"><span class="nav-number">2.4.5.</span> <span class="nav-text">AUIPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction"><span class="nav-number">2.4.6.</span> <span class="nav-text">相關的 pseudo-instruction</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NEG"><span class="nav-number">2.4.6.1.</span> <span class="nav-text">NEG</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MV"><span class="nav-number">2.4.6.2.</span> <span class="nav-text">MV</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LI-Load-Immediate"><span class="nav-number">2.4.6.3.</span> <span class="nav-text">LI (Load Immediate)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LA-Load-Address"><span class="nav-number">2.4.6.4.</span> <span class="nav-text">LA (Load Address)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NOP-%E7%A9%BA%E6%8C%87%E4%BB%A4"><span class="nav-number">2.4.6.5.</span> <span class="nav-text">NOP (空指令)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%8F%E8%BC%AF%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Logical-Instructions"><span class="nav-number">2.5.</span> <span class="nav-text">邏輯運算指令 (Logical Instructions)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AND"><span class="nav-number">2.5.1.</span> <span class="nav-text">AND</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OR"><span class="nav-number">2.5.2.</span> <span class="nav-text">OR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XOR"><span class="nav-number">2.5.3.</span> <span class="nav-text">XOR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ANDI"><span class="nav-number">2.5.4.</span> <span class="nav-text">ANDI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ORI"><span class="nav-number">2.5.5.</span> <span class="nav-text">ORI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XORI"><span class="nav-number">2.5.6.</span> <span class="nav-text">XORI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-1"><span class="nav-number">2.5.7.</span> <span class="nav-text">相關的 pseudo-instruction</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NOT"><span class="nav-number">2.5.7.1.</span> <span class="nav-text">NOT</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%BB%E4%BD%8D%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Shifting-Instructions"><span class="nav-number">2.6.</span> <span class="nav-text">移位運算指令 (Shifting Instructions)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SLL-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB"><span class="nav-number">2.6.1.</span> <span class="nav-text">SLL (邏輯左移)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SRL-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB"><span class="nav-number">2.6.2.</span> <span class="nav-text">SRL (邏輯右移)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SLLI-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="nav-number">2.6.3.</span> <span class="nav-text">SLLI (邏輯左移常數)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SRLI-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="nav-number">2.6.4.</span> <span class="nav-text">SRLI (邏輯右移常數)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SRA-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB"><span class="nav-number">2.6.5.</span> <span class="nav-text">SRA (算術右移)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SRAI-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="nav-number">2.6.6.</span> <span class="nav-text">SRAI (算術右移常數)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E8%AE%80%E5%AF%AB%E6%8C%87%E4%BB%A4-Load-and-Store-Instructions"><span class="nav-number">2.7.</span> <span class="nav-text">記憶體讀寫指令 (Load and Store Instructions)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LB"><span class="nav-number">2.7.1.</span> <span class="nav-text">LB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LBU"><span class="nav-number">2.7.2.</span> <span class="nav-text">LBU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LH"><span class="nav-number">2.7.3.</span> <span class="nav-text">LH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LHU"><span class="nav-number">2.7.4.</span> <span class="nav-text">LHU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LW"><span class="nav-number">2.7.5.</span> <span class="nav-text">LW</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SB"><span class="nav-number">2.7.6.</span> <span class="nav-text">SB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SH"><span class="nav-number">2.7.7.</span> <span class="nav-text">SH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SW"><span class="nav-number">2.7.8.</span> <span class="nav-text">SW</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E6%8C%87%E4%BB%A4-Conditional-Branch-Instructions"><span class="nav-number">2.8.</span> <span class="nav-text">分支指令 (Conditional Branch Instructions)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BEQ"><span class="nav-number">2.8.1.</span> <span class="nav-text">BEQ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BNE"><span class="nav-number">2.8.2.</span> <span class="nav-text">BNE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLT"><span class="nav-number">2.8.3.</span> <span class="nav-text">BLT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLTU"><span class="nav-number">2.8.4.</span> <span class="nav-text">BLTU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGE"><span class="nav-number">2.8.5.</span> <span class="nav-text">BGE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGEU"><span class="nav-number">2.8.6.</span> <span class="nav-text">BGEU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-2"><span class="nav-number">2.8.7.</span> <span class="nav-text">相關的 pseudo-instruction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLE"><span class="nav-number">2.8.8.</span> <span class="nav-text">BLE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLEU"><span class="nav-number">2.8.9.</span> <span class="nav-text">BLEU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGT"><span class="nav-number">2.8.10.</span> <span class="nav-text">BGT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGTU"><span class="nav-number">2.8.11.</span> <span class="nav-text">BGTU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BEQZ"><span class="nav-number">2.8.12.</span> <span class="nav-text">BEQZ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BNEZ"><span class="nav-number">2.8.13.</span> <span class="nav-text">BNEZ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLTZ"><span class="nav-number">2.8.14.</span> <span class="nav-text">BLTZ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLEZ"><span class="nav-number">2.8.15.</span> <span class="nav-text">BLEZ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGTZ"><span class="nav-number">2.8.16.</span> <span class="nav-text">BGTZ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGEZ"><span class="nav-number">2.8.17.</span> <span class="nav-text">BGEZ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%84%A1%E6%A2%9D%E4%BB%B6%E8%B7%B3%E8%BD%89-Unconditional-Jump-Instructions"><span class="nav-number">2.9.</span> <span class="nav-text">無條件跳轉 (Unconditional Jump Instructions)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JAL-Jump-And-Link"><span class="nav-number">2.9.1.</span> <span class="nav-text">JAL (Jump And Link)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JALR-Jump-And-Link-Register"><span class="nav-number">2.9.2.</span> <span class="nav-text">JALR (Jump And Link Register)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OS-Development"><span class="nav-number">3.</span> <span class="nav-text">OS Development</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%80%E5%8F%96-CSR"><span class="nav-number">3.1.</span> <span class="nav-text">讀取 CSR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-UART"><span class="nav-number">3.2.</span> <span class="nav-text">設定 UART</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E7%AE%A1%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">記憶體管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multitask-and-context-switch"><span class="nav-number">3.4.</span> <span class="nav-text">multitask and context switch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#multitask"><span class="nav-number">3.4.1.</span> <span class="nav-text">multitask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#type-of-multitask"><span class="nav-number">3.4.2.</span> <span class="nav-text">type of multitask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cooperative-Multitasking"><span class="nav-number">3.4.3.</span> <span class="nav-text">Cooperative Multitasking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Trap-Exception"><span class="nav-number">3.5.</span> <span class="nav-text">Trap &amp; Exception</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%95%B0%E5%B8%B8%E6%8E%A7%E5%88%B6%E6%B5%81-Exceptional-Control-Flow"><span class="nav-number">3.5.1.</span> <span class="nav-text">異常控制流(Exceptional Control Flow)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Machine-mode-%E4%B8%8B%E7%9A%84-CSR"><span class="nav-number">3.5.2.</span> <span class="nav-text">Machine mode 下的 CSR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mtvec-Machine-Trap-Vector-Base-Address"><span class="nav-number">3.5.3.</span> <span class="nav-text">mtvec (Machine Trap-Vector Base-Address)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mepc-Machine-Exception-Program-Counter"><span class="nav-number">3.5.4.</span> <span class="nav-text">mepc (Machine Exception Program Counter)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mcause-Machine-Cause"><span class="nav-number">3.5.5.</span> <span class="nav-text">mcause (Machine Cause)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mtval-Machine-Trap-Value"><span class="nav-number">3.5.6.</span> <span class="nav-text">mtval (Machine Trap Value)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mstatus-Machine-Status"><span class="nav-number">3.5.7.</span> <span class="nav-text">mstatus (Machine Status)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Trap-%E8%99%95%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">3.6.</span> <span class="nav-text">Trap 處理流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Trap-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">3.6.1.</span> <span class="nav-text">Trap 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top-half"><span class="nav-number">3.6.2.</span> <span class="nav-text">top half</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bottom-half"><span class="nav-number">3.6.3.</span> <span class="nav-text">Bottom half</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%9E-Trap-%E8%BF%94%E5%9B%9E"><span class="nav-number">3.6.4.</span> <span class="nav-text">從 Trap 返回</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Interrupt"><span class="nav-number">3.7.</span> <span class="nav-text">Interrupt</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Interrupt-%E5%88%86%E9%A1%9E"><span class="nav-number">3.7.1.</span> <span class="nav-text">Interrupt 分類</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mie-%E8%88%87-mip"><span class="nav-number">3.7.2.</span> <span class="nav-text">mie 與 mip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PLIC"><span class="nav-number">3.7.3.</span> <span class="nav-text">PLIC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Priority"><span class="nav-number">3.7.4.</span> <span class="nav-text">Priority</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pending"><span class="nav-number">3.7.5.</span> <span class="nav-text">Pending</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Enable"><span class="nav-number">3.7.6.</span> <span class="nav-text">Enable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Threshold"><span class="nav-number">3.7.7.</span> <span class="nav-text">Threshold</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Claim-Complete"><span class="nav-number">3.7.8.</span> <span class="nav-text">Claim&#x2F;Complete</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PLIC-%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">3.7.9.</span> <span class="nav-text">PLIC 操作流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UART-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">3.7.10.</span> <span class="nav-text">UART 的例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timer-interrupt"><span class="nav-number">3.8.</span> <span class="nav-text">timer interrupt</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mtime"><span class="nav-number">3.8.1.</span> <span class="nav-text">mtime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mtimecmp"><span class="nav-number">3.8.2.</span> <span class="nav-text">mtimecmp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MSIP"><span class="nav-number">3.8.3.</span> <span class="nav-text">MSIP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CLINT-Time-Interrupt"><span class="nav-number">3.8.4.</span> <span class="nav-text">CLINT Time Interrupt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.8.5.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Preemtive-Multitasking"><span class="nav-number">3.9.</span> <span class="nav-text">Preemtive Multitasking</span></a></li></ol></li></ol></div>
         </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Ina.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+
+        </div>
+      </div>
     </div>
-</footer>
 
-        <!-- wrapper -->
-        <div class="wrapper">
-            <div class="site-intro" style="
-
-
-
-
-
-
-
-    height:50vh;
-
-">
     
-    <!-- 主页  -->
-    
-        
-    <!-- 404页  -->
-    
-    <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
-    <div class="site-intro-meta">
-        <!-- 标题  -->
-        <h1 class="intro-title">
-            <!-- 主页  -->
-            
-                RVOS OSDI 筆記
-            <!-- 404 -->
-            
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Ina.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RVOS OSDI 筆記 | Mes's Studio">
+      <meta itemprop="description" content="看 OSDI 網課的筆記，課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 [mini-riscv-os](https://github.com/cccriscv/mini-riscv-os) 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RVOS OSDI 筆記
         </h1>
-        <!-- 副标题 -->
-        <p class="intro-subtitle">
-            <!-- 主页副标题  -->
-            
-                
-            <!-- 404 -->
-            
-        </p>
-        <!-- 文章页 meta -->
-        
-            <div class="post-intros">
-                <!-- 文章页标签  -->
-                
-                    <div class= post-intro-tags >
-    
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="OSDI">OSDI</a>
-    
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-06-17 00:00:00" itemprop="dateCreated datePublished" datetime="2023-06-17T00:00:00+00:00">2023-06-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-03-27 15:11:16" itemprop="dateModified" datetime="2024-03-27T15:11:16+00:00">2024-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OS/" itemprop="url" rel="index"><span itemprop="name">OS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>14k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>52 mins.</span>
+    </span>
 </div>
 
-                
-                <!-- 文章字数统计 -->
-                
-                    <div class="post-intro-read">
-                        <span>字數: <span class="post-count word-count">14.6k</span>閱讀時長: <span class="post-count reading-time">62 min</span></span>
-                    </div>
-                
-                <div class="post-intro-meta">
-                    <!-- 撰写日期 -->
-                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
-                    <span class="post-intro-time">2023/06/17</span>
-                    <!-- busuanzi -->
-                    
-                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
-                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
-                            <span id="busuanzi_value_page_pv"></span>
-                        </span>
-                    
-                    <!-- 文章分享 -->
-                    <span class="share-wrapper">
-                        <span class="iconfont-archer share-icon">&#xe71d;</span>
-                        <span class="share-text">Share</span>
-                        <ul class="share-list">
-                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
-                                <div class="share-qrcode"></div>
-                            </li>
-                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
-                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
-                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
-                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
-                        </ul>
-                    </span>
-                </div>
-            </div>
-        
-    </div>
-</div>
+            <div class="post-description">看 OSDI 網課的筆記，課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 [mini-riscv-os](https://github.com/cccriscv/mini-riscv-os) 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了</div>
+        </div>
+      </header>
 
-            <script>
-  // get user agent
-  function getBrowserVersions() {
-    var u = window.navigator.userAgent
-    return {
-      userAgent: u,
-      trident: u.indexOf('Trident') > -1, //IE内核
-      presto: u.indexOf('Presto') > -1, //opera内核
-      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
-      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
-      iPad: u.indexOf('iPad') > -1, //是否为iPad
-      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
-      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
-      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
-    }
-  }
-  var browser = {
-    versions: getBrowserVersions(),
-  }
-  console.log('userAgent: ' + browser.versions.userAgent)
-
-  // callback
-  function fontLoaded() {
-    console.log('font loaded')
-    if (document.getElementsByClassName('site-intro-meta')) {
-      document
-        .getElementsByClassName('intro-title')[0]
-        .classList.add('intro-fade-in')
-      document
-        .getElementsByClassName('intro-subtitle')[0]
-        .classList.add('intro-fade-in')
-      var postIntros = document.getElementsByClassName('post-intros')[0]
-      if (postIntros) {
-        postIntros.classList.add('post-fade-in')
-      }
-    }
-  }
-
-  // UC不支持跨域，所以直接显示
-  function asyncCb() {
-    if (browser.versions.uc) {
-      console.log('UCBrowser')
-      fontLoaded()
-    } else {
-      WebFont.load({
-        custom: {
-          families: ['Oswald-Regular'],
-        },
-        loading: function () {
-          // 所有字体开始加载
-          // console.log('font loading');
-        },
-        active: function () {
-          // 所有字体已渲染
-          fontLoaded()
-        },
-        inactive: function () {
-          // 字体预加载失败，无效字体或浏览器不支持加载
-          console.log('inactive: timeout')
-          fontLoaded()
-        },
-        timeout: 5000, // Set the timeout to two seconds
-      })
-    }
-  }
-
-  function asyncErr() {
-    console.warn('script load from CDN failed, will load local script')
-  }
-
-  // load webfont-loader async, and add callback function
-  function async(u, cb, err) {
-    var d = document,
-      t = 'script',
-      o = d.createElement(t),
-      s = d.getElementsByTagName(t)[0]
-    o.src = u
-    if (cb) {
-      o.addEventListener(
-        'load',
-        function (e) {
-          cb(null, e)
-        },
-        false
-      )
-    }
-    if (err) {
-      o.addEventListener(
-        'error',
-        function (e) {
-          err(null, e)
-        },
-        false
-      )
-    }
-    s.parentNode.insertBefore(o, s)
-  }
-
-  var asyncLoadWithFallBack = function (arr, success, reject) {
-    var currReject = function () {
-      reject()
-      arr.shift()
-      if (arr.length) async(arr[0], success, currReject)
-    }
-
-    async(arr[0], success, currReject)
-  }
-
-  asyncLoadWithFallBack(
-    [
-      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
-      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
-      "/lib/webfontloader.min.js",
-    ],
-    asyncCb,
-    asyncErr
-  )
-</script>
-
-            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
-            <div class="container container-unloaded">
-                <main class="main post-page">
-    <article class="article-entry">
-        <h1 id="RVOS-OSDI-筆記"><a href="#RVOS-OSDI-筆記" class="headerlink" title="RVOS OSDI 筆記"></a>RVOS OSDI 筆記</h1><p>這是我在 bilibili 上面看一門叫做「<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Q5411w7z5/?spm_id_from=333.999.0.0&vd_source=493154d46ef9c42825a755d6b7857b3c">循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春</a>」的課的筆記</p>
-<p>課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 <a target="_blank" rel="noopener" href="https://github.com/cccriscv/mini-riscv-os">mini-riscv-os</a> 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了</p>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="RVOS-OSDI-筆記"><a href="#RVOS-OSDI-筆記" class="headerlink" title="RVOS OSDI 筆記"></a>RVOS OSDI 筆記</h1><p>這是我在 bilibili 上面看一門叫做「<span class="exturl" data-url="aHR0cHM6Ly93d3cuYmlsaWJpbGkuY29tL3ZpZGVvL0JWMVE1NDExdzd6NS8/c3BtX2lkX2Zyb209MzMzLjk5OS4wLjAmdmRfc291cmNlPTQ5MzE1NGQ0NmVmOWM0MjgyNWE3NTVkNmI3ODU3YjNj">循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春<i class="fa fa-external-link-alt"></i></span>」的課的筆記</p>
+<p>課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2NjY3Jpc2N2L21pbmktcmlzY3Ytb3M=">mini-riscv-os<i class="fa fa-external-link-alt"></i></span> 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了</p>
 <h1 id="常用的-RISC-V-筆記"><a href="#常用的-RISC-V-筆記" class="headerlink" title="常用的 RISC-V 筆記"></a>常用的 RISC-V 筆記</h1><h2 id="基本架構"><a href="#基本架構" class="headerlink" title="基本架構"></a>基本架構</h2><p>一條典型的 RISC-V 語句由 3 部分組成：</p>
 <blockquote>
 <p>[ label: ] [ operation ] [ comment ]</p>
@@ -1519,1184 +1288,113 @@
 <p>最後執行 <code>mret</code> 返回，進到 Task B：</p>
 <p><img src="https://hackmd.io/_uploads/rksBnrn_a.png" alt="image"></p>
 
-    </article>
-    <!-- license -->
+    </div>
+
     
-        <div class="license-wrapper">
-            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
-            <p>原文連結：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/</a>
-            <p>發布日期：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">June 17th 2023, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2023/06/17/OS/OSDI/risc-v_osdi/">March 21st 2024, 12:13:12 pm</a>
-            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
-        </div>
     
-    <!-- paginator -->
-    <ul class="post-paginator">
-        <li class="next">
-            
-                <div class="nextSlogan">Next Post</div>
-                <a href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/" title="礦坑系列 ── Indirect through null pointer">
-                    <div class="nextTitle">礦坑系列 ── Indirect through null pointer</div>
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSDI/" rel="tag"># OSDI</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/01/09/security/PE_file_format/" rel="prev" title="PE file format">
+                  <i class="fa fa-angle-left"></i> PE file format
                 </a>
-            
-        </li>
-        <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href="/2023/01/09/security/PE_file_format/" title="PE file format">
-                    <div class="prevTitle">PE file format</div>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/" rel="next" title="礦坑系列 ── Indirect through null pointer">
+                  礦坑系列 ── Indirect through null pointer <i class="fa fa-angle-right"></i>
                 </a>
-            
-        </li>
-    </ul>
-    <!-- comment -->
-    
-        <div class="post-comment">
-            <!-- 来必力 City 版安装代码 -->
-
-
-            
-
-            
-
-            
-
-            <!-- utteranc评论 -->
-
-
-            <!-- partial('_partial/comment/changyan') -->
-            <!--PC版-->
-
-
-            
-            
-
-            
-
-        </div>
-    
-    <!-- timeliness note -->
-    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
-    
-    <!-- Mathjax -->
-    
-        
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-            }
-        };
-    </script>
-
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
-
-
-    
-</main>
-
-                <!-- profile -->
-                
             </div>
-            <footer class="footer footer-unloaded">
-    <!-- social  -->
-    
-        <div class="social">
-            
-    
-        
-            
-                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
-            
-        
-    
-        
-            
-                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-            
-                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
-            
-        
-    
-        
-            
-                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
-            
-        
-    
-        
-            
-                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-
-
-        </div>
-    
-    <!-- powered by Hexo  -->
-    <div class="copyright">
-        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
-    </div>
-    <!-- website approve for Chinese user -->
-    
-    <!-- 不蒜子  -->
-    
-        <div class="busuanzi-container">
-            
-             
-                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
-            
-        </div>
-    	
-</footer>
-
-        </div>
-        <!-- toc -->
-        
-            <div class="toc-wrapper toc-wrapper-loding" style=
-
-
-
-
-
-
-
-    top:50vh;
-
->
-                <div class="toc-catalog">
-                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
-                </div>
-                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RVOS-OSDI-%E7%AD%86%E8%A8%98"><span class="toc-number">1.</span> <span class="toc-text">RVOS OSDI 筆記</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84-RISC-V-%E7%AD%86%E8%A8%98"><span class="toc-number">2.</span> <span class="toc-text">常用的 RISC-V 筆記</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%9E%B6%E6%A7%8B"><span class="toc-number">2.1.</span> <span class="toc-text">基本架構</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#label-%E6%A8%99%E7%B1%A4"><span class="toc-number">2.1.1.</span> <span class="toc-text">label(標籤)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#operation"><span class="toc-number">2.1.2.</span> <span class="toc-text">operation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E7%9A%84%E6%93%8D%E4%BD%9C%E5%B0%8D%E8%B1%A1"><span class="toc-number">2.2.</span> <span class="toc-text">指令的操作對象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E7%B7%A8%E7%A2%BC%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text">指令編碼格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E8%A1%93%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Arithmetic-Instruction"><span class="toc-number">2.4.</span> <span class="toc-text">算術運算指令(Arithmetic Instruction)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ADD"><span class="toc-number">2.4.1.</span> <span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SUB"><span class="toc-number">2.4.2.</span> <span class="toc-text">SUB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ADDI-ADD-Immediate"><span class="toc-number">2.4.3.</span> <span class="toc-text">ADDI (ADD Immediate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LUI-Load-Upper-Immediate"><span class="toc-number">2.4.4.</span> <span class="toc-text">LUI (Load Upper Immediate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AUIPC"><span class="toc-number">2.4.5.</span> <span class="toc-text">AUIPC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction"><span class="toc-number">2.4.6.</span> <span class="toc-text">相關的 pseudo-instruction</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NEG"><span class="toc-number">2.4.6.1.</span> <span class="toc-text">NEG</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MV"><span class="toc-number">2.4.6.2.</span> <span class="toc-text">MV</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LI-Load-Immediate"><span class="toc-number">2.4.6.3.</span> <span class="toc-text">LI (Load Immediate)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LA-Load-Address"><span class="toc-number">2.4.6.4.</span> <span class="toc-text">LA (Load Address)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NOP-%E7%A9%BA%E6%8C%87%E4%BB%A4"><span class="toc-number">2.4.6.5.</span> <span class="toc-text">NOP (空指令)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%8F%E8%BC%AF%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Logical-Instructions"><span class="toc-number">2.5.</span> <span class="toc-text">邏輯運算指令 (Logical Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AND"><span class="toc-number">2.5.1.</span> <span class="toc-text">AND</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OR"><span class="toc-number">2.5.2.</span> <span class="toc-text">OR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XOR"><span class="toc-number">2.5.3.</span> <span class="toc-text">XOR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ANDI"><span class="toc-number">2.5.4.</span> <span class="toc-text">ANDI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ORI"><span class="toc-number">2.5.5.</span> <span class="toc-text">ORI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XORI"><span class="toc-number">2.5.6.</span> <span class="toc-text">XORI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-1"><span class="toc-number">2.5.7.</span> <span class="toc-text">相關的 pseudo-instruction</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NOT"><span class="toc-number">2.5.7.1.</span> <span class="toc-text">NOT</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A7%BB%E4%BD%8D%E9%81%8B%E7%AE%97%E6%8C%87%E4%BB%A4-Shifting-Instructions"><span class="toc-number">2.6.</span> <span class="toc-text">移位運算指令 (Shifting Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SLL-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB"><span class="toc-number">2.6.1.</span> <span class="toc-text">SLL (邏輯左移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRL-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB"><span class="toc-number">2.6.2.</span> <span class="toc-text">SRL (邏輯右移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SLLI-%E9%82%8F%E8%BC%AF%E5%B7%A6%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.3.</span> <span class="toc-text">SLLI (邏輯左移常數)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRLI-%E9%82%8F%E8%BC%AF%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.4.</span> <span class="toc-text">SRLI (邏輯右移常數)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRA-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB"><span class="toc-number">2.6.5.</span> <span class="toc-text">SRA (算術右移)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SRAI-%E7%AE%97%E8%A1%93%E5%8F%B3%E7%A7%BB%E5%B8%B8%E6%95%B8"><span class="toc-number">2.6.6.</span> <span class="toc-text">SRAI (算術右移常數)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E8%AE%80%E5%AF%AB%E6%8C%87%E4%BB%A4-Load-and-Store-Instructions"><span class="toc-number">2.7.</span> <span class="toc-text">記憶體讀寫指令 (Load and Store Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LB"><span class="toc-number">2.7.1.</span> <span class="toc-text">LB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LBU"><span class="toc-number">2.7.2.</span> <span class="toc-text">LBU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LH"><span class="toc-number">2.7.3.</span> <span class="toc-text">LH</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LHU"><span class="toc-number">2.7.4.</span> <span class="toc-text">LHU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LW"><span class="toc-number">2.7.5.</span> <span class="toc-text">LW</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SB"><span class="toc-number">2.7.6.</span> <span class="toc-text">SB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SH"><span class="toc-number">2.7.7.</span> <span class="toc-text">SH</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SW"><span class="toc-number">2.7.8.</span> <span class="toc-text">SW</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E6%8C%87%E4%BB%A4-Conditional-Branch-Instructions"><span class="toc-number">2.8.</span> <span class="toc-text">分支指令 (Conditional Branch Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BEQ"><span class="toc-number">2.8.1.</span> <span class="toc-text">BEQ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BNE"><span class="toc-number">2.8.2.</span> <span class="toc-text">BNE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLT"><span class="toc-number">2.8.3.</span> <span class="toc-text">BLT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLTU"><span class="toc-number">2.8.4.</span> <span class="toc-text">BLTU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGE"><span class="toc-number">2.8.5.</span> <span class="toc-text">BGE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGEU"><span class="toc-number">2.8.6.</span> <span class="toc-text">BGEU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E9%97%9C%E7%9A%84-pseudo-instruction-2"><span class="toc-number">2.8.7.</span> <span class="toc-text">相關的 pseudo-instruction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLE"><span class="toc-number">2.8.8.</span> <span class="toc-text">BLE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLEU"><span class="toc-number">2.8.9.</span> <span class="toc-text">BLEU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGT"><span class="toc-number">2.8.10.</span> <span class="toc-text">BGT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGTU"><span class="toc-number">2.8.11.</span> <span class="toc-text">BGTU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BEQZ"><span class="toc-number">2.8.12.</span> <span class="toc-text">BEQZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BNEZ"><span class="toc-number">2.8.13.</span> <span class="toc-text">BNEZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLTZ"><span class="toc-number">2.8.14.</span> <span class="toc-text">BLTZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BLEZ"><span class="toc-number">2.8.15.</span> <span class="toc-text">BLEZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGTZ"><span class="toc-number">2.8.16.</span> <span class="toc-text">BGTZ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BGEZ"><span class="toc-number">2.8.17.</span> <span class="toc-text">BGEZ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%A1%E6%A2%9D%E4%BB%B6%E8%B7%B3%E8%BD%89-Unconditional-Jump-Instructions"><span class="toc-number">2.9.</span> <span class="toc-text">無條件跳轉 (Unconditional Jump Instructions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JAL-Jump-And-Link"><span class="toc-number">2.9.1.</span> <span class="toc-text">JAL (Jump And Link)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JALR-Jump-And-Link-Register"><span class="toc-number">2.9.2.</span> <span class="toc-text">JALR (Jump And Link Register)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OS-Development"><span class="toc-number">3.</span> <span class="toc-text">OS Development</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%80%E5%8F%96-CSR"><span class="toc-number">3.1.</span> <span class="toc-text">讀取 CSR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A-UART"><span class="toc-number">3.2.</span> <span class="toc-text">設定 UART</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E7%AE%A1%E7%90%86"><span class="toc-number">3.3.</span> <span class="toc-text">記憶體管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#multitask-and-context-switch"><span class="toc-number">3.4.</span> <span class="toc-text">multitask and context switch</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#multitask"><span class="toc-number">3.4.1.</span> <span class="toc-text">multitask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#type-of-multitask"><span class="toc-number">3.4.2.</span> <span class="toc-text">type of multitask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cooperative-Multitasking"><span class="toc-number">3.4.3.</span> <span class="toc-text">Cooperative Multitasking</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trap-Exception"><span class="toc-number">3.5.</span> <span class="toc-text">Trap &amp; Exception</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%95%B0%E5%B8%B8%E6%8E%A7%E5%88%B6%E6%B5%81-Exceptional-Control-Flow"><span class="toc-number">3.5.1.</span> <span class="toc-text">異常控制流(Exceptional Control Flow)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Machine-mode-%E4%B8%8B%E7%9A%84-CSR"><span class="toc-number">3.5.2.</span> <span class="toc-text">Machine mode 下的 CSR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtvec-Machine-Trap-Vector-Base-Address"><span class="toc-number">3.5.3.</span> <span class="toc-text">mtvec (Machine Trap-Vector Base-Address)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mepc-Machine-Exception-Program-Counter"><span class="toc-number">3.5.4.</span> <span class="toc-text">mepc (Machine Exception Program Counter)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mcause-Machine-Cause"><span class="toc-number">3.5.5.</span> <span class="toc-text">mcause (Machine Cause)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtval-Machine-Trap-Value"><span class="toc-number">3.5.6.</span> <span class="toc-text">mtval (Machine Trap Value)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mstatus-Machine-Status"><span class="toc-number">3.5.7.</span> <span class="toc-text">mstatus (Machine Status)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trap-%E8%99%95%E7%90%86%E6%B5%81%E7%A8%8B"><span class="toc-number">3.6.</span> <span class="toc-text">Trap 處理流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Trap-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.6.1.</span> <span class="toc-text">Trap 初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#top-half"><span class="toc-number">3.6.2.</span> <span class="toc-text">top half</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bottom-half"><span class="toc-number">3.6.3.</span> <span class="toc-text">Bottom half</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%9E-Trap-%E8%BF%94%E5%9B%9E"><span class="toc-number">3.6.4.</span> <span class="toc-text">從 Trap 返回</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interrupt"><span class="toc-number">3.7.</span> <span class="toc-text">Interrupt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Interrupt-%E5%88%86%E9%A1%9E"><span class="toc-number">3.7.1.</span> <span class="toc-text">Interrupt 分類</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mie-%E8%88%87-mip"><span class="toc-number">3.7.2.</span> <span class="toc-text">mie 與 mip</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PLIC"><span class="toc-number">3.7.3.</span> <span class="toc-text">PLIC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Priority"><span class="toc-number">3.7.4.</span> <span class="toc-text">Priority</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pending"><span class="toc-number">3.7.5.</span> <span class="toc-text">Pending</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable"><span class="toc-number">3.7.6.</span> <span class="toc-text">Enable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Threshold"><span class="toc-number">3.7.7.</span> <span class="toc-text">Threshold</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claim-Complete"><span class="toc-number">3.7.8.</span> <span class="toc-text">Claim&#x2F;Complete</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PLIC-%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.7.9.</span> <span class="toc-text">PLIC 操作流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UART-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-number">3.7.10.</span> <span class="toc-text">UART 的例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#timer-interrupt"><span class="toc-number">3.8.</span> <span class="toc-text">timer interrupt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mtime"><span class="toc-number">3.8.1.</span> <span class="toc-text">mtime</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mtimecmp"><span class="toc-number">3.8.2.</span> <span class="toc-text">mtimecmp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MSIP"><span class="toc-number">3.8.3.</span> <span class="toc-text">MSIP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CLINT-Time-Interrupt"><span class="toc-number">3.8.4.</span> <span class="toc-text">CLINT Time Interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-number">3.8.5.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Preemtive-Multitasking"><span class="toc-number">3.9.</span> <span class="toc-text">Preemtive Multitasking</span></a></li></ol></li></ol>
-            </div>
-        
-        <!-- sidebar -->
-        <div class="sidebar sidebar-hide">
-    <ul class="sidebar-tabs sidebar-tabs-active-0">
-        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
-        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
-        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
-    </ul>
-    <div class="sidebar-content sidebar-content-show-archive">
-        <div class="sidebar-panel-archives">
-    <!-- 在 ejs 中将 archive 按照时间排序 -->
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    
-    
-    <div class="total-and-search">
-        <div class="total-archive">
-        Total : 39
-        </div>
-        <!-- search  -->
-        
-            <div class="site-search site-search-loading popup-trigger">
-                <span class="iconfont-archer search-icon">&#xe627;</span>
-            </div>
-        
-    </div>
-    
-    <div class="post-archive">
-    
-        
-            
-            
-            <div class="archive-year"> 2023 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/13</span>
-            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/20</span>
-            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/14</span>
-            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">08/12</span>
-            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/17</span>
-            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">01/09</span>
-            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2022 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/01</span>
-            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/23</span>
-            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/21</span>
-            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/19</span>
-            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/28</span>
-            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/22</span>
-            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/14</span>
-            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/25</span>
-            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/24</span>
-            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/06</span>
-            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2021 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/20</span>
-            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/15</span>
-            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/17</span>
-            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/15</span>
-            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/06</span>
-            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/13</span>
-            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/12</span>
-            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/14</span>
-            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/27</span>
-            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/01</span>
-            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
-        </li>
-    
-    </div>
+          </div>
+    </footer>
+  </article>
 </div>
 
-        <div class="sidebar-panel-tags">
-    <div class="sidebar-tags-name">
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="Linux">
-                <span class="iconfont-archer">&#xe606;</span>
-                Linux
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OS">
-                <span class="iconfont-archer">&#xe606;</span>
-                OS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="ROS">
-                <span class="iconfont-archer">&#xe606;</span>
-                ROS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="memory">
-                <span class="iconfont-archer">&#xe606;</span>
-                memory
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="miscellaneous">
-                <span class="iconfont-archer">&#xe606;</span>
-                miscellaneous
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="numerical_algebra">
-                <span class="iconfont-archer">&#xe606;</span>
-                numerical_algebra
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="security">
-                <span class="iconfont-archer">&#xe606;</span>
-                security
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner-BlackMagic
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OSDI">
-                <span class="iconfont-archer">&#xe606;</span>
-                OSDI
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner_tutorial
-            </span>
-        
-    </div>
-    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
-    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
-        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
-    </div> 
-    <div class="sidebar-tags-list"></div>
-</div>
 
-        <div class="sidebar-panel-categories">
-    <div class="sidebar-categories-name">
-    
-        <span class="sidebar-category-name" data-categories="C++ Miner">
-            <span class="iconfont-archer">&#xe60a;</span>
-            C++ Miner
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="Linux">
-            <span class="iconfont-archer">&#xe60a;</span>
-            Linux
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="OS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            OS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="ROS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            ROS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="memory">
-            <span class="iconfont-archer">&#xe60a;</span>
-            memory
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="miscellaneous">
-            <span class="iconfont-archer">&#xe60a;</span>
-            miscellaneous
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="numerical_algebra">
-            <span class="iconfont-archer">&#xe60a;</span>
-            numerical_algebra
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="security">
-            <span class="iconfont-archer">&#xe60a;</span>
-            security
-        </span>
-    
-    </div>
-    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
-    <div class="sidebar-categories-list"></div>
+
+
+
+
 </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">162k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">9:47</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
 
     </div>
-</div>
+  </footer>
 
-        <!-- site-meta -->
-        <script>
-    var siteMetaRoot = "/"
-    if (siteMetaRoot === "undefined") {
-        siteMetaRoot = '/'
-    }
-    var siteMeta = {
-        url: "https://mes0903.github.io",
-        root: siteMetaRoot,
-        author: "Mes"
-    }
-</script>
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
-        <!-- import experimental options here -->
-        <!-- Custom Font -->
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
 
-        <!-- main func -->
-        <script src="/scripts/main.js?v=20211217"></script>
-        <!-- dark mode -->
-        <script src="/scripts/dark.js?v=20211217"></script>
-        <!-- fancybox -->
-        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
-        <!-- algolia -->
-        
-            <div class="site-search site-search-loading">
-    <div class="algolia-popup popup">
-        <div class="algolia-search">
-            <div class="algolia-search-input-icon">
-                <i class="fa fa-search"></i>
-            </div>
-            <div class="algolia-search-input" id="algolia-search-input"></div>
-            <div class="popup-btn-close">
-                <i class="iconfont-archer">&#xe609;</i>
-            </div>
-        </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
-        <div class="algolia-results">
-            <div id="algolia-stats" class="algolia-stats"></div>
-            <div id="algolia-hits"></div>
-            <div id="algolia-pagination" class="algolia-pagination"></div>
-        </div>
-    </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
-            <script src="/scripts/search.js?v=20211217" defer></script>
-        
-        <!-- busuanzi -->
-        
-            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
-        
-        <!-- CNZZ -->
-        
-        <!-- async load share.js -->
-        
-            <script src="/scripts/share.js?v=20211217" async></script>
-        
-        <!-- mermaid -->
-        
-            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
-            <script>
-                if (window.mermaid) {
-                    mermaid.initialize({theme: 'dark'});
-                }
-            </script>
-        
-    </body>
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
 </html>

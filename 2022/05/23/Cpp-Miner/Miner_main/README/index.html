@@ -1,527 +1,294 @@
 <!DOCTYPE html>
 <html lang="zh">
-    <!-- title -->
-
-
-    
-
-<!-- keywords -->
-
-
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="author" content="Mes">
-    <meta name="renderer" content="webkit">
-    <meta name="copyright" content="Mes">
-    
-        <meta name="keywords" content="Mes,Cpp Miner,C++ Miner">
-    
-    <meta name="description" content="">
-    <meta name="description" content="礦坑系列 ── C++03 ~ C++17 主要變化介紹     點此回到礦坑系列首頁：首頁   Modern Cpp 在追求什麼?來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static&#x2F;compile time error 等議題，並包含了如 functional language 的特性">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/uploads/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Ina-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Ina-16x16.png">
+  <link rel="mask-icon" href="/uploads/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="就... 介紹，當初演講的講稿整理出來的介紹文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="礦坑系列 ── C++03 ~ C++17 主要變化介紹">
 <meta property="og:url" content="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/index.html">
 <meta property="og:site_name" content="Mes&#39;s Studio">
-<meta property="og:description" content="礦坑系列 ── C++03 ~ C++17 主要變化介紹     點此回到礦坑系列首頁：首頁   Modern Cpp 在追求什麼?來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static&#x2F;compile time error 等議題，並包含了如 functional language 的特性">
+<meta property="og:description" content="就... 介紹，當初演講的講稿整理出來的介紹文">
 <meta property="og:locale">
 <meta property="og:image" content="https://i.imgur.com/CKnBgQN.png">
 <meta property="article:published_time" content="2022-05-23T00:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-21T10:54:52.675Z">
+<meta property="article:modified_time" content="2024-03-27T15:21:00.104Z">
 <meta property="article:author" content="Mes">
 <meta property="article:tag" content="C++ Miner">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://i.imgur.com/CKnBgQN.png">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link rel="icon" href="/assets/Ina.ico">
-    
-    <title>礦坑系列 ── C++03 ~ C++17 主要變化介紹 · Mes&#39;s Studio</title>
-    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
-/* This file is meant as a standalone workflow for
-- testing support for link[rel=preload]
-- enabling async CSS loading in browsers that do not support rel=preload
-- applying rel preload css once loaded, whether supported or not.
-*/ -->
-<script>
-    (function (w) {
-        'use strict'
-        // rel=preload support test
-        if (!w.loadCSS) {
-            w.loadCSS = function () {}
-        }
-        // define on the loadCSS obj
-        var rp = (loadCSS.relpreload = {})
-        // rel=preload feature support test
-        // runs once and returns a function for compat purposes
-        rp.support = (function () {
-            var ret
-            try {
-                ret = w.document.createElement('link').relList.supports('preload')
-            } catch (e) {
-                ret = false
-            }
-            return function () {
-                return ret
-            }
-        })()
 
-        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
-        // then change that media back to its intended value on load
-        rp.bindMediaToggle = function (link) {
-            // remember existing media attr for ultimate state, or default to 'all'
-            var finalMedia = link.media || 'all'
 
-            function enableStylesheet() {
-                link.media = finalMedia
-            }
+<link rel="canonical" href="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/">
 
-            // bind load handlers to enable media
-            if (link.addEventListener) {
-                link.addEventListener('load', enableStylesheet)
-            } else if (link.attachEvent) {
-                link.attachEvent('onload', enableStylesheet)
-            }
 
-            // Set rel and non-applicable media type to start an async request
-            // note: timeout allows this to happen async to let rendering continue in IE
-            setTimeout(function () {
-                link.rel = 'stylesheet'
-                link.media = 'only x'
-            })
-            // also enable media after 3 seconds,
-            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
-            setTimeout(enableStylesheet, 3000)
-        }
 
-        // loop through link elements in DOM
-        rp.poly = function () {
-            // double check this to prevent external calls from running
-            if (rp.support()) {
-                return
-            }
-            var links = w.document.getElementsByTagName('link')
-            for (var i = 0; i < links.length; i++) {
-                var link = links[i]
-                // qualify links to those with rel=preload and as=style attrs
-                if (
-                    link.rel === 'preload' &&
-                    link.getAttribute('as') === 'style' &&
-                    !link.getAttribute('data-loadcss')
-                ) {
-                    // prevent rerunning on link
-                    link.setAttribute('data-loadcss', true)
-                    // bind listeners to toggle media back
-                    rp.bindMediaToggle(link)
-                }
-            }
-        }
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/","path":"2022/05/23/Cpp-Miner/Miner_main/README/","title":"礦坑系列 ── C++03 ~ C++17 主要變化介紹"}</script>
 
-        // if unsupported, run the polyfill
-        if (!rp.support()) {
-            // run once at least
-            rp.poly()
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>礦坑系列 ── C++03 ~ C++17 主要變化介紹 | Mes's Studio</title>
+  
 
-            // rerun poly on an interval until onload
-            var run = w.setInterval(rp.poly, 500)
-            if (w.addEventListener) {
-                w.addEventListener('load', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            } else if (w.attachEvent) {
-                w.attachEvent('onload', function () {
-                    rp.poly()
-                    w.clearInterval(run)
-                })
-            }
-        }
 
-        // commonjs
-        if (typeof exports !== 'undefined') {
-            exports.loadCSS = loadCSS
-        } else {
-            w.loadCSS = loadCSS
-        }
-    })(typeof global !== 'undefined' ? global : this)
-</script>
 
-    <style type="text/css">
-    @font-face {
-        font-family: 'Oswald-Regular';
-        src: url("/font/Oswald-Regular.ttf");
-    }
 
-    body {
-        margin: 0;
-    }
 
-    header,
-    footer,
-    .back-top,
-    .sidebar,
-    .container,
-    .site-intro-meta,
-    .toc-wrapper {
-        display: none;
-    }
 
-    .site-intro {
-        position: relative;
-        z-index: 3;
-        width: 100%;
-        /* height: 50vh; */
-        overflow: hidden;
-    }
 
-    .site-intro-placeholder {
-        position: absolute;
-        z-index: -2;
-        top: 0;
-        left: 0;
-        width: calc(100% + 300px);
-        height: 100%;
-        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
-        background-position: center center;
-        transform: translate3d(-226px, 0, 0);
-        animation: gradient-move 2.5s ease-out 0s infinite;
-    }
 
-    @keyframes gradient-move {
-        0% {
-            transform: translate3d(-226px, 0, 0);
-        }
-        100% {
-            transform: translate3d(0, 0, 0);
-        }
-    }
-</style>
-
-    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
-    <link rel="stylesheet" href="/css/dark.css">
-    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
-    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
-    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
-    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
-    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
-    <!-- algolia -->
-    
-        <script>
-            var hits = JSON.parse('{"per_page":10}')
-            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
-
-            var algolia = {
-                applicationID: 'JNI49E87OH',
-                apiKey: '35168ffd5aef11c69f1626ef7cadb0e1',
-                indexName: 'MesBlog',
-                hits: hits,
-                labels: labels
-            }
-        </script>
-    
-    <!-- 百度统计  -->
-    
-    <!-- Google tag (gtag.js) -->
-    
-
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 <!-- hexo injector head_end start -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.1.1"></head>
+<!-- hexo injector head_end end --></head>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        if (typeof window.$ == undefined) {
-            console.warn('jquery load from jsdelivr failed, will load local script')
-            document.write('<script src="/lib/jquery.min.js" />')
-        }
-    </script>
-    
-        <body class="post-body">
-    
-        <!-- header -->
-        <header class="header header-mobile">
-    <!-- top read progress line -->
-    <div class="header-element">
-        <div class="read-progress"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-    <!-- sidebar menu button -->
-    <div class="header-element">
-        
-            <div class="header-sidebar-menu">
-        
-            
-                <div style="padding-left: 1px;">&#xe775;</div>
-            
-        </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">stop daydreaming, keep pursuing</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
-    <!-- header actions -->
-    <div class="header-actions">
-        <!-- theme mode switch button -->
-        <span class="header-theme-btn header-element">
-            <i class="fas fa-adjust"></i>
-        </span>
-        <!-- back to home page text -->
-        <span class="home-link header-element">
-            <a href=/>Mes's Studio</a>
-        </span>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
     </div>
-    <!-- toggle banner for post layout -->
-    
-        
-            <div class="banner">
-        
-            <div class="blog-title header-element">
-                <a href="/">Mes&#39;s Studio</a>
-            </div>
-            <div class="post-title header-element">
-                <a href="#" class="post-name">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
-            </div>
-        </div>
-    
+  </div>
+
 </header>
+        
+  
+  <aside class="sidebar">
 
-        <!-- fixed footer -->
-        <footer class="footer-fixed">
-    <!-- back to top button -->
-    <div class="footer-fixed-element">
-        
-            <div class="back-top back-top-hidden">
-        
-        
-            <div>&#xe639;</div>
-        
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A4%A6%E5%9D%91%E7%B3%BB%E5%88%97-%E2%94%80%E2%94%80-C-03-C-17-%E4%B8%BB%E8%A6%81%E8%AE%8A%E5%8C%96%E4%BB%8B%E7%B4%B9"><span class="nav-number">1.</span> <span class="nav-text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Modern-Cpp-%E5%9C%A8%E8%BF%BD%E6%B1%82%E4%BB%80%E9%BA%BC"><span class="nav-number">2.</span> <span class="nav-text">Modern Cpp 在追求什麼?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-98-C-03"><span class="nav-number">3.</span> <span class="nav-text">C++ 98 &amp; C++03</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E6%A7%8B%E5%AD%90%E8%88%87%E8%A7%A3%E6%A7%8B%E5%AD%90"><span class="nav-number">3.1.</span> <span class="nav-text">建構子與解構子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAII"><span class="nav-number">3.2.</span> <span class="nav-text">RAII</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF-Template"><span class="nav-number">3.3.</span> <span class="nav-text">模板 (Template)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#algorithm"><span class="nav-number">3.4.</span> <span class="nav-text">algorithm</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-11-C-14"><span class="nav-number">4.</span> <span class="nav-text">C++11 &amp; C++14</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#auto"><span class="nav-number">4.1.</span> <span class="nav-text">auto</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ranged-for-loop"><span class="nav-number">4.2.</span> <span class="nav-text">ranged-for loop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lambda"><span class="nav-number">4.3.</span> <span class="nav-text">lambda</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#variadic-templates"><span class="nav-number">4.4.</span> <span class="nav-text">variadic templates</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E6%85%A7%E6%8C%87%E6%A8%99-smart-pointer"><span class="nav-number">4.5.</span> <span class="nav-text">智慧指標 (smart pointer)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constexpr"><span class="nav-number">4.6.</span> <span class="nav-text">constexpr</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-17"><span class="nav-number">5.</span> <span class="nav-text">C++17</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Copy-Move-Elision-%E7%9A%84%E4%BF%9D%E8%AD%89"><span class="nav-number">5.1.</span> <span class="nav-text">Copy &#x2F; Move Elision 的保證</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constexpr-%E6%96%BC-Stdlib-%E4%B8%AD%E9%96%8B%E5%A7%8B%E8%A2%AB%E6%99%AE%E9%81%8D%E6%94%AF%E6%8F%B4"><span class="nav-number">5.2.</span> <span class="nav-text">constexpr 於 Stdlib 中開始被普遍支援</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constexpr-lambda"><span class="nav-number">5.3.</span> <span class="nav-text">constexpr lambda</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#string-view"><span class="nav-number">5.4.</span> <span class="nav-text">string_view</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Class-Template-Argument-Deduction"><span class="nav-number">5.5.</span> <span class="nav-text">Class Template Argument Deduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fold-expression"><span class="nav-number">5.6.</span> <span class="nav-text">fold expression</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Structured-Bindings"><span class="nav-number">5.7.</span> <span class="nav-text">Structured Bindings</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#if-init-expressions"><span class="nav-number">5.8.</span> <span class="nav-text">if-init expressions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">6.</span> <span class="nav-text">總結</span></a></li></ol></div>
         </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Ina.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+
+        </div>
+      </div>
     </div>
-</footer>
 
-        <!-- wrapper -->
-        <div class="wrapper">
-            <div class="site-intro" style="
-
-
-
-
-
-
-
-    height:50vh;
-
-">
     
-    <!-- 主页  -->
-    
-        
-    <!-- 404页  -->
-    
-    <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/hiroi.jpg)"></div>
-    <div class="site-intro-meta">
-        <!-- 标题  -->
-        <h1 class="intro-title">
-            <!-- 主页  -->
-            
-                礦坑系列 ── C++03 ~ C++17 主要變化介紹
-            <!-- 404 -->
-            
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Ina.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="礦坑系列 ── C++03 ~ C++17 主要變化介紹 | Mes's Studio">
+      <meta itemprop="description" content="就... 介紹，當初演講的講稿整理出來的介紹文">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          礦坑系列 ── C++03 ~ C++17 主要變化介紹
         </h1>
-        <!-- 副标题 -->
-        <p class="intro-subtitle">
-            <!-- 主页副标题  -->
-            
-                
-            <!-- 404 -->
-            
-        </p>
-        <!-- 文章页 meta -->
-        
-            <div class="post-intros">
-                <!-- 文章页标签  -->
-                
-                    <div class= post-intro-tags >
-    
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="C++ Miner">C++ Miner</a>
-    
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-05-23 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-23T00:00:00+00:00">2022-05-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-03-27 15:21:00" itemprop="dateModified" datetime="2024-03-27T15:21:00+00:00">2024-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/C-Miner/" itemprop="url" rel="index"><span itemprop="name">C++ Miner</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>12 mins.</span>
+    </span>
 </div>
 
-                
-                <!-- 文章字数统计 -->
-                
-                    <div class="post-intro-read">
-                        <span>字數: <span class="post-count word-count">3.4k</span>閱讀時長: <span class="post-count reading-time">14 min</span></span>
-                    </div>
-                
-                <div class="post-intro-meta">
-                    <!-- 撰写日期 -->
-                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
-                    <span class="post-intro-time">2022/05/23</span>
-                    <!-- busuanzi -->
-                    
-                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
-                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
-                            <span id="busuanzi_value_page_pv"></span>
-                        </span>
-                    
-                    <!-- 文章分享 -->
-                    <span class="share-wrapper">
-                        <span class="iconfont-archer share-icon">&#xe71d;</span>
-                        <span class="share-text">Share</span>
-                        <ul class="share-list">
-                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
-                                <div class="share-qrcode"></div>
-                            </li>
-                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
-                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
-                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
-                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
-                        </ul>
-                    </span>
-                </div>
-            </div>
-        
-    </div>
-</div>
+            <div class="post-description">就... 介紹，當初演講的講稿整理出來的介紹文</div>
+        </div>
+      </header>
 
-            <script>
-  // get user agent
-  function getBrowserVersions() {
-    var u = window.navigator.userAgent
-    return {
-      userAgent: u,
-      trident: u.indexOf('Trident') > -1, //IE内核
-      presto: u.indexOf('Presto') > -1, //opera内核
-      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
-      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
-      iPad: u.indexOf('iPad') > -1, //是否为iPad
-      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
-      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
-      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
-    }
-  }
-  var browser = {
-    versions: getBrowserVersions(),
-  }
-  console.log('userAgent: ' + browser.versions.userAgent)
-
-  // callback
-  function fontLoaded() {
-    console.log('font loaded')
-    if (document.getElementsByClassName('site-intro-meta')) {
-      document
-        .getElementsByClassName('intro-title')[0]
-        .classList.add('intro-fade-in')
-      document
-        .getElementsByClassName('intro-subtitle')[0]
-        .classList.add('intro-fade-in')
-      var postIntros = document.getElementsByClassName('post-intros')[0]
-      if (postIntros) {
-        postIntros.classList.add('post-fade-in')
-      }
-    }
-  }
-
-  // UC不支持跨域，所以直接显示
-  function asyncCb() {
-    if (browser.versions.uc) {
-      console.log('UCBrowser')
-      fontLoaded()
-    } else {
-      WebFont.load({
-        custom: {
-          families: ['Oswald-Regular'],
-        },
-        loading: function () {
-          // 所有字体开始加载
-          // console.log('font loading');
-        },
-        active: function () {
-          // 所有字体已渲染
-          fontLoaded()
-        },
-        inactive: function () {
-          // 字体预加载失败，无效字体或浏览器不支持加载
-          console.log('inactive: timeout')
-          fontLoaded()
-        },
-        timeout: 5000, // Set the timeout to two seconds
-      })
-    }
-  }
-
-  function asyncErr() {
-    console.warn('script load from CDN failed, will load local script')
-  }
-
-  // load webfont-loader async, and add callback function
-  function async(u, cb, err) {
-    var d = document,
-      t = 'script',
-      o = d.createElement(t),
-      s = d.getElementsByTagName(t)[0]
-    o.src = u
-    if (cb) {
-      o.addEventListener(
-        'load',
-        function (e) {
-          cb(null, e)
-        },
-        false
-      )
-    }
-    if (err) {
-      o.addEventListener(
-        'error',
-        function (e) {
-          err(null, e)
-        },
-        false
-      )
-    }
-    s.parentNode.insertBefore(o, s)
-  }
-
-  var asyncLoadWithFallBack = function (arr, success, reject) {
-    var currReject = function () {
-      reject()
-      arr.shift()
-      if (arr.length) async(arr[0], success, currReject)
-    }
-
-    async(arr[0], success, currReject)
-  }
-
-  asyncLoadWithFallBack(
-    [
-      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
-      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
-      "/lib/webfontloader.min.js",
-    ],
-    asyncCb,
-    asyncErr
-  )
-</script>
-
-            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
-            <div class="container container-unloaded">
-                <main class="main post-page">
-    <article class="article-entry">
-        <h1><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> 礦坑系列 ── C++03 ~ C++17 主要變化介紹 <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></h1>  
-
-<p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong>  </p>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="礦坑系列-──-C-03-C-17-主要變化介紹"><a href="#礦坑系列-──-C-03-C-17-主要變化介紹" class="headerlink" title="礦坑系列 ── C++03 ~ C++17 主要變化介紹"></a>礦坑系列 ── C++03 ~ C++17 主要變化介紹</h1><p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong>  </p>
 <h1 id="Modern-Cpp-在追求什麼"><a href="#Modern-Cpp-在追求什麼" class="headerlink" title="Modern Cpp 在追求什麼?"></a>Modern Cpp 在追求什麼?</h1><p>來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static&#x2F;compile time error 等議題，並包含了如 functional language 的特性進來，已經與以往的 Cpp 長的完全不一樣了。  </p>
 <p>如果要我講個我認為 Modern C++ 最重要的東西出來，我會選 RAII 與 move，在 modern C++ 前你會在 code 裡面發現許多的 new&#x2F;delete 與複製，這代表我們時常需要手動確保我們資源的生命週期，而 RAII 與 move 幫助我們做了這件事，而且做得很好，但也因此 C++ 的核心觀念有些改動。  </p>
 <p>這種例子在近代 C++ 內很多，然後在眾多改動中我覺得這個是最重要的改動，且其他大部分的改動其實都是語法糖，不過 spec 會對這個語法糖進行類似「語意」上的定義，或說某些條件，有點像在自己定義出新的概念，並繼續在此概念上疊上新的概念，但本質上整個都是語法糖，也因此語意在 C++ 內是個很重要的因素，但我有看見許多人並不清楚他在使用的語意為何，又或說「味道」更為精確。  </p>
-<p>這邊提供一個工具叫做 C++ Insights <a target="_blank" rel="noopener" href="https://cppinsights.io/">(連結)</a>，這個網站可以看見 Compiler 實際上看到的 code 「大概」長怎樣，這解析出來的結果基本上都很接近了，不過因為這還是一個 interpretation 的東西，所以可能還是有小差別，但很好用了，舉個例子，大家常說的 lambda 其實是語法糖，本質上是個匿名 class：  </p>
+<p>這邊提供一個工具叫做 C++ Insights <span class="exturl" data-url="aHR0cHM6Ly9jcHBpbnNpZ2h0cy5pby8=">(連結)<i class="fa fa-external-link-alt"></i></span>，這個網站可以看見 Compiler 實際上看到的 code 「大概」長怎樣，這解析出來的結果基本上都很接近了，不過因為這還是一個 interpretation 的東西，所以可能還是有小差別，但很好用了，舉個例子，大家常說的 lambda 其實是語法糖，本質上是個匿名 class：  </p>
 <p>輸入：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  []()&#123;&#125;;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
@@ -530,7 +297,7 @@
 
 <p>非常好用~~  </p>
 <p>接下來我就介紹一下 Jason Turner 整理的例子，看一下 Modern C++ 內 C++03 到 C++17 有什麼重要的東西 &amp; 概念，不會講太深，簡單介紹一下而已。  </p>
-<h1 id="C-98-C-03"><a href="#C-98-C-03" class="headerlink" title="C++ 98 &amp; C++03"></a>C++ 98 &amp; C++03</h1><p>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=78Y_LRZPVRg">C++ Weekly - Ep 173 - The Important Parts of C++98 in 13 Minutes</a>  </p>
+<h1 id="C-98-C-03"><a href="#C-98-C-03" class="headerlink" title="C++ 98 &amp; C++03"></a>C++ 98 &amp; C++03</h1><p>source：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj03OFlfTFJaUFZSZw==">C++ Weekly - Ep 173 - The Important Parts of C++98 in 13 Minutes<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="建構子與解構子"><a href="#建構子與解構子" class="headerlink" title="建構子與解構子"></a>建構子與解構子</h2><p>最初許多人稱 C++ 為 C with Object Oriented 的原因就是因為 C++ 引入了對物件導向的支援，我們能夠自己定義一個型態，這個型態的物件被建構出來時會去呼叫建構子，當物件被解構時會去呼叫解構子：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;T()&quot;</span>); &#125;  </span><br><span class="line">  ~<span class="built_in">T</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~T()&quot;</span>); &#125;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
 
@@ -542,7 +309,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before scope  </span><br><span class="line">T()          </span><br><span class="line">~T()         </span><br><span class="line">after scope  </span><br></pre></td></tr></table></figure>
 
 <p>在物件建構時，就會自動去呼叫建構子進行建構，在離開物件對應的 scope 時，會自動進行資源的回收，因此呼叫解構子，這就是 RAII 最主要的概念，這用在 <code>fstream</code>、<code>mutex</code> 等物件上十分好用。  </p>
-<p>讀更多：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34660259">c++经验之谈一：RAII原理介绍</a>  </p>
+<p>讀更多：<span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC8zNDY2MDI1OQ==">c++经验之谈一：RAII原理介绍<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="模板-Template"><a href="#模板-Template" class="headerlink" title="模板 (Template)"></a>模板 (Template)</h2><p>模板是 metaprogramming 的基礎之一，他可以幫助我們生成 code，看下面這個例子：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> First, <span class="keyword">typename</span> Second&gt;  </span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">T</span>&#123;  </span><br><span class="line">  First i;  </span><br><span class="line">  Second j;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
 
@@ -550,14 +317,14 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">T</span> &#123;  </span><br><span class="line">  <span class="type">int</span> i;  </span><br><span class="line">  <span class="type">bool</span> j;  </span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
 
 <p>template 是個大坑，越後面的版本可以玩的越花俏，另外 template 是圖靈完備的，十分有趣。  </p>
-<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/189172/c-templates-turing-complete">C++ templates Turing-complete?</a>  </p>
-<p>順代一提，<code>printf</code> 也是圖靈完備的，有個東西甚至叫 printf-oriented programming，有興趣的可以看看：<a target="_blank" rel="noopener" href="https://github.com/carlini/printf-tac-toe">printf-tac-toe</a>，他只用 <code>printf</code> 就寫了一個圈圈叉叉的遊戲，黑魔法。  </p>
+<p>額外閱讀：<span class="exturl" data-url="aHR0cHM6Ly9zdGFja292ZXJmbG93LmNvbS9xdWVzdGlvbnMvMTg5MTcyL2MtdGVtcGxhdGVzLXR1cmluZy1jb21wbGV0ZQ==">C++ templates Turing-complete?<i class="fa fa-external-link-alt"></i></span>  </p>
+<p>順代一提，<code>printf</code> 也是圖靈完備的，有個東西甚至叫 printf-oriented programming，有興趣的可以看看：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2NhcmxpbmkvcHJpbnRmLXRhYy10b2U=">printf-tac-toe<i class="fa fa-external-link-alt"></i></span>，他只用 <code>printf</code> 就寫了一個圈圈叉叉的遊戲，黑魔法。  </p>
 <h2 id="algorithm"><a href="#algorithm" class="headerlink" title="algorithm"></a>algorithm</h2><p>在 C++98 後我們可以使用 standard algorithm：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span>  </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; vec = &#123; <span class="number">3</span>, <span class="number">1</span>, <span class="number">2</span> &#125;;  </span><br><span class="line">  std::<span class="built_in">sort</span>(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>());    <span class="comment">// The elements of vec will be 1 2 3.  </span></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <p>有沒有在 standard lib 裡面是差很多的，這影響到程式的一致性。  </p>
 <h1 id="C-11-C-14"><a href="#C-11-C-14" class="headerlink" title="C++11 &amp; C++14"></a>C++11 &amp; C++14</h1><p>C++11 是一個大更新，而 C++14 則完善了 C++11，做了一些延伸，並沒有特別新增什麼東西，因此我兩個擺在一起講。  </p>
-<p>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=D5n6xMUKU3A">C++ Weekly - Ep 176 - Important Parts of C++11 in 12 Minutes</a><br>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=mXxNvaEdNHI">C++ Weekly - Ep 178 - The Important Parts of C++14 In 9 Minutes</a>  </p>
+<p>source：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1ENW42eE1VS1UzQQ==">C++ Weekly - Ep 176 - Important Parts of C++11 in 12 Minutes<i class="fa fa-external-link-alt"></i></span><br>source：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1tWHhOdmFFZE5ISQ==">C++ Weekly - Ep 178 - The Important Parts of C++14 In 9 Minutes<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="auto"><a href="#auto" class="headerlink" title="auto"></a>auto</h2><p>在某些情況下我們可能並不是特別在意某個物件的型態，在 C++11 後我們可以使用 auto，舉個例子：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span>  </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">count_things</span><span class="params">(<span class="type">const</span> std::vector&lt;<span class="type">int</span>&gt; &amp;vec, <span class="type">int</span> value)</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">const</span> <span class="keyword">auto</span> count = std::<span class="built_in">count</span>(std::<span class="built_in">begin</span>(vec), std::<span class="built_in">end</span>(vec), value);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
@@ -600,7 +367,7 @@
 <p>在 C++14 後我們可以使用 <code>make_unique</code> 來 allocate heap 段空間，這大幅減少了我們在 code 中對 <code>new</code> 的依賴性，也讓我們可以搭配 <code>auto</code> 使用：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span>  </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">allocate_memory</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="keyword">auto</span> ptr&#123;std::<span class="built_in">make_unique</span>&lt;<span class="type">int</span>&gt;(<span class="number">5</span>)&#125;;    </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
-<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/37514509/advantages-of-using-stdmake-unique-over-new-operator">Advantages of using std::make_unique over new operator</a>  </p>
+<p>額外閱讀：<span class="exturl" data-url="aHR0cHM6Ly9zdGFja292ZXJmbG93LmNvbS9xdWVzdGlvbnMvMzc1MTQ1MDkvYWR2YW50YWdlcy1vZi11c2luZy1zdGRtYWtlLXVuaXF1ZS1vdmVyLW5ldy1vcGVyYXRvcg==">Advantages of using std::make_unique over new operator<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="constexpr"><a href="#constexpr" class="headerlink" title="constexpr"></a>constexpr</h2><p><code>constexpr</code> 在 C++11 時限制非常的多，任何跟其有關的東西都需要也是 <code>constexpr</code> 的，這在後面的版本有放寬使用條件，用 <code>constexpr</code> 修飾表示這個東西可以在編譯期就被確定內容，用法大概會像這樣：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="type">int</span> <span class="title">get_value</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="keyword">return</span> <span class="number">5</span> * <span class="number">3</span>;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> value = <span class="built_in">get_value</span>();  </span><br></pre></td></tr></table></figure>
 
@@ -609,7 +376,7 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="type">int</span> <span class="title">get_value</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="type">int</span> val = <span class="number">5</span>;  </span><br><span class="line">  <span class="type">int</span> val2 = <span class="number">3</span>;  </span><br><span class="line">  <span class="keyword">return</span> val * val2;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
 <p>這在 C++11 的時候是不合法的，但在 C++14 合法。  </p>
-<h1 id="C-17"><a href="#C-17" class="headerlink" title="C++17"></a>C++17</h1><p>source：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=QpFjOlzg1r4">C++ Weekly - Ep 190 - The Important Parts of C++17 in 10 Minutes</a>  </p>
+<h1 id="C-17"><a href="#C-17" class="headerlink" title="C++17"></a>C++17</h1><p>source：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1RcEZqT2x6ZzFyNA==">C++ Weekly - Ep 190 - The Important Parts of C++17 in 10 Minutes<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="Copy-Move-Elision-的保證"><a href="#Copy-Move-Elision-的保證" class="headerlink" title="Copy &#x2F; Move Elision 的保證"></a>Copy &#x2F; Move Elision 的保證</h2><p>在 C++17 時 Copy Elision 被保證了：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span> &#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">  <span class="built_in">T</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;T()&quot;</span>); &#125;  </span><br><span class="line">  ~<span class="built_in">T</span>() &#123; <span class="built_in">puts</span>(<span class="string">&quot;~T()&quot;</span>); &#125;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="function">T <span class="title">fn</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">T</span>();  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">  T t = <span class="built_in">fn</span>();  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
 
@@ -624,8 +391,8 @@
 <h2 id="string-view"><a href="#string-view" class="headerlink" title="string_view"></a>string_view</h2><p><code>string_view</code> 是 <code>string</code> 的一個 「view」，也就是說唯讀，不可修改，以往可能會利用 <code>const std::string&amp;</code> 來傳遞，C++17 後可以使用 <code>string_view</code> 來更好的符合語意，且更解簡潔：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string_view&gt;</span>  </span></span><br><span class="line"><span class="keyword">constexpr</span> std::string_view name = <span class="string">&quot;Hello&quot;</span>;  </span><br></pre></td></tr></table></figure>
 
-<p>有關 <code>view</code> 的概念可以看看 TJSW 寫的這篇：<a target="_blank" rel="noopener" href="https://tjsw.medium.com/%E6%BD%AE-c-20-ranges-views-%E4%BD%BF%E7%94%A8-stl-%E7%9A%84%E5%85%A8%E6%96%B0%E5%A7%BF%E5%8B%A2-8007777a8da6">潮．C++20 | Ranges &amp; Views：使用 STL 的全新姿勢</a>  </p>
-<p>額外閱讀：<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/40127965/how-exactly-is-stdstring-view-faster-than-const-stdstring">How exactly is std::string_view faster than const std::string&amp;?</a>  </p>
+<p>有關 <code>view</code> 的概念可以看看 TJSW 寫的這篇：<span class="exturl" data-url="aHR0cHM6Ly90anN3Lm1lZGl1bS5jb20vJUU2JUJEJUFFLWMtMjAtcmFuZ2VzLXZpZXdzLSVFNCVCRCVCRiVFNyU5NCVBOC1zdGwtJUU3JTlBJTg0JUU1JTg1JUE4JUU2JTk2JUIwJUU1JUE3JUJGJUU1JThCJUEyLTgwMDc3NzdhOGRhNg==">潮．C++20 | Ranges &amp; Views：使用 STL 的全新姿勢<i class="fa fa-external-link-alt"></i></span>  </p>
+<p>額外閱讀：<span class="exturl" data-url="aHR0cHM6Ly9zdGFja292ZXJmbG93LmNvbS9xdWVzdGlvbnMvNDAxMjc5NjUvaG93LWV4YWN0bHktaXMtc3Rkc3RyaW5nLXZpZXctZmFzdGVyLXRoYW4tY29uc3Qtc3Rkc3RyaW5n">How exactly is std::string_view faster than const std::string&amp;?<i class="fa fa-external-link-alt"></i></span>  </p>
 <h2 id="Class-Template-Argument-Deduction"><a href="#Class-Template-Argument-Deduction" class="headerlink" title="Class Template Argument Deduction"></a>Class Template Argument Deduction</h2><p>在 C++17 後可以自動推斷 template argument 了：  </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;array&gt;</span>  </span></span><br><span class="line">std::array data&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;  </span><br></pre></td></tr></table></figure>
 
@@ -646,1169 +413,113 @@
 <p>至於要用什麼版本則是跟團隊講好就好，Modern Cpp 有很多工具能讓你方便做事，且效率不會變慢，錯誤也可以盡量在 Compile Time 找到，執行時間也可以往 Compile Time 推，然而這些對你來說也有可能不是那麼重要，此時使用熟悉的 C++03 也是一種選擇。 最近也有人開始在說可以從 Rust 入手，也是一個不錯的選擇。  </p>
 <p>語言之間並沒有太多優劣之分，希望大家不用戰語言。  </p>
 
-    </article>
-    <!-- license -->
+    </div>
+
     
-        <div class="license-wrapper">
-            <p>原文作者：<a href="https://mes0903.github.io">Mes</a>
-            <p>原文連結：<a href="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/">https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/</a>
-            <p>發布日期：<a href="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/">May 23rd 2022, 12:00:00 am</a>
-            <p>更新日期：<a href="https://mes0903.github.io/2022/05/23/Cpp-Miner/Miner_main/README/">March 21st 2024, 10:54:52 am</a>
-            <p>版權聲明：The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</p>
-        </div>
     
-    <!-- paginator -->
-    <ul class="post-paginator">
-        <li class="next">
-            
-                <div class="nextSlogan">Next Post</div>
-                <a href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/" title="礦坑系列 ── malloc、new 與 POD Type">
-                    <div class="nextTitle">礦坑系列 ── malloc、new 與 POD Type</div>
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C-Miner/" rel="tag"># C++ Miner</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/" rel="prev" title="礦坑系列 ── 黑魔法前言">
+                  <i class="fa fa-angle-left"></i> 礦坑系列 ── 黑魔法前言
                 </a>
-            
-        </li>
-        <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/" title="礦坑系列 ── 黑魔法前言">
-                    <div class="prevTitle">礦坑系列 ── 黑魔法前言</div>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/" rel="next" title="礦坑系列 ── malloc、new 與 POD Type">
+                  礦坑系列 ── malloc、new 與 POD Type <i class="fa fa-angle-right"></i>
                 </a>
-            
-        </li>
-    </ul>
-    <!-- comment -->
-    
-        <div class="post-comment">
-            <!-- 来必力 City 版安装代码 -->
-
-
-            
-
-            
-
-            
-
-            <!-- utteranc评论 -->
-
-
-            <!-- partial('_partial/comment/changyan') -->
-            <!--PC版-->
-
-
-            
-            
-
-            
-
-        </div>
-    
-    <!-- timeliness note -->
-    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
-    
-    <!-- Mathjax -->
-    
-</main>
-
-                <!-- profile -->
-                
             </div>
-            <footer class="footer footer-unloaded">
-    <!-- social  -->
-    
-        <div class="social">
-            
-    
-        
-            
-                <a href="mailto:mes900903@gmail.com" class="iconfont-archer email" title=email ></a>
-            
-        
-    
-        
-            
-                <a href="//github.com/Mes0903" class="iconfont-archer github" target="_blank" title=github></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-            
-                <a href="//www.facebook.com/Mes0903/" class="iconfont-archer facebook" target="_blank" title=facebook></a>
-            
-        
-    
-        
-            
-                <a href="//twitter.com/Mes_0903" class="iconfont-archer twitter" target="_blank" title=twitter></a>
-            
-        
-    
-        
-            
-                <a href="//www.instagram.com/mes_0903/" class="iconfont-archer instagram" target="_blank" title=instagram></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-
-
-        </div>
-    
-    <!-- powered by Hexo  -->
-    <div class="copyright">
-        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
-    </div>
-    <!-- website approve for Chinese user -->
-    
-    <!-- 不蒜子  -->
-    
-        <div class="busuanzi-container">
-            
-             
-                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
-            
-        </div>
-    	
-</footer>
-
-        </div>
-        <!-- toc -->
-        
-            <div class="toc-wrapper toc-wrapper-loding" style=
-
-
-
-
-
-
-
-    top:50vh;
-
->
-                <div class="toc-catalog">
-                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
-                </div>
-                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"> 礦坑系列 ── C++03 ~ C++17 主要變化介紹 </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Modern-Cpp-%E5%9C%A8%E8%BF%BD%E6%B1%82%E4%BB%80%E9%BA%BC"><span class="toc-number">2.</span> <span class="toc-text">Modern Cpp 在追求什麼?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-98-C-03"><span class="toc-number">3.</span> <span class="toc-text">C++ 98 &amp; C++03</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E6%A7%8B%E5%AD%90%E8%88%87%E8%A7%A3%E6%A7%8B%E5%AD%90"><span class="toc-number">3.1.</span> <span class="toc-text">建構子與解構子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAII"><span class="toc-number">3.2.</span> <span class="toc-text">RAII</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF-Template"><span class="toc-number">3.3.</span> <span class="toc-text">模板 (Template)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#algorithm"><span class="toc-number">3.4.</span> <span class="toc-text">algorithm</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-11-C-14"><span class="toc-number">4.</span> <span class="toc-text">C++11 &amp; C++14</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#auto"><span class="toc-number">4.1.</span> <span class="toc-text">auto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ranged-for-loop"><span class="toc-number">4.2.</span> <span class="toc-text">ranged-for loop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lambda"><span class="toc-number">4.3.</span> <span class="toc-text">lambda</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#variadic-templates"><span class="toc-number">4.4.</span> <span class="toc-text">variadic templates</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%99%BA%E6%85%A7%E6%8C%87%E6%A8%99-smart-pointer"><span class="toc-number">4.5.</span> <span class="toc-text">智慧指標 (smart pointer)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#constexpr"><span class="toc-number">4.6.</span> <span class="toc-text">constexpr</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-17"><span class="toc-number">5.</span> <span class="toc-text">C++17</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Copy-Move-Elision-%E7%9A%84%E4%BF%9D%E8%AD%89"><span class="toc-number">5.1.</span> <span class="toc-text">Copy &#x2F; Move Elision 的保證</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#constexpr-%E6%96%BC-Stdlib-%E4%B8%AD%E9%96%8B%E5%A7%8B%E8%A2%AB%E6%99%AE%E9%81%8D%E6%94%AF%E6%8F%B4"><span class="toc-number">5.2.</span> <span class="toc-text">constexpr 於 Stdlib 中開始被普遍支援</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#constexpr-lambda"><span class="toc-number">5.3.</span> <span class="toc-text">constexpr lambda</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#string-view"><span class="toc-number">5.4.</span> <span class="toc-text">string_view</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Class-Template-Argument-Deduction"><span class="toc-number">5.5.</span> <span class="toc-text">Class Template Argument Deduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fold-expression"><span class="toc-number">5.6.</span> <span class="toc-text">fold expression</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Structured-Bindings"><span class="toc-number">5.7.</span> <span class="toc-text">Structured Bindings</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#if-init-expressions"><span class="toc-number">5.8.</span> <span class="toc-text">if-init expressions</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B8%BD%E7%B5%90"><span class="toc-number">6.</span> <span class="toc-text">總結</span></a></li></ol>
-            </div>
-        
-        <!-- sidebar -->
-        <div class="sidebar sidebar-hide">
-    <ul class="sidebar-tabs sidebar-tabs-active-0">
-        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
-        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
-        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
-    </ul>
-    <div class="sidebar-content sidebar-content-show-archive">
-        <div class="sidebar-panel-archives">
-    <!-- 在 ejs 中将 archive 按照时间排序 -->
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    
-    
-    <div class="total-and-search">
-        <div class="total-archive">
-        Total : 39
-        </div>
-        <!-- search  -->
-        
-            <div class="site-search site-search-loading popup-trigger">
-                <span class="iconfont-archer search-icon">&#xe627;</span>
-            </div>
-        
-    </div>
-    
-    <div class="post-archive">
-    
-        
-            
-            
-            <div class="archive-year"> 2023 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/13</span>
-            <a class="archive-post-title" href="/2023/12/13/ROS/ROS_Install/">Ros Install (noetic)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/20</span>
-            <a class="archive-post-title" href="/2023/11/20/Linux/physical-address-syscall/">實作一個回傳物理位址的系統呼叫</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/14</span>
-            <a class="archive-post-title" href="/2023/11/14/memory/sw-reram/">ReRAM 與 Smith-Waterman Algorithm 介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">08/12</span>
-            <a class="archive-post-title" href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/">礦坑系列 ── Indirect through null pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/17</span>
-            <a class="archive-post-title" href="/2023/06/17/OS/OSDI/risc-v_osdi/">RVOS OSDI 筆記</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">01/09</span>
-            <a class="archive-post-title" href="/2023/01/09/security/PE_file_format/">PE file format</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2022 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/01</span>
-            <a class="archive-post-title" href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/">礦坑系列 ── Concept と SFINAE と Detection Idiom</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/">礦坑系列 ── malloc、new 與 POD Type</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/23</span>
-            <a class="archive-post-title" href="/2022/05/23/Cpp-Miner/Miner_main/README/">礦坑系列 ── C++03 ~ C++17 主要變化介紹</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/README/">礦坑系列 ── 黑魔法前言</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/">礦坑系列 ── 用 "explicit" 來偵測複製</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/22</span>
-            <a class="archive-post-title" href="/2022/05/22/Cpp-Miner/Miner_BlackMagic/SSO/README/">礦坑系列 ── Small String Optimization (SSO)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/21</span>
-            <a class="archive-post-title" href="/2022/05/21/Cpp-Miner/Miner_BlackMagic/NoConst/README/">礦坑系列 ── 四個你不該用 "const" 的時機</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/19</span>
-            <a class="archive-post-title" href="/2022/05/19/Cpp-Miner/Miner_Tutorial/OO/README/">C++ 教學系列 ── Class & 物件導向</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/28</span>
-            <a class="archive-post-title" href="/2022/04/28/Cpp-Miner/Miner_Tutorial/Class/README/">C++ 教學系列 ── Class</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/22</span>
-            <a class="archive-post-title" href="/2022/03/22/Cpp-Miner/Miner_Tutorial/Function_Memory/README/">C++ 教學系列 ── Function 與 Memory</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">03/14</span>
-            <a class="archive-post-title" href="/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/README/">C++ 教學系列 ── Array 與 Pointer</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/25</span>
-            <a class="archive-post-title" href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/">C++ 教學系列 ── Object、Expression、Statement</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/24</span>
-            <a class="archive-post-title" href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">02/06</span>
-            <a class="archive-post-title" href="/2022/02/06/OS/Process-Concept/">Ch3 Processes Concept</a>
-        </li>
-    
-        
-            
-            
-                
-                </ul>
-            
-            <div class="archive-year"> 2021 </div>
-            <ul class="year-list">
-            
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/20</span>
-            <a class="archive-post-title" href="/2021/12/20/OS/OS-Structure/">Ch2 OS Structure</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/15</span>
-            <a class="archive-post-title" href="/2021/12/15/miscellaneous/The_mind_behind_Linux/">The mind behind Linux 筆記 & 心得</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/Introduction/">Ch1 基礎概論</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">12/10</span>
-            <a class="archive-post-title" href="/2021/12/10/OS/README/">作業系統 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/17</span>
-            <a class="archive-post-title" href="/2021/11/17/ROS/ROS_Tutorial_Introduction/">ROS Tutorial Introduction</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/15</span>
-            <a class="archive-post-title" href="/2021/11/15/numerical_algebra/Power-Method/">Power Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Linear-Algebra-and-Eigenvalues/">Linear Algebra and Eigenvalues</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/07</span>
-            <a class="archive-post-title" href="/2021/11/07/numerical_algebra/Polynomials-of-Least-square/">最小平方逼近多項式(Polynomials of Least square)</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/06</span>
-            <a class="archive-post-title" href="/2021/11/06/numerical_algebra/Least-Squares/">Least Squares</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Conjugate-Gradient/">Conjugate Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/31</span>
-            <a class="archive-post-title" href="/2021/10/31/numerical_algebra/Gradient/">Gradient Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Error_Bound/">Error Bounds</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/16</span>
-            <a class="archive-post-title" href="/2021/10/16/numerical_algebra/Relaxation/">Relaxation Method</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/13</span>
-            <a class="archive-post-title" href="/2021/10/13/numerical_algebra/Gauss-Seidel/">Gauss-Seidel Metheod</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/19</span>
-            <a class="archive-post-title" href="/2021/09/19/numerical_algebra/Norm/">Norm</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">06/12</span>
-            <a class="archive-post-title" href="/2021/06/12/Cpp-Miner/Miner_main/Std_Function/README/">礦坑系列 ── std::function</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">05/14</span>
-            <a class="archive-post-title" href="/2021/05/14/Cpp-Miner/README/">礦坑系列 ── 序</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/27</span>
-            <a class="archive-post-title" href="/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/">礦坑系列 ── 值類別 Value Categoraries</a>
-        </li>
-    
-        
-        <li class="archive-post-item">
-            <span class="archive-post-date">04/01</span>
-            <a class="archive-post-title" href="/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/">礦坑系列 ── 結構化綁定 Structured Binding Declaration</a>
-        </li>
-    
-    </div>
+          </div>
+    </footer>
+  </article>
 </div>
 
-        <div class="sidebar-panel-tags">
-    <div class="sidebar-tags-name">
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="Linux">
-                <span class="iconfont-archer">&#xe606;</span>
-                Linux
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OS">
-                <span class="iconfont-archer">&#xe606;</span>
-                OS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="ROS">
-                <span class="iconfont-archer">&#xe606;</span>
-                ROS
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="memory">
-                <span class="iconfont-archer">&#xe606;</span>
-                memory
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="miscellaneous">
-                <span class="iconfont-archer">&#xe606;</span>
-                miscellaneous
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="numerical_algebra">
-                <span class="iconfont-archer">&#xe606;</span>
-                numerical_algebra
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="security">
-                <span class="iconfont-archer">&#xe606;</span>
-                security
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner-BlackMagic">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner-BlackMagic
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="OSDI">
-                <span class="iconfont-archer">&#xe606;</span>
-                OSDI
-            </span>
-        
-            <span class="sidebar-tag-name" data-tags="C++ Miner_tutorial">
-                <span class="iconfont-archer">&#xe606;</span>
-                C++ Miner_tutorial
-            </span>
-        
-    </div>
-    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
-    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
-        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
-    </div> 
-    <div class="sidebar-tags-list"></div>
-</div>
 
-        <div class="sidebar-panel-categories">
-    <div class="sidebar-categories-name">
-    
-        <span class="sidebar-category-name" data-categories="C++ Miner">
-            <span class="iconfont-archer">&#xe60a;</span>
-            C++ Miner
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="Linux">
-            <span class="iconfont-archer">&#xe60a;</span>
-            Linux
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="OS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            OS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="ROS">
-            <span class="iconfont-archer">&#xe60a;</span>
-            ROS
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="memory">
-            <span class="iconfont-archer">&#xe60a;</span>
-            memory
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="miscellaneous">
-            <span class="iconfont-archer">&#xe60a;</span>
-            miscellaneous
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="numerical_algebra">
-            <span class="iconfont-archer">&#xe60a;</span>
-            numerical_algebra
-        </span>
-    
-        <span class="sidebar-category-name" data-categories="security">
-            <span class="iconfont-archer">&#xe60a;</span>
-            security
-        </span>
-    
-    </div>
-    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
-    <div class="sidebar-categories-list"></div>
+
+
+
+
 </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">162k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">9:47</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
 
     </div>
-</div>
+  </footer>
 
-        <!-- site-meta -->
-        <script>
-    var siteMetaRoot = "/"
-    if (siteMetaRoot === "undefined") {
-        siteMetaRoot = '/'
-    }
-    var siteMeta = {
-        url: "https://mes0903.github.io",
-        root: siteMetaRoot,
-        author: "Mes"
-    }
-</script>
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
-        <!-- import experimental options here -->
-        <!-- Custom Font -->
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
 
-        <!-- main func -->
-        <script src="/scripts/main.js?v=20211217"></script>
-        <!-- dark mode -->
-        <script src="/scripts/dark.js?v=20211217"></script>
-        <!-- fancybox -->
-        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
-        <!-- algolia -->
-        
-            <div class="site-search site-search-loading">
-    <div class="algolia-popup popup">
-        <div class="algolia-search">
-            <div class="algolia-search-input-icon">
-                <i class="fa fa-search"></i>
-            </div>
-            <div class="algolia-search-input" id="algolia-search-input"></div>
-            <div class="popup-btn-close">
-                <i class="iconfont-archer">&#xe609;</i>
-            </div>
-        </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
-        <div class="algolia-results">
-            <div id="algolia-stats" class="algolia-stats"></div>
-            <div id="algolia-hits"></div>
-            <div id="algolia-pagination" class="algolia-pagination"></div>
-        </div>
-    </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
-            <script src="/scripts/search.js?v=20211217" defer></script>
-        
-        <!-- busuanzi -->
-        
-            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
-        
-        <!-- CNZZ -->
-        
-        <!-- async load share.js -->
-        
-            <script src="/scripts/share.js?v=20211217" async></script>
-        
-        <!-- mermaid -->
-        
-            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
-            <script>
-                if (window.mermaid) {
-                    mermaid.initialize({theme: 'dark'});
-                }
-            </script>
-        
-    </body>
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
 </html>
