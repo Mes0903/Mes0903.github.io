@@ -5646,6 +5646,179 @@ image source：RSL ROS Tutorial</center><br>
       </tags>
   </entry>
   <entry>
+    <title>礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
+    <url>/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/</url>
+    <content><![CDATA[<center><h1> <img src = "https://i.imgur.com/thmVmX6.png?w=1000"w=1000" height = 50> 礦坑系列 ── 結構化綁定 Structured Binding Declaration <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></h1></center>
+
+<p>礦坑系列首頁：<strong><a href = "https://github.com/Mes0903/Cpp-Miner" class = "redlink">首頁</a></strong></p>
+<p>hackmd 版首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a><span class = "orange">前言</span></h1><p>Structured binding declaration 是 C++17 加入的一個新特性，它讓我們能夠更簡單地去處理多個回傳值或多變數的情況，通常會在要接 tuple_like 的容器或 Struct 回傳值時搭配 auto 來使用。</p>
+<p>我盡量將原裡理解並寫在了「介紹及原理」的部分，有些部分是翻譯了官方的文件，原先只是想弄個翻譯，結果翻著翻著發現官方有些地方講的不是讓人很明白，於是就又加上了自己的文字，漸漸地就變一篇文件了，如果只想知道如何使用的朋友可以直接跳到下方的應用部分。</p>
+<h1 id="語法"><a href="#語法" class="headerlink" title="語法"></a><span class = "orange">語法</span></h1><p>主要有三種初始化的方式：</p>
+<blockquote>
+<p><strong>1. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list] &#x3D; expression;</strong> [color&#x3D;#30DCD8]</p>
+</blockquote>
+<blockquote>
+<p><strong>2. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list]{ expression };</strong>	</p>
+</blockquote>
+<blockquote>
+<p><strong>3. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list]( expression );</strong></p>
+</blockquote>
+<blockquote>
+<p>opt 代表的是 optional，可加可不加的意思。</p>
+</blockquote>
+<ul>
+<li><p><strong>attr</strong> :whale:<br>  指的是 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2F0dHJpYnV0ZXM=">attrubutes<i class="fa fa-external-link-alt"></i></span>，可加可不加。</p>
+</li>
+<li><p><strong>cv</strong> :whale:<br>  可能是<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2N2">cv-qualifier<i class="fa fa-external-link-alt"></i></span>，後方需加上 auto，需要的話也可以加上 static、thread_local 之類的<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3N0b3JhZ2VfZHVyYXRpb24=">儲存類說明符<i class="fa fa-external-link-alt"></i></span>，但不推薦使用到 volatile。</p>
+</li>
+<li><p><strong>ref-qualifier</strong> :whale:<br>  <code>&amp;</code> 或 <code>&amp;&amp;</code>，可加可不加，取決於你的需求。</p>
+</li>
+<li><p><strong>identifier-list</strong> :whale:<br>  這裡放妳要使用的變數名稱，他實際上不是變數而是標示符，它們之間需要以逗點 <code>,</code> 隔開，後方會有例子。</p>
+</li>
+<li><p><strong>expression</strong> :whale:<br>  表達式，通常會放 array、tuple-like 容器或是個沒有 union 成員的 Class，語法上會是 assignment-expression，它們不能是 <code>throw</code> 表達式，並且在 top-level 不能有逗號運算符，這裡應該是指 expression 能夠有 sub-expression，而它要的是最上層的那個 (感謝marty大佬)。 另外，expression 內的變數名不能和 identifier-list 內的變數名相同，簡單來說就是不能重複宣告同樣名字的變數。</p>
+</li>
+</ul>
+<h1 id="介紹及原理"><a href="#介紹及原理" class="headerlink" title="介紹及原理"></a><span class = "orange">介紹及原理</span></h1><p>Structed binding 會在你現在的 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3Njb3Bl">scope<i class="fa fa-external-link-alt"></i></span> 內採用你 identifier-list 裡給的標示符，並且將其連結到你 expression 裡寫的元素或子物件。採用時它會先創造出一個特殊的變數來存取你的初始化敘述(initializer)，型態取決於你的 expression，這個變數的名稱這裡我們先取作 <code>__e</code> ，由於 <code>__e</code> 可能是個容器或參考，所以我們給他取叫 initializer，沒看過這個詞的朋友不用太擔心，而 <code>__e</code> 在存取時有一些規則：</p>
+<ul>
+<li><p><strong>如果 expression 是個 A型態的 array，而且你沒有使用 ref-qualifier，那麼 <code>__e</code> 會是原先 expression 計算結果的複本，型態會是 <code>cv A</code>，cv指的就是<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2N2">cv-qualifier<i class="fa fa-external-link-alt"></i></span>。而 <code>__e</code> 內的元素會依據你使用的初始化方式(最上方寫的三種方式)來初始化。</strong></p>
+<p>  如果你使用的是第一種(<code>=</code>號)方式，那麼 <code>__e</code> 內的元素會使用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2NvcHlfaW5pdGlhbGl6YXRpb24=">複製初始化<i class="fa fa-external-link-alt"></i></span>來初始化為你 expression 內相對應的元素；</p>
+<p>  若你使用的是第二或第三種方法，那麼 <code>__e</code> 內的元素會使用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2RpcmVjdF9pbml0aWFsaXphdGlvbg==">直接初始化<i class="fa fa-external-link-alt"></i></span>來初始化為你 expression 內相對應的元素。</p>
+</li>
+<li><p><strong>如果不是上面的那種情況，那麼編譯器先將 Structured Binding 改寫，直接使用 <code>__e</code> 這個名稱作為原先 expression 的複本，像這樣：</strong></p>
+<blockquote>
+<p><strong>1. attr(opt) cv(opt) auto ref-qualifier(opt) __e &#x3D; expression;</strong> [color&#x3D;#30DCD8]<br><strong>2. attr(opt) cv(opt) auto ref-qualifier(opt) __e{ expression };</strong><br><strong>3. attr(opt) cv(opt) auto ref-qualifier(opt) __e( expression );</strong></p>
+</blockquote>
+<p>  <code>__e</code> 會是個匿名的 tuple-like 的容器(沒ref-qualifier時) 或是 tuple-like 的容器的參考(有ref-qualifier時)，簡短來說妳有寫 <code>&amp;</code> 這個 <code>__e</code> 就會是個參考，如果沒寫就是個容器。 接著編譯器會去看它是否符合 <span class="exturl" data-url="aHR0cHM6Ly90aW1zb25nLWNwcC5naXRodWIuaW8vY3Bwd3AvbjQ4NjEvZGNsLnN0cnVjdC5iaW5kIzQ=">Tuple-Like” Binding Protoco ( tuple-like 連結協定)<i class="fa fa-external-link-alt"></i></span>，簡單來說會長這樣：</p>
+<ul>
+<li><code>std::tuple_size&lt;__E&gt;::value</code> 必須是個格式正確的整數常量表達式 (integer constant expression)。</li>
+<li>identifier-list 內元素的數量必須與 <code>std::tuple_size&lt;__E&gt;::value</code> 相同。</li>
+<li>如果上面兩項有其中一項不符合，便去檢查這個 Class 的成員變數是否都為 public，如果不是(有 private 的成員變數)，則編譯錯誤</li>
+</ul>
+<p>  接著 identifier-list 內的元素便會「連結」到 <code>__e</code> 內相對應的元素，這也是妳有寫 <code>&amp;</code> 時，對 identifier-list 內的元素做改動就能改動到原容器的原因，因為 <code>__e</code> 是個參考，舉個例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::tuple&lt;<span class="type">int</span>,<span class="type">int</span>&gt; a&#123;<span class="number">1</span>,<span class="number">2</span>&#125;</span><br><span class="line"><span class="keyword">auto</span> [x,y] = a; <span class="comment">// __e 是個容器， x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br><span class="line"><span class="keyword">auto</span> &amp;[x,y] = a; <span class="comment">// __e 是 a 的左值參考，  x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br><span class="line"><span class="keyword">auto</span> &amp;&amp;[x, y] = std::<span class="built_in">make_tuple</span>( <span class="number">1</span>, <span class="number">2</span> ); <span class="comment">// __e 是右邊那個 tuple 的右值參考，x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br></pre></td></tr></table></figure>
+<p>  Code 有點長，大家可以複製下來看，在網頁上可能不太好閱讀。 可以看見內部是使用 <code>std::get&lt;&gt;()</code> 來存取元素的，因此妳的 expression 必須是個回傳 tuple-like 容器的敘述，否則妳的 <code>__e</code> 不會是個 tuple-like 的容器(或容器的參考)，那個也就無法使用 <code>std::get&lt;&gt;()</code> 了。<br>  :::info<br>  :bulb: 這邊只舉了 tuple-like 容器的例子，因為原生陣列沒有複製建構子，也就是說他不能被改寫成上面那三種樣式，也就不能用那三種方法初始化，可以看下面這個例子，它會噴錯：<br>  <br><br>  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>]&#123; <span class="number">1</span>, <span class="number">2</span> &#125;;</span><br><span class="line"><span class="type">int</span> b[<span class="number">2</span>] = a;</span><br></pre></td></tr></table></figure><br>  所以會需要另外規定方式來初始化。<br>  :::<br>  「連結」這個動作無法以 C++ 語言描述，妳可以把他想像成參考，又或是宏定義，但要記得他不是，他是 C++ 語言的本身，沒辦法用 C++ 寫出來，已經類似語言特性的概念了，就好像我們無法自己實作 function-body 的大括號一樣 (感謝Cy解釋)。<br>  :::danger<br>  :bulb: 官方文件是這麼寫的： Structured Binding 像是個參考，它是某個已經存在的物件的別名，但 Structured Binding 不是參考，它不需要是個引用類型。<br>  :::<br>  <del>挺玄學的</del>，我自己是用「類似宏定義」來理解的，底下也會如此解釋，但各位要記得它不是宏定義，也許是為了確保將標示符丟進 <code>std::remove_reference_t&lt;decltype((標示符))&gt;()</code> 時型態要與連結到的元素丟進 <code>std::remove_reference_t&lt;decltype((連結到的元素))&gt;()</code> 一樣才如此設計的。</p>
+</li>
+</ul>
+<p>接下來我會詳細的講解一下內部的原理，這裡用 <code>__E</code> 來表示 <code>__e</code> 的型態，也就是說 <code>__E</code> 為初始化敘述(initializer) 的型態，另外我們也可以說 <code>__E</code> 與 <code>std::remove_reference_t&lt;decltype((__e))&gt;</code> 等價。</p>
+<p>上述的初始化結束後，它會根據 <code>__E</code> 的狀況來進行連結，會有三種情況：</p>
+<ul>
+<li><p><strong>如果 <code>__E</code> 是個 array 型態 ，那麼 identifier-list 內的元素會與初始化敘述(initializer) 內相對應的元素連結</strong></p>
+<p>  這種情況下，每個 identifier-list 內的標示符會是一個左值(lvalue)，與初始化敘述(initializer) 內相應的元素連結，也因此，identifier-list 內的標示符數量需要與 array 內的變數數量一樣多，看一下下面這個例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> [x,y] = a;</span><br></pre></td></tr></table></figure>
+<p>  <code>auto [x,y] = a;</code> 會創建一個名字叫 <code>__e</code> 的 array <code>__e[2]</code>，利用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2NvcHlfaW5pdGlhbGl6YXRpb24=">複製初始化<i class="fa fa-external-link-alt"></i></span>來初始化 <code>__e[2]</code>，之後 x 與 y 分別會與 <code>__e[0]</code> 與 <code>__e[1]</code> 連結，你可以把他們想像成參考，或是宏定義，但要記住它們實際上不是。</p>
+<p>  如果有寫 ref-qualifier 且 expression 回傳的是 lvalue，則 identifier-list 內的元素會間接與 a 內的元素連結，對 identifier-list 內的元素的操作將會反應到 a 的元素上：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span>&amp; [x,y] = a;</span><br></pre></td></tr></table></figure>
+<p>  <code>auto&amp; [x,y] = a;</code> 會創建一個名字叫 <code>__e</code> 的參考引用 expression 的計算結果，而 identifier-list 內的元素則會透過 <code>__e</code> 間接變為 a 內元素的參考，可以把他想像成這樣：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> &amp; __e = a;    <span class="comment">// 等價於 int(&amp;e)[2] = a;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x __e[0]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y __e[1]</span></span><br></pre></td></tr></table></figure>
+<p>  而如果 expression 回傳的是 rvalue，則 identifier-list 內的元素會與 <code>__e</code> 內的元素連結：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> T = <span class="type">int</span>[<span class="number">3</span>];</span><br><span class="line"><span class="keyword">auto</span> &amp;&amp;[x, y, z] = T&#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;</span><br></pre></td></tr></table></figure>
+<p>  可以把他想像成這樣：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> &amp;&amp;__e = T&#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x __e[0]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y __e[1]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> z __e[2]</span></span><br></pre></td></tr></table></figure>
+<p>  當然上面這兩個例子都是偽代碼，內部當然不是這樣的，連結無法以 C++ 語言來描述，x 與 y 僅僅是標示符，所以不會是上面這個樣子，這只是個示意。</p>
+</li>
+<li><p><strong>如果 <code>__E</code> 是個沒有 union 成員的 Class 型態，而且 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL3V0aWxpdHkvdHVwbGUvdHVwbGVfc2l6ZQ==">std::tuple_size&lt;__E&gt;<i class="fa fa-external-link-alt"></i></span> 是個有成員的完全型(不用管這個成員的型態或可訪問性如何)，簡單來說就是 <code>__e</code> 能夠做成 tuple-like 的容器，符合 tuple-like 連結協定，那麼就會使用 tuple-like 連結協定來進行連結</strong></p>
+<p>  與前面提到的一樣，首先 <code>std::tuple_size&lt;__E&gt;::value</code> 必須是個格式正確的整數常量表達式 (integer constant expression)，並且 identifier-list 內元素的數量必須與 <code>std::tuple_size&lt;__E&gt;::value</code> 相同。</p>
+<p>  再來對於每個標示符，都會連結一個元素(也就是 <code>__e</code> 內的元素)，元素的型態會類似是 「<code>std::tuple_element&lt;i,__E&gt;::type</code> 的 “引用”」，注意它是「引用」，<code>i</code> 指的是 <code>__e</code> 內第 i 個元素，如果這個型態對應的初始化敘述(initializer) 是左值，那這個變數就會是左值引用，如果是右值那就是右值引用。</p>
+<p>  連結到的第 i 個元素詳細如下：</p>
+<ul>
+<li><p>如果通過 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL29wZXJhdG9yX21lbWJlcl9hY2Nlc3M=">Class成員訪問<i class="fa fa-external-link-alt"></i></span>的方式在 <code>__E</code> 的範圍內查找到至少一個函式模板，且這個函式模板的第一個模板參數是個 <span class="exturl" data-url="aHR0cHM6Ly93d3cubGVhcm5jcHAuY29tL2NwcC10dXRvcmlhbC90ZW1wbGF0ZS1ub24tdHlwZS1wYXJhbWV0ZXJzLw==">non-type參數<i class="fa fa-external-link-alt"></i></span>，那麼第 i 個元素的初始化敘述(initializer) 會是 <code>e.get&lt;i&gt;()</code>。</p>
+</li>
+<li><p>如果沒有找到符合情況的函式模板，那麼會使用 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2FkbA==">argument-dependent lookup<i class="fa fa-external-link-alt"></i></span> 的方式來呼叫 <code>get&lt;i&gt;(__e)</code>，因此第 i 個元素的初始化敘述(initializer) 會是 <code>e.get&lt;i&gt;(__e)</code>。</p>
+</li>
+</ul>
+<p>  在這些初始化敘述中，如果 <code>__e</code> 是一個左值參考 (這只會發生在你的 <code>ref-qualifier</code> 是 <code>&amp;</code> ，或是你的初始化敘述是個左值而且 <code>ref-qualifier</code> 是 <code>&amp;&amp;</code> ，簡單來說就是收合為 <code>&amp;</code> 時)，那麼你將 expression 內相對應的元素會是一個左值 (這聽起來很廢話，但重點在下一句)。</p>
+<p>  否則 expression 內相對應的元素會是一個消亡值(xvalue)，因為內部實際上執行了一次完美轉發(perfect-forwarding)， 而 <code>i</code> 會是個型態為 <code>std::size_t</code> 的純右值(prvalue)，因此 <code>&lt;i&gt;</code> 會被轉換(解釋)為<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3RlbXBsYXRlX3BhcmFtZXRlcnM=">模板參數列表<i class="fa fa-external-link-alt"></i></span>。</p>
+<p>  :::info<br>  :bulb: 有三點提醒大家一下</p>
+<ul>
+<li>identifier-list 內的標示符、<code>__e</code> 內的元素與 expression 內相對應的元素，這三個會有一樣的生命週期。</li>
+<li>我們通常會直接稱 identifier-list 內的標示符為「變數」，儘管它不是，但它使用上與變數基本上一樣，概念也類似。</li>
+<li>identifier-list 內第i個元素型態會是 <code>std::tuple_element&lt;i,E&gt;::type</code>。<br>  :::</li>
+</ul>
+<p>  看一下這個例子：<br>  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">   <span class="type">float</span> x&#123;&#125;;</span><br><span class="line"><span class="type">char</span> y&#123;&#125;;</span><br><span class="line"><span class="type">int</span> z&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">std::tuple&lt;<span class="type">float</span> &amp;, <span class="type">char</span> &amp;&amp;, <span class="type">int</span>&gt; <span class="title">tpl</span><span class="params">( x, std::move( y ), z )</span></span>;</span><br><span class="line"><span class="type">const</span> <span class="keyword">auto</span> &amp;[a, b, c] = tpl;</span><br></pre></td></tr></table></figure><br>  a 的名字叫做「Structured Binding」，連結到 tpl內第一個元素， <code>decltype(a)</code> 為 <code>float&amp;</code><br>  b 的名字叫做「Structured Binding」，連結到 tpl內第二個元素， <code>decltype(b)</code> 為 <code>char&amp;&amp;</code><br>  c 的名字叫做「Structured Binding」，連結到 tpl內第三個元素， <code>decltype(c)</code> 為 <code>const int</code></p>
+</li>
+<li><p><strong>如果不是以上兩種情況，則 expression 內的每個 non-static 成員變數都需要是個直接成員或是 expression 的相同基類，而且 Structured Binding 格式需要正確，讓我們能夠間接使用 <code>__e.name</code> 來呼叫變數。你的 expression 內不能有匿名或是 union 的成員，identifier-list 內的標示符數量需要與 non-static 的成員變數數量相同。</strong></p>
+<p>  每個 identifier-list 內的標示符都會連結到相對應的成員變數，實際上是連結到 <code>__e.m_i</code> ，<code>m_i</code> 表示第 i 個成員變數，另外 Structured Binding 支援 bit field 用法，</p>
+<p>  看這個例子：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span> &#123;</span><br><span class="line">    <span class="keyword">mutable</span> <span class="type">int</span> x1 : <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">double</span> y1;</span><br><span class="line">    <span class="type">int</span> z1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">using</span> f = S;    </span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> [x, y, z] = <span class="built_in">f</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  x 會是個整數左值標示符，連結到一個 2-bit 的整數元素 x1，y 會連結到 const volatile double 的元素 y1。</p>
+</li>
+</ul>
+<h1 id="使用-Structured-Binding"><a href="#使用-Structured-Binding" class="headerlink" title="使用 Structured Binding"></a><span class = "orange">使用 Structured Binding</span></h1><blockquote>
+<p>記得要切換成 C++17 才能夠使用。</p>
+</blockquote>
+<p>現在我們舉個簡單的例子(<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1lVXNUTzVCTzNXSSZhYl9jaGFubmVsPVRoZUNoZXJubw==">來源<i class="fa fa-external-link-alt"></i></span>)，現在我要定義一個「人」的函式，人會有年齡、名字等等，因此它的回傳型態會是一個 <code>std::tuple&lt;std::string, int&gt;</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">std::tuple&lt;std::string, <span class="type">int</span>&gt; <span class="title">CreatePerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="string">&quot;Cherno&quot;</span>, <span class="number">24</span> &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而在 <code>main</code> 內我們需要用到資料時，過去需要像這樣：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::tuple&lt;std::string, <span class="type">int</span>&gt; person = <span class="built_in">CreatePerson</span>();    <span class="comment">// 當然你可以用auto</span></span><br><span class="line">std::string &amp;name = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;( person );</span><br><span class="line"><span class="type">int</span> &amp;age = std::<span class="built_in">get</span>&lt;<span class="number">1</span>&gt;( person );</span><br></pre></td></tr></table></figure>
+<p>而對 tuple 熟悉的朋友可能會使用 <code>std::tie</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::string name;</span><br><span class="line"><span class="type">int</span> age;</span><br><span class="line">std::<span class="built_in">tie</span>( name, age ) = <span class="built_in">CreatePerson</span>();</span><br></pre></td></tr></table></figure>
+<p>好多了，我們不需要為了賦值多個變數而額外創個 <code>person</code>，但它仍然需要 3 行，又或許我們可以使用 Struct，但在 C++17 後多了一個新特性 Structured Binding，現在我們只需要這樣：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> [name, age] = <span class="built_in">CreatePerson</span>();</span><br></pre></td></tr></table></figure>
+
+<p>而它也不只限定 tuple-like 的容器，也可以與 Struct 和原生陣列連結，看一下這個例子(<span class="exturl" data-url="aHR0cHM6Ly9pdGhlbHAuaXRob21lLmNvbS50dy9hcnRpY2xlcy8xMDIxNzM1OA==">來源<i class="fa fa-external-link-alt"></i></span>)：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">TeaShopOwner</span> &#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line">    std::string name;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">GetTeaShopOwner</span><span class="params">()</span> -&gt; TeaShopOwner </span>&#123;</span><br><span class="line">    TeaShopOwner owner &#123; <span class="number">1</span>, <span class="string">&quot;test&quot;</span>&#125;; </span><br><span class="line">    <span class="keyword">return</span> owner;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> [id, name] = <span class="built_in">GetTeaShopOwner</span>();   <span class="comment">//  id = 1 ， name = &quot;test&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>如此一來 id 便會等於 1，name 則會是 “test” 了。Structured Binding 的另一個好處是可以搭配 Ranged-based for Loop 使用：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">TeaShopOwner</span> &#123;</span><br><span class="line">    <span class="type">int</span>         id;</span><br><span class="line">    std::string name;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;TeaShopOwner&gt; owners &#123;&#123;<span class="number">1</span>, <span class="string">&quot;COCO&quot;</span>&#125;, &#123;<span class="number">2</span>, <span class="string">&quot;1Shit&quot;</span>&#125;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// C++17 前的用法</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; owner : owners) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Owner id = %d\n&quot;</span>, owner.id);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Using Structured Binding</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; [id, _] : owners) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Owner id = %d\n&quot;</span>, id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>留意上面的 Ranged-based for-loop 接住 <code>owners</code> 時，將第二個變數名稱取為 <code>_</code>，通常會利用這個手法來表示 <code>name</code> 在迴圈裡不受「重視」。</p>
+<p>以往 C++ 函數的回傳值多是單一型別，如 bool, int。有了 Structured Binding 再搭配其他技巧，在處理回傳值時更有彈性。</p>
+<h1 id="補充"><a href="#補充" class="headerlink" title="補充"></a><span class = "orange">補充</span></h1><ul>
+<li><p>對成員的 <code>get</code> 進行查找時會忽略可訪問性與非類型模板參數的確切類型。像是 <code>template&lt;char*&gt; void get();</code> ，成員將導致使用成員解釋，即使格式是錯的。</p>
+</li>
+<li><p>有些 <code>[</code> 前方的聲明僅適用於隱藏變數 <code>__e</code> ，而不適用 identifier-list 內的元素：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>, b = <span class="number">2</span>;</span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> &amp;[x, y] = std::<span class="built_in">tie</span>( a, b );    <span class="comment">// x and y are of type int&amp;</span></span><br><span class="line">    <span class="keyword">auto</span> [z, w] = std::<span class="built_in">tie</span>( a, b );    <span class="comment">// z and w are still of type int&amp;</span></span><br><span class="line">    <span class="built_in">assert</span>( &amp;z == &amp;a );    <span class="comment">// passes</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>tuple-like 的意思是使用 <code>std::tuple_size&lt;&gt;</code> 會是個完全型，即使它可能導致格式錯誤：</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123;</span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">tuple_size</span>&lt;::A&gt; &#123;&#125;;</span><br><span class="line">&#125;    <span class="comment">// namespace std</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> [x] = A&#123;&#125;;    <span class="comment">// error; the &quot;data member&quot; interpretation is not considered.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<br>
+
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a><span class = "orange">參考資料</span></h1><p><strong><a href = "https://en.cppreference.com/w/cpp/language/structured_binding" class = "redlink">1. Structured binding declaration (since C++17)</a></strong> (文章部分來源，例子來源)</p>
+<p><strong><a href = "https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/449584/" class = "redlink">2. C 17嚐鮮：結構化繫結宣告（Structured Binding Declaration）<br></a></strong></p>
+<p><strong><a href = "https://zh-blog.logan.tw/2019/10/29/cxx-17-structured-binding/" class = "redlink">3. C++ 17 結構化綁定</a></strong> </p>
+<p><strong><a href = "https://blog.csdn.net/LYR1994/article/details/105340773?ops_request_misc=&request_id=&biz_id=102&utm_term=Structured%20binding%20declaration&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-105340773.first_rank_v2_pc_rank_v29" class = "redlink">4. C++ 学习指南基础（三）</a></strong></p>
+<p><strong><a href = "https://blog.csdn.net/zwvista/article/details/78111346?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161728731916780264014555%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=161728731916780264014555&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-78111346.first_rank_v2_pc_rank_v29&utm_term=Structured+binding+declaration&spm=1018.2226.3001.4187" class = "redlink">5. C++17尝鲜：结构化绑定声明（Structured Binding Declaration）</a></strong></p>
+<p><strong><a href = "https://blog.csdn.net/yangsenuestc/article/details/79840670?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161728731916780264014555%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=161728731916780264014555&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-79840670.first_rank_v2_pc_rank_v29&utm_term=Structured+binding+declaration" class = "redlink">6. C++17新特性(1) – 结构化绑定初始化(Structured binding declaration)</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/44963201/when-does-an-incomplete-type-error-occur-in-c" class = "redlink">7. When does an Incomplete Type error occur in C++</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/types/remove_reference" class = "redlink">8. std::remove_reference</a></strong></p>
+<p><strong><a href = "https://www.mdeditor.tw/pl/pjYZ/zh-tw" class = "redlink">9. remove_reference 引用移除工作原理</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/types/is_same" class = "redlink">10. std::is_same</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/storage_duration" class = "redlink">11. Storage class specifiers</a></strong></p>
+<p><strong><a href = "https://www.youtube.com/watch?v=eUsTO5BO3WI&ab_channel=TheCherno" class = "redlink">12. STRUCTURED BINDINGS in C++ </a></strong> (例子來源)</p>
+<p><strong><a href = "https://stackoverflow.com/questions/53787312/if-with-initializer-in-structured-binding-declaration-example-ill-formed" class = "redlink">13. if-with-initializer in structured binding declaration example ill formed?</a></strong></p>
+<p><strong><a href = "https://blog.csdn.net/zqxf123456789/article/details/71582384" class = "redlink">14. [C++] - 中的复制初始化(copy initialization)</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/attributes" class = "redlink">15. Attribute specifier sequence(since C++11)</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/cv" class = "redlink">16. cv (const and volatile) type qualifiers</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/copy_initialization" class = "redlink">17. Copy initialization</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/1051379/is-there-a-difference-between-copy-initialization-and-direct-initialization" class = "redlink">18. Is there a difference between copy initialization and direct initialization?</a></strong></p>
+<p><strong><a href = "https://docs.microsoft.com/zh-tw/cpp/cpp/initializers?view=msvc-160" class = "redlink">19. Initializers</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/22577679/what-is-a-sub-expression-in-c/22577708" class = "redlink">20. What is a sub-expression in C?</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/utility/tuple/tuple_size" class = "redlink">21. std::tuple_size&lt;std::tuple&gt;</a></strong></p>
+<p><strong><a href = "http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0144r0.pdf" class = "redlink">22. P0144R0</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/39763517/structured-bindings-implementation-underground-and-stdtuple" class = "redlink">23. Structured bindings implementation underground and std::tuple</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/operator_member_access" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink">24. Member access operators</a></strong></p>
+<p><strong><a href = "https://www.learncpp.com/cpp-tutorial/template-non-type-parameters/" class = "redlink">25. Template non-type parameters</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/adl" class = "redlink">26. Argument-dependent lookup</a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/language/template_parameters" class = "redlink"></a></strong></p>
+<p><strong><a href = "" class = "redlink">27. Template parameters and template arguments<br></a></strong></p>
+<p><strong><a href = "https://en.cppreference.com/w/cpp/utility/tuple/get" class = "redlink">28. std::get(std::tuple)</a></strong></p>
+<p><strong><a href = "http://eel.is/c++draft/dcl.struct.bind#4" class = "redlink">29. Structured binding declarations [dcl.struct.bind]</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/49795131/understand-structured-binding-in-c17-by-analogy" class = "redlink">30. Understand structured binding in C++17 by analogy</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/55329651/structured-binding-on-const" class = "redlink">31. Structured binding on const</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/45821678/is-always-the-address-of-a-reference-equal-to-the-address-of-origin" class = "redlink">32. Is always the address of a reference equal to the address of origin?</a></strong></p>
+<p><strong><a href = "https://stackoverflow.com/questions/17259531/c-primary-expressions-is-it-primary-expression-or-not" class = "redlink">33. C++ primary expressions - Is it primary expression or not?</a></strong></p>
+<p><strong><a href = "https://ithelp.ithome.com.tw/articles/10217358" class = "redlink">34. DAY 16：Structured Bindings</a></strong> (例子來源)</p>
+]]></content>
+      <categories>
+        <category>C++ Miner</category>
+      </categories>
+      <tags>
+        <tag>C++ Miner</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <url>/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/</url>
     <content><![CDATA[<h1><center><img src = "https://i.imgur.com/thmVmX6.png?" height = 50> 礦坑系列 ── Concept と SFINAE と Detection Idiom <img src = "https://i.imgur.com/thmVmX6.png?" height = 50></center></h1>
@@ -6012,179 +6185,6 @@ image source：RSL ROS Tutorial</center><br>
 <p><strong><a href = "https://stackoverflow.com/questions/87372/check-if-a-class-has-a-member-function-of-a-given-signature" class = "redlink">9. Check if a class has a member function of a given signature</a></strong></p>
 <p><strong><a href = "https://stackoverflow.com/questions/1005476/how-to-detect-whether-there-is-a-specific-member-variable-in-class" class = "redlink">10. How to detect whether there is a specific member variable in class?</a></strong></p>
 <p><strong><a href = "https://cpptalk.wordpress.com/2009/09/12/substitution-failure-is-not-an-error-2/" class = "redlink">11. Substitution failure is not an error, part II</a></strong></p>
-]]></content>
-      <categories>
-        <category>C++ Miner</category>
-      </categories>
-      <tags>
-        <tag>C++ Miner</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
-    <url>/2021/04/01/Cpp-Miner/Miner_main/Structured_Binding/README/</url>
-    <content><![CDATA[<center><h1> <img src = "https://i.imgur.com/thmVmX6.png?w=1000"w=1000" height = 50> 礦坑系列 ── 結構化綁定 Structured Binding Declaration <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></h1></center>
-
-<p>礦坑系列首頁：<strong><a href = "https://github.com/Mes0903/Cpp-Miner" class = "redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong></p>
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a><span class = "orange">前言</span></h1><p>Structured binding declaration 是 C++17 加入的一個新特性，它讓我們能夠更簡單地去處理多個回傳值或多變數的情況，通常會在要接 tuple_like 的容器或 Struct 回傳值時搭配 auto 來使用。</p>
-<p>我盡量將原裡理解並寫在了「介紹及原理」的部分，有些部分是翻譯了官方的文件，原先只是想弄個翻譯，結果翻著翻著發現官方有些地方講的不是讓人很明白，於是就又加上了自己的文字，漸漸地就變一篇文件了，如果只想知道如何使用的朋友可以直接跳到下方的應用部分。</p>
-<h1 id="語法"><a href="#語法" class="headerlink" title="語法"></a><span class = "orange">語法</span></h1><p>主要有三種初始化的方式：</p>
-<blockquote>
-<p><strong>1. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list] &#x3D; expression;</strong> [color&#x3D;#30DCD8]</p>
-</blockquote>
-<blockquote>
-<p><strong>2. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list]{ expression };</strong>	</p>
-</blockquote>
-<blockquote>
-<p><strong>3. attr(opt) cv(opt) auto ref-qualifier(opt) [idendentifier-list]( expression );</strong></p>
-</blockquote>
-<blockquote>
-<p>opt 代表的是 optional，可加可不加的意思。</p>
-</blockquote>
-<ul>
-<li><p><strong>attr</strong> :whale:<br>  指的是 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2F0dHJpYnV0ZXM=">attrubutes<i class="fa fa-external-link-alt"></i></span>，可加可不加。</p>
-</li>
-<li><p><strong>cv</strong> :whale:<br>  可能是<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2N2">cv-qualifier<i class="fa fa-external-link-alt"></i></span>，後方需加上 auto，需要的話也可以加上 static、thread_local 之類的<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3N0b3JhZ2VfZHVyYXRpb24=">儲存類說明符<i class="fa fa-external-link-alt"></i></span>，但不推薦使用到 volatile。</p>
-</li>
-<li><p><strong>ref-qualifier</strong> :whale:<br>  <code>&amp;</code> 或 <code>&amp;&amp;</code>，可加可不加，取決於你的需求。</p>
-</li>
-<li><p><strong>identifier-list</strong> :whale:<br>  這裡放妳要使用的變數名稱，他實際上不是變數而是標示符，它們之間需要以逗點 <code>,</code> 隔開，後方會有例子。</p>
-</li>
-<li><p><strong>expression</strong> :whale:<br>  表達式，通常會放 array、tuple-like 容器或是個沒有 union 成員的 Class，語法上會是 assignment-expression，它們不能是 <code>throw</code> 表達式，並且在 top-level 不能有逗號運算符，這裡應該是指 expression 能夠有 sub-expression，而它要的是最上層的那個 (感謝marty大佬)。 另外，expression 內的變數名不能和 identifier-list 內的變數名相同，簡單來說就是不能重複宣告同樣名字的變數。</p>
-</li>
-</ul>
-<h1 id="介紹及原理"><a href="#介紹及原理" class="headerlink" title="介紹及原理"></a><span class = "orange">介紹及原理</span></h1><p>Structed binding 會在你現在的 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3Njb3Bl">scope<i class="fa fa-external-link-alt"></i></span> 內採用你 identifier-list 裡給的標示符，並且將其連結到你 expression 裡寫的元素或子物件。採用時它會先創造出一個特殊的變數來存取你的初始化敘述(initializer)，型態取決於你的 expression，這個變數的名稱這裡我們先取作 <code>__e</code> ，由於 <code>__e</code> 可能是個容器或參考，所以我們給他取叫 initializer，沒看過這個詞的朋友不用太擔心，而 <code>__e</code> 在存取時有一些規則：</p>
-<ul>
-<li><p><strong>如果 expression 是個 A型態的 array，而且你沒有使用 ref-qualifier，那麼 <code>__e</code> 會是原先 expression 計算結果的複本，型態會是 <code>cv A</code>，cv指的就是<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2N2">cv-qualifier<i class="fa fa-external-link-alt"></i></span>。而 <code>__e</code> 內的元素會依據你使用的初始化方式(最上方寫的三種方式)來初始化。</strong></p>
-<p>  如果你使用的是第一種(<code>=</code>號)方式，那麼 <code>__e</code> 內的元素會使用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2NvcHlfaW5pdGlhbGl6YXRpb24=">複製初始化<i class="fa fa-external-link-alt"></i></span>來初始化為你 expression 內相對應的元素；</p>
-<p>  若你使用的是第二或第三種方法，那麼 <code>__e</code> 內的元素會使用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2RpcmVjdF9pbml0aWFsaXphdGlvbg==">直接初始化<i class="fa fa-external-link-alt"></i></span>來初始化為你 expression 內相對應的元素。</p>
-</li>
-<li><p><strong>如果不是上面的那種情況，那麼編譯器先將 Structured Binding 改寫，直接使用 <code>__e</code> 這個名稱作為原先 expression 的複本，像這樣：</strong></p>
-<blockquote>
-<p><strong>1. attr(opt) cv(opt) auto ref-qualifier(opt) __e &#x3D; expression;</strong> [color&#x3D;#30DCD8]<br><strong>2. attr(opt) cv(opt) auto ref-qualifier(opt) __e{ expression };</strong><br><strong>3. attr(opt) cv(opt) auto ref-qualifier(opt) __e( expression );</strong></p>
-</blockquote>
-<p>  <code>__e</code> 會是個匿名的 tuple-like 的容器(沒ref-qualifier時) 或是 tuple-like 的容器的參考(有ref-qualifier時)，簡短來說妳有寫 <code>&amp;</code> 這個 <code>__e</code> 就會是個參考，如果沒寫就是個容器。 接著編譯器會去看它是否符合 <span class="exturl" data-url="aHR0cHM6Ly90aW1zb25nLWNwcC5naXRodWIuaW8vY3Bwd3AvbjQ4NjEvZGNsLnN0cnVjdC5iaW5kIzQ=">Tuple-Like” Binding Protoco ( tuple-like 連結協定)<i class="fa fa-external-link-alt"></i></span>，簡單來說會長這樣：</p>
-<ul>
-<li><code>std::tuple_size&lt;__E&gt;::value</code> 必須是個格式正確的整數常量表達式 (integer constant expression)。</li>
-<li>identifier-list 內元素的數量必須與 <code>std::tuple_size&lt;__E&gt;::value</code> 相同。</li>
-<li>如果上面兩項有其中一項不符合，便去檢查這個 Class 的成員變數是否都為 public，如果不是(有 private 的成員變數)，則編譯錯誤</li>
-</ul>
-<p>  接著 identifier-list 內的元素便會「連結」到 <code>__e</code> 內相對應的元素，這也是妳有寫 <code>&amp;</code> 時，對 identifier-list 內的元素做改動就能改動到原容器的原因，因為 <code>__e</code> 是個參考，舉個例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::tuple&lt;<span class="type">int</span>,<span class="type">int</span>&gt; a&#123;<span class="number">1</span>,<span class="number">2</span>&#125;</span><br><span class="line"><span class="keyword">auto</span> [x,y] = a; <span class="comment">// __e 是個容器， x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br><span class="line"><span class="keyword">auto</span> &amp;[x,y] = a; <span class="comment">// __e 是 a 的左值參考，  x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br><span class="line"><span class="keyword">auto</span> &amp;&amp;[x, y] = std::<span class="built_in">make_tuple</span>( <span class="number">1</span>, <span class="number">2</span> ); <span class="comment">// __e 是右邊那個 tuple 的右值參考，x 與 std::get&lt;0&gt;(__e) 連結， y 與 std::get&lt;1&gt;(__e) 連結</span></span><br></pre></td></tr></table></figure>
-<p>  Code 有點長，大家可以複製下來看，在網頁上可能不太好閱讀。 可以看見內部是使用 <code>std::get&lt;&gt;()</code> 來存取元素的，因此妳的 expression 必須是個回傳 tuple-like 容器的敘述，否則妳的 <code>__e</code> 不會是個 tuple-like 的容器(或容器的參考)，那個也就無法使用 <code>std::get&lt;&gt;()</code> 了。<br>  :::info<br>  :bulb: 這邊只舉了 tuple-like 容器的例子，因為原生陣列沒有複製建構子，也就是說他不能被改寫成上面那三種樣式，也就不能用那三種方法初始化，可以看下面這個例子，它會噴錯：<br>  <br><br>  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>]&#123; <span class="number">1</span>, <span class="number">2</span> &#125;;</span><br><span class="line"><span class="type">int</span> b[<span class="number">2</span>] = a;</span><br></pre></td></tr></table></figure><br>  所以會需要另外規定方式來初始化。<br>  :::<br>  「連結」這個動作無法以 C++ 語言描述，妳可以把他想像成參考，又或是宏定義，但要記得他不是，他是 C++ 語言的本身，沒辦法用 C++ 寫出來，已經類似語言特性的概念了，就好像我們無法自己實作 function-body 的大括號一樣 (感謝Cy解釋)。<br>  :::danger<br>  :bulb: 官方文件是這麼寫的： Structured Binding 像是個參考，它是某個已經存在的物件的別名，但 Structured Binding 不是參考，它不需要是個引用類型。<br>  :::<br>  <del>挺玄學的</del>，我自己是用「類似宏定義」來理解的，底下也會如此解釋，但各位要記得它不是宏定義，也許是為了確保將標示符丟進 <code>std::remove_reference_t&lt;decltype((標示符))&gt;()</code> 時型態要與連結到的元素丟進 <code>std::remove_reference_t&lt;decltype((連結到的元素))&gt;()</code> 一樣才如此設計的。</p>
-</li>
-</ul>
-<p>接下來我會詳細的講解一下內部的原理，這裡用 <code>__E</code> 來表示 <code>__e</code> 的型態，也就是說 <code>__E</code> 為初始化敘述(initializer) 的型態，另外我們也可以說 <code>__E</code> 與 <code>std::remove_reference_t&lt;decltype((__e))&gt;</code> 等價。</p>
-<p>上述的初始化結束後，它會根據 <code>__E</code> 的狀況來進行連結，會有三種情況：</p>
-<ul>
-<li><p><strong>如果 <code>__E</code> 是個 array 型態 ，那麼 identifier-list 內的元素會與初始化敘述(initializer) 內相對應的元素連結</strong></p>
-<p>  這種情況下，每個 identifier-list 內的標示符會是一個左值(lvalue)，與初始化敘述(initializer) 內相應的元素連結，也因此，identifier-list 內的標示符數量需要與 array 內的變數數量一樣多，看一下下面這個例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> [x,y] = a;</span><br></pre></td></tr></table></figure>
-<p>  <code>auto [x,y] = a;</code> 會創建一個名字叫 <code>__e</code> 的 array <code>__e[2]</code>，利用<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2NvcHlfaW5pdGlhbGl6YXRpb24=">複製初始化<i class="fa fa-external-link-alt"></i></span>來初始化 <code>__e[2]</code>，之後 x 與 y 分別會與 <code>__e[0]</code> 與 <code>__e[1]</code> 連結，你可以把他們想像成參考，或是宏定義，但要記住它們實際上不是。</p>
-<p>  如果有寫 ref-qualifier 且 expression 回傳的是 lvalue，則 identifier-list 內的元素會間接與 a 內的元素連結，對 identifier-list 內的元素的操作將會反應到 a 的元素上：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span>&amp; [x,y] = a;</span><br></pre></td></tr></table></figure>
-<p>  <code>auto&amp; [x,y] = a;</code> 會創建一個名字叫 <code>__e</code> 的參考引用 expression 的計算結果，而 identifier-list 內的元素則會透過 <code>__e</code> 間接變為 a 內元素的參考，可以把他想像成這樣：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> a[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> &amp; __e = a;    <span class="comment">// 等價於 int(&amp;e)[2] = a;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x __e[0]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y __e[1]</span></span><br></pre></td></tr></table></figure>
-<p>  而如果 expression 回傳的是 rvalue，則 identifier-list 內的元素會與 <code>__e</code> 內的元素連結：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> T = <span class="type">int</span>[<span class="number">3</span>];</span><br><span class="line"><span class="keyword">auto</span> &amp;&amp;[x, y, z] = T&#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;</span><br></pre></td></tr></table></figure>
-<p>  可以把他想像成這樣：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> &amp;&amp;__e = T&#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x __e[0]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y __e[1]</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> z __e[2]</span></span><br></pre></td></tr></table></figure>
-<p>  當然上面這兩個例子都是偽代碼，內部當然不是這樣的，連結無法以 C++ 語言來描述，x 與 y 僅僅是標示符，所以不會是上面這個樣子，這只是個示意。</p>
-</li>
-<li><p><strong>如果 <code>__E</code> 是個沒有 union 成員的 Class 型態，而且 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL3V0aWxpdHkvdHVwbGUvdHVwbGVfc2l6ZQ==">std::tuple_size&lt;__E&gt;<i class="fa fa-external-link-alt"></i></span> 是個有成員的完全型(不用管這個成員的型態或可訪問性如何)，簡單來說就是 <code>__e</code> 能夠做成 tuple-like 的容器，符合 tuple-like 連結協定，那麼就會使用 tuple-like 連結協定來進行連結</strong></p>
-<p>  與前面提到的一樣，首先 <code>std::tuple_size&lt;__E&gt;::value</code> 必須是個格式正確的整數常量表達式 (integer constant expression)，並且 identifier-list 內元素的數量必須與 <code>std::tuple_size&lt;__E&gt;::value</code> 相同。</p>
-<p>  再來對於每個標示符，都會連結一個元素(也就是 <code>__e</code> 內的元素)，元素的型態會類似是 「<code>std::tuple_element&lt;i,__E&gt;::type</code> 的 “引用”」，注意它是「引用」，<code>i</code> 指的是 <code>__e</code> 內第 i 個元素，如果這個型態對應的初始化敘述(initializer) 是左值，那這個變數就會是左值引用，如果是右值那就是右值引用。</p>
-<p>  連結到的第 i 個元素詳細如下：</p>
-<ul>
-<li><p>如果通過 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL29wZXJhdG9yX21lbWJlcl9hY2Nlc3M=">Class成員訪問<i class="fa fa-external-link-alt"></i></span>的方式在 <code>__E</code> 的範圍內查找到至少一個函式模板，且這個函式模板的第一個模板參數是個 <span class="exturl" data-url="aHR0cHM6Ly93d3cubGVhcm5jcHAuY29tL2NwcC10dXRvcmlhbC90ZW1wbGF0ZS1ub24tdHlwZS1wYXJhbWV0ZXJzLw==">non-type參數<i class="fa fa-external-link-alt"></i></span>，那麼第 i 個元素的初始化敘述(initializer) 會是 <code>e.get&lt;i&gt;()</code>。</p>
-</li>
-<li><p>如果沒有找到符合情況的函式模板，那麼會使用 <span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL2FkbA==">argument-dependent lookup<i class="fa fa-external-link-alt"></i></span> 的方式來呼叫 <code>get&lt;i&gt;(__e)</code>，因此第 i 個元素的初始化敘述(initializer) 會是 <code>e.get&lt;i&gt;(__e)</code>。</p>
-</li>
-</ul>
-<p>  在這些初始化敘述中，如果 <code>__e</code> 是一個左值參考 (這只會發生在你的 <code>ref-qualifier</code> 是 <code>&amp;</code> ，或是你的初始化敘述是個左值而且 <code>ref-qualifier</code> 是 <code>&amp;&amp;</code> ，簡單來說就是收合為 <code>&amp;</code> 時)，那麼你將 expression 內相對應的元素會是一個左值 (這聽起來很廢話，但重點在下一句)。</p>
-<p>  否則 expression 內相對應的元素會是一個消亡值(xvalue)，因為內部實際上執行了一次完美轉發(perfect-forwarding)， 而 <code>i</code> 會是個型態為 <code>std::size_t</code> 的純右值(prvalue)，因此 <code>&lt;i&gt;</code> 會被轉換(解釋)為<span class="exturl" data-url="aHR0cHM6Ly9lbi5jcHByZWZlcmVuY2UuY29tL3cvY3BwL2xhbmd1YWdlL3RlbXBsYXRlX3BhcmFtZXRlcnM=">模板參數列表<i class="fa fa-external-link-alt"></i></span>。</p>
-<p>  :::info<br>  :bulb: 有三點提醒大家一下</p>
-<ul>
-<li>identifier-list 內的標示符、<code>__e</code> 內的元素與 expression 內相對應的元素，這三個會有一樣的生命週期。</li>
-<li>我們通常會直接稱 identifier-list 內的標示符為「變數」，儘管它不是，但它使用上與變數基本上一樣，概念也類似。</li>
-<li>identifier-list 內第i個元素型態會是 <code>std::tuple_element&lt;i,E&gt;::type</code>。<br>  :::</li>
-</ul>
-<p>  看一下這個例子：<br>  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">   <span class="type">float</span> x&#123;&#125;;</span><br><span class="line"><span class="type">char</span> y&#123;&#125;;</span><br><span class="line"><span class="type">int</span> z&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">std::tuple&lt;<span class="type">float</span> &amp;, <span class="type">char</span> &amp;&amp;, <span class="type">int</span>&gt; <span class="title">tpl</span><span class="params">( x, std::move( y ), z )</span></span>;</span><br><span class="line"><span class="type">const</span> <span class="keyword">auto</span> &amp;[a, b, c] = tpl;</span><br></pre></td></tr></table></figure><br>  a 的名字叫做「Structured Binding」，連結到 tpl內第一個元素， <code>decltype(a)</code> 為 <code>float&amp;</code><br>  b 的名字叫做「Structured Binding」，連結到 tpl內第二個元素， <code>decltype(b)</code> 為 <code>char&amp;&amp;</code><br>  c 的名字叫做「Structured Binding」，連結到 tpl內第三個元素， <code>decltype(c)</code> 為 <code>const int</code></p>
-</li>
-<li><p><strong>如果不是以上兩種情況，則 expression 內的每個 non-static 成員變數都需要是個直接成員或是 expression 的相同基類，而且 Structured Binding 格式需要正確，讓我們能夠間接使用 <code>__e.name</code> 來呼叫變數。你的 expression 內不能有匿名或是 union 的成員，identifier-list 內的標示符數量需要與 non-static 的成員變數數量相同。</strong></p>
-<p>  每個 identifier-list 內的標示符都會連結到相對應的成員變數，實際上是連結到 <code>__e.m_i</code> ，<code>m_i</code> 表示第 i 個成員變數，另外 Structured Binding 支援 bit field 用法，</p>
-<p>  看這個例子：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">S</span> &#123;</span><br><span class="line">    <span class="keyword">mutable</span> <span class="type">int</span> x1 : <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">double</span> y1;</span><br><span class="line">    <span class="type">int</span> z1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">using</span> f = S;    </span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> [x, y, z] = <span class="built_in">f</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>  x 會是個整數左值標示符，連結到一個 2-bit 的整數元素 x1，y 會連結到 const volatile double 的元素 y1。</p>
-</li>
-</ul>
-<h1 id="使用-Structured-Binding"><a href="#使用-Structured-Binding" class="headerlink" title="使用 Structured Binding"></a><span class = "orange">使用 Structured Binding</span></h1><blockquote>
-<p>記得要切換成 C++17 才能夠使用。</p>
-</blockquote>
-<p>現在我們舉個簡單的例子(<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1lVXNUTzVCTzNXSSZhYl9jaGFubmVsPVRoZUNoZXJubw==">來源<i class="fa fa-external-link-alt"></i></span>)，現在我要定義一個「人」的函式，人會有年齡、名字等等，因此它的回傳型態會是一個 <code>std::tuple&lt;std::string, int&gt;</code>：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">std::tuple&lt;std::string, <span class="type">int</span>&gt; <span class="title">CreatePerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="string">&quot;Cherno&quot;</span>, <span class="number">24</span> &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>而在 <code>main</code> 內我們需要用到資料時，過去需要像這樣：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::tuple&lt;std::string, <span class="type">int</span>&gt; person = <span class="built_in">CreatePerson</span>();    <span class="comment">// 當然你可以用auto</span></span><br><span class="line">std::string &amp;name = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;( person );</span><br><span class="line"><span class="type">int</span> &amp;age = std::<span class="built_in">get</span>&lt;<span class="number">1</span>&gt;( person );</span><br></pre></td></tr></table></figure>
-<p>而對 tuple 熟悉的朋友可能會使用 <code>std::tie</code>：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::string name;</span><br><span class="line"><span class="type">int</span> age;</span><br><span class="line">std::<span class="built_in">tie</span>( name, age ) = <span class="built_in">CreatePerson</span>();</span><br></pre></td></tr></table></figure>
-<p>好多了，我們不需要為了賦值多個變數而額外創個 <code>person</code>，但它仍然需要 3 行，又或許我們可以使用 Struct，但在 C++17 後多了一個新特性 Structured Binding，現在我們只需要這樣：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> [name, age] = <span class="built_in">CreatePerson</span>();</span><br></pre></td></tr></table></figure>
-
-<p>而它也不只限定 tuple-like 的容器，也可以與 Struct 和原生陣列連結，看一下這個例子(<span class="exturl" data-url="aHR0cHM6Ly9pdGhlbHAuaXRob21lLmNvbS50dy9hcnRpY2xlcy8xMDIxNzM1OA==">來源<i class="fa fa-external-link-alt"></i></span>)：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">TeaShopOwner</span> &#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line">    std::string name;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">GetTeaShopOwner</span><span class="params">()</span> -&gt; TeaShopOwner </span>&#123;</span><br><span class="line">    TeaShopOwner owner &#123; <span class="number">1</span>, <span class="string">&quot;test&quot;</span>&#125;; </span><br><span class="line">    <span class="keyword">return</span> owner;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> [id, name] = <span class="built_in">GetTeaShopOwner</span>();   <span class="comment">//  id = 1 ， name = &quot;test&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>如此一來 id 便會等於 1，name 則會是 “test” 了。Structured Binding 的另一個好處是可以搭配 Ranged-based for Loop 使用：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">TeaShopOwner</span> &#123;</span><br><span class="line">    <span class="type">int</span>         id;</span><br><span class="line">    std::string name;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::vector&lt;TeaShopOwner&gt; owners &#123;&#123;<span class="number">1</span>, <span class="string">&quot;COCO&quot;</span>&#125;, &#123;<span class="number">2</span>, <span class="string">&quot;1Shit&quot;</span>&#125;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// C++17 前的用法</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; owner : owners) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Owner id = %d\n&quot;</span>, owner.id);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Using Structured Binding</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; [id, _] : owners) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Owner id = %d\n&quot;</span>, id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>留意上面的 Ranged-based for-loop 接住 <code>owners</code> 時，將第二個變數名稱取為 <code>_</code>，通常會利用這個手法來表示 <code>name</code> 在迴圈裡不受「重視」。</p>
-<p>以往 C++ 函數的回傳值多是單一型別，如 bool, int。有了 Structured Binding 再搭配其他技巧，在處理回傳值時更有彈性。</p>
-<h1 id="補充"><a href="#補充" class="headerlink" title="補充"></a><span class = "orange">補充</span></h1><ul>
-<li><p>對成員的 <code>get</code> 進行查找時會忽略可訪問性與非類型模板參數的確切類型。像是 <code>template&lt;char*&gt; void get();</code> ，成員將導致使用成員解釋，即使格式是錯的。</p>
-</li>
-<li><p>有些 <code>[</code> 前方的聲明僅適用於隱藏變數 <code>__e</code> ，而不適用 identifier-list 內的元素：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">   <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>, b = <span class="number">2</span>;</span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> &amp;[x, y] = std::<span class="built_in">tie</span>( a, b );    <span class="comment">// x and y are of type int&amp;</span></span><br><span class="line">    <span class="keyword">auto</span> [z, w] = std::<span class="built_in">tie</span>( a, b );    <span class="comment">// z and w are still of type int&amp;</span></span><br><span class="line">    <span class="built_in">assert</span>( &amp;z == &amp;a );    <span class="comment">// passes</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>tuple-like 的意思是使用 <code>std::tuple_size&lt;&gt;</code> 會是個完全型，即使它可能導致格式錯誤：</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123;</span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">tuple_size</span>&lt;::A&gt; &#123;&#125;;</span><br><span class="line">&#125;    <span class="comment">// namespace std</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> [x] = A&#123;&#125;;    <span class="comment">// error; the &quot;data member&quot; interpretation is not considered.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<br>
-
-<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a><span class = "orange">參考資料</span></h1><p><strong><a href = "https://en.cppreference.com/w/cpp/language/structured_binding" class = "redlink">1. Structured binding declaration (since C++17)</a></strong> (文章部分來源，例子來源)</p>
-<p><strong><a href = "https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/449584/" class = "redlink">2. C 17嚐鮮：結構化繫結宣告（Structured Binding Declaration）<br></a></strong></p>
-<p><strong><a href = "https://zh-blog.logan.tw/2019/10/29/cxx-17-structured-binding/" class = "redlink">3. C++ 17 結構化綁定</a></strong> </p>
-<p><strong><a href = "https://blog.csdn.net/LYR1994/article/details/105340773?ops_request_misc=&request_id=&biz_id=102&utm_term=Structured%20binding%20declaration&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-105340773.first_rank_v2_pc_rank_v29" class = "redlink">4. C++ 学习指南基础（三）</a></strong></p>
-<p><strong><a href = "https://blog.csdn.net/zwvista/article/details/78111346?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161728731916780264014555%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=161728731916780264014555&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-78111346.first_rank_v2_pc_rank_v29&utm_term=Structured+binding+declaration&spm=1018.2226.3001.4187" class = "redlink">5. C++17尝鲜：结构化绑定声明（Structured Binding Declaration）</a></strong></p>
-<p><strong><a href = "https://blog.csdn.net/yangsenuestc/article/details/79840670?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161728731916780264014555%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=161728731916780264014555&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-79840670.first_rank_v2_pc_rank_v29&utm_term=Structured+binding+declaration" class = "redlink">6. C++17新特性(1) – 结构化绑定初始化(Structured binding declaration)</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/44963201/when-does-an-incomplete-type-error-occur-in-c" class = "redlink">7. When does an Incomplete Type error occur in C++</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/types/remove_reference" class = "redlink">8. std::remove_reference</a></strong></p>
-<p><strong><a href = "https://www.mdeditor.tw/pl/pjYZ/zh-tw" class = "redlink">9. remove_reference 引用移除工作原理</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/types/is_same" class = "redlink">10. std::is_same</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/storage_duration" class = "redlink">11. Storage class specifiers</a></strong></p>
-<p><strong><a href = "https://www.youtube.com/watch?v=eUsTO5BO3WI&ab_channel=TheCherno" class = "redlink">12. STRUCTURED BINDINGS in C++ </a></strong> (例子來源)</p>
-<p><strong><a href = "https://stackoverflow.com/questions/53787312/if-with-initializer-in-structured-binding-declaration-example-ill-formed" class = "redlink">13. if-with-initializer in structured binding declaration example ill formed?</a></strong></p>
-<p><strong><a href = "https://blog.csdn.net/zqxf123456789/article/details/71582384" class = "redlink">14. [C++] - 中的复制初始化(copy initialization)</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/attributes" class = "redlink">15. Attribute specifier sequence(since C++11)</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/cv" class = "redlink">16. cv (const and volatile) type qualifiers</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/copy_initialization" class = "redlink">17. Copy initialization</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/1051379/is-there-a-difference-between-copy-initialization-and-direct-initialization" class = "redlink">18. Is there a difference between copy initialization and direct initialization?</a></strong></p>
-<p><strong><a href = "https://docs.microsoft.com/zh-tw/cpp/cpp/initializers?view=msvc-160" class = "redlink">19. Initializers</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/22577679/what-is-a-sub-expression-in-c/22577708" class = "redlink">20. What is a sub-expression in C?</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/utility/tuple/tuple_size" class = "redlink">21. std::tuple_size&lt;std::tuple&gt;</a></strong></p>
-<p><strong><a href = "http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0144r0.pdf" class = "redlink">22. P0144R0</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/39763517/structured-bindings-implementation-underground-and-stdtuple" class = "redlink">23. Structured bindings implementation underground and std::tuple</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/operator_member_access" class = "redlink"></a></strong></p>
-<p><strong><a href = "" class = "redlink">24. Member access operators</a></strong></p>
-<p><strong><a href = "https://www.learncpp.com/cpp-tutorial/template-non-type-parameters/" class = "redlink">25. Template non-type parameters</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/adl" class = "redlink">26. Argument-dependent lookup</a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/language/template_parameters" class = "redlink"></a></strong></p>
-<p><strong><a href = "" class = "redlink">27. Template parameters and template arguments<br></a></strong></p>
-<p><strong><a href = "https://en.cppreference.com/w/cpp/utility/tuple/get" class = "redlink">28. std::get(std::tuple)</a></strong></p>
-<p><strong><a href = "http://eel.is/c++draft/dcl.struct.bind#4" class = "redlink">29. Structured binding declarations [dcl.struct.bind]</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/49795131/understand-structured-binding-in-c17-by-analogy" class = "redlink">30. Understand structured binding in C++17 by analogy</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/55329651/structured-binding-on-const" class = "redlink">31. Structured binding on const</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/45821678/is-always-the-address-of-a-reference-equal-to-the-address-of-origin" class = "redlink">32. Is always the address of a reference equal to the address of origin?</a></strong></p>
-<p><strong><a href = "https://stackoverflow.com/questions/17259531/c-primary-expressions-is-it-primary-expression-or-not" class = "redlink">33. C++ primary expressions - Is it primary expression or not?</a></strong></p>
-<p><strong><a href = "https://ithelp.ithome.com.tw/articles/10217358" class = "redlink">34. DAY 16：Structured Bindings</a></strong> (例子來源)</p>
 ]]></content>
       <categories>
         <category>C++ Miner</category>
