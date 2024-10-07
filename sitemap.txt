@@ -1,3 +1,4 @@
+https://mes0903.github.io/2024/10/18/Cpp-Miner/Miner_Tutorial/Computer_Introduction/README/
 https://mes0903.github.io/2021/05/14/Cpp-Miner/README/
 https://mes0903.github.io/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/
 https://mes0903.github.io/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/
