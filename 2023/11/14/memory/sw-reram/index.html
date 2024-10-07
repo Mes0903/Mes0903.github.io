@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="簡單介紹了 ReRAM 與 Smith-Waterman Algorithm，並找了一些論文論證可以在 ReRAM 上結合 systolic array 來實作 Smith-Waterman Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReRAM 與 Smith-Waterman Algorithm 介紹">
+<meta property="og:url" content="https://mes0903.github.io/2023/11/14/memory/sw-reram/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="簡單介紹了 ReRAM 與 Smith-Waterman Algorithm，並找了一些論文論證可以在 ReRAM 上結合 systolic array 來實作 Smith-Waterman Algorithm">
+<meta property="og:locale">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1RAWmZ4T.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rJwygdG4a.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJj_n_GEa.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/H1sMyYMVT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Sy_SlYfNp.png">
+<meta property="og:image" content="https://github.com/Mes0903/Mes_Note/blob/main/SystolicArrayOnRRAM/img/SystolicArrayForMatrix.jpg?raw=true">
+<meta property="og:image" content="https://hackmd.io/_uploads/HJlB2l7VT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Hktr0lQ4T.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1hOy-X4a.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1GwNzmu6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJyjVzQd6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SyrbHzQdp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S10Urf7OT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/ryBCIGQdp.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1LQPG7dT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJ0I_zmuT.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/Sy01Fz7_a.png">
+<meta property="article:published_time" content="2023-11-14T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-07T20:03:03.927Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="memory">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hackmd.io/_uploads/S1RAWmZ4T.png">
+
+
+<link rel="canonical" href="https://mes0903.github.io/2023/11/14/memory/sw-reram/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2023/11/14/memory/sw-reram/","path":"2023/11/14/memory/sw-reram/","title":"ReRAM 與 Smith-Waterman Algorithm 介紹"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ReRAM 與 Smith-Waterman Algorithm 介紹 | Mes's Studio</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Mes 雜七雜八</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E5%9B%A0%E5%BA%8F%E5%88%97%E6%AF%94%E5%B0%8D"><span class="nav-number">2.</span> <span class="nav-text">基因序列比對</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DNA%E7%AA%81%E8%AE%8A%E7%9A%84%E9%A1%9E%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">DNA突變的類型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B7%A8%E8%BC%AF%E8%B7%9D%E9%9B%A2"><span class="nav-number">2.2.</span> <span class="nav-text">編輯距離</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8D%E9%BD%8A-Alignment"><span class="nav-number">3.</span> <span class="nav-text">對齊(Alignment)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Needleman-Wunsch"><span class="nav-number">3.1.</span> <span class="nav-text">Needleman-Wunsch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F"><span class="nav-number">3.1.1.</span> <span class="nav-text">步驟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.1.2.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Smith-Waterman"><span class="nav-number">3.2.</span> <span class="nav-text">Smith-Waterman</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">步驟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Systolic-Array"><span class="nav-number">4.</span> <span class="nav-text">Systolic Array</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">4.0.1.</span> <span class="nav-text">例子 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-2"><span class="nav-number">4.0.2.</span> <span class="nav-text">例子 2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ReRAM-RRAM"><span class="nav-number">5.</span> <span class="nav-text">ReRAM (RRAM)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E6%80%9D%E8%B7%AF"><span class="nav-number">6.</span> <span class="nav-text">實作思路</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E8%A8%88%E5%87%BA-SW-%E6%BC%94%E7%AE%97%E6%B3%95%E7%9A%84-Systolic-Array"><span class="nav-number">6.1.</span> <span class="nav-text">設計出 SW 演算法的 Systolic Array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Systolic-Array-%E5%85%A7%E9%83%A8%E7%9A%84-PE-%E6%A8%A3%E8%B2%8C"><span class="nav-number">6.2.</span> <span class="nav-text">Systolic Array 內部的 PE 樣貌</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NOR-gate-on-ReRAM"><span class="nav-number">6.3.</span> <span class="nav-text">NOR gate on ReRAM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OR-gate-NOT-gate"><span class="nav-number">6.3.1.</span> <span class="nav-text">OR gate + NOT gate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Truth-table"><span class="nav-number">6.3.2.</span> <span class="nav-text">Truth table</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">6.4.</span> <span class="nav-text">結論</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Survey-of-related-paper"><span class="nav-number">7.</span> <span class="nav-text">Survey of related paper</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AB%96%E6%96%87%E5%A4%96%E7%9A%84%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">8.</span> <span class="nav-text">論文外的參考資料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Icon.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description">The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+  <div class="cc-license animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/big/by_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2023/11/14/memory/sw-reram/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Icon.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ReRAM 與 Smith-Waterman Algorithm 介紹 | Mes's Studio">
+      <meta itemprop="description" content="簡單介紹了 ReRAM 與 Smith-Waterman Algorithm，並找了一些論文論證可以在 ReRAM 上結合 systolic array 來實作 Smith-Waterman Algorithm">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ReRAM 與 Smith-Waterman Algorithm 介紹
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-11-14 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-14T00:00:00+00:00">2023-11-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-07 20:03:03" itemprop="dateModified" datetime="2024-10-07T20:03:03+00:00">2024-10-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/memory/" itemprop="url" rel="index"><span itemprop="name">memory</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>8k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>29 mins.</span>
+    </span>
+</div>
+
+            <div class="post-description">簡單介紹了 ReRAM 與 Smith-Waterman Algorithm，並找了一些論文論證可以在 ReRAM 上結合 systolic array 來實作 Smith-Waterman Algorithm</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
+<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
+<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQGpzZXJ2L0hreUN0MGhxYj90eXBlPXZpZXc=">因為自動飲料機而延畢的那一年<i class="fa fa-external-link-alt"></i></span></p>
+<p>但我這學期實在是太忙了，所以我的想法很簡單，找一些別人還沒有在 Non-volatile memory 這塊做過的演算法，我用 Non-volatile memory 做一些 in-memory computing 看看，這樣一來演算法不會太難，而且會有在別的地方做過的相關論文可以參考，這大概也勉強算在「還沒被解過」的範疇內</p>
+<p>而很剛好的，張家華學長對生物工程這方面有所涉略，真的是太猛了，我不管跑去玩什麼有的沒的，他好像都可以給我建議，真的是大神。總之，學長看了看說可以考慮把 systolic array 加進來，因為 systolic array 上面每個 cell 都是一個 memory unit，而我們又能做 in-memory computing，理論上可以做得到，而且這樣可以讓題目更落在「還沒被解過」的圈圈裡面</p>
+<p>因此和老師和學長討論後，選的演算法就是 Smith-Waterman Algorithm 了，演算法不會太 hardcode</p>
+<p>整個過程可以被分為兩部分：</p>
+<ol>
+<li>利用 systolic array 實作 Smith-waterman Algorithm</li>
+<li>利用 ReRAM 實作 systolic array</li>
+</ol>
+<p>雖然我們因為沒有空所以沒有去實作，但經過這一兩個月的 paper survey，覺得我們的想法是可行的，整個過程的主要困難點在於 ReRAM 的 program，說實話 systolic array 的部份並不難，systolic array 可以使用很簡單的結構來做，當然也有看到弄得很漂亮的 systolic array，但內部電路就會複雜起來了</p>
+<p>但重點還是在 ReRAM 的 program part 我們完全沒摸過，雖然知道只要能夠 program ReRAM 內的電阻部份，就能實作出基本邏輯閘，整個專案基本上就沒問題了，但礙於時間我們就沒去研究怎麼去 program 這部份了</p>
+<p>當初老師的建議是可以使用 gem5 + NVMain 來進行模擬，google 搜了一下感覺這東西光是 build 起來就有一堆點要注意，而且目前還沒看到有哪個教學有寫說該怎麼使用，可能之後有閒再來摸摸吧 XD</p>
+<p>Smith-Waterman Algorithm 是一個用在生物工程的演算法，由 Needleman-Wunsch 變化而來，用來做基因序列的比對，所以我們這篇文就從基因序列比對開始介紹起吧~</p>
+<h1 id="基因序列比對"><a href="#基因序列比對" class="headerlink" title="基因序列比對"></a>基因序列比對</h1><p>這一段介紹轉載自<span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQFVsdnlkam9RUUthZmE0aXdCa0o5bGcvQmtHdW1WWnR1">基因序列比對演算法<i class="fa fa-external-link-alt"></i></span>，寫得很好，我只小改了一些用詞，有興趣的可以去看看原文</p>
+<p>一般而言，我們會把 DNA 和蛋白質分別看成是由 4 和 20 個英文字母所組成的序列或字串，因為他們分別是由 4 種核苷酸和 20 種胺基酸所組成的。對 DNA 而言，突變是非常平常的事情，也是自然的演化過程。藉由基因的突變，生物可以適應自然環境的改變。</p>
+<h2 id="DNA突變的類型"><a href="#DNA突變的類型" class="headerlink" title="DNA突變的類型"></a>DNA突變的類型</h2><p>常見的DNA突變有3種，分別是取代、插入及刪除。</p>
+<table>
+<thead>
+<tr>
+<th>DNA突變行為</th>
+<th>意義</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>取代(配錯)</td>
+<td>把一個字母用另一個字母取代</td>
+</tr>
+<tr>
+<td>插入</td>
+<td>在 DNA 序列的某一個位置插入一個字母</td>
+</tr>
+<tr>
+<td>刪除</td>
+<td>在 DNA 序列的某一個位置刪除一個字母</td>
+</tr>
+</tbody></table>
+<h2 id="編輯距離"><a href="#編輯距離" class="headerlink" title="編輯距離"></a>編輯距離</h2><p>通常生物學家會利用所謂的<strong>編輯距離</strong>，來衡量兩條 DNA 序列之間的相異程度。生命總是朝著最短路徑進行演化，所以兩條序列之間的編輯距離被定義為：把其中一條序列編輯轉成另外一條序列，所需最少的編輯運算個數。兩條 DNA 序列之間的編輯距離越小，代表它們之間的相似程度越高。從演化的觀點來說，這意味著它們演化自同一個祖先（即所謂的同源），所以彼此間應該會有相似的結構及功能。</p>
+<p>生物學家喜歡利用比對來衡量兩條序列之間的相似程度。拿 <code>GACGGATAG</code> 和 <code>GATCGGAATAG</code> 這兩條 DNA 序列來說，乍看之下這兩條長度不同的DNA序列似乎不太相似。但當我們如下表一般，把它們重疊在一起，並在第 1 條序列的第 2 個和第 3 個字母間，與第 6 個和第 7 個字母之間分別插入一個空白字，就可發現其實這兩條 DNA 序列還蠻相像的。</p>
+<table>
+<thead>
+<tr>
+<th>重疊前</th>
+<th>重疊後</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GACGGATAG</td>
+<td>GA_CGGA_TAG</td>
+</tr>
+<tr>
+<td>GATCGGAATAG</td>
+<td>GATCGGAATAG</td>
+</tr>
+</tbody></table>
+<p>這種將序列重疊在一起的方式，就稱為序列的比對</p>
+<p>我們可以在兩條序列的任意位置上插入一個或多個空白字，這樣做的目的是讓相同或相似的字母能夠儘量對齊。但要特別注意的是，不能讓兩個插入的空白字對齊在一起，因為這樣對衡量序列之間的相似程度並無幫助。</p>
+<p>因此字母之間對齊的方式其實就只有2種:</p>
+<ol>
+<li>字母與字母的對齊</li>
+<li>字母與空白字的對齊</li>
+</ol>
+<h1 id="對齊-Alignment"><a href="#對齊-Alignment" class="headerlink" title="對齊(Alignment)"></a>對齊(Alignment)</h1><p>我們可以把 Alignment 的演算法分為 Global 與 Local 兩種</p>
+<ul>
+<li><p>Global Alignment（全局比對）：</p>
+<ul>
+<li>目標： 在整個序列的整體範圍內找到最佳的對應，強調整個序列的相似性</li>
+<li>特點： 將整個序列進行比對，並試圖找到一個最佳的比對方案，即最大相似性得分。這種比對通常用於比較兩個相對較相似的序列，如同一基因在不同物種中的同源基因</li>
+<li>應用： 常見的全局比對算法包括 Needleman-Wunsch 算法</li>
+</ul>
+</li>
+<li><p>Local Alignment（局部比對）：</p>
+<ul>
+<li>目標： 在序列的某個區域內找到最佳的對應，強調局部相似性</li>
+<li>特點： 局部比對專注於找到序列中的局部相似區域，而不要求整個序列的相似性。這種比對通常用於比較兩個相對較不相似的序列，以尋找局部相似的區域，如同源基因的某一片段</li>
+<li>應用： 常見的局部比對算法包括 Smith-Waterman 算法</li>
+</ul>
+</li>
+</ul>
+<h2 id="Needleman-Wunsch"><a href="#Needleman-Wunsch" class="headerlink" title="Needleman-Wunsch"></a>Needleman-Wunsch</h2><h3 id="步驟"><a href="#步驟" class="headerlink" title="步驟"></a>步驟</h3><p>Needleman-Wunsch 的步驟如下</p>
+<ol>
+<li><p>初始化得分矩陣（Initialization）：<br> 給予兩個序列 $M$ 與 $N$，創建一個矩陣，大小為 $(m+1) \times (n+1)$，其中 $m$ 和 $n$ 分別是兩個輸入序列的長度。</p>
+<p> 接下來初始化第一行和第一列的值，使第一列的每個元素等於 $0 - gap\ penalty \times 行號$，每一行的每個元素等於 $0 - gap\ penalty \times 列號$，其中 gap penalty 是插入或刪除的懲罰分數</p>
+</li>
+<li><p>計算得分（Matrix Filling）：<br> 遍歷得分矩陣的每個元素 $F(i,j)$，計算其得分。 得分是由三個可能的來源數值選出的最大值，這三個來源數值為：</p>
+<ul>
+<li>$F(i-1, j-1) + match&#x2F;mismatch\ score$：<br>  來自左上方的對角線的元素，表示匹配或不匹配的得分</li>
+<li>$F(i-1, j) - gap\ penalty$：<br>  來自上方的元素，表示插入的得分</li>
+<li>$F(i, j-1) - gap\ penalty$：<br>  來自左方的元素，表示刪除的得分</li>
+</ul>
+</li>
+<li><p>回溯（Traceback）：<br> 從右下角開始回溯，如果 $M_i &#x3D; N_j$，則回溯到左上角那格，如果 $M_i \neq N_j$，則回溯到左上角、上面、左邊中值最大的那格，其中 $M_i$ 表示 $M$ 內的第 $i$ 個元素，$N_j$ 同理；如果有相同最大值的格子，按照左上角、上面、左邊的順序來回溯</p>
+</li>
+<li><p>寫出回溯路徑<br> 最後我們就根據回溯路徑，寫出匹配的序列了，假設輸出的序列為 $M’$ 與 $N’$：</p>
+<ul>
+<li>如果回溯到左上角的格子，將 $M_i$ 添加到 $M’$ 中，將 $N_j$ 添加到 $N’$ 中</li>
+<li>如果回溯到上面的格子，將 $M_i$ 添加到 $M’$，將空格 <code>_</code> 添加到 $N’$ 中</li>
+<li>如果回溯到左邊的格子，將空格 <code>_</code> 添加到 $M’$ 中，將 $N_j$ 添加到 $N’$ 中</li>
+</ul>
+</li>
+</ol>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>這邊給一個例子，我們考慮兩個 sequence：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">N</span><span class="operator">:</span> <span class="variable">ATGCT</span></span><br><span class="line"><span class="variable">M</span><span class="operator">:</span> <span class="variable">AGCT</span></span><br></pre></td></tr></table></figure>
+
+<p>然後設定匹配得分(Match) 為 +1，不匹配懲罰分數(Mismatch) 為 -1，插入&#x2F;刪除的懲罰分數(GAP) 為 -2，因此得分矩陣（Score Matrix）初始化的樣子如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T   G   C   T -- 序列 N</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span>  -<span class="number">6</span>  -<span class="number">8</span> -<span class="number">10</span> -- 初始化為 <span class="number">0</span> - (-<span class="number">2</span>) * <span class="selector-tag">i</span>-<span class="selector-tag">th</span> column</span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span></span><br><span class="line">G -<span class="number">4</span></span><br><span class="line">C -<span class="number">6</span></span><br><span class="line">T -<span class="number">8</span></span><br><span class="line">|  |--初始化為 <span class="number">0</span> - (-<span class="number">2</span>) * j-<span class="selector-tag">th</span> row</span><br><span class="line">|--序列 M</span><br></pre></td></tr></table></figure>
+
+<p>然後填充，我們以 $F(2,2)$ 為例子計算一次，我這裡 index 從 $1$ 開始，$F(1,1)$ 到 $F(2,2)$ 的局部樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span></span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   ?</span><br></pre></td></tr></table></figure>
+
+<p>因此三個來源數值為：</p>
+<ul>
+<li>左上方：$0 + 1 &#x3D; 1$，因此為 $1$<br>  這邊是 $+1$ 而不是 $+(-1)$ 的原因是因為 $A &#x3D;&#x3D; A$，因此為 match，加上 match score</li>
+<li>上方：$(-2) - 2 &#x3D; -4$，因此為 $-4$</li>
+<li>左方：$(-2) - 2 &#x3D; -4$，因此為 $-4$</li>
+</ul>
+<p>三個數值中最大的數值為 $1$，因此填入 $1$：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span></span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來我們往右一個元素繼續執行這個過程，$F(1,1)$ 到 $F(2,3)$ 的局部樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span>   ?</span><br></pre></td></tr></table></figure>
+
+<p>三個來源數值為：</p>
+<ul>
+<li>左上方：$(-2) + (-1) &#x3D; -3$，因此為 $-3$<br>  這邊是 $+ (-1)$ 而不是 $+1$ 的原因是因為 $A \neq T$，因此為 mismatch，加上 mismatch score</li>
+<li>上方：$(-4) - 2 &#x3D; -6$，因此為 $-6$</li>
+<li>左方：$1 - 2 &#x3D; -1$，因此為 $-1$</li>
+</ul>
+<p>三個數值中最大的為 $-1$，因此填入 $-1$：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span>  -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>對每一層持續進行這個過程，第一次完成後矩陣的樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T   G   C   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span>  -<span class="number">6</span>  -<span class="number">8</span> -<span class="number">10</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span></span><br><span class="line">G -<span class="number">4</span>    </span><br><span class="line">C -<span class="number">6</span>    </span><br><span class="line">T -<span class="number">8</span>   </span><br></pre></td></tr></table></figure>
+
+<p>第二次迭代：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T   G   C   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span>  -<span class="number">6</span>  -<span class="number">8</span> -<span class="number">10</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span>  -<span class="number">1</span></span><br><span class="line">G -<span class="number">4</span>  -<span class="number">1</span> </span><br><span class="line">C -<span class="number">6</span>  </span><br><span class="line">T -<span class="number">8</span>  </span><br></pre></td></tr></table></figure>
+
+<p>整個流程完成後，矩陣的樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T   G   C   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span>  -<span class="number">6</span>  -<span class="number">8</span> -<span class="number">10</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span>  -<span class="number">1</span>  -<span class="number">3</span>  -<span class="number">5</span>  -<span class="number">7</span></span><br><span class="line">G -<span class="number">4</span>  -<span class="number">1</span>   <span class="number">0</span>   <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span></span><br><span class="line">C -<span class="number">6</span>  -<span class="number">3</span>  -<span class="number">2</span>  -<span class="number">1</span>   <span class="number">1</span>  -<span class="number">1</span></span><br><span class="line">T -<span class="number">8</span>  -<span class="number">5</span>  -<span class="number">2</span>  -<span class="number">3</span>  -<span class="number">1</span>   <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>Score Matrix 填充完畢後，開始從右下角回溯，找到最佳路徑。</p>
+<p>由 $F(5, 6)$ 的 $2$ 開始，由於 $C &#x3D;&#x3D; C$，所以往左上角走，接下來 $G &#x3D;&#x3D; G$，因此再往左上角走，接下來 $A \neq T$，因此找最大的格子，為 $F(2,2)$ 的 $1$，往左走，然後因為 $A &#x3D;&#x3D; A$，因此再往左上角走</p>
+<p>因此整體路徑為：$F(5,6) &#x3D;&gt; F(4,5) &#x3D;&gt; F(3,4) &#x3D;&gt; F(3, 3) &#x3D;&gt; F(2, 2)$<br>方向的話為：$左上 &#x3D;&gt; 左上 &#x3D;&gt; 左 &#x3D;&gt; 左上$</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">N</span><span class="operator">&#x27;:</span> <span class="variable">ATGCT</span></span><br><span class="line"><span class="variable">M</span><span class="operator">&#x27;:</span> <span class="variable">A</span><span class="operator">-</span><span class="variable">GCT</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Smith-Waterman"><a href="#Smith-Waterman" class="headerlink" title="Smith-Waterman"></a>Smith-Waterman</h2><p>與全局比對算法（如 Needleman-Wunsch）不同，Smith-Waterman 專注於找到序列中的局部相似區域，並計算這些區域的最大得分</p>
+<h3 id="步驟-1"><a href="#步驟-1" class="headerlink" title="步驟"></a>步驟</h3><p>Smith-Waterman 的步驟如下：</p>
+<ol>
+<li><p>初始化得分矩陣（Initialization）：<br> 給予兩個序列 $M$ 與 $N$，創建一個矩陣，大小為 $(m+1) \times (n+1)$，其中 $m$ 和 $n$ 分別是兩個輸入序列的長度</p>
+<p> 接下來初始化第一行和第一列的值初始化為 $0$</p>
+</li>
+<li><p>計算得分（Matrix Filling）：<br> 遍歷得分矩陣的每個元素 $F(i,j)$，計算其得分。 得分是由三個可能的來源數值選出的最大值，這三個來源數值為：</p>
+<ul>
+<li>如果這三個數值的最大值小於 $0$，則取 $0$</li>
+<li>$F(i-1, j-1) + match&#x2F;mismatch\ score$：<br>  來自左上方的對角線的元素，表示匹配或不匹配的得分</li>
+<li>$F(i-1, j) - gap\ penalty$：<br>  來自上方的元素，表示插入的得分</li>
+<li>$F(i, j-1) - gap\ penalty$：<br>  來自左方的元素，表示刪除的得分</li>
+</ul>
+</li>
+<li><p>找到最大得分<br> 在填充矩陣的過程中將最大值的值與位置記錄起來</p>
+</li>
+<li><p>回溯（Traceback）：<br> 從最大值的位置開始回溯，如果 $M_i &#x3D; N_j$，則回溯到左上角那格，如果 $M_i \neq N_j$，則回溯到左上角、上面、左邊中值最大的那格，其中 $M_i$ 表示 $M$ 內的第 $i$ 個元素，$N_j$ 同理；如果有相同最大值的格子，按照左上角、上面、左邊的順序來回溯</p>
+</li>
+<li><p>寫出回溯路徑<br> 最後我們就根據回溯路徑，寫出匹配的序列了，假設輸出的序列為 $M’$ 與 $N’$：</p>
+<ul>
+<li>如果回溯到左上角的格子，將 $M_i$ 添加到 $M’$ 中，將 $N_j$ 添加到 $N’$ 中</li>
+<li>如果回溯到上面的格子，將 $M_i$ 添加到 $M’$，將空格 <code>_</code> 添加到 $N’$ 中</li>
+<li>如果回溯到左邊的格子，將空格 <code>_</code> 添加到 $M’$ 中，將 $N_j$ 添加到 $N’$ 中</li>
+</ul>
+</li>
+</ol>
+<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h3><p>這邊我使用一篇 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lvaGpvYi9hcnRpY2xlL2RldGFpbHMvODkxNDQwMzI=">CSDN<i class="fa fa-external-link-alt"></i></span> 裡面的例子，我們考慮兩個 sequence：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">N</span><span class="operator">:</span> <span class="variable">TGTTACGG</span></span><br><span class="line"><span class="variable">M</span><span class="operator">:</span> <span class="variable">GGTTGACTA</span></span><br></pre></td></tr></table></figure>
+
+<p>然後設定匹配得分(Match) 為 +3，不匹配懲罰分數(Mismatch) 為 -3，插入&#x2F;刪除的懲罰分數(GAP) 為 -2</p>
+<p>首先將得分矩陣（Score Matrix）初始化：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">   -   T   G   T   T   <span class="selector-tag">A</span>   C   G   G -- 序列 N</span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span></span><br><span class="line">T  <span class="number">0</span></span><br><span class="line">T  <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span></span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span></span><br><span class="line">C  <span class="number">0</span></span><br><span class="line">T  <span class="number">0</span></span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span></span><br><span class="line">|--序列 M</span><br></pre></td></tr></table></figure>
+
+<p>然後填充，我們以 $F(2,2)$ 為例子計算一次，我這裡 index 從 $1$ 開始，$F(1,1)$ 到 $F(2,2)$ 的局部樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   T</span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   ?</span><br></pre></td></tr></table></figure>
+
+<p>因此三個來源數值為：</p>
+<ul>
+<li>左上方：$0 + (-3) &#x3D; -3$，因此為 $-3$</li>
+<li>上方：$0 - 2 &#x3D; -2$，因此為 $-2$</li>
+<li>左方：$0 - 2 &#x3D; -2$，因此為 $-2$</li>
+</ul>
+<p>由於三個數值中最大的為 $-2$，<span class = "yellow">小於 $0$</span>，因此填入 $0$：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   T</span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來我們往右一個元素繼續執行這個過程，$F(1,1)$ 到 $F(2,3)$ 的局部樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   T   G</span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   ?</span><br></pre></td></tr></table></figure>
+
+<p>三個來源數值為：</p>
+<ul>
+<li>左上方：$0 + 3 &#x3D; 3$，因此為 $3$</li>
+<li>上方：$0 - 2 &#x3D; -2$，因此為 $-2$</li>
+<li>左方：$0 - 2 &#x3D; -1$，因此為 $-2$</li>
+</ul>
+<p>由於三個數值中最大的為 $3$，因此填入 $3$：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T</span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>對每一層持續進行這個過程，第一次完成後矩陣的樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   -   T   G   T   T   <span class="selector-tag">A</span>   C   G   G </span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   </span><br><span class="line">G  <span class="number">0</span>  </span><br><span class="line">T  <span class="number">0</span>  </span><br><span class="line">T  <span class="number">0</span>  </span><br><span class="line">G  <span class="number">0</span>  </span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>  </span><br><span class="line">C  <span class="number">0</span>  </span><br><span class="line">T  <span class="number">0</span>  </span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>  </span><br></pre></td></tr></table></figure>
+
+<p>第二次迭代：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   -   T   G   T   T   <span class="selector-tag">A</span>   C   G   G </span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span>   </span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   </span><br><span class="line">T  <span class="number">0</span>   </span><br><span class="line">T  <span class="number">0</span>   </span><br><span class="line">G  <span class="number">0</span>   </span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>   </span><br><span class="line">C  <span class="number">0</span>   </span><br><span class="line">T  <span class="number">0</span>   </span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>   </span><br></pre></td></tr></table></figure>
+
+<p>整個流程完成後，矩陣的樣子為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   -   T   G   T   T   <span class="selector-tag">A</span>   C   G   G </span><br><span class="line">-  <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span>   <span class="number">1</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span>   <span class="number">3</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span>   <span class="number">1</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">3</span>   <span class="number">6</span></span><br><span class="line">T  <span class="number">0</span>   <span class="number">3</span>   <span class="number">1</span>   <span class="number">6</span>   <span class="number">4</span>   <span class="number">2</span>   <span class="number">0</span>   <span class="number">1</span>   <span class="number">4</span></span><br><span class="line">T  <span class="number">0</span>   <span class="number">3</span>   <span class="number">1</span>   <span class="number">4</span>   <span class="number">9</span>   <span class="number">7</span>   <span class="number">5</span>   <span class="number">3</span>   <span class="number">2</span></span><br><span class="line">G  <span class="number">0</span>   <span class="number">1</span>   <span class="number">6</span>   <span class="number">4</span>   <span class="number">7</span>   <span class="number">6</span>   <span class="number">4</span>   <span class="number">8</span>   <span class="number">6</span></span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>   <span class="number">0</span>   <span class="number">4</span>   <span class="number">3</span>   <span class="number">5</span>  <span class="number">10</span>   <span class="number">8</span>   <span class="number">6</span>   <span class="number">5</span></span><br><span class="line">C  <span class="number">0</span>   <span class="number">0</span>   <span class="number">2</span>   <span class="number">1</span>   <span class="number">3</span>   <span class="number">8</span>  <span class="number">13</span>  <span class="number">11</span>   <span class="number">9</span></span><br><span class="line">T  <span class="number">0</span>   <span class="number">3</span>   <span class="number">1</span>   <span class="number">5</span>   <span class="number">4</span>   <span class="number">6</span>  <span class="number">11</span>  <span class="number">10</span>   <span class="number">8</span></span><br><span class="line"><span class="selector-tag">A</span>  <span class="number">0</span>   <span class="number">1</span>   <span class="number">0</span>   <span class="number">3</span>   <span class="number">2</span>   <span class="number">7</span>   <span class="number">9</span>   <span class="number">8</span>   <span class="number">7</span></span><br></pre></td></tr></table></figure>
+
+<p>Score Matrix 填充完畢後，開始從最大值的位置回溯，找到最佳路徑。</p>
+<p>最大值為 13，其位於 $F(8,7)$，因此從 $F(8,7)$ 開始回溯</p>
+<p>回溯路徑如下圖：</p>
+<center>    
+<img src="https://hackmd.io/_uploads/S1RAWmZ4T.png">
+
+<p>圖源：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lvaGpvYi9hcnRpY2xlL2RldGFpbHMvODkxNDQwMzI=">Smith-Waterman算法、Needleman-Wunsch算法的算法原理及算法比较<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+
+<p>因此最終得到的序列為</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">N</span><span class="operator">&#x27;:</span> <span class="type">GTT_AC</span></span><br><span class="line"><span class="variable">M</span><span class="operator">&#x27;:</span> <span class="variable">GTTGAC</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Systolic-Array"><a href="#Systolic-Array" class="headerlink" title="Systolic Array"></a>Systolic Array</h1><p>這邊使用一下清大林永隆教授數邏的上課內容來介紹 Systolic Array，建議大家也可以去看看上課影片：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj02UEZnT01IQVVvMA==">19a 數位邏輯設計 Systolic Array<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1vc3dHWndiNURjdw==">19b 數位邏輯設計 Systolic Array<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+<p>Systolic Array 是由孔祥重院士提出的，問題的起因是把東西從 cache 搬到 register 的開銷其實是實際進行運算的開銷的好幾倍，若我們搬完一筆數據後只拿去運算一次就移走他，之後用到他的時候才又把它搬回來，就會造成另一筆額外且相對大的開銷</p>
+<p>所以核心的思想就是讓資料搬進 register 後要好好的被利用，做很多很多的運算，做完後才把數據移走，實作的方式有 pipeline 的味道在裡面</p>
+<p>下圖中的「PE」是運算單元，可以看見其將數據一次性地經過了多個 PE：</p>
+<center>
+    
+<img src="https://hackmd.io/_uploads/rJwygdG4a.png">
+
+<p>圖源：<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzE2NTM4MjU=">Kung, “Why systolic architectures?,” in Computer, vol. 15, no. 1, pp. 37-46, Jan. 1982, doi: 10.1109&#x2F;MC.1982.1653825.<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+
+<p>所以你可以猜到並不是所有的運算都適合利用 systolic array 來運算，因為數據並不一定符合「能一次性地做很多很多的運算」的這個特性</p>
+<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子 1"></a>例子 1</h3><p>那麼有什麼樣的運算符合呢? 在孔祥重院士的論文中舉了一個例子：捲積(Convolution)</p>
+<p>我們先從一維的開始下手，Convolution 是現代很常使用到的計算方法，在 Convolution 的運算中會有兩個輸入序列，這邊假設輸入為 $X$ 與 $w$，其值為：</p>
+<p>$$<br>\begin{cases}<br>X: {3, 2, -1, 2, 0, 1}\newline<br>w:{2, -1, 2}<br>\end{cases}<br>$$</p>
+<p>並且 Convolution 會有一個輸出序列，這邊假設輸出為 $Y$，其運算方式為 $\Sigma_{j&#x3D;1}^3w_jX_{i+j-1}$，此處 Sigma 內的 <code>3</code> 為 $w$ 序列的元素個數</p>
+<p>因此 $Y$ 的第一個元素為 $w_1X_1 + w_2X_2 + w_3X_3$，也就是 $w$ 與 $X$ 的前三個元素做內積，將值代入的話為：$(2\times 3)\ + (-1 \times 2)\ + (2 \times -1) &#x3D; 2$。</p>
+<p>按照這個方式計算過後，$Y$ 序列最終為：</p>
+<p>$$<br>Y: {2, 9, -4, 6}<br>$$</p>
+<p>此時孔院士就發現這可以有很多種算法，首先我們可以讓 $X$ 從我們元件的左邊按照設定好的順序傳進來，$w$ 的每個元素固定從元件的上方傳進來，每個元件內會有 register 與乘法器，我們將元素依序在每個元件內做相乘並存起來</p>
+<p>假設一個開始 <code>t = 0</code>，則當 <code>t = 3</code> 時整個架構會長得像這樣：</p>
+<center><img src="https://hackmd.io/_uploads/SJj_n_GEa.png"></center><br>
+
+<p>上圖中有三個 PE，每個 PE 內有一個 register 用來存進來的 $X_i$，而每個 PE 的上方會有固定的 $w_i$ 數據傳入，PE 的內部有一個乘法器負責做乘法運算，運算完的結果會傳出來跟其他 PE 的運算結果做加法，整個做完後就是我們要的 $Y_1$ 了</p>
+<p>可以再多看一個 $Y_2$ 的樣子：</p>
+<center><img src="https://hackmd.io/_uploads/H1sMyYMVT.png"></center><br>
+
+<p>而還有其他的方法，如孔院士提出的 broadcast inputs, move results, weights stay：</p>
+<center>
+    
+<img src="https://hackmd.io/_uploads/Sy_SlYfNp.png">
+
+<p>圖源：<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzE2NTM4MjU=">Kung, “Why systolic architectures?,” in Computer, vol. 15, no. 1, pp. 37-46, Jan. 1982, doi: 10.1109&#x2F;MC.1982.1653825.<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+
+<p>在上例中，$w_i$ 會預先存在每一個 PE 裡面，$X_i$ 則從上方平行傳入對應的 PE 中，這被稱為「廣播」，而 $Y_i$ 則向右側依序傳入，這個動作被稱為「脈動」</p>
+<p>從上例你也可以很簡單的看出到 <code>t = 3</code> 的時候，$Y_1$ 的值也會出來了</p>
+<p>這樣的電路架構我們稱它為 Systolic Array，你可以看見它的結構非常的簡單且 Regular，每個 PE 做的操作都一樣，操作也不複雜，然而也因此導致其 Systolic Array 泛用性不高，很難同一組 Systolic Array 拿去做不同場合的運算，需要針對不同的場合設計不同的 Systolic Array</p>
+<h3 id="例子-2"><a href="#例子-2" class="headerlink" title="例子 2"></a>例子 2</h3><p>接下來我們看一下二維的例子：矩陣運算</p>
+<p>這也是 Google TPU 的應用，拿來做 ML 加速</p>
+<p>假設我們現在有兩個 Array 做相乘，寫作 $C &#x3D; A \times B$，其中 $A$、$B$、$C$ 都是矩陣，假設 $A$、$B$ 兩矩陣為：</p>
+<p>$$<br>A &#x3D;<br>\begin{bmatrix}<br> 1 &amp; 2 \newline<br> 3 &amp; 4 \newline<br>\end{bmatrix},\<br>B &#x3D;<br>\begin{bmatrix}<br> 5 &amp; 6 \newline<br> 7 &amp; 8 \newline<br>\end{bmatrix}<br>$$</p>
+<p>則</p>
+<p>$$<br>C &#x3D;<br>\begin{bmatrix}<br> 1 &amp; 2 \newline<br> 3 &amp; 4 \newline<br>\end{bmatrix}<br>\begin{bmatrix}<br> 5 &amp; 6 \newline<br> 7 &amp; 8 \newline<br>\end{bmatrix}&#x3D;<br>\begin{bmatrix}<br> 19 &amp; 22 \newline<br> 43 &amp; 50 \newline<br>\end{bmatrix}<br>$$</p>
+<p>這個的 Systolic Array 會有四個 PE，整體步驟如下圖所示：</p>
+<center><img src="https://github.com/Mes0903/Mes_Note/blob/main/SystolicArrayOnRRAM/img/SystolicArrayForMatrix.jpg?raw=true"></center><br>
+
+<p>原先的矩陣乘法，一個 $N\times N$ 的矩陣，會需要做 $N\times N\times N$ 次的乘法，透過 Systolic Array，可以將運算降低至 $3N - 1$ 個 cycles</p>
+<p>註：<code>t = 0</code> 還沒開始運算，所以不算在 cycle 內，以這個例子來說 $3\times 2 - 1$ 算起來有 5 個 cycles，對應到圖中的<code>t = 1</code> 到 <code>t = 5</code></p>
+<h1 id="ReRAM-RRAM"><a href="#ReRAM-RRAM" class="headerlink" title="ReRAM (RRAM)"></a>ReRAM (RRAM)</h1><p>ReRAM 是一種新型的非揮發性記憶體，所謂的「非揮發性」表示斷電後 memory 內的數據並不會消失，會被保存下來，跟目前主流的 DRAM、SRAM 不一樣</p>
+<p>具我所知目前 ReRAM 還沒有終端產品，ReRAM 基於內部的可變電阻，可以通過改變 memory cell 內的的電阻來實現 in-memory computing，而至於內部的物理長怎樣我也不會，所以這邊就不多闡述，但有一部影片講得還不錯，有興趣的可以看看：<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1QOWtjYkd2VG9GVQ==">EE Research Talk—Next generation memory technology: a Resistive Random-Access (ReRAM) Memor<i class="fa fa-external-link-alt"></i></span></p>
+<p>這邊簡單寫一下 ReRAM 裡面的架構，ReRAM 的基本單元是由兩個電極之間的一層絕緣材料構成，稱為 ReRAM cell。這兩個電極通常被稱為「頂電極（Top Electrode）」和「底電極（Bottom Electrode）」。兩個電極之間的絕緣材料通常是一種氧化物，像是氧化鋯（Zirconium Oxide）</p>
+<p>比較特別的地方在於中間那個絕緣材料有可變電阻的特性。當電流通過 ReRAM cell 時，這會導致絕緣材料中的一部分變成導體，改變電阻值。這個改變是可逆的，可以通過反向電流（負極-&gt;正極）或其他方法將它恢復</p>
+<center>
+
+<img src="https://hackmd.io/_uploads/HJlB2l7VT.png">
+    
+<p>圖源：<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzcyNzQ0ODQ=">R. Liu, D. Mahalanabis, H. J. Barnaby and S. Yu, “Investigation of Single-Bit and Multiple-Bit Upsets in Oxide RRAM-Based 1T1R and Crossbar Memory Arrays,” in IEEE Transactions on Nuclear Science, vol. 62, no. 5, pp. 2294-2301, Oct. 2015, doi: 10.1109&#x2F;TNS.2015.2465164.<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+
+<p>當 ReRAM 單元處於高阻態（HRS）時，表示存儲的是數據位「0」；當處於低阻態（LRS）時，表示存儲的是數據位「1」。通過對 ReRAM cell 施加適當的電壓，可以在兩種狀態之間切換</p>
+<p>ReRAM 也可以有 Multi-level 的型態，在這種情況寫一個 ReRAM cell 就可以表示多個 bits，做法是將電壓的區間切分的更細，如切成四等分，那麼便可以表示四種狀態：00、01、10、11，這樣的 memory cell 我們稱為 Multi-level cell</p>
+<p>有一篇知乎寫得也不錯，但因為他禁止轉載，所以連結放這邊建議大家可以點進去看看：<span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC8zNTE1MjY2OD9mYmNsaWQ9SXdBUjF0aE5mYVhQOFVqU19tdGVfcXlDaWNhcU9HQWM4NUt5SWFJbFQ4MGk3dkVGUjl3cGdpUlZEZzkyMA==">閱讀筆記一：RRAM (ReRAM)<i class="fa fa-external-link-alt"></i></span></p>
+<p>而 In-Memory Computing 是一種將計算操作直接執行在儲存設備中的計算模型，像是這邊的儲存設備就是 ReRAM，另外還有 DRAM In-memory computing 等等的。這種模型消除了傳統計算模型中從需要把數據搬移到處理器造成的傳輸瓶頸，提供了更高效的計算方式</p>
+<p>至於該如何計算，這邊舉個例子，假設我們現在有四個 ReRAM cell：</p>
+<center><img src="https://hackmd.io/_uploads/Hktr0lQ4T.png"></center><br>
+
+<p>當我們設定 WL 上的電壓 $V_i$ 與對應的可變電阻 $G_i$ 時，BL 會產生對應的電流 $I_i$，以圖中的例子來說，利用歐姆定律，我們可以算出 $I_1 &#x3D; V_1G_1 + V_2G_2$，$I_2$ 同理</p>
+<p>這個就可以拿來做矩陣運算，假設我們今天想要算的運算為</p>
+<p>$$<br>\begin{bmatrix}<br> 1 &amp; 2 \newline<br>\end{bmatrix}<br>\begin{bmatrix}<br> 3 &amp; 4 \newline<br> 5 &amp; 6 \newline<br>\end{bmatrix}&#x3D;<br>\begin{bmatrix}<br> 13 &amp; 16 \newline<br>\end{bmatrix}<br>$$</p>
+<p>我們就可以將電壓與電阻設為特殊的數值來計算出我們要的結果：</p>
+<center><img src="https://hackmd.io/_uploads/r1hOy-X4a.png"></center><br>
+
+<p>如此一來就完成了一個矩陣運算，另外，這種一個 Vector 與 Matrix 的乘法操作有個名字稱為 matrix-vector-multiplication，簡寫為 MVM，常出現在論文裡面</p>
+<h1 id="實作思路"><a href="#實作思路" class="headerlink" title="實作思路"></a>實作思路</h1><p>我們的思路主要如下：</p>
+<ol>
+<li>設計出 SW 演算法的 Systolic Array</li>
+<li>確認 Systolic Array 內部的 PE 樣貌</li>
+<li>確認使用到的 gate 是否可以在 ReRAM 上實現</li>
+<li>如果可以，那理論上就可以在 ReRAM 上實作出 SW 演算法的 Systolic Array</li>
+</ol>
+<h2 id="設計出-SW-演算法的-Systolic-Array"><a href="#設計出-SW-演算法的-Systolic-Array" class="headerlink" title="設計出 SW 演算法的 Systolic Array"></a>設計出 SW 演算法的 Systolic Array</h2><p>這邊以「<span class="exturl" data-url="aHR0cHM6Ly93d3cucmVzZWFyY2hnYXRlLm5ldC9wdWJsaWNhdGlvbi8yMjA5NjkzMzBfQV9TeXN0b2xpY19BcnJheV9BcmNoaXRlY3R1cmVfZm9yX3RoZV9TbWl0aC1XYXRlcm1hbl9BbGdvcml0aG1fd2l0aF9IaWdoX1BlcmZvcm1hbmNlX0NlbGxfRGVzaWdu">A Systolic Array Architecture for the Smith-Waterman Algorithm with High Performance Cell Design<i class="fa fa-external-link-alt"></i></span>」這篇論文內的設計為主，這篇論文使用的是比較直觀的設計方法，因此非常簡單易懂</p>
+<p>這裡主要做的是 SW 填充步驟的平行化，以下面這個矩陣為例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   -   <span class="selector-tag">A</span>   T   G   C   T</span><br><span class="line">-  <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span>  -<span class="number">6</span>  -<span class="number">8</span> -<span class="number">10</span></span><br><span class="line"><span class="selector-tag">A</span> -<span class="number">2</span>   <span class="number">1</span>  -<span class="number">1</span>  -<span class="number">3</span>  -<span class="number">5</span>  -<span class="number">7</span></span><br><span class="line">G -<span class="number">4</span>  -<span class="number">1</span>   <span class="number">0</span>   <span class="number">0</span>  -<span class="number">2</span>  -<span class="number">4</span></span><br><span class="line">C -<span class="number">6</span>  -<span class="number">3</span>  -<span class="number">2</span>  -<span class="number">1</span>   <span class="number">1</span>  -<span class="number">1</span></span><br><span class="line">T -<span class="number">8</span>  -<span class="number">5</span>  -<span class="number">2</span>  -<span class="number">3</span>  -<span class="number">1</span>   <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>他的 Systolic Array 應該要是以下形式：</p>
+<p><img src="https://hackmd.io/_uploads/r1GwNzmu6.png" alt="image"></p>
+<p>可以看見他將整個矩陣的運算優化到了 7 個 cycle</p>
+<h2 id="Systolic-Array-內部的-PE-樣貌"><a href="#Systolic-Array-內部的-PE-樣貌" class="headerlink" title="Systolic Array 內部的 PE 樣貌"></a>Systolic Array 內部的 PE 樣貌</h2><p>而每個 PE 的設計也很簡單：</p>
+<p><img src="https://hackmd.io/_uploads/SJyjVzQd6.png" alt="image"></p>
+<p>其中，當 <code>Sequence\#1</code> 等於 <code>Sequence\#2</code> 時，$S_{i,j}$ 為 match score，否則為 mismatch score</p>
+<p>而 Comparator 的本體也不難，由於是比較等於，網路上一找馬上就有簡單的實作出來了：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/SyrbHzQdp.png" alt="image"><br>Reference：<span class="exturl" data-url="aHR0cHM6Ly93d3cucmVuZXNhcy5jb20vdXMvZW4vcHJvZHVjdHMvbWVtb3J5LWxvZ2ljL3N0YW5kYXJkLWxvZ2ljL2Zhc3QtY21vcy10dGwtY29tcGF0aWJsZS1mY3QvNzRmY3Q1MjF0LTgtYml0LWlkZW50aXR5LWNvbXBhcmF0b3I=">8-Bit Identity Comparator<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+    
+<p>其中的 XOR 可以用 NOR 實作出來：</p>
+<center>
+    
+<p><img src="https://hackmd.io/_uploads/S10Urf7OT.png" alt="image"><br>Reference：<span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvWE9SX2dhdGU=">wiki<i class="fa fa-external-link-alt"></i></span></p>
+</center>
+    
+<h2 id="NOR-gate-on-ReRAM"><a href="#NOR-gate-on-ReRAM" class="headerlink" title="NOR gate on ReRAM"></a>NOR gate on ReRAM</h2><p>所以我們接下來需要確認 ReRAM 上是否能實作出 NOR gate 的功能，這邊有兩篇我覺得寫得蠻清楚的論文，各提了一種方法來實作，這邊就把兩篇論文的想法都很簡化的講解一下</p>
+<h3 id="OR-gate-NOT-gate"><a href="#OR-gate-NOT-gate" class="headerlink" title="OR gate + NOT gate"></a>OR gate + NOT gate</h3><p>這個是「<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzcyNzQ2NTY/ZmJjbGlkPUl3QVIwRmJCeWE4YnZRR1lpZHk3UXdlMVRyeC1NMkJDTjVhbUExLS0zRFpyVm5lVVF1MURxMi1GbXd4eXc=">Nonvolatile Logic and In Situ Data Transfer Demonstrated in Crossbar Resistive RAM Array<i class="fa fa-external-link-alt"></i></span>」這篇論文提出來的方法</p>
+<p>主要有幾個重點：</p>
+<ul>
+<li>用「電阻」儲存變數</li>
+<li>LRS 對應到 1，HRS 對應到 0；LRS 代表低電阻，HRS 代表高電阻</li>
+<li>cell 會被初始化為 0，RESET 操作也是將 cell 設為 0</li>
+<li>當目標電流大於限制電流(CC) 時，會進行 SET 操作，將 OUTPUT 設為 1</li>
+</ul>
+<p>論文中給出的範例如下，首先有三個 cell：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/ryBCIGQdp.png" alt="image"></p>
+</center>
+
+<p>A、B 是我們輸入的兩個變數，而 OUT 是對應的輸出，當我們給定電壓，讓電流從左邊通過時，其電流如下：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/S1LQPG7dT.png" alt="image"></p>
+</center>
+    
+<p>首先假設 CC 電流為 1mA：</p>
+<ul>
+<li>當 A、B 都為 0 時，由於都是高電阻，因此流過兩個 cell 的電流都不會大於 CC 電流</li>
+<li>當 A、B 為 0、1 時，由於 B 被設為低電阻了，因此經過此 cell 時電流大於 CC 電流，進行 SET 操作，將 OUT 設為 1，也因此會輸出 1</li>
+<li>當 A、B 為 1、0 時，由於 A 被設為低電阻了，接下來同上</li>
+<li>當 A、B 為 1、1 時同理</li>
+</ul>
+<p>如此一來便完成了 OR gate，接下來的 NOT gate 更簡單了：</p>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/SJ0I_zmuT.png" alt="image"></p>
+</center>
+    
+<h3 id="Truth-table"><a href="#Truth-table" class="headerlink" title="Truth table"></a>Truth table</h3><p>這個是「<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzc0MDk3MjA=">Efficient in-memory computing architecture based on crossbar arrays<i class="fa fa-external-link-alt"></i></span>」這篇論文提出的方法</p>
+<p>重點為：</p>
+<ul>
+<li>以電壓傳遞變數</li>
+<li>事先利用可變電阻將目標 gate 的真值表存起來</li>
+<li>偵測輸入電壓後的目標電流對應的電阻值</li>
+</ul>
+<center>
+
+<p><img src="https://hackmd.io/_uploads/Sy01Fz7_a.png" alt="image"><br>(我也不知道為什麼論文內的圖這麼糊)</p>
+</center>
+    
+<p>上圖是 NOR gate 的例子，電阻塗黃表示 1，塗白則為 0</p>
+<p>我們會將變數的 0、1 分別以低、高電壓表示，至於多低、多高則自己定義，論文內舉了 2V 與 4V 為例子</p>
+<p>因此當 2V 與 4V 傳入圖中對應的 WL(直行) 時，等我們傳入 readout 電壓，便只有第三列的電流會小於我們所設定的限制電流，我們就可以讀取對應的電阻值，得到的輸出了</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>透過簡單閱讀上面這兩篇論文，我們已經確認了 NOR gate 可以在 ReRAM 上被實作出來，而 NOR gate 是 functional complete 的，因此基本上想組什麼出來都是沒問題的，但 performance 怎麼樣就不好說了XD</p>
+<p>因為時間關係把整個過程簡化了許多，但已經確認這個想法確實是可行的，接下來就是等有閒的時候來嘗試實作看看了</p>
+<p>實際實作下去會冒出很多我們現在沒想到的問題，如果有人看到這篇文，有興趣也歡迎去玩玩看，和我分享結果XD</p>
+<p>另外「<span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzY3MzQ2ODk=">Protein Alignment Systolic Array Throughput Optimization<i class="fa fa-external-link-alt"></i></span>」這篇論文對 SW 的 Systolic Array 進行了改良，Systolic Array 變得很小，而且使用率變得更好了，但 PE 的內部電路相對就變得複雜了起來，有興趣的也可以看看</p>
+<h1 id="Survey-of-related-paper"><a href="#Survey-of-related-paper" class="headerlink" title="Survey of related paper"></a>Survey of related paper</h1><p>「對齊」的演算法的加速仍受到現有的硬體架構限制，因其資料量大，register 容量相對來說有限，因此需要頻繁的移動資料，導致計算成本高昂，另外對齊演算法並不是單純的矩陣運算，這也會導致難以優化</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzg0MDkyNTk=">AligneR: A Process-in-Memory Architecture for Short Read Alignment in ReRAMs<i class="fa fa-external-link-alt"></i></span><ul>
+<li>提出了一種使用 RRAM 設計的 Hamming Distance Unit，用來加速計算基因序列片段的漢名距離，並透過這個 RHU (ReRAMbased HD unit) 構建了一個完整的 AligneR 管道來最大化讀取對齊的 throughput。</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzIyMDUuMTU1MDU=">DNA Pattern Matching Acceleration with Analog Resistive CAM<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzEwMjQ0NzMw">Enabling Highly-Efficient DNA Sequence Mapping via ReRAM-based TCAM<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzg4OTE2NjM=">FindeR: Accelerating FM-Index-Based Exact Pattern Matching in Genomic Sequences through ReRAM Technology<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzg1OTQ2MjQ=">RASSA: Resistive Prealignment Accelerator for Approximate DNA Long Read Mapping<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9kbC5hY20ub3JnL2RvaS9hYnMvMTAuMTE0NS8zNDAwMzAyLjM0MTU2NTE=">Seed-and-vote based in-memory accelerator for DNA read mapping<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzk3NzQ3MTU=">RePAIR: A ReRAM-based Processing-in-Memory Accelerator for Indel Realignment<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxMTY0Njk=">PSB-RNN: A Processing-in-Memory Systolic Array Architecture using Block Circulant Matrices for Recurrent Neural Networks<i class="fa fa-external-link-alt"></i></span><ul>
+<li>提出了一種基於 ReRAM crossbar based PIM 架構，結合了 block circulant compression for RNNs，設計了一種 Systolic Array 來加速運算</li>
+<li>註：block circulant compression for RNNs 是一種用來減少 RNN 模型的參數數量的方法</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzg2ODA2MjM=">MAX$^2$: An ReRAM-Based Neural Network Accelerator That Maximizes Data Reuse and Area Utilization<i class="fa fa-external-link-alt"></i></span><ul>
+<li>提出了一種在 ReRAM 上實作的 Systolic Array，用來加速 CNN 的運算</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzY3MzQ2ODk=">Protein Alignment Systolic Array Throughput Optimization<i class="fa fa-external-link-alt"></i></span><ul>
+<li>提出了一種改良過的 Systolic Array 來實作 Smith-Waterman</li>
+<li>改良的點著重在於當 RNA 有 Internal loop 時，一般直觀的 Systolic Array 設計會有效能劇減的問題</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuc2NpZW5jZWRpcmVjdC5jb20vc2NpZW5jZS9hcnRpY2xlL3BpaS9TMjc3MzA2NDYyMjAwMDE2MA==">A survey on processing-in-memory techniques: Advances and challenges<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubWRwaS5jb20vMjUwNC00OTkwLzEvMS81">A Survey of ReRAM-Based Architectures for Processing-In-Memory and Neural Networks<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvYWJzLzIyMTEuMDU3MzM=">RAPIDx: High-performance ReRAM Processing in-Memory Accelerator for Sequence Alignment<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubWRwaS5jb20vMjA3OS05MjkyLzExLzIyLzM2Njc=">Resistive-RAM-Based In-Memory Computing for Neural Network: A Review<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzE2NTM4MjU=">Why systolic architectures?<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cucmVzZWFyY2hnYXRlLm5ldC9wdWJsaWNhdGlvbi8yMjA5NjkzMzBfQV9TeXN0b2xpY19BcnJheV9BcmNoaXRlY3R1cmVfZm9yX3RoZV9TbWl0aC1XYXRlcm1hbl9BbGdvcml0aG1fd2l0aF9IaWdoX1BlcmZvcm1hbmNlX0NlbGxfRGVzaWdu">A Systolic Array Architecture for the Smith-Waterman Algorithm with High Performance Cell Design.<i class="fa fa-external-link-alt"></i></span><ul>
+<li>設計了給 SW 用的 Systolic Array</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkzOTM0OTE/ZmJjbGlkPUl3QVIxUGRRRVlSaXN0MFhqNEFtSmZ6bi1EcXRJWXNyaEM5VF94N2Nua0lIZ1dtUVpzMk5kYkJUbXlqOGs=">Accelerated Addition in Resistive RAM Array Using Parallel-Friendly Majority Gates<i class="fa fa-external-link-alt"></i></span><ul>
+<li>在 ReRAM 上實作了 majority gate</li>
+</ul>
+</li>
+<li><a href="">Efficient in-memory computing architecture based on crossbar arrays</a><ul>
+<li>在 ReRAM 上實作了 NOR gate，並進一步實作了全加器和乘法器</li>
+</ul>
+</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50Lzg0NTQyNTg=">Efficient Implementation of Boolean and Full-Adder Functions With 1T1R RRAMs for Beyond Von Neumann In-Memory Computing<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzcyNzQ2NTY/ZmJjbGlkPUl3QVIwRmJCeWE4YnZRR1lpZHk3UXdlMVRyeC1NMkJDTjVhbUExLS0zRFpyVm5lVVF1MURxMi1GbXd4eXc=">Nonvolatile Logic and In Situ Data Transfer Demonstrated in Crossbar Resistive RAM Array<i class="fa fa-external-link-alt"></i></span><ul>
+<li>在 ReRAM 實作了 NOR gate</li>
+</ul>
+</li>
+</ul>
+<h1 id="論文外的參考資料"><a href="#論文外的參考資料" class="headerlink" title="論文外的參考資料"></a>論文外的參考資料</h1><ol>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQFVsdnlkam9RUUthZmE0aXdCa0o5bGcvQmtHdW1WWnR1">基因序列比對演算法<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9iaW8ubGlicmV0ZXh0cy5vcmcvQm9va3NoZWx2ZXMvQ29tcHV0YXRpb25hbF9CaW9sb2d5L0Jvb2slM0FfQ29tcHV0YXRpb25hbF9CaW9sb2d5Xy1fR2Vub21lc19OZXR3b3Jrc19hbmRfRXZvbHV0aW9uXyhLZWxsaXNfZXRfYWwuKS8wMyUzQV9SYXBpZF9TZXF1ZW5jZV9BbGlnbm1lbnRfYW5kX0RhdGFiYXNlX1NlYXJjaC8zLjAzJTNBX0dsb2JhbF9hbGlnbm1lbnRfdnMuX0xvY2FsX2FsaWdubWVudF92cy5fU2VtaS1nbG9iYWxfYWxpZ25tZW50">Global alignment vs. Local alignment vs. Semi-global alignment<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1pcHAtcE5SSXA0Zw==">Global Sequence Alignment &amp; Needleman-Wunsch || Algorithm and Example<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lvaGpvYi9hcnRpY2xlL2RldGFpbHMvODkxNDQwMzI=">Smith-Waterman算法、Needleman-Wunsch算法的算法原理及算法比较<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC8zNTE1MjY2OD9mYmNsaWQ9SXdBUjF0aE5mYVhQOFVqU19tdGVfcXlDaWNhcU9HQWM4NUt5SWFJbFQ4MGk3dkVGUjl3cGdpUlZEZzkyMA==">閱讀筆記一：RRAM (ReRAM)<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC8yNjUyMjMxNQ==">脈動陣列- 因Google TPU獲得新生<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pbXBsZW1lbnRhdGlvbi5lZS5udGh1LmVkdS50dy9jb21wZXRpdGlvbi9ncm91cHMvZTUzNmNlNmItMTEzMi00YTAzLWFmYjctYmM0ZThhNzgxMzliL2F0dGFjaG1lbnRzL3N1bW1hcnk/ZG93bmxvYWQ9MCZmYmNsaWQ9SXdBUjBLU1dmbkNHUDJtcDVmWWt3T1Y0V2FILXZYdVhzYUVVU21UcjFGd2IzUTEzdlpZRUVvelRrN3FTdw==">應用於神經網路之電阻式記憶體內運算<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1CVG5yOHotZVBSNA==">What is In-Memory Computing?<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2phc29ubGluMzE2L1N5c3RvbGljLUFycmF5LWZvci1TbWl0aC1XYXRlcm1hbj9mYmNsaWQ9SXdBUjJxRkx1aWNNcU1qSjMyVk53Nk1xMTd4VTRIZHItOVBndk9LeHlxem93TENxVl9IcEltbU1rSnFnMA==">Systolic Array for Smith-Waterman<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1QOWtjYkd2VG9GVSZ0PTEzM3M=">EE Research Talk—Next generation memory technology: a Resistive Random-Access (ReRAM) Memory<i class="fa fa-external-link-alt"></i></span></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Mes
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://mes0903.github.io/2023/11/14/memory/sw-reram/" title="ReRAM 與 Smith-Waterman Algorithm 介紹">https://mes0903.github.io/2023/11/14/memory/sw-reram/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-SA</span> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/memory/" rel="tag"># memory</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/" rel="prev" title="礦坑系列 ── Indirect through null pointer">
+                  <i class="fa fa-angle-left"></i> 礦坑系列 ── Indirect through null pointer
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/20/Linux/physical-address-syscall/" rel="next" title="實作一個回傳物理位址的系統呼叫">
+                  實作一個回傳物理位址的系統呼叫 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">172k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">10:26</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

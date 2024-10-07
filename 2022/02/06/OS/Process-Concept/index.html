@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="簡單介紹了 Process">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ch3 Processes Concept">
+<meta property="og:url" content="https://mes0903.github.io/2022/02/06/OS/Process-Concept/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="簡單介紹了 Process">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.imgur.com/FalUQpT.png">
+<meta property="og:image" content="https://i.imgur.com/NCeLmMW.png">
+<meta property="og:image" content="https://i.imgur.com/j3IftQs.png">
+<meta property="og:image" content="https://i.imgur.com/DZ5idza.png">
+<meta property="og:image" content="https://i.imgur.com/5YwZ5qJ.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rJGYRCtep.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/rypUyk5x6.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/S1KETR5lT.png">
+<meta property="og:image" content="https://i.imgur.com/UxK49Kx.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/SJ7U3J2-a.png">
+<meta property="og:image" content="https://hackmd.io/_uploads/r1cMRynbp.png">
+<meta property="article:published_time" content="2022-02-06T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-07T20:03:03.892Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="OS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/FalUQpT.png">
+
+
+<link rel="canonical" href="https://mes0903.github.io/2022/02/06/OS/Process-Concept/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2022/02/06/OS/Process-Concept/","path":"2022/02/06/OS/Process-Concept/","title":"Ch3 Processes Concept"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Ch3 Processes Concept | Mes's Studio</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Mes 雜七雜八</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ch3-Processes-Concept"><span class="nav-number">1.</span> <span class="nav-text">Ch3 Processes Concept</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-Concept"><span class="nav-number">1.1.</span> <span class="nav-text">Process Concept</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-in-Memory"><span class="nav-number">1.2.</span> <span class="nav-text">Process in Memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Thread"><span class="nav-number">1.3.</span> <span class="nav-text">Thread</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-State"><span class="nav-number">1.4.</span> <span class="nav-text">Process State</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-Control-Block-PCB"><span class="nav-number">1.5.</span> <span class="nav-text">Process Control Block (PCB)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-Switch"><span class="nav-number">1.6.</span> <span class="nav-text">Context Switch</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Processing-Scheduling"><span class="nav-number">2.</span> <span class="nav-text">Processing Scheduling</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduler"><span class="nav-number">2.1.</span> <span class="nav-text">Scheduler</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Process-Creation"><span class="nav-number">3.</span> <span class="nav-text">Process Creation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PID"><span class="nav-number">3.1.</span> <span class="nav-text">PID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process-Creation-1"><span class="nav-number">3.2.</span> <span class="nav-text">Process Creation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fork"><span class="nav-number">3.2.1.</span> <span class="nav-text">fork</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Interprocess-Communication-IPC"><span class="nav-number">4.</span> <span class="nav-text">Interprocess Communication(IPC)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Shared-Memory"><span class="nav-number">4.1.</span> <span class="nav-text">Shared Memory</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Consumer-Producer-Problem"><span class="nav-number">4.1.1.</span> <span class="nav-text">Consumer &amp; Producer Problem</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Message-Passing"><span class="nav-number">4.2.</span> <span class="nav-text">Message Passing</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Icon.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description">The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+  <div class="cc-license animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/big/by_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2022/02/06/OS/Process-Concept/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Icon.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Ch3 Processes Concept | Mes's Studio">
+      <meta itemprop="description" content="簡單介紹了 Process">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ch3 Processes Concept
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-02-06 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-06T00:00:00+00:00">2022-02-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-07 20:03:03" itemprop="dateModified" datetime="2024-10-07T20:03:03+00:00">2024-10-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OS/" itemprop="url" rel="index"><span itemprop="name">OS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.9k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>14 mins.</span>
+    </span>
+</div>
+
+            <div class="post-description">簡單介紹了 Process</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Ch3-Processes-Concept"><a href="#Ch3-Processes-Concept" class="headerlink" title="Ch3 Processes Concept"></a>Ch3 Processes Concept</h1><h2 id="Process-Concept"><a href="#Process-Concept" class="headerlink" title="Process Concept"></a>Process Concept</h2><p>前面一直看到 Process 和 Program，他們翻成中文都叫程式，但他們是有一些差別的，Program 是一堆儲存在 disk 裡面的 binary，它是死的東西，只是個檔案，等著被執行，簡單來講就是程式碼而已。而 Process 就是跑起來的 Program，在 memory 裡面，因為正在被執行，是活的。</p>
+<p>一個 Process 會有一個 memory space，裡面會有一些主要的 content：</p>
+<ul>
+<li><p>Code segment (text section)</p>
+<p>  簡單來說就是你的程式碼，原本這些是儲存在 disk 裡面的，但當 Process 要執行時 OS 會把你的 code load 到 memory 裡面，等著被 CPU fetch 進去 instruction。</p>
+<p>  所以當然這些 code 就不是一般的 code，而是 instruction 了，因為要直接送到 CPU 裡去了。</p>
+</li>
+<li><p>Data section</p>
+<p>  全域變數儲存的地方，Process 一開始就存在，所有的 function 都可以 access。</p>
+</li>
+<li><p>Stack</p>
+<p>  local 變數儲存的地方，function call 完後就會消失了。</p>
+</li>
+<li><p>Heap</p>
+<p>  dynamic allocated 的變數儲存的地方。</p>
+</li>
+<li><p>Current activity</p>
+<p>  一些 metadata，拿來管理 Process 用的，像是 program counter，register contents 等等</p>
+</li>
+<li><p>一些相關的 resources</p>
+<p>  在開檔，使用電腦上的資源時，Process 會需要一個類似 token 的東西，讓 OS 能夠知道你開了哪些檔案，或是用了多少 socket port 等等。</p>
+</li>
+</ul>
+<h2 id="Process-in-Memory"><a href="#Process-in-Memory" class="headerlink" title="Process in Memory"></a>Process in Memory</h2><p>所以我們常說一個 Process 在 OS 的世界裡就是一個 memory 的 space，基本長的會像這樣：</p>
+<p><img src="https://i.imgur.com/FalUQpT.png"></p>
+<p>但這只是個例子，每個作業系統的管理方式可能會有些不同。</p>
+<p>heap 和 stack 的大小是會隨 Process 執行而變化的，而 data 段和 code 段則是固定的。</p>
+<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><p>另一個你可能很常聽到的東西是 thread，thread 和 process 很相似，但也有一些地方不一樣。</p>
+<p>Thread 有另外一個名字叫 lightweight processs，因為它的管理方式跟 process 很像，但很多 thread 是可以共用一些 memory 的，像是之前我們說 shared memory 的溝通我們用 shared programming，因為它本身就有一塊 memory 在預設上是共用的。</p>
+<p>在建立一個 thread 的時候，這些共用的空間就不用在重複建立了，因為在形成這些 thread 的 parent process 時就已經 allocate 好了，因此在管理上和 memory allocation 上就少了一些動作，我們才會說他是比較 lightweight 的。</p>
+<p>同時，在運作的時候，電腦系統裡面最基本的單位其實是 thread，也就是說 CPU 在執行的單位是 thread，因為 Process 可以被切成很多個 thread，所以 thread 才是 CPU 執行的最小單位。</p>
+<p>下圖可以看的更清楚 thread 和 Process 的差異，其實就在於說在同一個 Process 下的所有 thread，它們有些 memory 是共用的，定義上來說，只要是同一個 Process 下的 thread，它的 code section，data section 和 OS resources 是共用的，某一個 thread 開了一個檔案，另一個 thread 可以直接拿這個檔案的 pointer 跟著去做讀寫。</p>
+<p><img src="https://i.imgur.com/NCeLmMW.png"></p>
+<p>但是可以看見 register、stack 等就沒有共用了，因為每一個 thread 執行的位置可以不一樣，甚至可以執行不同的 function call，所以執行的狀態也是獨立的。</p>
+<p>因為要可以獨立執行，所以 thread 會有自己的 ID，program counter，register set 和 stack，讓 OS 知道它是 Process 裡的哪一個 thread。</p>
+<h2 id="Process-State"><a href="#Process-State" class="headerlink" title="Process State"></a>Process State</h2><p>一個 Process 被 launch 起來後整個執行的過程主要會有五個狀態</p>
+<ul>
+<li><p>New</p>
+<p>  Process 被建立起來，這個狀態會做很多事情，要把 Program load 到 memory，把剛剛看到的記憶體配置分配好，並做初始化等等的動作。</p>
+<p>  所以比較早期的電腦 memory 比較小，launch 太多 Process 時，可能會連 New 一個 Process 都會遇到困難，這樣在 New 的過程就會直接把這個 Process kill 掉。</p>
+</li>
+<li><p>Ready</p>
+<p>  因為在電腦裡面資源需要去分配，Process 需要去競爭 CPU，所以 Process 被 allocate 完存在記憶體裡，等著使用 CPU 之前的狀態就是 Ready，Process 此時會被放到一個 queue 裡面等著 OS 做排程，此時 Process 可以立刻被執行。</p>
+</li>
+<li><p>Running</p>
+<p>  當 Process 被選中，能夠送 instruction 進 CPU 執行時的狀態就是 Running。</p>
+</li>
+<li><p>Waiting</p>
+<p>  一個 Process 執行的過程中不只會使用 CPU，可能還會去做 I&#x2F;O 等等，此時就會進到 Waiting State</p>
+</li>
+<li><p>Terminated</p>
+<p>  Process 執行完畢，所有資源會被釋放回去。</p>
+</li>
+</ul>
+<p>可以看下圖，更好記憶：</p>
+<p><img src="https://i.imgur.com/j3IftQs.png"></p>
+<h2 id="Process-Control-Block-PCB"><a href="#Process-Control-Block-PCB" class="headerlink" title="Process Control Block (PCB)"></a>Process Control Block (PCB)</h2><p>上面的 Process State 是一個管理的邏輯，實現的方式是 OS 會幫 Process 建立一個 table，紀錄剛剛那些 information，這樣 OS 就可以知道誰在 Queue 裡面，誰的 State 是什麼等等：</p>
+<p><img src="https://i.imgur.com/DZ5idza.png"></p>
+<p>PCB 是 OS 建立的一個物件，前面提到 Process 會被放到 Queue 裡面，這是一個抽象的概念，實際上是 PCB 被放到 Queue 裡面，實作的方法通常是 linked list，所以 PCB 裡面會有一個 pointer 指向下一個 PCB。</p>
+<p>另外 PCB 裡面還會有 Process State，Program counter，CPU register 等資訊，這些東西是放在 memory 裡面，而且是 kernel space，是 OS 自己的 memory 裡面。</p>
+<h2 id="Context-Switch"><a href="#Context-Switch" class="headerlink" title="Context Switch"></a>Context Switch</h2><p>前面有提到 Process 需要在 CPU 與 memory 間，與其它的 Process 交換，這動作有個專有名詞叫 Context Switch，這部分也是利用了 PCB 來完成。</p>
+<p>我們前面有提到 Context Switch 會發生一定是因為有 interrupt 進來，或者是自己 call 了一個 system call，所以才會切換到其他的程式。</p>
+<p>下面有張簡單的圖，假設 Process P0 是一開始在執行的，所有的東西都 load 到 CPU 的 register，然後有一個 interrupt 進來，所以 P0 就進了 idle，當 P0 要把 CPU 讓出來時，就需要做 Context Switch。</p>
+<p>動作其實很單純，就是要把 CPU 裡面的 state 全部存到 P0 的 PCB 裡面，記完後再去執行 P1，P1 可能是 OS 或是別的 Process，為了讓它執行，需要把 P1 的 PCB 的資訊 load 到 CPU 的 register，此時的 P0 和 P1 都是在 idle 的。</p>
+<p>Context Switch 完成後就會開始執行 P1，所以會把 program counter 設到該執行的位置，做 fetching 的動作。</p>
+<p>下圖裡面 P1 執行完後又做了一次 Context Switch 回 P0，一樣的意思，會 save 和 reload PCB：</p>
+<p><img src="https://i.imgur.com/5YwZ5qJ.png"></p>
+<p>簡單來說 Context Switch 就是在做 Process 的 load 和 save，但要注意 Context Switch 的時間是 overhead 的，也就是多餘的時間，上圖可以看見在做 Context Switch 時 P0 和 P1 都是在 idle 的，等於是在浪費 cpu cycle，純粹是為了管理與 sharing。</p>
+<p>所以其實我們有時候應該要去避免 Context Switch</p>
+<p>在實際的系統中，因為 Context Switch 無法避免，所以我們會希望盡量減少每次 Context Switch 所需要花費的時間</p>
+<h1 id="Processing-Scheduling"><a href="#Processing-Scheduling" class="headerlink" title="Processing Scheduling"></a>Processing Scheduling</h1><p>由於 memory 裡面會有很多 process 等著被執行，同時我們要實現 time sharing，因此這些 process 會需要輪流使用 CPU，而決定誰先用誰後用的動作就叫做 Scheduling</p>
+<p>Process 在被 schedule 的過程中會被放在 OS 內部的 qeueu 裡面，他們分別是</p>
+<ul>
+<li>Job queue<ul>
+<li>New State</li>
+<li>放要從 Program 進到被 launch 狀態的 Program</li>
+<li>較早期的 OS 才有</li>
+</ul>
+</li>
+<li>Ready queue<ul>
+<li>Ready State</li>
+<li>放 main memory 內所有等待使用 CPU 的 Process</li>
+</ul>
+</li>
+<li>Device queue<ul>
+<li>Wait State</li>
+<li>放等著做 I&#x2F;O 或 sleep 等等的 Process</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://hackmd.io/_uploads/rJGYRCtep.png"></p>
+<p>上圖中最上面的是 Ready queue，而 I&#x2F;O 的 Waiting queue 通常會有很多個，看你是哪個 device 就去那裏排；Ready queue 也不一定只有一個，可能會有 level1、level2、level3 之類的 Ready queue</p>
+<p>所以整體流程會類似下圖，最上面有個 ready queue，而下方有四個 Waiting queue：</p>
+<p><img src="https://hackmd.io/_uploads/rypUyk5x6.png"></p>
+<h2 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h2><p> Scheduler 是負責幫忙做 scheduling 的 process，依照場合可將其分為三類，也可以對應到上方的三個 queue：</p>
+<ul>
+<li>short-term scheduler<ul>
+<li>將 process 從 memory 拉到 CPU 執行</li>
+<li>操作很頻繁所以叫 short-term</li>
+<li>Ready State -&gt; Run State</li>
+<li>很注重效率</li>
+</ul>
+</li>
+<li>Long-term scheduler<ul>
+<li>選擇要被 load 到 memory，將其設為 Ready State 的 Process</li>
+<li>New State -&gt; Ready State</li>
+<li>決定可以有多少 Process 在 memory 內<ul>
+<li>太少的話 CPU 會 idle，太多的話 CPU 會有 thrashing 發生</li>
+</ul>
+</li>
+<li>近代的 OS 可能沒有(由於近代 memory 比以前大很多)<ul>
+<li>ex. UNIX&#x2F;NT 沒有 long-term scheduler</li>
+<li>一些 long term running machine 可能還有，但我們的電腦一般不是(Process 執行時間很短，或是通常就放著 idle)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Medium-term sheduler<ul>
+<li>選擇要被 swap 回 Disk，或是要從 Disk swap 回 memory 的 Process</li>
+<li>Ready State -&gt; Wait State</li>
+<li>目的是用來平衡 CPU 和 I&#x2F;O 的使用率，還有控制記憶體的使用量</li>
+<li>後面讀完 memory 的部分後會比較好理解</li>
+<li>現代的 OS 沒有 medium-term scheduler，工作內容由 Vitrual memory 機制代替</li>
+</ul>
+</li>
+</ul>
+<h1 id="Process-Creation"><a href="#Process-Creation" class="headerlink" title="Process Creation"></a>Process Creation</h1><h2 id="PID"><a href="#PID" class="headerlink" title="PID"></a>PID</h2><p>Process 在 OS 中是一個實體，要找到他 我們就需要給 Process 一個 id，這個 id 我們稱之為 pid</p>
+<p>Process 要產生需要被 Parent create，所以我們一定可以把 Process 畫成一個 Tree：</p>
+<p><img src="https://hackmd.io/_uploads/S1KETR5lT.png"></p>
+<h2 id="Process-Creation-1"><a href="#Process-Creation-1" class="headerlink" title="Process Creation"></a>Process Creation</h2><p>Parent 和 Child Process 會有一定的關聯性，但實際上有什麼樣的關聯性是交由 OS 設計者來決定的</p>
+<h3 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h3><p>在 UNIX&#x2F;Linux 中，要創建一個 Process，我們需要使用 <code>fork</code> 這個 system call，被 fork 出來的 child 的記憶體配置一開始會和 parent process 一模一樣</p>
+<p>parent 與 child process 是 concurrently 執行的，也就是說 parent 不需要等 child 執行完才能接著執行</p>
+<p>fork 會有一個 return value，child 與 parent 的唯一差別在於這個 return 的 value 會不一樣，child 的 return value 為 <code>0</code>，而 parent 的 return value 為他的 <code>pid</code>，但要注意 child 一樣有自己的 pid</p>
+<p>fork 完之後我們可以使用 <code>execlp</code> 這個 system call 來把你要執行的 binary file 塞進你的 child process 的 memory，把原本的 memory 內容洗掉，這樣就可以執行你要的 code 了</p>
+<p>而如果我們想要等待某個 Process 執行結束後才繼續執行，我們可以使用 <code>wait</code> 這個 system call，把 Process 放到 waiting queue 裡面</p>
+<p>可以簡單看一下 <code>fork</code> 用起來的樣子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  fork();</span><br><span class="line">  fork();</span><br><span class="line">  fork();</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;hello\n&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>輸出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br><span class="line">hello</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fork();   <span class="comment">// Line 1</span></span><br><span class="line">fork();   <span class="comment">// Line 2</span></span><br><span class="line">fork();   <span class="comment">// Line 3</span></span><br><span class="line">	</span><br><span class="line">      L1        <span class="comment">// There will be 1 child process </span></span><br><span class="line">    /    \      <span class="comment">// created by line 1.</span></span><br><span class="line">  L2      L2    <span class="comment">// There will be 2 child processes</span></span><br><span class="line"> /  \    /  \   <span class="comment">// created by line 2</span></span><br><span class="line">L3  L3  L3  L3  <span class="comment">// There will be 4 child processes </span></span><br><span class="line">                <span class="comment">// created by line 3</span></span><br></pre></td></tr></table></figure>
+<p>從這個圖你可以看出來總共有 8 個 process 執行了</p>
+<h1 id="Interprocess-Communication-IPC"><a href="#Interprocess-Communication-IPC" class="headerlink" title="Interprocess Communication(IPC)"></a>Interprocess Communication(IPC)</h1><p>現在我們會創建 Process 了，接下來會需要的就是 Process 內的溝通，簡稱為 IPC，之前有講過主要有兩種方式，Shared memory 與 Message Passing</p>
+<p><img src="https://i.imgur.com/UxK49Kx.png"></p>
+<p>Shared memory 的優點是快，透過 memory address 來 access data，但缺點就是要處理 Synchronization 的問題; Message Passing 就反過來，比較慢，但不用處理 Synchronization，在某些情況下用 Message Passing，因為不用處理 Synchronization，所以反而會比較快</p>
+<p>一般來說，在同一台電腦上，溝通的 Process 多，情況複雜，我們就會使用 Message Passing，如果溝通的 Process 少，Communication Pattern 比較簡單，我們就會使用 Shared Memory，</p>
+<h2 id="Shared-Memory"><a href="#Shared-Memory" class="headerlink" title="Shared Memory"></a>Shared Memory</h2><p>主要是用 Thread Porgramming 的方式在寫，因此條件很單純，因為就是 memory access，唯一的條件就是你要有辦法去創見一塊共用的記憶體出來，這件事情預設是不會有的，需要靠 system call 才能做到</p>
+<p>另外 Shared Memory 需要處理 Synchronization 的問題，不能讓兩個 Process 同時寫一塊記憶體，可以看一個知名的例子</p>
+<h3 id="Consumer-Producer-Problem"><a href="#Consumer-Producer-Problem" class="headerlink" title="Consumer &amp; Producer Problem"></a>Consumer &amp; Producer Problem</h3><p>Producer 是一個 Process 負責產生 data，而 Consumer 是另一個 Process 負責消耗 data，所以有兩支不同的 Process，並會有一段共用的記憶體空間給這兩個 Process 放 data 與拿 data</p>
+<p>考慮一個直觀的寫法(來源：<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3poLXR3LyVFNyU5NCU5RiVFNCVCQSVBNyVFOCU4MCU4NSVFNiVCNiU4OCVFOCVCNCVCOSVFOCU4MCU4NSVFOSU5NyVBRSVFOSVBMiU5OA==">wiki<i class="fa fa-external-link-alt"></i></span>)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> itemCount = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">procedure <span class="title">producer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        item = <span class="built_in">produceItem</span>();</span><br><span class="line">        <span class="keyword">if</span> (itemCount == BUFFER_SIZE) &#123;</span><br><span class="line">            <span class="built_in">sleep</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">putItemIntoBuffer</span>(item);</span><br><span class="line">        itemCount = itemCount + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (itemCount == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="built_in">wakeup</span>(consumer);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">procedure <span class="title">consumer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (itemCount == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">sleep</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        item = <span class="built_in">removeItemFromBuffer</span>();</span><br><span class="line">        itemCount = itemCount - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (itemCount == BUFFER_SIZE - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="built_in">wakeup</span>(producer);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">consumeItem</span>(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>調用 sleep 的 Process 會被阻斷，進入睡眠狀態，直到有另一個 Process 用 wakeup 喚醒它</p>
+<p>上面代碼中的問題在於它可能導致 race condition，假設 count 為 2，考慮下面的情況：</p>
+<ol>
+<li>Producer 將 2 存入 register 並將其 + 1，因此 Producer 現在認為 count 的值為 3</li>
+<li>Consumer 將 2 存入 register 並將其 - 1，因此 Consumer 現在認為 count 的值為 1</li>
+</ol>
+<p>之後問題就來了，如果是 Producer 先將 count 的值寫回記憶體，之後 Consumer 再將 count 的值寫回記憶體，此時記憶體中 count 的值就為 1，反之則為 3</p>
+<p>不管是哪種情況，你都會覺得怪怪的，原因就出在兩個 Process 同時在讀寫這塊記憶體，這種問題我們稱為 Synchronization Problem</p>
+<p>因此我們需要特別處理這塊記憶體的使用，假設共用的記憶體空間是一個有 <code>B</code> 個元素的 circular array，我們有兩個指標 <code>in</code> 與 <code>out</code>，<code>in</code> 指向放入 data 的位置，<code>out</code> 指向拿出 data 的位置：</p>
+<p><img src="https://hackmd.io/_uploads/SJ7U3J2-a.png"></p>
+<p>當 <code>in</code> 與 <code>out</code> 指向同一個地方的時候代表這個 array 現在是空的，當 <code>in+1</code> 模除 array size 指向的地方和 <code>out</code> 相同時表示這個 array 是滿的</p>
+<p>我們可以簡單看一下 code:</p>
+<p><img src="https://hackmd.io/_uploads/r1cMRynbp.png"></p>
+<p>在 Producer 中，當 array 是滿的時候，<code>while(((in + 1) % BUFFER_SIZE) == out) ;</code> 這個 while 迴圈會卡在那邊空轉，直到 Consumer 把東西拿走，讓 array 有空間，Producer 才會繼續放東西進去 array，注意這個 while 的後面有一個分號，這是因為 while loop 的後面需要接一個 statement</p>
+<p>而在 Consumer 中，當 array 是空的時候，<code>while(in == out) ;</code> 這個 while 迴圈會卡在那邊空轉，直到 Producer 將東西放進 array，讓 array 內有東西，Consumser 才會把 array 內的東西拿出來</p>
+<p>由於 <code>in</code> 與 <code>out</code> 都只會有一個 Process 在修改，因此就避免了同步的問題，這邊要注意一點是 <code>in</code> 與 <code>out</code> 必須是 <code>volatile</code> 的，這會保證每次使用 <code>in</code> 與 <code>out</code> 的變數時其都會重新從記憶體中讀值</p>
+<p>我有實作一個 Demo 用的小程式，我是使用 semaphore 來處理 Synchronization Problem，你可以在這個<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1JMW5NMjA3S1N0Zw==">連結<i class="fa fa-external-link-alt"></i></span>內看到我的錄影，底下說明欄有對應的 code，這是跑在 windows 上的，如果需要 unix 的版本，網路上應該蠻多的</p>
+<h2 id="Message-Passing"><a href="#Message-Passing" class="headerlink" title="Message Passing"></a>Message Passing</h2><p>要使用 Message Passing，首先我們要建立一個管道，這可以是一個 Hardware bus，或是網路，甚至是一塊 shared memory 都可以，因為這是一個機制，你只要有管道能讓你溝通就可以</p>
+<p>溝通的時候可以簡單分為兩種方式：Direct 與 Indirect，Direct communication 表示在溝通前要先指定要和誰溝通，類似我們在打電話一樣，好處是 link 的關係較清晰，都是 One-to-One 的</p>
+<p>用這個方法來處理剛剛的 Producer Consumer Problem 就會變得很簡單：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// producer</span></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="built_in">send</span>(consumer, nextProduced);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// consumer</span></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="built_in">receive</span>(producer, nextConsumed);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 Producer 呼叫 <code>send</code> 時，會需要等到 Consumer 端呼叫 <code>receive</code>，它才可以繼續執行下一行</p>
+<p>這樣會等待對方回應的訊息傳遞方式我們稱為 Blocking，又稱 synchronous，相反的，如果 <code>send</code> 呼叫完後不會去等對方，則稱為 non-Blocking，又稱為 asynchronous</p>
+<p>要注意，<code>send</code> 與 <code>receive</code> 不一定要統一使用某種方法，可以其中一端為 Blocking，另一端為 non-Blocking 的</p>
+<p>Indirect Communication 則是像在信箱放信一樣，發送端會把訊息放到一個 mailbox 裡面，而接收端需要自己去 mailbox 拿訊息，接收端不需要知道是誰發過來的，而且可以多對多，大家都到這個 mailbox 裡面拿訊息</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Mes
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://mes0903.github.io/2022/02/06/OS/Process-Concept/" title="Ch3 Processes Concept">https://mes0903.github.io/2022/02/06/OS/Process-Concept/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-SA</span> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/OS/" rel="tag"># OS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/12/20/OS/OS-Structure/" rel="prev" title="Ch2 OS Structure">
+                  <i class="fa fa-angle-left"></i> Ch2 OS Structure
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/" rel="next" title="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置">
+                  C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">172k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">10:26</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

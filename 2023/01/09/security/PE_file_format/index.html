@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等，因為專題無聊就跑來玩這個了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PE file format">
+<meta property="og:url" content="https://mes0903.github.io/2023/01/09/security/PE_file_format/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等，因為專題無聊就跑來玩這個了">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.imgur.com/BfrIbY7.png">
+<meta property="og:image" content="https://i.imgur.com/DSXIYGw.png">
+<meta property="og:image" content="https://i.imgur.com/pSgDDr2.png">
+<meta property="og:image" content="https://i.imgur.com/f2ipUd5.png">
+<meta property="og:image" content="https://i.imgur.com/s36aBT9.png">
+<meta property="og:image" content="https://i.imgur.com/AGvgrV0.png">
+<meta property="og:image" content="https://i.imgur.com/rp3SlJU.png">
+<meta property="og:image" content="https://i.imgur.com/OO7V54g.png">
+<meta property="og:image" content="https://i.imgur.com/IYN5DN3.png">
+<meta property="article:published_time" content="2023-01-09T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-07T20:03:03.929Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="security">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/BfrIbY7.png">
+
+
+<link rel="canonical" href="https://mes0903.github.io/2023/01/09/security/PE_file_format/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2023/01/09/security/PE_file_format/","path":"2023/01/09/security/PE_file_format/","title":"PE file format"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PE file format | Mes's Studio</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Mes 雜七雜八</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PE-file-format"><span class="nav-number">1.</span> <span class="nav-text">PE file format</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DOS-Header"><span class="nav-number">3.</span> <span class="nav-text">DOS Header</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NT-Headers-PE-Headers"><span class="nav-number">4.</span> <span class="nav-text">NT Headers (PE Headers)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FileHeader"><span class="nav-number">4.1.</span> <span class="nav-text">FileHeader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Optional-Header-%E5%8F%AF%E9%81%B8%E9%A0%AD"><span class="nav-number">4.2.</span> <span class="nav-text">Optional Header (可選頭)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Section-Headers-%E5%8D%80%E6%AE%B5%E9%A0%AD"><span class="nav-number">5.</span> <span class="nav-text">Section Headers (區段頭)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Section-%E5%8D%80%E6%AE%B5"><span class="nav-number">6.</span> <span class="nav-text">Section(區段)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VA%E3%80%81RVA%E3%80%81FOA"><span class="nav-number">7.</span> <span class="nav-text">VA、RVA、FOA</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Icon.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description">The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+  <div class="cc-license animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/big/by_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2023/01/09/security/PE_file_format/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Icon.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="PE file format | Mes's Studio">
+      <meta itemprop="description" content="PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等，因為專題無聊就跑來玩這個了">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PE file format
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-01-09 00:00:00" itemprop="dateCreated datePublished" datetime="2023-01-09T00:00:00+00:00">2023-01-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-07 20:03:03" itemprop="dateModified" datetime="2024-10-07T20:03:03+00:00">2024-10-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/security/" itemprop="url" rel="index"><span itemprop="name">security</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+            <div class="post-description">PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等，因為專題無聊就跑來玩這個了</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="PE-file-format"><a href="#PE-file-format" class="headerlink" title="PE file format"></a>PE file format</h1><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等。</p>
+<p>PE File 內部的格式是規定好的，也就是所謂的 PE file format，大致可以分為兩部分，Header 與 Section：</p>
+<p><img src="https://i.imgur.com/BfrIbY7.png"><br>(圖片<span class="exturl" data-url="aHR0cHM6Ly93d3cucmVzZWFyY2hnYXRlLm5ldC9maWd1cmUvUG9ydGFibGUtZXhlY3V0YWJsZS1maWxlLWZvcm1hdF9maWc2XzMzODM1NTg3Mw==">連結<i class="fa fa-external-link-alt"></i></span>)</p>
+<p>Header 是用來管理 PE file 的，包含了一些執行檔的重要資訊，而 Section 則包含了程式碼、常量、資料和圖片資源等等。</p>
+<p>為了後續講解，這邊用 asm 寫了一個很簡單的 Windows Program，執行檔名為 demo.exe：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">; demo.asm</span><br><span class="line"></span><br><span class="line">    .386</span><br><span class="line">    .model flat, stdcall</span><br><span class="line">    option casemap:none</span><br><span class="line"></span><br><span class="line">include \masm32\include\windows.inc</span><br><span class="line">include \masm32\include\kernel32.inc</span><br><span class="line">include \masm32\include\user32.inc</span><br><span class="line">include \masm32\include\masm32.inc</span><br><span class="line">includelib \masm32\lib\kernel32.lib</span><br><span class="line">includelib \masm32\lib\user32.lib</span><br><span class="line">includelib \masm32\lib\masm32.lib</span><br><span class="line"></span><br><span class="line">    .data</span><br><span class="line">szCaptions  db &#x27;hello&#x27;, 0</span><br><span class="line">szText  db &#x27;Hello World!&#x27;, 0</span><br><span class="line"></span><br><span class="line">    .code</span><br><span class="line">start:</span><br><span class="line">    push 0</span><br><span class="line">    lea eax, szCaptions</span><br><span class="line">    push eax</span><br><span class="line">    lea eax, szText</span><br><span class="line">    push eax</span><br><span class="line">    push 0</span><br><span class="line">    call MessageBox</span><br><span class="line">    push 0</span><br><span class="line">    call ExitProcess</span><br><span class="line"></span><br><span class="line">    end start</span><br></pre></td></tr></table></figure>
+
+<p>由於我是用 masm 組譯，所以指令就下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">\masm32\bin\ml /c /Zd /coff demo.asm</span><br><span class="line">\masm32\bin\Link /SUBSYSTEM:CONSOLE demo.obj</span><br></pre></td></tr></table></figure>
+
+<p>我們可以用 PE-bear 這個軟體來看 PE file 的內容，這是我用 PEbear 將 demo.exe 開起來的樣貌：</p>
+<p><img src="https://i.imgur.com/DSXIYGw.png"></p>
+<p>可以看見 demo.exe 由 DOS Header, DOS stub, NT Headers, Section Headers 與幾個 Sections 組成，那接下來就會依序介紹這些東西。</p>
+<h1 id="DOS-Header"><a href="#DOS-Header" class="headerlink" title="DOS Header"></a>DOS Header</h1><p>PE file 最一開始的部分是 Dos Header，PE-bear 可以幫我們把這段 binary：</p>
+<p><img src="https://i.imgur.com/pSgDDr2.png"></p>
+<p>解析為這樣：</p>
+<p><img src="https://i.imgur.com/f2ipUd5.png"></p>
+<p>DOS Header 是 PE File 中的起始位置，以前的功用是用來保持與 DOS 的兼容性與定位 NT Header，而現在的功用只剩下後者。</p>
+<p>DOS Header 是一個 C struct，在 <code>winnt.h</code> 中的定義如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_DOS_HEADER</span> &#123;</span>      <span class="comment">// DOS .EXE header</span></span><br><span class="line">  WORD   e_magic;                     <span class="comment">// EXE 簽名 mz</span></span><br><span class="line">  WORD   e_cblp;                      <span class="comment">// Bytes on last page of file</span></span><br><span class="line">  WORD   e_cp;                        <span class="comment">// Pages in file</span></span><br><span class="line">  WORD   e_crlc;                      <span class="comment">// Relocations</span></span><br><span class="line">  WORD   e_cparhdr;                   <span class="comment">// Size of header in paragraphs</span></span><br><span class="line">  WORD   e_minalloc;                  <span class="comment">// Minimum extra paragraphs needed</span></span><br><span class="line">  WORD   e_maxalloc;                  <span class="comment">// Maximum extra paragraphs needed</span></span><br><span class="line">  WORD   e_ss;                        <span class="comment">// Initial (relative) SS value</span></span><br><span class="line">  WORD   e_sp;                        <span class="comment">// Initial SP value</span></span><br><span class="line">  WORD   e_csum;                      <span class="comment">// Checksum</span></span><br><span class="line">  WORD   e_ip;                        <span class="comment">// Initial IP value</span></span><br><span class="line">  WORD   e_cs;                        <span class="comment">// Initial (relative) CS value</span></span><br><span class="line">  WORD   e_lfarlc;                    <span class="comment">// File address of relocation table</span></span><br><span class="line">  WORD   e_ovno;                      <span class="comment">// Overlay number</span></span><br><span class="line">  WORD   e_res[<span class="number">4</span>];                    <span class="comment">// Reserved words</span></span><br><span class="line">  WORD   e_oemid;                     <span class="comment">// OEM identifier (for e_oeminfo)</span></span><br><span class="line">  WORD   e_oeminfo;                   <span class="comment">// OEM information; e_oemid specific</span></span><br><span class="line">  WORD   e_res2[<span class="number">10</span>];                  <span class="comment">// Reserved words</span></span><br><span class="line">  LONG   e_lfanew;                    <span class="comment">// NT Header 位址</span></span><br><span class="line">&#125; IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;</span><br></pre></td></tr></table></figure>
+
+<p>它的大小為 <code>40h</code>(h 代表用十六進位表示)，其中 <code>WORD</code> 是 2bytes，<code>LONG</code> 是 4bytes。 我們關心的只有兩個成員：<code>e_magic</code> 與 <code>e_lfanew</code>。</p>
+<p><code>e_magic</code> 是一個簽名，ASCII 的轉換結果為 <code>MZ</code>，所有的 PE file 都要以這個 <code>MZ</code> 開頭；而 <code>e_lfanew</code> 指向 NT Header 的位址。 其它的元素是在 DOS 環境下要使用的，在 Windows 下就無關。</p>
+<p>而 DOS Stub 也是在 DOS 環境下使用的，主要功能就是拿來報錯，這邊也就不詳細介紹。</p>
+<h1 id="NT-Headers-PE-Headers"><a href="#NT-Headers-PE-Headers" class="headerlink" title="NT Headers (PE Headers)"></a>NT Headers (PE Headers)</h1><p>NT Headers 也是一個 C struct，它在 <code>winnt.h</code> 的定義如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN64</span></span><br><span class="line"><span class="keyword">typedef</span> IMAGE_NT_HEADERS64                  IMAGE_NT_HEADERS;</span><br><span class="line"><span class="keyword">typedef</span> PIMAGE_NT_HEADERS64                 PIMAGE_NT_HEADERS;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">typedef</span> IMAGE_NT_HEADERS32                  IMAGE_NT_HEADERS;</span><br><span class="line"><span class="keyword">typedef</span> PIMAGE_NT_HEADERS32                 PIMAGE_NT_HEADERS;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>其中的 <code>32</code> 與 <code>64</code> 就代表 32 位元和 64 位元，在編譯期的時候就會選擇好了。</p>
+<p>而 <code>IMAGE_NT_HEADERS64</code> 與 <code>IMAGE_NT_HEADERS32</code> 的差異也很小：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_NT_HEADERS64</span> &#123;</span><br><span class="line">    DWORD Signature; <span class="comment">// PE 簽名</span></span><br><span class="line">    IMAGE_FILE_HEADER FileHeader;</span><br><span class="line">    IMAGE_OPTIONAL_HEADER64 OptionalHeader;</span><br><span class="line">&#125; IMAGE_NT_HEADERS64, *PIMAGE_NT_HEADERS64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_NT_HEADERS</span> &#123;</span><br><span class="line">    DWORD Signature;</span><br><span class="line">    IMAGE_FILE_HEADER FileHeader;</span><br><span class="line">    IMAGE_OPTIONAL_HEADER32 OptionalHeader;</span><br><span class="line">&#125; IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;</span><br></pre></td></tr></table></figure>
+
+<p>可以看見基本上一樣的，差異只在 Optional Header。</p>
+<p>第一個成員 <code>Signature</code> 是 <code>PE File</code> 的簽名，簽名為 <code>PE</code>，用 PE-bear 可以看見其 binary 為<br><code>00 00 45 50</code>(此 exe 為 little endian)。</p>
+<p><img src="https://i.imgur.com/s36aBT9.png"></p>
+<h2 id="FileHeader"><a href="#FileHeader" class="headerlink" title="FileHeader"></a>FileHeader</h2><p>FileHeader 的定義如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_FILE_HEADER</span> &#123;</span><br><span class="line">  WORD    Machine;                       <span class="comment">// 平台，intel 386 為 0x014c，intel 64 為 0x0200</span></span><br><span class="line">  WORD    NumberOfSections;              <span class="comment">// Section 數量，最多 96 個字節</span></span><br><span class="line">  DWORD   TimeDateStamp;                 <span class="comment">// 編譯日期</span></span><br><span class="line">  DWORD   PointerToSymbolTable;</span><br><span class="line">  DWORD   NumberOfSymbols;</span><br><span class="line">  WORD    SizeOfOptionalHeader;          <span class="comment">// OptionalHeader 大小, 32 位通常為 E0，64 位通常為 F0</span></span><br><span class="line">  WORD    Characteristics;               <span class="comment">// 檔案屬性，EXE 通常為 010f，DLL 通常為 210e</span></span><br><span class="line">&#125; IMAGE_FILE_HEADER, *PIMAGE_FILE_HEADER;</span><br></pre></td></tr></table></figure>
+
+<p><code>Machine</code> 表示平台，可能得值如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_UNKNOWN           0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_TARGET_HOST       0x0001  <span class="comment">// Useful for indicating we want to interact with the host and not a WoW guest.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_I386              0x014c  <span class="comment">// Intel 386.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_R3000             0x0162  <span class="comment">// MIPS little-endian, 0x160 big-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_R4000             0x0166  <span class="comment">// MIPS little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_R10000            0x0168  <span class="comment">// MIPS little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_WCEMIPSV2         0x0169  <span class="comment">// MIPS little-endian WCE v2</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_ALPHA             0x0184  <span class="comment">// Alpha_AXP</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_SH3               0x01a2  <span class="comment">// SH3 little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_SH3DSP            0x01a3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_SH3E              0x01a4  <span class="comment">// SH3E little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_SH4               0x01a6  <span class="comment">// SH4 little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_SH5               0x01a8  <span class="comment">// SH5</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_ARM               0x01c0  <span class="comment">// ARM Little-Endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_THUMB             0x01c2  <span class="comment">// ARM Thumb/Thumb-2 Little-Endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_ARMNT             0x01c4  <span class="comment">// ARM Thumb-2 Little-Endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_AM33              0x01d3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_POWERPC           0x01F0  <span class="comment">// IBM PowerPC Little-Endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_POWERPCFP         0x01f1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_IA64              0x0200  <span class="comment">// Intel 64</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_MIPS16            0x0266  <span class="comment">// MIPS</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_ALPHA64           0x0284  <span class="comment">// ALPHA64</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_MIPSFPU           0x0366  <span class="comment">// MIPS</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_MIPSFPU16         0x0466  <span class="comment">// MIPS</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_AXP64             IMAGE_FILE_MACHINE_ALPHA64</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_TRICORE           0x0520  <span class="comment">// Infineon</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_CEF               0x0CEF</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_EBC               0x0EBC  <span class="comment">// EFI Byte Code</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_AMD64             0x8664  <span class="comment">// AMD64 (K8)</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_M32R              0x9041  <span class="comment">// M32R little-endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_ARM64             0xAA64  <span class="comment">// ARM64 Little-Endian</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_MACHINE_CEE               0xC0EE</span></span><br></pre></td></tr></table></figure>
+
+<p>以 demo.exe 來說，其值為 <code>014c</code></p>
+<p><img src="https://i.imgur.com/AGvgrV0.png"></p>
+<p>這很長一串，用到的時候再查就好。</p>
+<p><code>TimeDateStamp</code> 表示編譯日期；<code>SizeOfOptionalHeader</code> 表示 Optional Header 的大小，32 bit 的電腦通常為 <code>0xE0</code>，64 bit 通常為 <code>0xF0</code>。</p>
+<p>Characteristics 記錄了這個檔案的屬性，會是以下這些值去做 <code>or</code> 運算：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_RELOCS_STRIPPED           0x0001  <span class="comment">// Relocation info stripped from file.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_EXECUTABLE_IMAGE          0x0002  <span class="comment">// File is executable  (i.e. no unresolved external references).</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_LINE_NUMS_STRIPPED        0x0004  <span class="comment">// Line nunbers stripped from file.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_LOCAL_SYMS_STRIPPED       0x0008  <span class="comment">// Local symbols stripped from file.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_AGGRESIVE_WS_TRIM         0x0010  <span class="comment">// Aggressively trim working set</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_LARGE_ADDRESS_AWARE       0x0020  <span class="comment">// App can handle &gt;2gb addresses</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_BYTES_REVERSED_LO         0x0080  <span class="comment">// Bytes of machine word are reversed.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_32BIT_MACHINE             0x0100  <span class="comment">// 32 bit word machine.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_DEBUG_STRIPPED            0x0200  <span class="comment">// Debugging info stripped from file in .DBG file</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP   0x0400  <span class="comment">// If Image is on removable media, copy and run from the swap file.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_NET_RUN_FROM_SWAP         0x0800  <span class="comment">// If Image is on Net, copy and run from the swap file.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_SYSTEM                    0x1000  <span class="comment">// System File.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_DLL                       0x2000  <span class="comment">// File is a DLL.</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_UP_SYSTEM_ONLY            0x4000  <span class="comment">// File should only be run on a UP machine</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_FILE_BYTES_REVERSED_HI         0x8000  <span class="comment">// Bytes of machine word are reversed.</span></span></span><br></pre></td></tr></table></figure>
+
+<p>以 demo.exe 來說其值為 <code>0x010f</code>，因此是 1, 2, 4, 8, 100 做 <code>or</code> 運算</p>
+<p><img src="https://i.imgur.com/rp3SlJU.png"></p>
+<h2 id="Optional-Header-可選頭"><a href="#Optional-Header-可選頭" class="headerlink" title="Optional Header (可選頭)"></a>Optional Header (可選頭)</h2><p>Optional Header 雖然有 <code>Optional</code> 這詞在裡面，但它是一定要有的，其定義如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_OPTIONAL_HEADER</span> &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// Standard fields.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line"></span><br><span class="line">    WORD    Magic;                       <span class="comment">// 簽名， 107h = ROM Image， 10Bh = EXE Image，20Bh = PE32+</span></span><br><span class="line">    BYTE    MajorLinkerVersion;          <span class="comment">// Linker 版本號</span></span><br><span class="line">    BYTE    MinorLinkerVersion;</span><br><span class="line">    DWORD   SizeOfCode;                  <span class="comment">// 所有含有程式碼的 Section 大小</span></span><br><span class="line">    DWORD   SizeOfInitializedData;       <span class="comment">// 所有含有初始化數據的 Section 大小</span></span><br><span class="line">    DWORD   SizeOfUninitializedData;     <span class="comment">// 所有含位未始化數據的 Section 大小(不佔用檔案空間，載入記憶體後才會分配空間)</span></span><br><span class="line">    DWORD   AddressOfEntryPoint;         <span class="comment">// Process 執行入口 RVA(距離 PE 載入後地址的距離，病毒和加密程式都會修改其值，從而獲得程式的控制權；對於 DLL，如果沒有入口函式，那麼就是 0；對於驅動其值為初始化的函式地址)</span></span><br><span class="line">    DWORD   BaseOfCode;                  <span class="comment">// 程式碼的 Section 的起始 RVA(通常跟在 NT Header 後)</span></span><br><span class="line">    DWORD   BaseOfData;                  <span class="comment">// 數據的 Section 的起始 RVA </span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// NT additional fields.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line"></span><br><span class="line">    DWORD   ImageBase;                   <span class="comment">// Process 建議的載入地址</span></span><br><span class="line">    DWORD   SectionAlignment;            <span class="comment">// 記憶體中的 Section 對齊值</span></span><br><span class="line">    DWORD   FileAlignment;               <span class="comment">// 檔案中的 Section 對齊值</span></span><br><span class="line">    WORD    MajorOperatingSystemVersion; <span class="comment">// OS 版本號</span></span><br><span class="line">    WORD    MinorOperatingSystemVersion;</span><br><span class="line">    WORD    MajorImageVersion;           <span class="comment">// PE 版本號</span></span><br><span class="line">    WORD    MinorImageVersion;</span><br><span class="line">    WORD    MajorSubsystemVersion;       <span class="comment">// 需要的 Subsystem 版本號</span></span><br><span class="line">    WORD    MinorSubsystemVersion;</span><br><span class="line">    DWORD   Win32VersionValue;           <span class="comment">// 未使用，必須為 0</span></span><br><span class="line">    DWORD   SizeOfImage;                 <span class="comment">// 記憶體中整個 PE 檔案的 image 大小</span></span><br><span class="line">    DWORD   SizeOfHeaders;               <span class="comment">// 所有的 Header 與 Section Header 加起來的大小</span></span><br><span class="line">    DWORD   CheckSum;                    <span class="comment">// 檢驗值，一般文件為 0，DLL 和 SYS 則會有其設定的值</span></span><br><span class="line">    WORD    Subsystem;                   <span class="comment">// 檔案子系統</span></span><br><span class="line">    WORD    DllCharacteristics;          <span class="comment">// DLL 檔案特性</span></span><br><span class="line">    DWORD   SizeOfStackReserve;          <span class="comment">// 初始化時保留的 stack 大小 (預設 1M)</span></span><br><span class="line">    DWORD   SizeOfStackCommit;           <span class="comment">// 初始化時實際給予的 stack 大小 (預設 4K)</span></span><br><span class="line">    DWORD   SizeOfHeapReserve;           <span class="comment">// 初始化時保留的 Heap 大小 (預設 1M)</span></span><br><span class="line">    DWORD   SizeOfHeapCommit;            <span class="comment">// 初始化時實際給予的 Heap 大小 (預設 4K)</span></span><br><span class="line">    DWORD   LoaderFlags;                 <span class="comment">// 加載旗幟，通常是 0</span></span><br><span class="line">    DWORD   NumberOfRvaAndSizes;         <span class="comment">// 數據目錄的數量</span></span><br><span class="line">    IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; <span class="comment">// 數據目錄的陣列</span></span><br><span class="line">&#125; IMAGE_OPTIONAL_HEADER32, *PIMAGE_OPTIONAL_HEADER32;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Section-Headers-區段頭"><a href="#Section-Headers-區段頭" class="headerlink" title="Section Headers (區段頭)"></a>Section Headers (區段頭)</h1><p>Section Header 會記錄每個 Section 的資訊，定義如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_SIZEOF_SHORT_NAME              8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_SECTION_HEADER</span> &#123;</span><br><span class="line">    BYTE    Name[IMAGE_SIZEOF_SHORT_NAME];       <span class="comment">// 區段名，如 .text 或 .data</span></span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">            DWORD   PhysicalAddress;</span><br><span class="line">            DWORD   VirtualSize;                 <span class="comment">// 區段大小</span></span><br><span class="line">    &#125; Misc;</span><br><span class="line">    DWORD   VirtualAddress;                      <span class="comment">// 區段的位移 (RVA)</span></span><br><span class="line">    DWORD   SizeOfRawData;                       <span class="comment">// Section 在檔案中對齊後的大小</span></span><br><span class="line">    DWORD   PointerToRawData;                    <span class="comment">// Section 在檔案中的偏移量 (FOA)</span></span><br><span class="line">    DWORD   PointerToRelocations;                <span class="comment">// 在 OBJ 文件中使用</span></span><br><span class="line">    DWORD   PointerToLinenumbers;                <span class="comment">// 行號表的位置(debug 時使用)</span></span><br><span class="line">    WORD    NumberOfRelocations;                 <span class="comment">// 在 OBJ 文件中使用</span></span><br><span class="line">    WORD    NumberOfLinenumbers;                 <span class="comment">// 行號表中行號的數量</span></span><br><span class="line">    DWORD   Characteristics;                     <span class="comment">// Section 屬性</span></span><br><span class="line">&#125; IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_SIZEOF_SECTION_HEADER          40</span></span><br></pre></td></tr></table></figure>
+
+<p>每個 Section Header 會指向對應的 Section，像是這樣</p>
+<p><img src="https://i.imgur.com/OO7V54g.png"><br>(圖片<span class="exturl" data-url="aHR0cHM6Ly90ZWNoLXplYWxvdHMuY29tL21hbHdhcmUtYW5hbHlzaXMvcGUtcG9ydGFibGUtZXhlY3V0YWJsZS1zdHJ1Y3R1cmUtbWFsd2FyZS1hbmFseXNpcy1wYXJ0LTIv">連結<i class="fa fa-external-link-alt"></i></span>)</p>
+<p>Section Header 只負責記錄對應 Section 的重要屬性，像是 Section 的名字，大小，RVA 等等。</p>
+<h1 id="Section-區段"><a href="#Section-區段" class="headerlink" title="Section(區段)"></a>Section(區段)</h1><p>在 Headers 之後接的就是各個 Section，像是大家熟悉的 <code>.text</code>、<code>.data</code> 等等都是個 Section。</p>
+<p><code>.text</code> 通常會是第一個 Section，是你可執行程式碼所在的位置，執行檔的進入點通常也會在這裡。</p>
+<p><code>.data</code> 段則是放你的數據，像是我們 <code>std::cout &lt;&lt; &quot;Hello&quot;;</code>，那麼 <code>&quot;Hello&quot;</code> 這個資料就會放在 <code>.data</code> 裡面。</p>
+<p>其他還有很多，上面的圖也可以大概看到，有興趣的可以查一下，這邊就不贅述。</p>
+<h1 id="VA、RVA、FOA"><a href="#VA、RVA、FOA" class="headerlink" title="VA、RVA、FOA"></a>VA、RVA、FOA</h1><p>而一個 PE 在硬碟與在記憶體中的偏移量會有所不同，這邊會有三個名詞先介紹一下：</p>
+<ul>
+<li>VA: 虛擬位址(Virtual Address)，指 PE 檔案載入「記憶體」後的位址</li>
+<li>RVA: 相對虛擬位址(Relative Virtual Address)，是 PE 檔案中資料、Section 等在「記憶體」中的偏移量</li>
+<li>FOA: 文件偏移位址(File Offset Address)，是 PE 檔案中資料、Section 等在「硬碟」中的偏移量</li>
+</ul>
+<p>我們看張圖來解釋：</p>
+<p><img src="https://i.imgur.com/IYN5DN3.png"></p>
+<p>這邊假設每個 Section 的大小都小於 Alignment 的大小，所以一個 Section 的大小就是一個 Alignment 的大小。x86 下 FileAlignment 通常是 <code>0x200</code>，也就是 512 bytes，這也是一個硬碟扇區的大小。而 x86 下 SectionAlignment 通常是 <code>0x1000</code>。</p>
+<p>而 Section 開始的位址為 Base 的位址加上其偏移量，在硬碟中，Base 的位址為 0，偏移量則是 <code>PointerToRawData</code> 決定的，也就是 FOA。</p>
+<p>在記憶體中，Base 的位址為 Imagebase 的位址，然而這是對第一個載入記憶體的 PE 而言，當 Imagebase 處已經有 PE 載入時，OS 會介入調整載入位址，因此我們常說 Imagebase 為「建議載入」位址，而記憶體中 Section 的偏移量則是 <code>VirtualAddress</code> 的數值，也就是 RVA，RVA 的數值加上 Base 的位址則是 Section 在記憶體上的位址，稱為 VA，因此 VA &#x3D; RVA + Imagebase。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Mes
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://mes0903.github.io/2023/01/09/security/PE_file_format/" title="PE file format">https://mes0903.github.io/2023/01/09/security/PE_file_format/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-SA</span> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/security/" rel="tag"># security</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/12/01/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/README/" rel="prev" title="礦坑系列 ── Concept と SFINAE と Detection Idiom">
+                  <i class="fa fa-angle-left"></i> 礦坑系列 ── Concept と SFINAE と Detection Idiom
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/06/17/OS/OSDI/risc-v_osdi/" rel="next" title="RVOS OSDI 筆記">
+                  RVOS OSDI 筆記 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">172k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">10:26</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/Icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/Icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mes0903.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.19.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置">
+<meta property="og:url" content="https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/index.html">
+<meta property="og:site_name" content="Mes&#39;s Studio">
+<meta property="og:description" content="這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.imgur.com/56JpJz7.png">
+<meta property="og:image" content="https://i.imgur.com/QD5XzvG.png">
+<meta property="og:image" content="https://i.imgur.com/nsJWPVE.png">
+<meta property="og:image" content="https://i.imgur.com/fqfjlXi.png">
+<meta property="og:image" content="https://i.imgur.com/nvssG0p.png">
+<meta property="og:image" content="https://i.imgur.com/7BgII7U.png">
+<meta property="og:image" content="https://i.imgur.com/qTV67LN.png">
+<meta property="og:image" content="https://i.imgur.com/BgbgUDi.png">
+<meta property="og:image" content="https://i.imgur.com/w8yfayQ.png">
+<meta property="og:image" content="https://i.imgur.com/pgMTKuw.png">
+<meta property="og:image" content="https://i.imgur.com/ptIGjnL.png">
+<meta property="og:image" content="https://i.imgur.com/VLd7vOi.png">
+<meta property="og:image" content="https://i.imgur.com/xJd0BNT.png">
+<meta property="og:image" content="https://i.imgur.com/aKxOwxu.png">
+<meta property="og:image" content="https://i.imgur.com/eC9x6wG.png">
+<meta property="og:image" content="https://i.imgur.com/K7E8Vai.png">
+<meta property="og:image" content="https://i.imgur.com/cSabeng.png">
+<meta property="og:image" content="https://i.imgur.com/oqp9k55.png">
+<meta property="og:image" content="https://i.imgur.com/RlMEPwt.png">
+<meta property="og:image" content="https://i.imgur.com/3pXrpSs.png">
+<meta property="og:image" content="https://i.imgur.com/EzGA3D9.png">
+<meta property="og:image" content="https://i.imgur.com/trtTKqf.png">
+<meta property="og:image" content="https://i.imgur.com/FS4ehKL.png">
+<meta property="og:image" content="https://i.imgur.com/n0YekM9.png">
+<meta property="og:image" content="https://i.imgur.com/eWxGvYW.png">
+<meta property="og:image" content="https://i.imgur.com/bHFNHMM.png">
+<meta property="og:image" content="https://i.imgur.com/b0GDfWb.png">
+<meta property="og:image" content="https://i.imgur.com/zDhGEbK.png">
+<meta property="og:image" content="https://i.imgur.com/m4TrOQm.png">
+<meta property="og:image" content="https://i.imgur.com/oLBBwCM.png">
+<meta property="article:published_time" content="2022-02-24T00:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-07T20:05:51.596Z">
+<meta property="article:author" content="Mes">
+<meta property="article:tag" content="C++ Miner_tutorial">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/56JpJz7.png">
+
+
+<link rel="canonical" href="https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh","comments":true,"permalink":"https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/","path":"2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/","title":"C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置 | Mes's Studio</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Mes's Studio</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Mes 雜七雜八</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>Commonweal 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text"> C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置 </span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Vscode-%E5%AE%89%E8%A3%9D"><span class="nav-number">3.</span> <span class="nav-text">Vscode 安裝</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-Mingw-gcc"><span class="nav-number">4.</span> <span class="nav-text">安裝 Mingw-gcc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6%E7%AC%AC%E4%B8%80%E5%80%8B-C-%E7%A8%8B%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">測試第一個 C++ 程式</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mes"
+      src="/uploads/Icon.png">
+  <p class="site-author-name" itemprop="name">Mes</p>
+  <div class="site-description" itemprop="description">The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mes0903"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOm1lczkwMDkwM0BnbWFpbC5jb20=" title="E-Mail → mailto:mes900903@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly95b3V0dWJlLmNvbS9AbWVzMzQ4MA==" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;@mes3480"><i class="fab fa-youtube fa-fw"></i>YouTube</span>
+      </span>
+  </div>
+  <div class="cc-license animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/big/by_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Icon.png">
+      <meta itemprop="name" content="Mes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mes's Studio">
+      <meta itemprop="description" content="The content on this site is all<br>CC-BY-SA, or<br>MIT/GPLv3+ dual license for code.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置 | Mes's Studio">
+      <meta itemprop="description" content="這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-02-24 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-24T00:00:00+00:00">2022-02-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-07 20:05:51" itemprop="dateModified" datetime="2024-10-07T20:05:51+00:00">2024-10-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/C-Miner/" itemprop="url" rel="index"><span itemprop="name">C++ Miner</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+            <div class="post-description">這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1><center><img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50> C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置 <img src = "https://i.imgur.com/thmVmX6.png?w=1000" height = 50></center></h1>  
+
+<p>點此回到礦坑系列首頁：<strong><a href = "https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class = "redlink">首頁</a></strong>  </p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索。  </p>
+<p>為了在 windows 上寫 C++，我們會需要兩個東西  </p>
+<ol>
+<li><p>文字編輯器  </p>
+<p> 本系列使用 Vscode，如果你有其他的選項當然也可以，自己習慣就好，甚至是記事本也 ok，或是你要用 IDE 也可以  </p>
+</li>
+<li><p>編譯器  </p>
+<p> 編譯器是負責幫我們把 C++ code 翻譯給電腦看的軟體，本文使用 Mingw-gcc，如果你有其他選項也可以，一樣，習慣就好</p>
+</li>
+</ol>
+<p>之後的教學我可能是在 Linux 環境下撰寫的，但考慮到大多數人的環境可能還是 windows，所以寫了這篇讓大家能夠跟著建置可用的環境。  </p>
+<h1 id="Vscode-安裝"><a href="#Vscode-安裝" class="headerlink" title="Vscode 安裝"></a>Vscode 安裝</h1><p>首先到 Vscode 官網的<span class="exturl" data-url="aHR0cHM6Ly9jb2RlLnZpc3VhbHN0dWRpby5jb20vZG93bmxvYWQ=">下載頁面<i class="fa fa-external-link-alt"></i></span>下載自己對應的系統版本，這邊我們選 Windows  </p>
+<p><img src="https://i.imgur.com/56JpJz7.png">  </p>
+<p>下載後開啟，並同意合約，然後下一步  </p>
+<p><img src="https://i.imgur.com/QD5XzvG.png">  </p>
+<p>這邊除了最後一個要勾之外其他的都看個人喜好，我自己是全勾，然後下一步並確認安裝，先不用重開機，後面裝完編譯器再重開就好。  </p>
+<p><img src="https://i.imgur.com/nsJWPVE.png">  </p>
+<p>安裝好後開啟 Vscode，進到 Extension(圖片標示 1 處)，搜尋 <code>C++</code> (圖片標示 2 處)，然後安裝，我這邊是已經安裝好的畫面，各位左邊那條可能不會那麼多東西，數量不一樣是正常的，不用擔心。  </p>
+<p><img src="https://i.imgur.com/fqfjlXi.png">  </p>
+<p>如果看不習慣英文的可以下載中文模組，在剛剛那個搜尋欄裡面搜尋 Chinese，然後安裝：  </p>
+<p><img src="https://i.imgur.com/nvssG0p.png">  </p>
+<h1 id="安裝-Mingw-gcc"><a href="#安裝-Mingw-gcc" class="headerlink" title="安裝 Mingw-gcc"></a>安裝 Mingw-gcc</h1><p>本文使用的是 winlibs 提供的 Mingw-w64 GCC，你可以直接點<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2JyZWNodHNhbmRlcnMvd2lubGlic19taW5ndy9yZWxlYXNlcy9kb3dubG9hZC8xMS4yLjAtOS4wLjAtdWNydC1yNS93aW5saWJzLXg4Nl82NC1wb3NpeC1zZWgtZ2NjLTExLjIuMC1taW5ndy13NjR1Y3J0LTkuMC4wLXI1Ljd6">這裡<i class="fa fa-external-link-alt"></i></span>下載，或是進到 <span class="exturl" data-url="aHR0cHM6Ly93aW5saWJzLmNvbS8=">winlibs<i class="fa fa-external-link-alt"></i></span> 的網站，在下方選擇你想要的版本，我上方連結給的版本是下圖紅圈圈起來的版本：  </p>
+<p><img src="https://i.imgur.com/7BgII7U.png">  </p>
+<p>下載好後解壓縮，解壓縮出來的資料夾裡面會有一個叫 mingw 的資料夾：  </p>
+<p><img src="https://i.imgur.com/qTV67LN.png">  </p>
+<p>把這個資料夾移到 C 槽或你想要的地方：  </p>
+<p><img src="https://i.imgur.com/BgbgUDi.png">  </p>
+<p>之後在 windows 搜尋「編輯系統環境變數」，點進去：  </p>
+<p><img src="https://i.imgur.com/w8yfayQ.png">  </p>
+<p>在進階裡面有一個環境變數，點進去：  </p>
+<p><img src="https://i.imgur.com/pgMTKuw.png">  </p>
+<p>會發現下方系統變數的地方有一個 <code>Path</code>，連點它兩下，或選取後按編輯：  </p>
+<p><img src="https://i.imgur.com/ptIGjnL.png">  </p>
+<p>點擊右方的新增，把剛剛的 mingw 下的 <code>bin</code> 資料夾位置貼進去：  </p>
+<p><img src="https://i.imgur.com/VLd7vOi.png">  </p>
+<p>之後按確定出來，<strong><span class = "yellow">重開機</span></strong>。  </p>
+<h1 id="測試第一個-C-程式"><a href="#測試第一個-C-程式" class="headerlink" title="測試第一個 C++ 程式"></a>測試第一個 C++ 程式</h1><p>開啟 Vscode，選取左上方的檔案，然後選取開啟資料夾  </p>
+<p><img src="https://i.imgur.com/xJd0BNT.png">  </p>
+<p><img src="https://i.imgur.com/aKxOwxu.png">  </p>
+<p>然後創建一個資料夾，這個資料夾拿來放你要寫的 cpp 檔，名稱盡量用英文的比較好  </p>
+<p><img src="https://i.imgur.com/eC9x6wG.png">  </p>
+<p>然後選取這個資料夾開啟，開啟後 Vscode 可能會問你是否要信任這個資料夾的作者，選是  </p>
+<p><img src="https://i.imgur.com/K7E8Vai.png">  </p>
+<p>此時你的畫面會長這樣，資料夾名稱的右邊有四個按鈕：  </p>
+<p><img src="https://i.imgur.com/cSabeng.png">  </p>
+<p><img src="https://i.imgur.com/oqp9k55.png">  </p>
+<p>這四個按鈕的功能由左至右分別為新增檔案、新增資料夾、重新整理和摺疊資料夾。  </p>
+<p>我們選取新增檔案，檔名取為 <code>test.cpp</code>，<code>.cpp</code> 代表這是一個 C++ 的檔案，test 則是檔名，你可以取你喜歡的，但一樣檔名盡量取英文的：  </p>
+<p><img src="https://i.imgur.com/RlMEPwt.png">  </p>
+<p>此時你的資料夾裡面應該長這樣：  </p>
+<p><img src="https://i.imgur.com/3pXrpSs.png">  </p>
+<p><img src="https://i.imgur.com/EzGA3D9.png">  </p>
+<p>在 Vscode 裡面點選剛剛創好的檔案，此時右邊會出現讓你編輯文字的畫面，輸入以下這段文字：  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>  </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;test&quot;</span>;  </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/trtTKqf.png">  </p>
+<p><img src="https://i.imgur.com/FS4ehKL.png">  </p>
+<p>按 ctrl+s 存檔後按 F5，此時會跳出一個選單，選取「C++ (GDB&#x2F;LLDB)」：  </p>
+<p><img src="https://i.imgur.com/n0YekM9.png">  </p>
+<p><img src="https://i.imgur.com/eWxGvYW.png"><br>然後選取 「g++.exe - 建置及偵錯使用中的檔案」，後面的檔案位址要確認一下是不是剛剛安裝的 mingw：  </p>
+<p><img src="https://i.imgur.com/bHFNHMM.png">  </p>
+<p><img src="https://i.imgur.com/b0GDfWb.png">  </p>
+<p>此時你的資料夾裡面會多一個叫做 <code>.vscode</code> 的資料夾，這個是 Vscode 的設定檔，然後右方(或下方)可能會跳出一個視窗，視窗上方由左至右分別為問題、輸出、偵錯主控台和終端機，這邊點選終端機，就可以看到剛剛程式執行的結果了  </p>
+<p><img src="https://i.imgur.com/zDhGEbK.png">  </p>
+<p><img src="https://i.imgur.com/m4TrOQm.png">  </p>
+<p><img src="https://i.imgur.com/oLBBwCM.png">  </p>
+<p>這樣一來你的環境就建好了，好好享受 C++ ㄅ</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Mes
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/" title="C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置">https://mes0903.github.io/2022/02/24/Cpp-Miner/Miner_Tutorial/Environment_Building/README/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-SA</span> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/C-Miner-tutorial/" rel="tag"># C++ Miner_tutorial</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/02/06/OS/Process-Concept/" rel="prev" title="Ch3 Processes Concept">
+                  <i class="fa fa-angle-left"></i> Ch3 Processes Concept
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/02/25/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/README/" rel="next" title="C++ 教學系列 ── Object、Expression、Statement">
+                  C++ 教學系列 ── Object、Expression、Statement <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">The content on this site is all CC-BY-SA (or MIT/GPLv3+ dual license for code)</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">172k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">10:26</span>
+  </span>
+</div>
+  <div class="powered-by">Powered by <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL01lczA5MDM=" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
