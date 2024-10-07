@@ -1,4 +1,6 @@
-https://mes0903.github.io/2024/10/18/Cpp-Miner/Miner_Tutorial/Computer_Introduction/README/
+https://mes0903.github.io/2024/10/08/essay/RasterI/RasterI/
+https://mes0903.github.io/2024/09/15/essay/AboutMovingForward/%E9%97%9C%E6%96%BC%E5%BE%80%E5%89%8D%E9%80%99%E4%BB%B6%E4%BA%8B/
+https://mes0903.github.io/2024/10/08/Cpp-Miner/Miner_Tutorial/Computer_Introduction/README/
 https://mes0903.github.io/2021/05/14/Cpp-Miner/README/
 https://mes0903.github.io/2021/04/27/Cpp-Miner/Miner_main/Value_Categories/README/
 https://mes0903.github.io/2022/09/19/Cpp-Miner/Miner_main/malloc_new_POD/README/
@@ -31,7 +33,6 @@ https://mes0903.github.io/2021/09/19/numerical_algebra/Norm/
 https://mes0903.github.io/2021/11/07/numerical_algebra/Polynomials-of-Least-square/
 https://mes0903.github.io/2021/11/15/numerical_algebra/Power-Method/
 https://mes0903.github.io/2021/10/16/numerical_algebra/Relaxation/
-https://mes0903.github.io/2024/09/15/essay/%E9%97%9C%E6%96%BC%E5%BE%80%E5%89%8D%E9%80%99%E4%BB%B6%E4%BA%8B/
 https://mes0903.github.io/2023/11/14/memory/sw-reram/
 https://mes0903.github.io/2021/12/15/miscellaneous/The_mind_behind_Linux/
 https://mes0903.github.io/2021/10/31/numerical_algebra/Conjugate-Gradient/
@@ -50,7 +51,6 @@ https://mes0903.github.io/tags/C-Miner/
 https://mes0903.github.io/tags/Linux/
 https://mes0903.github.io/tags/OS/
 https://mes0903.github.io/tags/ROS/
-https://mes0903.github.io/tags/essay/
 https://mes0903.github.io/tags/memory/
 https://mes0903.github.io/tags/miscellaneous/
 https://mes0903.github.io/tags/numerical-algebra/
@@ -58,14 +58,15 @@ https://mes0903.github.io/tags/security/
 https://mes0903.github.io/tags/C-Miner-BlackMagic/
 https://mes0903.github.io/tags/OSDI/
 https://mes0903.github.io/tags/computer-network/
+https://mes0903.github.io/tags/essay/
 https://mes0903.github.io/tags/C-Miner-tutorial/
 https://mes0903.github.io/categories/C-Miner/
 https://mes0903.github.io/categories/Linux/
 https://mes0903.github.io/categories/OS/
 https://mes0903.github.io/categories/ROS/
-https://mes0903.github.io/categories/essay/
 https://mes0903.github.io/categories/memory/
 https://mes0903.github.io/categories/miscellaneous/
 https://mes0903.github.io/categories/numerical-algebra/
 https://mes0903.github.io/categories/security/
 https://mes0903.github.io/categories/computer-network/
+https://mes0903.github.io/categories/essay/
