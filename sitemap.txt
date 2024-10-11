@@ -20,7 +20,6 @@ https://mes0903.github.io/2022/03/14/Cpp-Miner/Miner_Tutorial/Array_Pointer/READ
 https://mes0903.github.io/2022/05/22/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/README/
 https://mes0903.github.io/2023/08/12/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/README/
 https://mes0903.github.io/2023/01/09/security/PE_file_format/
-https://mes0903.github.io/googlebf69ebdce31e8d6d.html
 https://mes0903.github.io/about/index.html
 https://mes0903.github.io/categories/index.html
 https://mes0903.github.io/tags/index.html
