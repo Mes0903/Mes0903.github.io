@@ -2,4 +2,4 @@
 User-agent:*
 Disallow:
 
-Sitemap: https://mes0903.github.io/mes-sitemap20250319.xml
+Sitemap: https://mes0903.github.io/sitemap.xml
