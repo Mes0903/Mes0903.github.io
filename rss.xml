@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Fri, 18 Apr 2025 08:34:50 GMT</pubDate>
-    <lastBuildDate>Fri, 18 Apr 2025 08:34:50 GMT</lastBuildDate>
+    <pubDate>Sun, 20 Apr 2025 16:47:57 GMT</pubDate>
+    <lastBuildDate>Sun, 20 Apr 2025 16:47:57 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>computer-graphic</category>
@@ -3413,12 +3413,12 @@
       <link>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</link>
       <guid>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</guid>
       <source url="https://mes0903.github.io/rss.xml">(WIP) Supervisor-Level ISA</source>
-      <description>12. Supervisor-Level ISA, Version 1.13 12.1.1. Supervisor Status (sstatus) Register sstatus 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，為 mstatus 的子集 當 SXLEN 為 32 時，格式如下圖： 當 S...</description>
+      <description>12. Supervisor-Level ISA, Version 1.13 12.1.1. Supervisor Status (sstatus) Register sstatus 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 mstatus 的子集 當 SXLEN 為 32 時，格式如下圖： 當 ...</description>
       <category>risc-v</category>
       <pubDate>Tue, 25 Feb 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
 <h3>12.1.1. Supervisor Status (<code>sstatus</code>) Register</h3>
-<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，為 <code>mstatus</code> 的子集</p>
+<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 <code>mstatus</code> 的子集</p>
 <p>當 <code>SXLEN</code> 為 32 時，格式如下圖：</p>
 <div class="center-column">
 <img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/risc-v/Supervisor-Level-ISA/image/sstatus1.png?raw=true">
@@ -3453,7 +3453,7 @@
 </li>
 <li><code>SPIE</code>
 <ul>
-<li>用來紀錄在進入 S-mode 之前是否啟用了 S-mode 下的中斷</li>
+<li>用來記錄在進入 S-mode 之前是否啟用了 S-mode 下的中斷</li>
 <li>當 Trap 進入 S-mode 時，<code>SPIE</code> 被設為 <code>SIE</code>，並且 <code>SIE</code> 被設為 0</li>
 <li>執行 <code>SRET</code> 指令時，<code>SIE</code> 被設為 <code>SPIE</code>，然後 <code>SPIE</code> 被設為 1</li>
 </ul>
@@ -3566,7 +3566,7 @@
 </div><br>
 <p><code>SUM</code> 的機制可以防止 S-mode 下的軟體意外存取 user memory，作業系統可以在 <code>SUM=0</code> 的情況下執行大部分的程式碼，並在少數需要訪問 user memory 的情況下再暫時設定 <code>SUM</code></p>
 <p><code>SUM</code> 的機制不允許 S-mode 軟體執行 user code pages 中的指令。 但這在其他場景下通常也是個不合法的操作，在 POSIX 環境中也禁止 S-mode 執行 U-mode memory page 中的指令，因為如果 S-mode 中存在任意代碼執行(Arbitrary Code Execution, ACE) 的漏洞，那麼這類漏洞將變得更容易被利用，特別是當攻擊者能夠將惡意代碼存放在 U-mode 可存取的記憶體 (user buffer) 並在攻擊過程中執行它</p>
-<p>但是有些 non-POSIX 的單一位址空間(Single Address Space) 作業系統允許部分軟體在 S-mode 下執行 U-mode program，其大部分程式都運行在 U-mode 下，並和 kernel 共用同一個位址空間。 在這種情況下，可以通過映射相同的物理記憶體到不同的虛擬記憶體頁面，並設定不同的權限來允許 S-mode 軟體部分執行 U-mode 的程式碼</p>
+<p>但是有些 non-POSIX 的單一位址空間(Single Address Space) 作業系統允許部分軟體在 S-mode 下執行 U-mode program，其大部分程式都運行在 U-mode 下，並和 kernel 共用同一個位址空間。 在這種情況下，可以通過映射相同的物理記憶體到不同的虛擬記憶體 page，並設定不同的權限來允許 S-mode 軟體部分執行 U-mode 的程式碼</p>
 <h4>12.1.1.3. Endianness Control in <code>sstatus</code> Register (<code>UBE</code>)</h4>
 <p><code>UBE</code> 為原是個 WARL 的字段，用來控制 U-mode 下記憶體存取的位元組順序(Endianness)，其可能與 S-mode 下的位元組順序不同。 實作上可能會把 UBE 設成一個唯讀的字段，使其始終與 S-mode 的位元組順序相同</p>
 <ul>
@@ -3608,7 +3608,7 @@
 <li><code>SDT=1</code></li>
 <li>該存取指令導致了 guest page-fault</li>
 </ul>
-<p>時，不過這不常發生。 另外，儘管 GPA 不會被記錄，但這沒關係，需要的話仍可以通過遍歷 page table 來達成目的</p>
+<p>時，不過這不常發生。 另外，儘管 GPA 不會被記錄，但這沒關係，需要的話仍可以通過走訪 page table 來達成目的</p>
 <p>對於源自 VS-mode 的 double trap，M-mode 應該要將該異常重新導向到 HS-mode，具體做法是：</p>
 <ul>
 <li>將 M-mode 處理該異常時更新的 CSR 的值複製到 HS-mode 中對應的 CSR</li>
@@ -7806,74 +7806,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
-      <title>Conjugate Gradient Method</title>
-      <link>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</link>
-      <guid>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Conjugate Gradient Method</source>
-      <description>Conjugate Gradient Method Conjugate Gradient Method 這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Met...</description>
-      <category>numerical-algebra</category>
-      <pubDate>Sun, 31 Oct 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h4>Conjugate Gradient Method</h4>
-<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
-<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
-<p>我們先看 ，先不管 ，所以假設  已知：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
-</div><br>
-<p>基本上推導過程差不多，所以重點就是  要怎麼找</p>
-<h4>A-orthogonal</h4>
-<p>在開始找之前我們先給個定義，假設 A 是個  的矩陣，我們說有一個 nonzero vector 的 set ，如果這個集合滿足  的話，我們就說這個集合是一個 A-orthogonal 的 set</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/2.png?raw=true">
-</div><br>
-<p>那我們說這個集合如果是 A-orthogonal 而且 A 矩陣是對稱正定的話，那麼這個集合必定會線性獨立，證明：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/3.png?raw=true">
-</div><br>
-<p>代表這個集合是  的一組基底</p>
-<h4>Thm 7.32</h4>
-<p>給定一個集合 A-orthogonal 的集合 ， 是對稱正定矩陣</p>
-<p>那當我們要解  時我們要用這個式子：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/4.png?raw=true">
-</div><br>
-<p>那妳可以看見  只有 n 項，也就代表最多只會迭代 n 次，也就是說  就是我們要的 </p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/5.png?raw=true">
-</div><br>
-<p>證明：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/6.png?raw=true">
-</div><br>
-<p>所以現在問題就變成  要怎麼找了</p>
-<h4>Thm 7.33</h4>
-<p>residual vector , k = 1, 2, ..., n，滿足 &lt;&gt;, j = 1, 2, ..., k</p>
-<p>也就是說  和  垂直， 和  還有  垂直， 和全部的  垂直</p>
-<p>那證明我們就用數學歸納法：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/7.png?raw=true">
-</div><br>
-<h4>找 A-orthogonal 的集合</h4>
-<p>假設執行到第 k 步的時候  且  都已經知道了，那下一次的 </p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/8.png?raw=true">
-</div><br>
-<p>因為我們要造的是 A-orthogonal 的集合，所以我們希望找到的  能讓  和上一次的  垂直，那就把寫下來整理一下：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/9.png?raw=true">
-</div><br>
-<p>然後把前面算出來的  抄下來推一下：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/10.png?raw=true">
-</div><br>
-<h4>算 Conjugate gradient</h4>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/11.png?raw=true">
-</div><br>
-]]></content:encoded>
-    </item>
-    <item>
       <title>Error Bounds</title>
       <link>https://mes0903.github.io/numerical_algebra/Error-Bound/</link>
       <guid>https://mes0903.github.io/numerical_algebra/Error-Bound/</guid>
@@ -7940,6 +7872,74 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <div class="center-column">
 <img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Error-Bound/image/10.png?raw=true">
 </div>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Conjugate Gradient Method</title>
+      <link>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</link>
+      <guid>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</guid>
+      <source url="https://mes0903.github.io/rss.xml">Conjugate Gradient Method</source>
+      <description>Conjugate Gradient Method Conjugate Gradient Method 這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Met...</description>
+      <category>numerical-algebra</category>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h4>Conjugate Gradient Method</h4>
+<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
+<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
+<p>我們先看 ，先不管 ，所以假設  已知：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
+</div><br>
+<p>基本上推導過程差不多，所以重點就是  要怎麼找</p>
+<h4>A-orthogonal</h4>
+<p>在開始找之前我們先給個定義，假設 A 是個  的矩陣，我們說有一個 nonzero vector 的 set ，如果這個集合滿足  的話，我們就說這個集合是一個 A-orthogonal 的 set</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/2.png?raw=true">
+</div><br>
+<p>那我們說這個集合如果是 A-orthogonal 而且 A 矩陣是對稱正定的話，那麼這個集合必定會線性獨立，證明：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/3.png?raw=true">
+</div><br>
+<p>代表這個集合是  的一組基底</p>
+<h4>Thm 7.32</h4>
+<p>給定一個集合 A-orthogonal 的集合 ， 是對稱正定矩陣</p>
+<p>那當我們要解  時我們要用這個式子：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/4.png?raw=true">
+</div><br>
+<p>那妳可以看見  只有 n 項，也就代表最多只會迭代 n 次，也就是說  就是我們要的 </p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/5.png?raw=true">
+</div><br>
+<p>證明：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/6.png?raw=true">
+</div><br>
+<p>所以現在問題就變成  要怎麼找了</p>
+<h4>Thm 7.33</h4>
+<p>residual vector , k = 1, 2, ..., n，滿足 &lt;&gt;, j = 1, 2, ..., k</p>
+<p>也就是說  和  垂直， 和  還有  垂直， 和全部的  垂直</p>
+<p>那證明我們就用數學歸納法：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/7.png?raw=true">
+</div><br>
+<h4>找 A-orthogonal 的集合</h4>
+<p>假設執行到第 k 步的時候  且  都已經知道了，那下一次的 </p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/8.png?raw=true">
+</div><br>
+<p>因為我們要造的是 A-orthogonal 的集合，所以我們希望找到的  能讓  和上一次的  垂直，那就把寫下來整理一下：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/9.png?raw=true">
+</div><br>
+<p>然後把前面算出來的  抄下來推一下：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/10.png?raw=true">
+</div><br>
+<h4>算 Conjugate gradient</h4>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/11.png?raw=true">
+</div><br>
 ]]></content:encoded>
     </item>
     <item>

@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-04-18T08:34:50.211Z</updated>
+  <updated>2025-04-20T16:47:57.477Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -82,7 +82,7 @@
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-04-18T08:34:50.220Z</updated>
+    <updated>2025-04-20T16:47:57.485Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -3467,17 +3467,17 @@
     <title type="text">(WIP) Supervisor-Level ISA</title>
     <id>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</id>
     <link href="https://mes0903.github.io/risc-v/Supervisor-Level-ISA/"/>
-    <updated>2025-04-02T16:46:19.000Z</updated>
+    <updated>2025-04-20T16:47:31.000Z</updated>
     <summary type="html"><![CDATA[
 <h3>12.1.1. Supervisor Status (<code>sstatus</code>) Register</h3>
-<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，為 <code>mstatus</code> 的子集</p>
+<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 <code>mstatus</code> 的子集</p>
 <p>當 <code>SXLEN</code> 為 32 時，格式如下圖：</p>
 <div class="center-column">
 <img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/risc-v/Supervisor-Level-ISA/image/sstatus1.png?raw=true">
 </div>]]></summary>
     <content type="html"><![CDATA[
 <h3>12.1.1. Supervisor Status (<code>sstatus</code>) Register</h3>
-<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，為 <code>mstatus</code> 的子集</p>
+<p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 <code>mstatus</code> 的子集</p>
 <p>當 <code>SXLEN</code> 為 32 時，格式如下圖：</p>
 <div class="center-column">
 <img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/risc-v/Supervisor-Level-ISA/image/sstatus1.png?raw=true">
@@ -3512,7 +3512,7 @@
 </li>
 <li><code>SPIE</code>
 <ul>
-<li>用來紀錄在進入 S-mode 之前是否啟用了 S-mode 下的中斷</li>
+<li>用來記錄在進入 S-mode 之前是否啟用了 S-mode 下的中斷</li>
 <li>當 Trap 進入 S-mode 時，<code>SPIE</code> 被設為 <code>SIE</code>，並且 <code>SIE</code> 被設為 0</li>
 <li>執行 <code>SRET</code> 指令時，<code>SIE</code> 被設為 <code>SPIE</code>，然後 <code>SPIE</code> 被設為 1</li>
 </ul>
@@ -3625,7 +3625,7 @@
 </div><br>
 <p><code>SUM</code> 的機制可以防止 S-mode 下的軟體意外存取 user memory，作業系統可以在 <code>SUM=0</code> 的情況下執行大部分的程式碼，並在少數需要訪問 user memory 的情況下再暫時設定 <code>SUM</code></p>
 <p><code>SUM</code> 的機制不允許 S-mode 軟體執行 user code pages 中的指令。 但這在其他場景下通常也是個不合法的操作，在 POSIX 環境中也禁止 S-mode 執行 U-mode memory page 中的指令，因為如果 S-mode 中存在任意代碼執行(Arbitrary Code Execution, ACE) 的漏洞，那麼這類漏洞將變得更容易被利用，特別是當攻擊者能夠將惡意代碼存放在 U-mode 可存取的記憶體 (user buffer) 並在攻擊過程中執行它</p>
-<p>但是有些 non-POSIX 的單一位址空間(Single Address Space) 作業系統允許部分軟體在 S-mode 下執行 U-mode program，其大部分程式都運行在 U-mode 下，並和 kernel 共用同一個位址空間。 在這種情況下，可以通過映射相同的物理記憶體到不同的虛擬記憶體頁面，並設定不同的權限來允許 S-mode 軟體部分執行 U-mode 的程式碼</p>
+<p>但是有些 non-POSIX 的單一位址空間(Single Address Space) 作業系統允許部分軟體在 S-mode 下執行 U-mode program，其大部分程式都運行在 U-mode 下，並和 kernel 共用同一個位址空間。 在這種情況下，可以通過映射相同的物理記憶體到不同的虛擬記憶體 page，並設定不同的權限來允許 S-mode 軟體部分執行 U-mode 的程式碼</p>
 <h4>12.1.1.3. Endianness Control in <code>sstatus</code> Register (<code>UBE</code>)</h4>
 <p><code>UBE</code> 為原是個 WARL 的字段，用來控制 U-mode 下記憶體存取的位元組順序(Endianness)，其可能與 S-mode 下的位元組順序不同。 實作上可能會把 UBE 設成一個唯讀的字段，使其始終與 S-mode 的位元組順序相同</p>
 <ul>
@@ -3667,7 +3667,7 @@
 <li><code>SDT=1</code></li>
 <li>該存取指令導致了 guest page-fault</li>
 </ul>
-<p>時，不過這不常發生。 另外，儘管 GPA 不會被記錄，但這沒關係，需要的話仍可以通過遍歷 page table 來達成目的</p>
+<p>時，不過這不常發生。 另外，儘管 GPA 不會被記錄，但這沒關係，需要的話仍可以通過走訪 page table 來達成目的</p>
 <p>對於源自 VS-mode 的 double trap，M-mode 應該要將該異常重新導向到 HS-mode，具體做法是：</p>
 <ul>
 <li>將 M-mode 處理該異常時更新的 CSR 的值複製到 HS-mode 中對應的 CSR</li>
@@ -8105,81 +8105,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <published>2023-11-14T00:00:00.000Z</published>
   </entry>
   <entry>
-    <title type="text">Conjugate Gradient Method</title>
-    <id>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</id>
-    <link href="https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/"/>
-    <updated>2025-03-29T06:05:03.000Z</updated>
-    <summary type="html"><![CDATA[
-<h4>Conjugate Gradient Method</h4>
-<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
-<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
-<p>我們先看 ，先不管 ，所以假設  已知：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
-</div>]]></summary>
-    <content type="html"><![CDATA[
-<h4>Conjugate Gradient Method</h4>
-<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
-<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
-<p>我們先看 ，先不管 ，所以假設  已知：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
-</div><br>
-<p>基本上推導過程差不多，所以重點就是  要怎麼找</p>
-<h4>A-orthogonal</h4>
-<p>在開始找之前我們先給個定義，假設 A 是個  的矩陣，我們說有一個 nonzero vector 的 set ，如果這個集合滿足  的話，我們就說這個集合是一個 A-orthogonal 的 set</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/2.png?raw=true">
-</div><br>
-<p>那我們說這個集合如果是 A-orthogonal 而且 A 矩陣是對稱正定的話，那麼這個集合必定會線性獨立，證明：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/3.png?raw=true">
-</div><br>
-<p>代表這個集合是  的一組基底</p>
-<h4>Thm 7.32</h4>
-<p>給定一個集合 A-orthogonal 的集合 ， 是對稱正定矩陣</p>
-<p>那當我們要解  時我們要用這個式子：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/4.png?raw=true">
-</div><br>
-<p>那妳可以看見  只有 n 項，也就代表最多只會迭代 n 次，也就是說  就是我們要的 </p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/5.png?raw=true">
-</div><br>
-<p>證明：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/6.png?raw=true">
-</div><br>
-<p>所以現在問題就變成  要怎麼找了</p>
-<h4>Thm 7.33</h4>
-<p>residual vector , k = 1, 2, ..., n，滿足 &lt;&gt;, j = 1, 2, ..., k</p>
-<p>也就是說  和  垂直， 和  還有  垂直， 和全部的  垂直</p>
-<p>那證明我們就用數學歸納法：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/7.png?raw=true">
-</div><br>
-<h4>找 A-orthogonal 的集合</h4>
-<p>假設執行到第 k 步的時候  且  都已經知道了，那下一次的 </p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/8.png?raw=true">
-</div><br>
-<p>因為我們要造的是 A-orthogonal 的集合，所以我們希望找到的  能讓  和上一次的  垂直，那就把寫下來整理一下：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/9.png?raw=true">
-</div><br>
-<p>然後把前面算出來的  抄下來推一下：</p>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/10.png?raw=true">
-</div><br>
-<h4>算 Conjugate gradient</h4>
-<div class="center-column">
-<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/11.png?raw=true">
-</div><br>
-]]></content>
-    <category term="numerical-algebra"/>
-    <published>2021-10-31T00:00:00.000Z</published>
-  </entry>
-  <entry>
     <title type="text">Error Bounds</title>
     <id>https://mes0903.github.io/numerical_algebra/Error-Bound/</id>
     <link href="https://mes0903.github.io/numerical_algebra/Error-Bound/"/>
@@ -8253,6 +8178,81 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content>
     <category term="numerical-algebra"/>
     <published>2021-10-16T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">Conjugate Gradient Method</title>
+    <id>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</id>
+    <link href="https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/"/>
+    <updated>2025-03-29T06:05:03.000Z</updated>
+    <summary type="html"><![CDATA[
+<h4>Conjugate Gradient Method</h4>
+<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
+<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
+<p>我們先看 ，先不管 ，所以假設  已知：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
+</div>]]></summary>
+    <content type="html"><![CDATA[
+<h4>Conjugate Gradient Method</h4>
+<p>這邊我們一樣考慮解 ，前面講的是 Gradient Method，那這節要講的是 Conjugate Gradient Method，效率一般來說會更好，而且好很多</p>
+<p> 要選來 minimize ，因為我們希望它越小越好，前面的 Gradient Method 裡面  是用 gradient 來做的，但這邊我們不用這個方法</p>
+<p>我們先看 ，先不管 ，所以假設  已知：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/1.png?raw=true">
+</div><br>
+<p>基本上推導過程差不多，所以重點就是  要怎麼找</p>
+<h4>A-orthogonal</h4>
+<p>在開始找之前我們先給個定義，假設 A 是個  的矩陣，我們說有一個 nonzero vector 的 set ，如果這個集合滿足  的話，我們就說這個集合是一個 A-orthogonal 的 set</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/2.png?raw=true">
+</div><br>
+<p>那我們說這個集合如果是 A-orthogonal 而且 A 矩陣是對稱正定的話，那麼這個集合必定會線性獨立，證明：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/3.png?raw=true">
+</div><br>
+<p>代表這個集合是  的一組基底</p>
+<h4>Thm 7.32</h4>
+<p>給定一個集合 A-orthogonal 的集合 ， 是對稱正定矩陣</p>
+<p>那當我們要解  時我們要用這個式子：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/4.png?raw=true">
+</div><br>
+<p>那妳可以看見  只有 n 項，也就代表最多只會迭代 n 次，也就是說  就是我們要的 </p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/5.png?raw=true">
+</div><br>
+<p>證明：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/6.png?raw=true">
+</div><br>
+<p>所以現在問題就變成  要怎麼找了</p>
+<h4>Thm 7.33</h4>
+<p>residual vector , k = 1, 2, ..., n，滿足 &lt;&gt;, j = 1, 2, ..., k</p>
+<p>也就是說  和  垂直， 和  還有  垂直， 和全部的  垂直</p>
+<p>那證明我們就用數學歸納法：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/7.png?raw=true">
+</div><br>
+<h4>找 A-orthogonal 的集合</h4>
+<p>假設執行到第 k 步的時候  且  都已經知道了，那下一次的 </p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/8.png?raw=true">
+</div><br>
+<p>因為我們要造的是 A-orthogonal 的集合，所以我們希望找到的  能讓  和上一次的  垂直，那就把寫下來整理一下：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/9.png?raw=true">
+</div><br>
+<p>然後把前面算出來的  抄下來推一下：</p>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/10.png?raw=true">
+</div><br>
+<h4>算 Conjugate gradient</h4>
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/numerical_algebra/Conjugate-Gradient/image/11.png?raw=true">
+</div><br>
+]]></content>
+    <category term="numerical-algebra"/>
+    <published>2021-10-31T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">Gauss-Seidel Metheod</title>
@@ -11886,7 +11886,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-04-18T08:34:51.665Z</updated>
+    <updated>2025-04-20T16:47:59.065Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -12217,7 +12217,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-04-18T08:34:51.688Z</updated>
+    <updated>2025-04-20T16:47:59.091Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -12364,7 +12364,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-04-18T08:34:51.700Z</updated>
+    <updated>2025-04-20T16:47:59.104Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -12623,7 +12623,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-04-18T08:34:51.711Z</updated>
+    <updated>2025-04-20T16:47:59.117Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -14127,7 +14127,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-04-18T08:34:51.836Z</updated>
+    <updated>2025-04-20T16:47:59.256Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -14516,7 +14516,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-04-18T08:34:51.863Z</updated>
+    <updated>2025-04-20T16:47:59.286Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -14844,7 +14844,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-04-18T08:34:51.887Z</updated>
+    <updated>2025-04-20T16:47:59.319Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -14867,7 +14867,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-04-18T08:34:51.894Z</updated>
+    <updated>2025-04-20T16:47:59.320Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15013,7 +15013,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-04-18T08:34:51.900Z</updated>
+    <updated>2025-04-20T16:47:59.326Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15411,7 +15411,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-04-18T08:34:51.933Z</updated>
+    <updated>2025-04-20T16:47:59.363Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15663,7 +15663,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-04-18T08:34:51.949Z</updated>
+    <updated>2025-04-20T16:47:59.380Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -17021,7 +17021,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-04-18T08:34:52.046Z</updated>
+    <updated>2025-04-20T16:47:59.498Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -17703,7 +17703,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-04-18T08:34:52.094Z</updated>
+    <updated>2025-04-20T16:47:59.550Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18032,7 +18032,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-04-18T08:34:52.209Z</updated>
+    <updated>2025-04-20T16:47:59.673Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18320,7 +18320,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-04-18T08:34:52.326Z</updated>
+    <updated>2025-04-20T16:47:59.803Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19076,7 +19076,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-04-18T08:34:52.371Z</updated>
+    <updated>2025-04-20T16:47:59.854Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19243,7 +19243,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-04-18T08:34:52.380Z</updated>
+    <updated>2025-04-20T16:47:59.865Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19670,7 +19670,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-04-18T08:34:52.582Z</updated>
+    <updated>2025-04-20T16:48:00.086Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19801,7 +19801,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-04-18T08:34:52.591Z</updated>
+    <updated>2025-04-20T16:48:00.096Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20796,7 +20796,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-04-18T08:34:52.925Z</updated>
+    <updated>2025-04-20T16:48:00.456Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
