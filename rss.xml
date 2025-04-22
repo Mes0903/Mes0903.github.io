@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Sun, 20 Apr 2025 17:19:08 GMT</pubDate>
-    <lastBuildDate>Sun, 20 Apr 2025 17:19:08 GMT</lastBuildDate>
+    <pubDate>Tue, 22 Apr 2025 03:34:12 GMT</pubDate>
+    <lastBuildDate>Tue, 22 Apr 2025 03:34:12 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>computer-graphic</category>
@@ -3409,14 +3409,18 @@
 ]]></content:encoded>
     </item>
     <item>
-      <title>(WIP) Supervisor-Level ISA</title>
+      <title>(WIP) RISC-V Supervisor-Level ISA</title>
       <link>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</link>
       <guid>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</guid>
-      <source url="https://mes0903.github.io/rss.xml">(WIP) Supervisor-Level ISA</source>
-      <description>12. Supervisor-Level ISA, Version 1.13 12.1.1. Supervisor Status (sstatus) Register sstatus 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 mstatus 的子集 當 SXLEN 為 32 時，格式如下圖： 當 ...</description>
+      <source url="https://mes0903.github.io/rss.xml">(WIP) RISC-V Supervisor-Level ISA</source>
+      <description>12. Supervisor-Level ISA, Version 1.13 本篇為 RISC-V Supervisor-Level ISA 的中文翻譯與筆記，原文可於官方 github 的第 12 章中看到 本篇內的 Info block 為原文中的補充段落，我全部都有翻，但會依照前後文的語境來決定要不要安插 Info block 進來，也就是說雖然...</description>
       <category>risc-v</category>
       <pubDate>Tue, 25 Feb 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
+<p>本篇為 RISC-V Supervisor-Level ISA 的中文翻譯與筆記，原文可於<a href="https://github.com/riscv/riscv-isa-manual/tree/main" target="_blank" rel="noopener noreferrer">官方 github</a> 的第 12 章中看到</p>
+<p>本篇內的 Info block 為原文中的補充段落，我全部都有翻，但會依照前後文的語境來決定要不要安插 Info block 進來，也就是說雖然本文中有些段落不在藍色的 Info 區塊內，但在原文中其屬於補充段落。 至於綠色的 Tips block 則是我個人的補充筆記</p>
+<h2>12.1. Supervisor CSRs</h2>
+<p>S-mode 無法窺探或取得任何來自更高 privilege mode（如 M-mode）的結構或資訊。 許多 supervisor-level 的 CSR 是對應的 M-mode CSR 的子集，因此為了理解 supervisor-level CSR 的描述，應該先閱讀 machine-mode 章節</p>
 <h3>12.1.1. Supervisor Status (<code>sstatus</code>) Register</h3>
 <p><code>sstatus</code> 暫存器是一個 SXLEN-bit read/write 的暫存器，用來追蹤處理器目前的狀態，其為 <code>mstatus</code> 的子集</p>
 <p>當 <code>SXLEN</code> 為 32 時，格式如下圖：</p>
@@ -3498,9 +3502,10 @@
 <p>如果 <code>UXLEN ≠ SXLEN</code>，則在 narrower mode 下執行的指令必須忽略配置的 <code>XLEN</code> 以上的來源暫存器運算元，並且必須對結果進行 sign-extend 以填充目標暫存器中最寬的 <code>XLEN</code></p>
 <p>如果 <code>UXLEN &lt; SXLEN</code>，U-mode 下的 instruction-fetch 位址，和 load/store 的有效位址以  模除。 換句話說，因為此時 U-mode 的指令和記憶體存取位址的有效位元數比 S-mode 的位址還短，因此只能存取較低範圍的記憶體</p>
 <p>舉個例子，當 <code>UXLEN</code> 為 32，<code>SXLEN</code> 為 64 的情況下，U-mode 下的程式無論怎麼操作記憶體，都只能看到低 4GiB 的記憶體範圍，換句話說 U-mode 的記憶體存取是 32 位元位址空間內的操作，而不是完整的 64 位元位址空間</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p> = 4GiB</p>
-</blockquote>
+</div>
 <h5>HINT 相關</h5>
 <p>HINT 指令是沒有實際運算效果，但可能被用來提供某些優化或調整的指令。 某些 HINT 指令會被編碼為整數計算指令，其會利用當下的值覆蓋目標暫存器值</p>
 <p>此時若 <code>XLEN &lt; SXLEN</code> 且目標暫存器 <code>SXLEN .. XLEN</code> 處的位元與 <code>XLEN - 1</code> 處的不一致，則目標暫存器 <code>SXLEN .. XLEN</code> 處的位元會依照 implementation-defined 的方式，將其值保留或以 <code>XLEN - 1</code> 處的位元延展覆蓋</p>
@@ -3595,9 +3600,10 @@
 </ul>
 <h4>12.1.1.5. Double Trap Control in <code>sstatus</code> Register</h4>
 <p><code>SDT</code>(S-mode-disable-trap) 是一個 WARL 的欄位，由 Ssdbltrp 擴充指令集引入，用來解決 S-mode 以下 double trap 的問題</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p>double trap 指的是，當 Trap handler 正在處理異常(Trap) 且正處於 non-reentrant 的狀態時，發生了另一個異常，導致其無法正常處理</p>
-</blockquote>
+</div>
 <p>當 <code>SDT</code> 位元透過 CSR write 顯式設為 1 時，無論該操作是否在同一寫入中試圖設定 <code>SIE</code>，<code>SIE</code> 都會被強制清 0，這代表 S-mode 將無法接受中斷。 而執行 <code>SRET</code> 指令 <code>SDT</code> 會被清 0</p>
 <p><code>SIE=1</code> 只能發生在 <code>SDT=0</code> 的情況下，如果 <code>SDT=1</code>，則 <code>SIE</code> 無法手動設為 <code>1</code>，這確保在 <code>SDT=1</code> 時 S-mode 不會收到新的中斷</p>
 <p>當系統發生異常(Trap) 時，如果 <code>SDT=0</code>，則 <code>SDT</code> 會被自動設定為 <code>1</code>，之後異常會正常傳遞到 S-mode。 然而如果 <code>SDT</code> 已經是 <code>1</code>(代表 S-mode 已經在處理異常)，則這是一個意外異常(unexpected trap)，當意外異常發生時，其會產生「Double-Trap Exception」，以將意外異常傳遞給 M-mode 處理</p>
