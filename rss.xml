@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Sun, 27 Apr 2025 12:25:20 GMT</pubDate>
-    <lastBuildDate>Sun, 27 Apr 2025 12:25:20 GMT</lastBuildDate>
+    <pubDate>Sun, 27 Apr 2025 17:30:02 GMT</pubDate>
+    <lastBuildDate>Sun, 27 Apr 2025 17:30:02 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>computer-graphic</category>
@@ -21,6 +21,226 @@
     <category>ROS1</category>
     <category>computer-network</category>
     <category>security</category>
+    <item>
+      <title>glTF：A Simple Animation</title>
+      <link>https://mes0903.github.io/ComputerGraphic/gltf/SimpleAnimation/</link>
+      <guid>https://mes0903.github.io/ComputerGraphic/gltf/SimpleAnimation/</guid>
+      <source url="https://mes0903.github.io/rss.xml">glTF：A Simple Animation</source>
+      <description>glTF：A Simple Animation 如同在「Scenes and Nodes」章節中所說的，每個節點都可以有一個局部變換，這個變換可以透過節點的 matrix 屬性來給定，或者是使用 translation、rotation 和 scale（簡稱 TRS）屬性來表示。 當變換是用 TRS 屬性來給定時，我們可以使用 animation 來描...</description>
+      <category>computer-graphic</category>
+      <pubDate>Mon, 28 Apr 2025 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<p>如同在「Scenes and Nodes」章節中所說的，每個節點都可以有一個局部變換，這個變換可以透過節點的 matrix 屬性來給定，或者是使用 <code>translation</code>、<code>rotation</code> 和 <code>scale</code>（簡稱 TRS）屬性來表示。 當變換是用 TRS 屬性來給定時，我們可以使用 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-animation" target="_blank" rel="noopener noreferrer"><code>animation</code></a> 來描述節點的 <code>translation</code>、<code>rotation</code> 或 <code>scale</code> 隨時間變化的方式</p>
+<p>下面是「Minimal glTF File」章節內給出的範例的擴充，加上了動畫的部分，本節會說明為了新增這個動畫，需要對原本 glTF 檔案做哪些修改與擴充：</p>
+<div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "scene"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "scenes"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "nodes"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "nodes"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "mesh"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "rotation"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "meshes"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "primitives"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">        "attributes"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "POSITION"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        },</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">        "indices"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">      } ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "animations"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">: [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "samplers"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "input"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "interpolation"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "LINEAR"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "output"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 3</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">      ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "channels"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">        "sampler"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">        "target"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "node"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">          "path"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "rotation"</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">      } ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "buffers"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "uri"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "data:application/octet-stream;base64,AAABAAIAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAA="</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 44</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "uri"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "data:application/octet-stream;base64,AAAAAAAAgD4AAAA/AABAPwAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAD0/TQ/9P00PwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAPT9ND/0/TS/AAAAAAAAAAAAAAAAAACAPw=="</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 100</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "bufferViews"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "buffer"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "target"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 34963</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "buffer"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 8</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 36</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "target"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 34962</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "buffer"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 100</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "accessors"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5123</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "SCALAR"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5126</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "VEC3"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5126</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "SCALAR"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 20</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5126</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "VEC4"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">-</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.707</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "asset"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">    "version"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "2.0"</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/blob/vuepress-theme-hope/src/ComputerGraphic/gltf/SimpleAnimation/image/animatedTriangle.gif?raw=true">
+(Image 6a: A single, animated triangle.)
+</div>
+<h2>The <code>rotation</code> property of the <code>node</code></h2>
+<p>在這個範例中，唯一的節點現在多了一個 <code>rotation</code> 屬性，其是一個陣列，包含了四個浮點數值，用來表示描述旋轉的四元數（quaternion）：</p>
+<div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "nodes"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "mesh"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "rotation"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這組數值所表示的是「0 度旋轉」的四元數，因此這個三角形在一開始會以初始姿態（initial orientation）被顯示出來</p>
+<h2>The animation data</h2>
+<p>為了編碼動畫資料，我們在 glTF JSON 的最上層陣列中新增了三個元素：</p>
+<ul>
+<li>一個新的 <code>buffer</code>，用來儲存原始的動畫資料</li>
+<li>一個新的 <code>bufferView</code>，用來參考這個 buffer</li>
+<li>兩個新的 <code>accessor</code> 物件，為動畫資料加入結構資訊</li>
+</ul>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>在這裡，「structural information（結構資訊）」是指附加在原始資料（raw data）之上，用來說明這些資料該怎麼被解讀、怎麼被排列、型別是什麼的額外描述資訊</p>
+<p>用 glTF 動畫的例子來講：</p>
+<ul>
+<li><code>buffer</code>：<br>
+純粹就是一連串的位元組（binary data），本身沒有結構意義，例如：「100 bytes 的資料」</li>
+<li><code>bufferView</code>：<br>
+把 <code>buffer</code> 切成小塊，但仍然不知道這些 bytes 是代表 float？還是 short？是一個數字還是一組向量？</li>
+<li><code>accessor</code>（這就是 Structural Information）：<br>
+其告訴你這段資料的結構：
+<ul>
+<li>資料型態是 <code>FLOAT</code></li>
+<li>每個元素是 <code>VEC4</code>（四個 float）</li>
+<li>總共有多少筆資料（count）</li>
+<li>每筆資料佔多少位元組（根據型態推得）</li>
+</ul>
+</li>
+</ul>
+<p>這就是 structural information，把純資料加上「型別」「數量」「佈局」的說明，讓渲染器（或讀取程式）知道怎麼正確地去解讀這些二進位資料</p>
+</div>
+<h3>The <code>buffer</code> and the <code>bufferView</code> for the raw animation data</h3>
+<p>我們新增了一個 <code>buffer</code> 存放原始的動畫資料，這個 buffer 同樣是透過 data URI 來編碼的，動畫資料總共有 100 個位元組：</p>
+<div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "buffers"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF">    ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "uri"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "data:application/octet-stream;base64,AAAAAAAAgD4AAAA/AABAPwAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAD0/TQ/9P00PwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAPT9ND/0/TS/AAAAAAAAAAAAAAAAAACAPw=="</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 100</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "bufferViews"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF">    ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "buffer"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteLength"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 100</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>另外我們還新增了一個 <code>bufferView</code>，簡單地指向剛剛新增、索引為 1 的 <code>buffer</code>，其涵蓋了整個動畫資料區段。 至於進一步的結構資訊，則透過接下來介紹的 accessor 物件來補充</p>
+<p>需要注意的是，其實也可以選擇把動畫資料附加在已經存在的 buffer（例如包含三角形幾何資料的 buffer）之後，如果這麼做，新的 <code>bufferView</code> 就會參考索引為 0 的原 <code>buffer</code>，並設定適當的 <code>byteOffset</code>，對應到動畫資料在 <code>buffer</code> 中的位置</p>
+<p>但在這個範例中，我們是新增了一個獨立的 buffer 來存放動畫資料，目的是清楚地分開管理幾何資料（geometry data）和動畫資料（animation data）</p>
+<h3>The <code>accessor</code> objects for the animation data</h3>
+<p>我們新增了兩個 <code>accessor</code> 物件來描述該如何解讀動畫資料，第一個 <code>accessor</code> 描述的是動畫關鍵影格（key frames）的時間點（times），其有五個元素（<code>count = 5</code>），每個元素都是一個 float 的純量，總共佔用了 20 個位元組</p>
+<p>第二個 <code>accessor</code> 則描述，在前面的 20 個位元組之後有五個元素，每個元素都是由 float 所組成的四維向量，它們是以四元數（quaternions）的形式表示的，會對應到五個關鍵影格的旋轉：</p>
+<div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  "accessors"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> : [</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF">    ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5126</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "SCALAR"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    },</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "bufferView"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "byteOffset"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 20</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "componentType"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5126</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "count"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "type"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "VEC4"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "max"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ],</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">      "min"</span><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF"> :</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">-</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.707</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ],</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上例中由 times accessor 和 rotations accessor 提供的實際資料如下表所示：</p>
+<p>| <em>times</em> accessor | <em>rotations</em> accessor | 含義 |<br>
+|:</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>glTF：Buffers, BufferViews, and Accessors</title>
       <link>https://mes0903.github.io/ComputerGraphic/gltf/BuffersBufferViewsAccessors/</link>
@@ -766,26 +986,26 @@
 <p>本教學假設你已具備一些 <a href="https://json.org/" target="_blank" rel="noopener noreferrer">JSON</a>（JavaScript 物件表示法）的基本知識。 此外，也需要對常見的圖形 API（例如 OpenGL 或 WebGL）有基本的了解。 這份教學的重點放在 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html" target="_blank" rel="noopener noreferrer">glTF version 2.0</a>，該版本首次引入了 基於物理的渲染（Physically Based Rendering）支援，但本教學中說明的其他概念也與 <a href="https://github.com/KhronosGroup/glTF/tree/main/specification/1.0" target="_blank" rel="noopener noreferrer">glTF version 1.0</a> 中的實作方式相似</p>
 <p>底下為原文各章節的連結：</p>
 <ul>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_001_Introduction.html" target="_blank">Introduction</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_002_BasicGltfStructure.html" target="_blank">Basic glTF Structure</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_003_MinimalGltfFile.html" target="_blank">Example: A Minimal glTF File</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_004_ScenesNodes.html" target="_blank">Scenes and Nodes</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_005_BuffersBufferViewsAccessors.html" target="_blank">Buffers, BufferViews, and Accessors</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_006_SimpleAnimation.html" target="_blank">Example: A Simple Animation</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_007_Animations.html" target="_blank">Animations</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_008_SimpleMeshes.html" target="_blank">Example: Simple Meshes</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_009_Meshes.html" target="_blank">Meshes</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_010_Materials.html" target="_blank">Materials</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_011_SimpleMaterial.html" target="_blank">Example: A Simple Material</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_012_TexturesImagesSamplers.html" target="_blank">Textures, Images, and Samplers</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_013_SimpleTexture.html" target="_blank">Example: A Simple Texture</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_014_AdvancedMaterial.html" target="_blank">Example: An Advanced Material</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_015_SimpleCameras.html" target="_blank">Example: Simple Cameras</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_016_Cameras.html" target="_blank">Cameras</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_017_SimpleMorphTarget.html" target="_blank">Example: A Simple Morph Target</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_018_MorphTargets.html" target="_blank">Morph Targets</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_019_SimpleSkin.html" target="_blank">Example: Simple Skin</a></li>
-<li><a href="/ComputerGraphic/gltf/gltfTutorial_020_Skins.html" target="_blank">Skins</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_001_Introduction.md" target="_blank" rel="noopener noreferrer">Introduction</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_002_BasicGltfStructure.md" target="_blank" rel="noopener noreferrer">Basic glTF Structure</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_003_MinimalGltfFile.md" target="_blank" rel="noopener noreferrer">Example: A Minimal glTF File</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_004_ScenesNodes.md" target="_blank" rel="noopener noreferrer">Scenes and Nodes</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_005_BuffersBufferViewsAccessors.md" target="_blank" rel="noopener noreferrer">Buffers, BufferViews, and Accessors</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_006_SimpleAnimation.md" target="_blank" rel="noopener noreferrer">Example: A Simple Animation</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_007_Animations.md" target="_blank" rel="noopener noreferrer">Animations</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_008_SimpleMeshes.md" target="_blank" rel="noopener noreferrer">Example: Simple Meshes</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_009_Meshes.md" target="_blank" rel="noopener noreferrer">Meshes</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_010_Materials.md" target="_blank" rel="noopener noreferrer">Materials</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_011_SimpleMaterial.md" target="_blank" rel="noopener noreferrer">Example: A Simple Material</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_012_TexturesImagesSamplers.md" target="_blank" rel="noopener noreferrer">Textures, Images, and Samplers</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_013_SimpleTexture.md" target="_blank" rel="noopener noreferrer">Example: A Simple Texture</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_014_AdvancedMaterial.md" target="_blank" rel="noopener noreferrer">Example: An Advanced Material</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_015_SimpleCameras.md" target="_blank" rel="noopener noreferrer">Example: Simple Cameras</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_016_Cameras.md" target="_blank" rel="noopener noreferrer">Cameras</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_017_SimpleMorphTarget.md" target="_blank" rel="noopener noreferrer">Example: A Simple Morph Target</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_018_MorphTargets.md" target="_blank" rel="noopener noreferrer">Morph Targets</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_019_SimpleSkin.md" target="_blank" rel="noopener noreferrer">Example: Simple Skin</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Tutorials/tree/main/gltfTutorial/gltfTutorial_020_Skins.md" target="_blank" rel="noopener noreferrer">Skins</a></li>
 </ul>
 <p><strong>Acknowledgements:</strong></p>
 <ul>
@@ -6266,6 +6486,35 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 ]]></content:encoded>
     </item>
     <item>
+      <title>作業系統 ── 序</title>
+      <link>https://mes0903.github.io/OS/NTHU/</link>
+      <guid>https://mes0903.github.io/OS/NTHU/</guid>
+      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
+      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
+      <category>OS</category>
+      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
+<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
+<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
+<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
+<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
+<p>然後這邊推一下 Jserv 的兩篇回文：</p>
+<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
+<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
+<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
+<p>再來是一些其他的資源：</p>
+<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
+<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
+<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
+]]></content:encoded>
+    </item>
+    <item>
       <title>The mind behind Linux 筆記 &amp; 心得</title>
       <link>https://mes0903.github.io/Linux/The_mind_behind_Linux/</link>
       <guid>https://mes0903.github.io/Linux/The_mind_behind_Linux/</guid>
@@ -7173,35 +7422,6 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 |</p>
 </li>
 </ul>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>作業系統 ── 序</title>
-      <link>https://mes0903.github.io/OS/NTHU/</link>
-      <guid>https://mes0903.github.io/OS/NTHU/</guid>
-      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
-      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
-      <category>OS</category>
-      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
-<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
-<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
-<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
-<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
-<p>然後這邊推一下 Jserv 的兩篇回文：</p>
-<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
-<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
-<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
-<p>再來是一些其他的資源：</p>
-<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
-<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
-<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
-<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
 ]]></content:encoded>
     </item>
     <item>
