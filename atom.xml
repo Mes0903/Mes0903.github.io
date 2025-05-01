@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-05-01T08:23:04.678Z</updated>
+  <updated>2025-05-01T08:27:55.871Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -977,7 +977,7 @@
 <p>不過需要注意的是，這些互動行為並不屬於 glTF 的定義範疇，完全取決於你怎麼實作，像圖 15a 就展示了切換內建相機與外部自訂相機的效果。 前者來自 glTF 內部定義，後者由應用程式提供互動控制</p>
 ]]></content>
     <category term="computer-graphic"/>
-    <published>2025-04-24T00:00:00.000Z</published>
+    <published>2025-05-01T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">glTF：Simple Cameras</title>
@@ -3355,7 +3355,7 @@
     <title type="text">(WIP) Memory Ordering</title>
     <id>https://mes0903.github.io/memory/memory_ordering/</id>
     <link href="https://mes0903.github.io/memory/memory_ordering/"/>
-    <updated>2025-05-01T08:23:04.957Z</updated>
+    <updated>2025-05-01T08:27:56.124Z</updated>
     <summary type="html"><![CDATA[
 <p>此篇為 Russ Cox 所寫的 <a href="https://research.swtch.com/hwmm" target="_blank" rel="noopener noreferrer">Hardware Memory Models</a> 與 <a href="https://research.swtch.com/plmm" target="_blank" rel="noopener noreferrer">Programming Language Memory Models</a> 的翻譯與筆記</p>
 <p>本篇文的所有例子一開始都被初始化為 0</p>
@@ -3436,7 +3436,7 @@
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-05-01T08:23:04.963Z</updated>
+    <updated>2025-05-01T08:27:56.134Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15284,7 +15284,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-05-01T08:23:06.659Z</updated>
+    <updated>2025-05-01T08:27:57.735Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15615,7 +15615,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-05-01T08:23:06.687Z</updated>
+    <updated>2025-05-01T08:27:57.763Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -15762,7 +15762,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-05-01T08:23:06.702Z</updated>
+    <updated>2025-05-01T08:27:57.776Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -16021,7 +16021,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-05-01T08:23:06.715Z</updated>
+    <updated>2025-05-01T08:27:57.783Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -17525,7 +17525,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-05-01T08:23:06.862Z</updated>
+    <updated>2025-05-01T08:27:57.936Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -17914,7 +17914,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-05-01T08:23:06.904Z</updated>
+    <updated>2025-05-01T08:27:57.965Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18242,7 +18242,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-05-01T08:23:06.932Z</updated>
+    <updated>2025-05-01T08:27:57.993Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18265,7 +18265,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-05-01T08:23:06.933Z</updated>
+    <updated>2025-05-01T08:27:57.993Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18411,7 +18411,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-05-01T08:23:06.945Z</updated>
+    <updated>2025-05-01T08:27:58.007Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18809,7 +18809,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-05-01T08:23:06.978Z</updated>
+    <updated>2025-05-01T08:27:58.046Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19061,7 +19061,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-05-01T08:23:07.004Z</updated>
+    <updated>2025-05-01T08:27:58.066Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20419,7 +20419,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-05-01T08:23:07.113Z</updated>
+    <updated>2025-05-01T08:27:58.177Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21101,7 +21101,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-05-01T08:23:07.170Z</updated>
+    <updated>2025-05-01T08:27:58.229Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21430,7 +21430,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-05-01T08:23:07.298Z</updated>
+    <updated>2025-05-01T08:27:58.355Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21718,7 +21718,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-05-01T08:23:07.432Z</updated>
+    <updated>2025-05-01T08:27:58.485Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22474,7 +22474,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-05-01T08:23:07.484Z</updated>
+    <updated>2025-05-01T08:27:58.538Z</updated>
     <summary type="html"><![CDATA[  
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22641,7 +22641,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-05-01T08:23:07.496Z</updated>
+    <updated>2025-05-01T08:27:58.543Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23068,7 +23068,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-05-01T08:23:07.720Z</updated>
+    <updated>2025-05-01T08:27:58.769Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23199,7 +23199,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-05-01T08:23:07.730Z</updated>
+    <updated>2025-05-01T08:27:58.780Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24194,7 +24194,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-05-01T08:23:08.099Z</updated>
+    <updated>2025-05-01T08:27:59.147Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>

@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Thu, 01 May 2025 08:23:04 GMT</pubDate>
-    <lastBuildDate>Thu, 01 May 2025 08:23:04 GMT</lastBuildDate>
+    <pubDate>Thu, 01 May 2025 08:27:55 GMT</pubDate>
+    <lastBuildDate>Thu, 01 May 2025 08:27:55 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>computer-graphic</category>
@@ -666,7 +666,7 @@
       <source url="https://mes0903.github.io/rss.xml">glTF：Cameras</source>
       <description>glTF：Cameras 在前一章 Simple Cameras 中，我們已經看到如何在 glTF 中定義透視相機（perspective camera）和正交相機（orthographic camera），以及如何將這些相機掛載（attach）到節點來整合進場景中了，本節將進一步說明兩種相機的差異與一般相機的處理方式 Perspective and ...</description>
       <category>computer-graphic</category>
-      <pubDate>Thu, 24 Apr 2025 00:00:00 GMT</pubDate>
+      <pubDate>Thu, 01 May 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
 <p>在前一章 Simple Cameras 中，我們已經看到如何在 glTF 中定義透視相機（perspective camera）和正交相機（orthographic camera），以及如何將這些相機掛載（attach）到節點來整合進場景中了，本節將進一步說明兩種相機的差異與一般相機的處理方式</p>
 <h2>Perspective and orthographic cameras</h2>
