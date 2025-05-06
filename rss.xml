@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Tue, 06 May 2025 17:02:46 GMT</pubDate>
-    <lastBuildDate>Tue, 06 May 2025 17:02:46 GMT</lastBuildDate>
+    <pubDate>Tue, 06 May 2025 17:13:24 GMT</pubDate>
+    <lastBuildDate>Tue, 06 May 2025 17:13:24 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>memory</category>
@@ -26,10 +26,14 @@
       <link>https://mes0903.github.io/memory/memory_model/</link>
       <guid>https://mes0903.github.io/memory/memory_model/</guid>
       <source url="https://mes0903.github.io/rss.xml">Memory Model</source>
-      <description>Memory Model 此篇為 Russ Cox 所寫的 Hardware Memory Models 與 Programming Language Memory Models 的翻譯與筆記，進行了小幅度的修改與增減。 與原文相同，本文依據 Creative Commons Attribution 4.0 International License ...</description>
+      <description>Memory Model 詩音畢業了嗚嗚嗚，鹽寶...... 我的鹽寶......（圖片取自鹽寶的 Twitter） 此篇為 Russ Cox 所寫的 Hardware Memory Models 與 Programming Language Memory Models 的翻譯與筆記，進行了小幅度的修改與增減。 與原文相同，本文依據 Creative ...</description>
       <category>memory</category>
       <pubDate>Sun, 04 May 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
+<div class="center-column">
+<img src="https://github.com/Mes0903/MesBlog/tree/vuepress-theme-hope/src/memory/memory_model/image/shion.png">
+<p>詩音畢業了嗚嗚嗚，鹽寶...... 我的鹽寶......（<a href="https://x.com/murasakishionch/status/1916085213568110734/photo/1" target="_blank" rel="noopener noreferrer">圖片取自鹽寶的 Twitter</a>）</p>
+</div>
 <p>此篇為 Russ Cox 所寫的 <a href="https://research.swtch.com/hwmm" target="_blank" rel="noopener noreferrer">Hardware Memory Models</a> 與 <a href="https://research.swtch.com/plmm" target="_blank" rel="noopener noreferrer">Programming Language Memory Models</a> 的翻譯與筆記，進行了小幅度的修改與增減。 與原文相同，本文依據 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 4.0 International License</a> 發佈</p>
 <p>本文內所有例子中的變數一開始都被初始化為 0</p>
 <h2>Hardware Memory Models</h2>
@@ -9063,6 +9067,35 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 ]]></content:encoded>
     </item>
     <item>
+      <title>作業系統 ── 序</title>
+      <link>https://mes0903.github.io/OS/NTHU/</link>
+      <guid>https://mes0903.github.io/OS/NTHU/</guid>
+      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
+      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
+      <category>OS</category>
+      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
+<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
+<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
+<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
+<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
+<p>然後這邊推一下 Jserv 的兩篇回文：</p>
+<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
+<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
+<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
+<p>再來是一些其他的資源：</p>
+<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
+<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
+<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
+]]></content:encoded>
+    </item>
+    <item>
       <title>The mind behind Linux 筆記 &amp; 心得</title>
       <link>https://mes0903.github.io/Linux/The_mind_behind_Linux/</link>
       <guid>https://mes0903.github.io/Linux/The_mind_behind_Linux/</guid>
@@ -9970,35 +10003,6 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 |</p>
 </li>
 </ul>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>作業系統 ── 序</title>
-      <link>https://mes0903.github.io/OS/NTHU/</link>
-      <guid>https://mes0903.github.io/OS/NTHU/</guid>
-      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
-      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
-      <category>OS</category>
-      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
-<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
-<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
-<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
-<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
-<p>然後這邊推一下 Jserv 的兩篇回文：</p>
-<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
-<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
-<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
-<p>再來是一些其他的資源：</p>
-<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
-<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
-<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
-<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
 ]]></content:encoded>
     </item>
     <item>
