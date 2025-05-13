@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-05-13T10:31:46.295Z</updated>
+  <updated>2025-05-13T10:47:41.725Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -4200,7 +4200,7 @@
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-05-13T10:31:46.630Z</updated>
+    <updated>2025-05-13T10:47:42.061Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -9863,6 +9863,192 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
     <published>2021-11-15T00:00:00.000Z</published>
   </entry>
   <entry>
+    <title type="text">The mind behind Linux 筆記 &amp; 心得</title>
+    <id>https://mes0903.github.io/Linux/The_mind_behind_Linux/</id>
+    <link href="https://mes0903.github.io/Linux/The_mind_behind_Linux/"/>
+    <updated>2025-05-13T10:31:22.000Z</updated>
+    <summary type="html"><![CDATA[
+<h3>前言</h3>
+<p>Linus Torvalds 在 2016 年的 <a href="https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux" target="_blank" rel="noopener noreferrer">TED interview</a> 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程</p>
+<p>於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的 github 與 <a href="https://hackmd.io/@sysprog/c-linked-list" target="_blank" rel="noopener noreferrer">Jserv 老師的解釋</a></p>]]></summary>
+    <content type="html"><![CDATA[
+<h3>前言</h3>
+<p>Linus Torvalds 在 2016 年的 <a href="https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux" target="_blank" rel="noopener noreferrer">TED interview</a> 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程</p>
+<p>於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的 github 與 <a href="https://hackmd.io/@sysprog/c-linked-list" target="_blank" rel="noopener noreferrer">Jserv 老師的解釋</a></p>
+<p>若文章內容有謬誤，或您有什麼建議，都很歡迎私訊告訴我~</p>
+<h3>概念</h3>
+<p>Linus Torvalds 舉的例子是移除一筆在 list 裡面的資料，一般的寫法會有 special case，第一筆資料與中間的資料的移除方法有點不太一樣</p>
+<p>如果要移除的是第一筆資料，那就需要把指標指向第一個 Node；而如果是要移除中間的資料，則須要把指標指向目標的前一個 Node</p>
+<p>Talk 裡面給的 Pseudo Code 長這樣：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">remove_list_entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(entry)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    prev </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> head;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Walk the list</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> entry) {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        prev </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> walk;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> walk</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Remove the entry by updating the</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // head pr the previous entry</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">!</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">prev)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        head </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    else</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        prev</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而 Linus Torvalds 的想法則換了一個角度，通過指標的指標來操作，如此一來 branch 就消失了</p>
+<p>Talk 裡面給的 Pseudo Code 長這樣：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">remove_list_entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(entry)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // The "indirect" pointer points to the</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // *address* of the thing we'll update</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">head;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Walk the list, looking for the thing that</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // points to the entry we want to remove</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ((</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> entry)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // .. and just remove it</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如果 Pseudo Code 有點難看，那你可以先跳過，往後看解釋和簡單的實作</p>
+<h3>解釋</h3>
+<p>Linus Torvalds 在 15:25 時說</p>
+<blockquote>
+<p>It does not have the if statement. And it doesn't really matter -- I don't want you understand why it doesn't have the if statement, but I want you to understand that sometimes you can see a problem in a different way and rewrite it so that a special case goes away and becomes the normal case. And that's good code. But this is simple code. This is CS 101. This is not important -- although, details are important.</p>
+</blockquote>
+<p>重點是有時候我們可以從不同的角度來詮釋問題，然後重寫，那麼例外就會消失，這樣就是好的程式</p>
+<p>第一種一般的方法大家應該很熟悉，有一個指向前一個元素的指標，一個目前位置的指標，之後利用 while loop 來走訪 list，找到 target 時停下來</p>
+<p>然後會有一個 branch 判斷 <code>prev</code> 是否為空指標，如果是空指標就代表 target 是 list 的 head，因此需要把 list 的 head 指向下一個元素；若非空就把前一個元素的 next Node 設為目前的下一個 Node：</p>
+<div class="center-column">
+<img src="https://raw.githubusercontent.com/Mes0903/MesBlog/refs/heads/vuepress-theme-hope/src/Linux/The_mind_behind_Linux/image/link_list1.png">
+</div>
+<p>而 Linus Torvalds 的想法則是拿一個指標指向「Node 裡面指向下一個 Node 的指標」，以「要更新的位址」為思考點來操作</p>
+<p>有一個指標的指標 <code>indirect</code>，一開始指向 head，之後一樣走訪 list，解指標看是不是我們要的 target，如果 <code>*indirect</code> 就是我們要刪除的元素，代表 <code>indirect</code> 現在指向前一個 Node 裡面的 next pointer，因此把 <code>*indirect</code> 設為 target 的下一個 Node 就完成整個操作了：</p>
+<div class="center-column">
+<img src="https://raw.githubusercontent.com/Mes0903/MesBlog/refs/heads/vuepress-theme-hope/src/Linux/The_mind_behind_Linux/image/link_list2.png">
+</div>
+<h3>簡單的實作</h3>
+<p>這邊我先用 C 來實作，參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的寫法，下面這些 code 的 github <a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Elegant_Linked_List.c" target="_blank" rel="noopener noreferrer">在這</a></p>
+<h4>struct 定義</h4>
+<p>首先先把 <code>Node</code> 與 <code>List</code> 的 struct 寫好：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Node {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> data;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">next;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} Node;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> List {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">head;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} List;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4>find</h4>
+<p>再來是一個幫忙尋找目標 Node 的函式，後面會透過這個 function 來幫助我們實作別的函式：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&amp;&amp;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> target)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> indirect;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在尋找時會有兩種 special case：</p>
+<ol>
+<li>List 是空的</li>
+<li>Node 不在 List 裡</li>
+</ol>
+<p>這個函式會回傳 target 的 indirect pointer，也就是指 <code>*indirect == target</code></p>
+<p>函式裡的 indirect pointer，一開始指向 head，然後走訪 List 尋找 target，一但找到，或是已經沒有下一個時就停止迴圈，並回傳 indirect pointer</p>
+<p>而如果元素不在 List 裡面，則會回傳指向最後一個 Node 的 next 指標的指標，也就是 <code>&amp;Node-&gt;next</code>，同時也是指 <code>*indirect == NULL</code></p>
+<h4>erase</h4>
+<p>接下來就是刪除 Node 的函式：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(list, target);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">        *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>刪除時如果 Node 不在 List 裡面，或者 List 是空的，那麼 find 就會回傳 <code>NULL</code>，因此我們會需要一個 <code>if</code> 來判斷是不是這些 special case，如果不是，就刪除 Node</p>
+<p>這邊並沒有去 call <code>free</code>，如果要呼叫 <code>free</code>，那就要再改一下寫法了</p>
+<h4>insert_before</h4>
+<p>然後是插入 Node 的函式：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> insert_before</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">item</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(list, target);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">    item</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> item;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>我們會傳入一個 target，並把 Node 插入於 target 的前方</p>
+<p>插入的方法是先把要插入的 Node 的 next 指向 target，再把原本指向 target 的指標指向 item</p>
+<p>特別的是如果 target 是傳 <code>NULL</code> 或一些非法、不在 List 裡面的指標進去，那麼元素會被加到 List 的最後面，因為如果 target 不在 List 裡面，<code>find</code> 回傳的會是最後一個元素的 next 指標的位址</p>
+<h4>output</h4>
+<p>最後就是把整個 List 輸出的函式：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> output</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect) {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        printf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">%d</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這個就跟一般的走訪輸出差不多，但因為是用 indirect pointer 實作，所以不用再去看 List 是否為空，變得非常漂亮優雅</p>
+<h4>main function</h4>
+<p>main function 裡面我寫了簡單的測試：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[N];</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    List list;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // initialize items and head pointer</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> N; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">i) {</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">        items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i].</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">data</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i;</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">        items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i].</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">    list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete when list is empty</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // insert element from head pointer</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> N; i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        insert_before</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">], </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // normal delete element</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete element which is not in list</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete the head node</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    output</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>items</code> 是所有的 Node，這裡用 array 存起來方便我們測試</p>
+<h3>Cpp 實作</h3>
+<p>我也用 Cpp 寫了一次，有兩種版本，一種是傳統 Raw Pointer 的版本，另一種是 Smart Pointer 的版本：</p>
+<ul>
+<li>
+<p>Raw Pointer Edition：<a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Elegant_Linked_List.cpp" target="_blank" rel="noopener noreferrer">github link</a></p>
+</li>
+<li>
+<p>Smart Pointer Edition：<a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Modern_Elegant_Linked_List.cpp" target="_blank" rel="noopener noreferrer">github link</a></p>
+</li>
+</ul>
+<p>整體的設計概念都一樣，但我有做一些小調整，讓使用的時候可以直接傳 <code>data</code> 進 user API，還有多處理了記憶體釋放的問題</p>
+<h2>延伸閱讀</h2>
+<p>看到這裡後建議可以去看一下 Jserv 老師提到的 <a href="https://hackmd.io/@sysprog/c-linked-list?fbclid=IwAR2dELWav-gGwBZHOnXBDnpywQQhEUtMcYdLPRKum99rdiz8QsVqrhYpKCM#%E6%A1%88%E4%BE%8B%E6%8E%A2%E8%A8%8E-LeetCode-21-Merge-Two-Sorted-Lists" target="_blank" rel="noopener noreferrer">Merge Two Sorted Lists</a> 這個案例，題目連結在這裡：<a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="noopener noreferrer">LeetCode 21. Merge Two Sorted Lists</a></p>
+<p>題目是給兩個已經排序好的 linked list，然後把他們 merge 起來，元素的順序要一樣由小到大或由大到小，實作上可以利用 indirect pointer 來省一些空間</p>
+<p>而如果你還有接著讀老師文章後方 <a href="https://leetcode.com/problems/merge-k-sorted-lists/" target="_blank" rel="noopener noreferrer">LeetCode 23. Merge k Sorted Lists</a> 的例子，那可以去看一下 Lambert Wu 寫的 <a href="https://hackmd.io/@nk8mC3QoR3yxmNf5DvbQXw/modified-merge-sort" target="_blank" rel="noopener noreferrer">Merge Sort 與它的變化</a>，裡面有多做一些解釋且有測試不同方法的速度</p>
+]]></content>
+    <category term="Linux"/>
+    <published>2021-12-15T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">實作一個回傳物理位址的系統呼叫</title>
     <id>https://mes0903.github.io/Linux/physical_address_syscall/</id>
     <link href="https://mes0903.github.io/Linux/physical_address_syscall/"/>
@@ -10597,192 +10783,6 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 ]]></content>
     <category term="Linux"/>
     <published>2023-11-20T00:00:00.000Z</published>
-  </entry>
-  <entry>
-    <title type="text">The mind behind Linux 筆記 &amp; 心得</title>
-    <id>https://mes0903.github.io/Linux/The_mind_behind_Linux/</id>
-    <link href="https://mes0903.github.io/Linux/The_mind_behind_Linux/"/>
-    <updated>2025-05-13T10:31:22.000Z</updated>
-    <summary type="html"><![CDATA[
-<h3>前言</h3>
-<p>Linus Torvalds 在 2016 年的 <a href="https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux" target="_blank" rel="noopener noreferrer">TED interview</a> 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程</p>
-<p>於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的 github 與 <a href="https://hackmd.io/@sysprog/c-linked-list" target="_blank" rel="noopener noreferrer">Jserv 老師的解釋</a></p>]]></summary>
-    <content type="html"><![CDATA[
-<h3>前言</h3>
-<p>Linus Torvalds 在 2016 年的 <a href="https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux" target="_blank" rel="noopener noreferrer">TED interview</a> 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程</p>
-<p>於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的 github 與 <a href="https://hackmd.io/@sysprog/c-linked-list" target="_blank" rel="noopener noreferrer">Jserv 老師的解釋</a></p>
-<p>若文章內容有謬誤，或您有什麼建議，都很歡迎私訊告訴我~</p>
-<h3>概念</h3>
-<p>Linus Torvalds 舉的例子是移除一筆在 list 裡面的資料，一般的寫法會有 special case，第一筆資料與中間的資料的移除方法有點不太一樣</p>
-<p>如果要移除的是第一筆資料，那就需要把指標指向第一個 Node；而如果是要移除中間的資料，則須要把指標指向目標的前一個 Node</p>
-<p>Talk 裡面給的 Pseudo Code 長這樣：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">remove_list_entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(entry)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    prev </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> head;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Walk the list</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> entry) {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        prev </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> walk;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        walk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> walk</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Remove the entry by updating the</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // head pr the previous entry</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">!</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">prev)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        head </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    else</span></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        prev</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而 Linus Torvalds 的想法則換了一個角度，通過指標的指標來操作，如此一來 branch 就消失了</p>
-<p>Talk 裡面給的 Pseudo Code 長這樣：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">remove_list_entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(entry)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // The "indirect" pointer points to the</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // *address* of the thing we'll update</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">head;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Walk the list, looking for the thing that</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // points to the entry we want to remove</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ((</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> entry)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // .. and just remove it</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> entry</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如果 Pseudo Code 有點難看，那你可以先跳過，往後看解釋和簡單的實作</p>
-<h3>解釋</h3>
-<p>Linus Torvalds 在 15:25 時說</p>
-<blockquote>
-<p>It does not have the if statement. And it doesn't really matter -- I don't want you understand why it doesn't have the if statement, but I want you to understand that sometimes you can see a problem in a different way and rewrite it so that a special case goes away and becomes the normal case. And that's good code. But this is simple code. This is CS 101. This is not important -- although, details are important.</p>
-</blockquote>
-<p>重點是有時候我們可以從不同的角度來詮釋問題，然後重寫，那麼例外就會消失，這樣就是好的程式</p>
-<p>第一種一般的方法大家應該很熟悉，有一個指向前一個元素的指標，一個目前位置的指標，之後利用 while loop 來走訪 list，找到 target 時停下來</p>
-<p>然後會有一個 branch 判斷 <code>prev</code> 是否為空指標，如果是空指標就代表 target 是 list 的 head，因此需要把 list 的 head 指向下一個元素；若非空就把前一個元素的 next Node 設為目前的下一個 Node：</p>
-<div class="center-column">
-<img src="https://raw.githubusercontent.com/Mes0903/MesBlog/refs/heads/vuepress-theme-hope/src/Linux/The_mind_behind_Linux/image/link_list1.png">
-</div>
-<p>而 Linus Torvalds 的想法則是拿一個指標指向「Node 裡面指向下一個 Node 的指標」，以「要更新的位址」為思考點來操作</p>
-<p>有一個指標的指標 <code>indirect</code>，一開始指向 head，之後一樣走訪 list，解指標看是不是我們要的 target，如果 <code>*indirect</code> 就是我們要刪除的元素，代表 <code>indirect</code> 現在指向前一個 Node 裡面的 next pointer，因此把 <code>*indirect</code> 設為 target 的下一個 Node 就完成整個操作了：</p>
-<div class="center-column">
-<img src="https://raw.githubusercontent.com/Mes0903/MesBlog/refs/heads/vuepress-theme-hope/src/Linux/The_mind_behind_Linux/image/link_list2.png">
-</div>
-<h3>簡單的實作</h3>
-<p>這邊我先用 C 來實作，參考了 <a href="https://github.com/felipec/linked-list-good-taste" target="_blank" rel="noopener noreferrer">felipec</a> 的寫法，下面這些 code 的 github <a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Elegant_Linked_List.c" target="_blank" rel="noopener noreferrer">在這</a></p>
-<h4>struct 定義</h4>
-<p>首先先把 <code>Node</code> 與 <code>List</code> 的 struct 寫好：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Node {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> data;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">next;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} Node;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> List {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">head;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} List;</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4>find</h4>
-<p>再來是一個幫忙尋找目標 Node 的函式，後面會透過這個 function 來幫助我們實作別的函式：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&amp;&amp;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> target)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> indirect;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在尋找時會有兩種 special case：</p>
-<ol>
-<li>List 是空的</li>
-<li>Node 不在 List 裡</li>
-</ol>
-<p>這個函式會回傳 target 的 indirect pointer，也就是指 <code>*indirect == target</code></p>
-<p>函式裡的 indirect pointer，一開始指向 head，然後走訪 List 尋找 target，一但找到，或是已經沒有下一個時就停止迴圈，並回傳 indirect pointer</p>
-<p>而如果元素不在 List 裡面，則會回傳指向最後一個 Node 的 next 指標的指標，也就是 <code>&amp;Node-&gt;next</code>，同時也是指 <code>*indirect == NULL</code></p>
-<h4>erase</h4>
-<p>接下來就是刪除 Node 的函式：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(list, target);</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">        *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>刪除時如果 Node 不在 List 裡面，或者 List 是空的，那麼 find 就會回傳 <code>NULL</code>，因此我們會需要一個 <code>if</code> 來判斷是不是這些 special case，如果不是，就刪除 Node</p>
-<p>這邊並沒有去 call <code>free</code>，如果要呼叫 <code>free</code>，那就要再改一下寫法了</p>
-<h4>insert_before</h4>
-<p>然後是插入 Node 的函式：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> insert_before</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">target</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">item</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> find</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(list, target);</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">    item</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> item;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>我們會傳入一個 target，並把 Node 插入於 target 的前方</p>
-<p>插入的方法是先把要插入的 Node 的 next 指向 target，再把原本指向 target 的指標指向 item</p>
-<p>特別的是如果 target 是傳 <code>NULL</code> 或一些非法、不在 List 裡面的指標進去，那麼元素會被加到 List 的最後面，因為如果 target 不在 List 裡面，<code>find</code> 回傳的會是最後一個元素的 next 指標的位址</p>
-<h4>output</h4>
-<p>最後就是把整個 List 輸出的函式：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> output</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">List </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">**</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect) {</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        printf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">%d</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        indirect </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">indirect)-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這個就跟一般的走訪輸出差不多，但因為是用 indirect pointer 實作，所以不用再去看 List 是否為空，變得非常漂亮優雅</p>
-<h4>main function</h4>
-<p>main function 裡面我寫了簡單的測試：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    Node </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[N];</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    List list;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // initialize items and head pointer</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> N; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">i) {</span></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">        items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i].</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">data</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i;</span></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">        items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i].</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">    list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete when list is empty</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // insert element from head pointer</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> N; i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        insert_before</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">], </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i]);</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // normal delete element</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">items</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete element which is not in list</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    erase</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">list</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">head</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // delete the head node</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    output</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>items</code> 是所有的 Node，這裡用 array 存起來方便我們測試</p>
-<h3>Cpp 實作</h3>
-<p>我也用 Cpp 寫了一次，有兩種版本，一種是傳統 Raw Pointer 的版本，另一種是 Smart Pointer 的版本：</p>
-<ul>
-<li>
-<p>Raw Pointer Edition：<a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Elegant_Linked_List.cpp" target="_blank" rel="noopener noreferrer">github link</a></p>
-</li>
-<li>
-<p>Smart Pointer Edition：<a href="https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Modern_Elegant_Linked_List.cpp" target="_blank" rel="noopener noreferrer">github link</a></p>
-</li>
-</ul>
-<p>整體的設計概念都一樣，但我有做一些小調整，讓使用的時候可以直接傳 <code>data</code> 進 user API，還有多處理了記憶體釋放的問題</p>
-<h2>延伸閱讀</h2>
-<p>看到這裡後建議可以去看一下 Jserv 老師提到的 <a href="https://hackmd.io/@sysprog/c-linked-list?fbclid=IwAR2dELWav-gGwBZHOnXBDnpywQQhEUtMcYdLPRKum99rdiz8QsVqrhYpKCM#%E6%A1%88%E4%BE%8B%E6%8E%A2%E8%A8%8E-LeetCode-21-Merge-Two-Sorted-Lists" target="_blank" rel="noopener noreferrer">Merge Two Sorted Lists</a> 這個案例，題目連結在這裡：<a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="noopener noreferrer">LeetCode 21. Merge Two Sorted Lists</a></p>
-<p>題目是給兩個已經排序好的 linked list，然後把他們 merge 起來，元素的順序要一樣由小到大或由大到小，實作上可以利用 indirect pointer 來省一些空間</p>
-<p>而如果你還有接著讀老師文章後方 <a href="https://leetcode.com/problems/merge-k-sorted-lists/" target="_blank" rel="noopener noreferrer">LeetCode 23. Merge k Sorted Lists</a> 的例子，那可以去看一下 Lambert Wu 寫的 <a href="https://hackmd.io/@nk8mC3QoR3yxmNf5DvbQXw/modified-merge-sort" target="_blank" rel="noopener noreferrer">Merge Sort 與它的變化</a>，裡面有多做一些解釋且有測試不同方法的速度</p>
-]]></content>
-    <category term="Linux"/>
-    <published>2021-12-15T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">作業系統 ── 序</title>
@@ -16047,7 +16047,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-05-13T10:31:48.264Z</updated>
+    <updated>2025-05-13T10:47:43.676Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -16378,7 +16378,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-05-13T10:31:48.284Z</updated>
+    <updated>2025-05-13T10:47:43.702Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -16525,7 +16525,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-05-13T10:31:48.297Z</updated>
+    <updated>2025-05-13T10:47:43.716Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -16784,7 +16784,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-05-13T10:31:48.310Z</updated>
+    <updated>2025-05-13T10:47:43.729Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18288,7 +18288,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-05-13T10:31:48.452Z</updated>
+    <updated>2025-05-13T10:47:43.873Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18677,7 +18677,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-05-13T10:31:48.491Z</updated>
+    <updated>2025-05-13T10:47:43.902Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19005,7 +19005,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-05-13T10:31:48.518Z</updated>
+    <updated>2025-05-13T10:47:43.936Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19028,7 +19028,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-05-13T10:31:48.519Z</updated>
+    <updated>2025-05-13T10:47:43.937Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19174,7 +19174,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-05-13T10:31:48.531Z</updated>
+    <updated>2025-05-13T10:47:43.943Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19572,7 +19572,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-05-13T10:31:48.563Z</updated>
+    <updated>2025-05-13T10:47:43.981Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19824,13 +19824,13 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-05-13T10:31:48.587Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:43.999Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>物件導向有三個很重要的特性：資料抽象化、繼承與動態連結。資料抽象化上章有提到，就是將介面與實作分開；繼承的話則可以幫助我們建立相似模型之間的關係；動態連結則可以讓我們使用某些型態的物件時不用在意其內部細節。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
@@ -21182,13 +21182,13 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-05-13T10:31:48.695Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:44.117Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>Class 背後最核心的概念是資料的抽象化(data abstraction)與資料封裝(data encapsulation)。這些是一種程式設計上的技巧、想法，其清楚區分了介面(interface)和實作(implementation)的不同，介面是與使用者直接互動的運算，實作則是利用了 Class 內的資料成員與成員函式來寫出的演算法，而封裝則是強制分開了介面與實作，實作會被隱藏，使用者只看的到介面，但看不到實作。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
@@ -21864,13 +21864,13 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-05-13T10:31:48.750Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:44.167Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>函式 (Function)</h2>
 <p>函式是一個有名稱的程式碼區塊，通常拿來表示一個過程，可以接受參數並產生一個結果，我們可以透過呼叫(calling) 來使用函式。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>函式 (Function)</h2>
@@ -22193,13 +22193,13 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-05-13T10:31:48.874Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:44.290Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>Array(陣列)</h2>
 <p>Array 與 int、char、bool 一樣是一種型態，稱為 array type，不過 array 並不是 fundamental type，而是 compound type。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>Array(陣列)</h2>
@@ -22482,13 +22482,13 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-05-13T10:31:49.000Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:44.417Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>這是 C++ 礦坑系列的前篇，為了讓大家能夠看懂礦坑系列在寫什麼，決定從 0 開始做一整個系列的教學。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
@@ -23256,13 +23256,13 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-05-13T10:31:49.052Z</updated>
-    <summary type="html"><![CDATA[  
+    <updated>2025-05-13T10:47:44.468Z</updated>
+    <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>這篇文章以 windows 為例，教大家如何建置 windows 上能寫 C++ 的環境。文字編輯器的部分我使用 Vscode，因為比較方便，擴充功能也挺多的，但這系列應該只會用到最基本的功能，擴充功能的部分大家可以自己多多摸索。</p>]]></summary>
-    <content type="html"><![CDATA[  
+    <content type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
@@ -23483,7 +23483,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-05-13T10:31:49.064Z</updated>
+    <updated>2025-05-13T10:47:44.479Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23910,7 +23910,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-05-13T10:31:49.287Z</updated>
+    <updated>2025-05-13T10:47:44.698Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23919,14 +23919,14 @@ default : statement (3)</p>
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <p>文章一覽：<a href="https://github.com/Mes0903/Cpp-Miner/blob/main/SUMMARY.md" target="_blank" rel="noopener noreferrer">連結</a></p>
-<h2>前言 <img src="https://walfiegif.wordpress.com/wp-content/uploads/2023/07/out-transparent-122.gif?w=930" height="50"></h2>
+<h2>前言</h2>
 <p>這是一本介紹 Modern C++ 與一些 C++ 深度解析的書，從我的 hackmd 搬運而來，你可以從<a href="https://github.com/Mes0903/Cpp-Miner/blob/main/SUMMARY.md" target="_blank" rel="noopener noreferrer">這裡</a>看見文章一覽。 如果您是 C++ 新手，我會建議您先去看 Miner Tutorial 的部分，裡面對初學者會學到的東西做了簡單的介紹，可以幫助大家理解、回憶一些基礎知識，同時可以讓你習慣本書風格</p>
 <p>讀著讀著便來到了 Modern C++，語法和文法比以往的 C、C++03 複雜很多，而且在找文章閱讀時發現網路上中文的資源其實沒有想像中的多，受到 Jserv 老師「你所不知道的 C 語言系列」啟發，想著那就自己來寫吧! 於是就有了這個礦坑系列~</p>
 <p>原本想說是一個禮拜一篇，但後來發現每篇文章的撰寫時間大概會需要到 50 小時，一個禮拜要一篇實在是有點難哈哈，<s>所以後來調整的速度大概會是一個月一篇左右，也有可能兩篇，但也有可能 0 篇QQ</s>，後來大約是三個月一篇的速度，若是短篇，像是黑魔法，可能一兩個禮拜便能寫好了，要看寫的內容而定</p>
 <p>文章的內容主要會是 Cppreference、draft 或一些好文章的翻譯，可以的話會把語法底層的一些原理也寫進去，可能會碰到一點編譯器和組語，希望能夠寫得盡量詳細，如果有什麼想看的或想補充的也都歡迎留言或私訊告訴我</p>
 <p>而取叫礦坑的原因是因為在寫這類文章的時候要挖的東西實在是太多了XD 常常需要挖到 C++ 會議的討論紀錄之類的，像是礦坑那樣深不見底，而想要的東西像鑽石一樣十分難找，自己就像個礦工一樣不停地往內部探索，所以就取叫礦坑系列啦!</p>
 <p>感謝一路上教我許多東西的老師、朋友與 Stackoverflow、Discord 上那些不認識但十分熱心的人們</p>
-<h2>Summary 文章一覽 <img src="https://walfiegif.wordpress.com/wp-content/uploads/2023/07/out-transparent-122.gif?w=930" height="50"></h2>
+<h2>Summary 文章一覽</h2>
 <h3>Miner Tutorial 新手教學</h3>
 <p>此處為新手教學，可以幫助大家回憶以前的東西，並幫助理解基礎 C++ 與熟悉本書風格</p>
 <ul>
@@ -23959,11 +23959,11 @@ default : statement (3)</p>
 <li><a href="https://github.com/Mes0903/Cpp-Miner/tree/main/Miner_BlackMagic/NoConst" target="_blank" rel="noopener noreferrer">四個不該用 "const" 的時機</a></li>
 <li><a href="https://github.com/Mes0903/Cpp-Miner/tree/main/Miner_BlackMagic/Indirect_through_null_pointer" target="_blank" rel="noopener noreferrer">Indirect through null pointer 是 UB 嗎?</a></li>
 </ul>
-<h2>貢獻此書 <img src="https://walfiegif.wordpress.com/wp-content/uploads/2023/07/out-transparent-122.gif?w=930" height="50"></h2>
+<h2>貢獻此書</h2>
 <p>如果你有任何想討論的內容、想看的內容，或是想添加章節等，歡迎你來聯絡我 <a href="mailto:mes900903@gmail.com" target="_blank" rel="noopener noreferrer">email</a>，也可以加我 Discord <code>mes_0903</code></p>
 <p>如果發現有錯字，可以到 hackmd 處直接修改，我會收到信件通知，你也可以直接發 PR，從 hackmd 搬過來有些格式可能會跑掉，若你發現格式長得有點奇怪，該換行的地方沒有換行等等的，也歡迎告訴我</p>
 <p>如果由於版本更新導致文章內容已與事實不符，也歡迎進行更新，文章有時內容會過於艱澀導致我無法翻譯，若你有能力且樂意幫忙翻譯，也很歡迎您修改</p>
-<h2>關於我 <img src="https://walfiegif.wordpress.com/wp-content/uploads/2023/07/out-transparent-122.gif?w=930" height="50"></h2>
+<h2>關於我</h2>
 <p>我是 Mes，一個喜愛 C++ 的人，寫文的現在(2021/04/02) 就讀中央大學數學系，目前大一，<s>成績很差，盡量不要問我數學</s>，如果想一起討論程式問題的話可以加我的 Discord、FB 或 IG，我主要用這三個，程式方面的討論我主要都在 Discord 找人問和回答問題：</p>
 <ul>
 <li>Discord：<code>mes_0903</code></li>
@@ -23971,7 +23971,7 @@ default : statement (3)</p>
 <li>Youtube：<a href="https://www.youtube.com/channel/UCT3MbveOznWLlxNIdLUUOhg" target="_blank" rel="noopener noreferrer">Mes</a></li>
 </ul>
 <p>興趣是寫作、Compiler、OS、C++、Assembly，偶爾會去攝影，會在 IG 上寫雜記和分享家裡的貓咪照片，FB 版上全是分享別人動物的貼文，<s>愜意的生活</s></p>
-<h2><span class="orange">一些資源</span> <img src="https://walfiegif.wordpress.com/wp-content/uploads/2023/07/out-transparent-122.gif?w=930" height="50"></h2>
+<h2><span class="orange">一些資源</span></h2>
 <p>下面這些是我可能會出現的 Discord 群，我通常會在這些群裡面回答問題或問問題：</p>
 <ul>
 <li>
@@ -24000,34 +24000,34 @@ default : statement (3)</p>
 <p><span class="burlywood">C/C++ Language References (final/current working drafts)</span></p>
 <ul>
 <li>
-<p><img src="https://i.imgur.com/g7fxJnW.png" height="30">  C89： (沒有 PDF 版本) 、 <a href="http://port70.net/~nsz/c/c89/c89-draft.html" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/g7fxJnW.png" width="30">  C89： (沒有 PDF 版本) 、 <a href="http://port70.net/~nsz/c/c89/c89-draft.html" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/g7fxJnW.png" height="30"> C99 (N1256)： <a href="http://port70.net/~nsz/c/c99/n1256.pdf" class="wheatlink">PDF</a> 、 <a href="http://port70.net/~nsz/c/c99/n1256.html" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/g7fxJnW.png" width="30"> C99 (N1256)： <a href="http://port70.net/~nsz/c/c99/n1256.pdf" class="wheatlink">PDF</a> 、 <a href="http://port70.net/~nsz/c/c99/n1256.html" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/g7fxJnW.png" height="30"> C11 (N1570)： <a href="http://port70.net/~nsz/c/c11/n1570.pdf" class="wheatlink">PDF</a> 、 <a href="http://port70.net/~nsz/c/c11/n1570.html" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/g7fxJnW.png" width="30"> C11 (N1570)： <a href="http://port70.net/~nsz/c/c11/n1570.pdf" class="wheatlink">PDF</a> 、 <a href="http://port70.net/~nsz/c/c11/n1570.html" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/g7fxJnW.png" height="30"> C17 (N2176)： <a href="https://files.lhmouse.com/standards/ISO%20C%20N2176.pdf" class="wheatlink">PDF</a> 、 (沒有 HTML 版本)</p>
+<p><img src="https://i.imgur.com/g7fxJnW.png" width="30"> C17 (N2176)： <a href="https://files.lhmouse.com/standards/ISO%20C%20N2176.pdf" class="wheatlink">PDF</a> 、 (沒有 HTML 版本)</p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/g7fxJnW.png" height="30"> C23： <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2596.pdf" class="wheatlink">PDF</a> 、 (沒有 HTML 版本)</p>
+<p><img src="https://i.imgur.com/g7fxJnW.png" width="30"> C23： <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2596.pdf" class="wheatlink">PDF</a> 、 (沒有 HTML 版本)</p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/OUNNxrC.png" height="30"> C++ 11 (N3337)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n3337/" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/OUNNxrC.png" width="30"> C++ 11 (N3337)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n3337/" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/OUNNxrC.png" height="30"> C++ 14 (N4140)： <a href="https://timsong-cpp.github.io/cppwp/n4140/draft.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4140/" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/OUNNxrC.png" width="30"> C++ 14 (N4140)： <a href="https://timsong-cpp.github.io/cppwp/n4140/draft.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4140/" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/OUNNxrC.png" height="30"> C++ 17 (N4659)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4659/" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/OUNNxrC.png" width="30"> C++ 17 (N4659)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4659/" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/OUNNxrC.png" height="30"> C++ 20 (N4861)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4861.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4861/" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/OUNNxrC.png" width="30"> C++ 20 (N4861)： <a href="http://open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4861.pdf" class="wheatlink">PDF</a> 、 <a href="https://timsong-cpp.github.io/cppwp/n4861/" class="wheatlink">HTML</a></p>
 </li>
 <li>
-<p><img src="https://i.imgur.com/OUNNxrC.png" height="30"> C++ 23 (N4885)： <a href="http://open-std.org/JTC1/SC22/WG21/docs/papers/2021/n4885.pdf" class="wheatlink">PDF</a> 、 <a href="https://eel.is/c++draft/" class="wheatlink">HTML</a></p>
+<p><img src="https://i.imgur.com/OUNNxrC.png" width="30"> C++ 23 (N4885)： <a href="http://open-std.org/JTC1/SC22/WG21/docs/papers/2021/n4885.pdf" class="wheatlink">PDF</a> 、 <a href="https://eel.is/c++draft/" class="wheatlink">HTML</a></p>
 </li>
 </ul>
 </strong>
@@ -24041,7 +24041,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-05-13T10:31:49.292Z</updated>
+    <updated>2025-05-13T10:47:44.709Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25037,7 +25037,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-05-13T10:31:49.663Z</updated>
+    <updated>2025-05-13T10:47:45.071Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
