@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-05-30T17:44:29.762Z</updated>
+  <updated>2025-05-30T20:59:29.611Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -19,6 +19,569 @@
   <category term="ROS1"/>
   <category term="computer-network"/>
   <category term="security"/>
+  <entry>
+    <title type="text">OSTEP 32：Concurrency Bugs</title>
+    <id>https://mes0903.github.io/OS/OSTEP/Concurrency/32/</id>
+    <link href="https://mes0903.github.io/OS/OSTEP/Concurrency/32/"/>
+    <updated>2025-05-30T20:59:04.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>研究人員多年來投入大量時間與精力研究並行錯誤。 早期研究多聚焦於 deadlock，我們在前章已稍作提及，接下來將深入探討這些主題 [C+71]。 近年則著重於其他常見並行錯誤（即非 deadlock 的錯誤）的研究。 本章將簡要檢視真實程式碼庫中出現的一些並行問題範例，以更清楚了解應注意哪些問題。 因此，本章的核心議題為：</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>如何處理常見的並行錯誤？</p>
+<p>並行錯誤通常呈現多種常見模式。 瞭解應警惕哪些模式，是撰寫更穩健且正確並行程式的第一步</p>
+</div>]]></summary>
+    <content type="html"><![CDATA[
+<p>研究人員多年來投入大量時間與精力研究並行錯誤。 早期研究多聚焦於 deadlock，我們在前章已稍作提及，接下來將深入探討這些主題 [C+71]。 近年則著重於其他常見並行錯誤（即非 deadlock 的錯誤）的研究。 本章將簡要檢視真實程式碼庫中出現的一些並行問題範例，以更清楚了解應注意哪些問題。 因此，本章的核心議題為：</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>如何處理常見的並行錯誤？</p>
+<p>並行錯誤通常呈現多種常見模式。 瞭解應警惕哪些模式，是撰寫更穩健且正確並行程式的第一步</p>
+</div>
+<h2>32.1 What Types Of Bugs Exist?</h2>
+<p>首要且最顯而易見的問題是：在複雜的並行程式中，會出現哪些類型的並行錯誤？ 這個問題一般而言很難回答，但幸好已有他人為我們做了研究。 我們特別參考 Lu 等人 [L+08] 的研究，他們深入分析多個流行的並行應用程式，以瞭解實際情況中會出現哪些錯誤</p>
+<p>該研究聚焦於四個重要的開源應用程式：MySQL（流行的資料庫管理系統）、Apache（知名的網頁伺服器）、Mozilla（著名的瀏覽器）與 OpenOffice（免費的 Office 套件）。 在研究中，作者檢視了這些程式碼庫中已發現並修復的並行錯誤，並將開發人員的工作轉化為一個量化的錯誤分析； 理解這些結果能幫助你掌握成熟程式碼庫中實際會遇到的問題類型</p>
+<p>圖 32.1 彙整了 Lu 等人研究的錯誤統計。 從圖中可見，總共分析了 105 個錯誤，其中大多數（74 個）並非 deadlock，剩下 31 個為 deadlock 錯誤。 此外，圖中還顯示了各應用程式中錯誤的數量； OpenOffice 僅有 8 件並行錯誤，而 Mozilla 則接近 60 件</p>
+<div class="center-column">
+<figure><figcaption>（Figure 32.1: Bugs In Modern Applications）</figcaption></figure>
+</div>
+<p>接下來，我們將更深入探討這兩類錯誤（非 deadlock 與 deadlock）。 對於第一類非 deadlock 錯誤，我們將使用該研究中的實例來展開討論； 至於第二類 deadlock 錯誤，則會介紹過去為預防、避免或處理 deadlock 所做的大量工作</p>
+<h2>32.2 Non-Deadlock Bugs</h2>
+<p>根據 Lu 的研究，非 deadlock 錯誤佔了並行錯誤的大多數。 但這些錯誤屬於哪些類型？ 它們如何產生？ 又該如何修復？ 現在我們來探討 Lu 等人發現的兩大類非 deadlock 錯誤：atomicity violation bugs 以及 order violation bugs</p>
+<h3>Atomicity-Violation Bugs</h3>
+<p>第一類錯誤稱為 atomicity violation（原子性違反）。 以下是一個在 MySQL 中出現的簡單範例。 在閱讀解說前，你可以先嘗試找出程式中的缺陷</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 1:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (thd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">-&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">proc_info) {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fputs</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">thd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">proc_info</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, ...); </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 2:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">thd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">-&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">proc_info </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 32.2: Atomicity Violation (atomicity.c)）</p>
+</div>
+<p>在此範例中，兩個不同的執行緒會存取結構 <code>thd</code> 的 <code>proc_info</code> 欄位。 第一個執行緒檢查該值是不是 non-NULL 的，然後印出它； 第二個執行緒則會將它設成 <code>NULL</code>。 顯然，如果第一個執行緒在呼叫 <code>fputs()</code> 前完成檢查卻遭中斷，第二個執行緒就可能會在中途將指標設為 <code>NULL</code>； 等第一個執行緒恢復執行時，<code>fputs()</code> 便會對 <code>NULL</code> 指標 dereference 並導致當機</p>
+<p>根據 Lu 等人的正式定義，atomicity violation 指的是「多次記憶體存取間預期的可序列化性被破壞（即某段程式區域原本應該是原子性執行的，但在實際執行時並未強制維護原子性）」。 在上述例子中，程式對於 <code>proc_info</code> 的非 <code>NULL</code> 檢查和緊接著在 <code>fputs()</code> 中使用該值，存在原子性假設； 當此假設不成立時，程式就無法正常運作</p>
+<p>針對此類問題提出修正通常（但不總是）相對簡單。 你能想出如何修復上面的程式碼嗎？</p>
+<p>在此解法（圖 32.3）中，我們只要在共用變數存取處加入鎖，確保每次執行緒要操作 <code>proc_info</code> 欄位時，都先取得 <code>proc_info_lock</code>。 當然，程式中其他所有存取該結構的程式碼，也都應該先取得此鎖才行</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">pthread_mutex_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> proc_info_lock </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PTHREAD_MUTEX_INITIALIZER;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 1:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">proc_info_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (thd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">-&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">proc_info) {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fputs</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">thd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">proc_info</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, ...);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">proc_info_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 2:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">proc_info_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">thd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">-&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">proc_info </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">proc_info_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 32.3: Atomicity Violation Fixed (atomicity fixed.c)）</p>
+</div>
+<h3>Order-Violation Bugs</h3>
+<p>另一種 Lu 等人發現的非 deadlock 錯誤稱為 order violation（順序違反）。 以下是一個簡單範例，同樣地，先試著看出程式在哪裡出了問題</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 1:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> init</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  mThread </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> PR_CreateThread</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mMain, ...); </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 2:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> mMain</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">...</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  mState </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> mThread</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">State</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 32.4: Ordering Bug (ordering.c)）</p>
+</div>
+<p>如你所料，Thread 2 中的程式似乎假設變數 <code>mThread</code> 已經完成了初始化（且非 <code>NULL</code>）； 但如果 Thread 2 在被建立後立即執行，<code>mMain()</code> 存取 <code>mThread</code> 時該值尚未被設定，就會因對 <code>NULL</code> 指標 dereference 而當機。 請注意，我們假設 <code>mThread</code> 的初始值為 <code>NULL</code>； 若非如此，Thread 2  dereference 任意記憶體位置時甚至會發生更怪異的錯誤</p>
+<p>根據 Lu 等人的正式定義，order violation 指的是「兩個（或多組）記憶體存取之間的預期順序被顛倒（即 A 應始終在 B 之前執行，但在實際執行時並未強制維護此順序）」[L+08]</p>
+<p>此類錯誤的修正通常是強制維護順序。 如前所述，使用 condition variables 是向現代程式庫中加入此類同步的簡單且可靠方式。 在上述範例中，我們可將程式重寫為圖 32.5 所示</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">pthread_mutex_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mtLock </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PTHREAD_MUTEX_INITIALIZER;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">pthread_cond_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mtCond </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PTHREAD_COND_INITIALIZER;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mtInit </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 1:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> init</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ... </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  mThread </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> PR_CreateThread</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mMain, ...);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // signal that the thread has been created...</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtLock);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  mtInit </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_cond_signal</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtCond);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtLock);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Thread 2:</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> mMain</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">...</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ...</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // wait for the thread to be initialized...</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtLock);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (mtInit </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    pthread_cond_wait</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtCond, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtLock);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">mtLock);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  mState </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> mThread</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">State</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 32.5: Fixing The Ordering Violation (ordering fixed.c)）</p>
+</div>
+<p>在此修正後的程式中，我們加入了一個 condition variable（<code>mtCond</code>）及其對應的鎖（<code>mtLock</code>），還有一個用以追蹤狀態的變數 <code>mtInit</code>。 當初始化程式執行時，它會將 <code>mtInit</code> 設為 1，並對 <code>mtCond</code> 發出 signal。 若 Thread 2 在此之前已經執行，它會在等待該 signal 及狀態變更； 若在此之後執行，則會檢查 <code>mtInit</code> 並發現初始化已完成（<code>mtInit</code> 為 1），便繼續執行。 請注意，為了簡化，我們並未使用 <code>mThread</code> 本身作為狀態變數。 當執行緒之間的執行順序至關重要時，condition variables（或 semaphores）就能派上用場</p>
+<h3>Non-Deadlock Bugs: Summary</h3>
+<p>在 Lu 等人研究的非 deadlock 錯誤中，有相當大比例（97%）屬於 atomicity violation 或 order violation。 因此，程式設計師若能針對這兩類錯誤模式進行深入思考，便能更有效地避免它們。 此外，隨著自動化程式檢查工具的發展，開發者應優先針對這兩種錯誤進行檢測，因為它們佔部署中非 deadlock 錯誤的大多數</p>
+<p>遺憾的是，並非所有錯誤都像上述範例般易於修復。 有些錯誤需要更深入地理解程式運作原理，或進行較大範圍的程式碼或資料結構重構才能解決。 欲知詳情，請參閱 Lu 等人那篇內容精彩且易讀的論文</p>
+<h2>32.3 Deadlock Bugs</h2>
+<p>除了前述的並行錯誤外，另一個在具有複雜的鎖協定的並行系統中經常出現的經典問題稱為 deadlock。 deadlock 的典型情況是：執行緒（例如 Thread 1）持有鎖 L1 並等待鎖 L2； 不巧的是，持有鎖 L2 的執行緒（Thread 2）正在等待 L1 被釋放。 以下程式片段展示了可能導致 deadlock 的情境：</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Thread </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">:                  Thread </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">:</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);    </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);    </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 32.6: Simple Deadlock (deadlock.c)）</p>
+</div>
+<p>請注意，程式執行時不一定會發生 deadlock； 但若 Thread 1 先取得鎖 L1，接著切換到 Thread 2 執行，Thread 2 再取得 L2 並嘗試取得 L1，便會陷入 deadlock，因為兩者互相等待而無法繼續執行。 圖 32.7 以圖形方式示意此情況：圖中出現的環路即代表 deadlock。 上述說明應該足以讓問題變得清晰。 那麼，程式設計師應如何撰寫程式，才能以某種方式處理 deadlock 呢？</p>
+<div class="center-column">
+<figure><figcaption>（Figure 32.7: The Deadlock Dependency Graph）</figcaption></figure>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>如何處理 deadlock？</p>
+<p>我們應如何設計系統來預防、避免，或至少偵測並恢復 deadlock？ 這在現今的系統中是否真是個問題？</p>
+</div>
+<h3>Why Do Deadlocks Occur?</h3>
+<p>如你所想，上述這類簡單 deadlock 看似很容易避免。 例如，只要 Thread 1 和 2 保持相同的鎖取得順序，就不會發生 deadlock。 那麼，為什麼 deadlock 還是會出現？</p>
+<p>其中一個原因是，在大型程式碼庫中，各組件間會產生複雜的相依關係。 以作業系統為例：虛擬記憶體系統可能需要存取檔案系統，將磁碟區塊換入； 而檔案系統又可能需要一頁記憶體來讀取該區塊，進而聯絡虛擬記憶體系統。 因此，在大型系統中設計鎖策略時，必須謹慎考量，以避免程式中自然形成的循環相依導致 deadlock</p>
+<p>另一個原因源自封裝（encapsulation）的本質。 作為軟體開發者，我們被教導要隱藏實作細節，以便以模組化方式建構軟體。 可惜，這種模組化與鎖的機制並不相容。 如 Jula 等人所述 [J+08]，某些看似無害的介面幾乎會誘發 deadlock。 例如，Java 中的 Vector 類別及其 <code>AddAll()</code> method，使用方式如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Vector v1, v2;  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">v1.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">AddAll</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">v2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>在內部，為了讓此 method 具備多執行緒安全性，必須同時取得目標 vector（v1）與參數 vector（v2）的鎖。 這個 routine 會以某種任意順序（例如先 v1 再 v2）取得鎖，然後將 v2 的內容加入 v1。 若另一個執行緒幾乎同時呼叫 <code>v2.AddAll(v1)</code>，便可能發生 deadlock，而這一切對呼叫端來說幾乎毫無察覺</p>
+<h3>Conditions for Deadlock</h3>
+<p>Deadlock 的發生需要以下四個條件同時成立：</p>
+<ul>
+<li>Mutual exclusion：執行緒對其所需的資源（如鎖）擁有排他控制</li>
+<li>Hold-and-wait：執行緒一邊持有已分配給它的資源（如已取得的鎖），一邊等待額外的資源（如想要再取得的鎖）</li>
+<li>No preemption：資源（如鎖）無法被強制從正使用它們的執行緒上移除</li>
+<li>Circular wait：存在一個執行緒環路，每個執行緒都持有下一個執行緒所需要的資源（如鎖）</li>
+</ul>
+<p>若以上任一條件不成立，deadlock 就無法發生。 因此，我們首先探討預防 deadlock 的技術； 每種策略都旨在阻止上述某個條件出現，從而作為處理 deadlock 的方法之一</p>
+<h3>Prevention</h3>
+<h4>Circular Wait</h4>
+<p>最實用的預防技巧（也是最常被採用的）莫過於在編寫有鎖的程式碼時，保證永不產生 circular wait。 最直接的方法就是對鎖的取得建立 total ordering。 舉例來說，若系統中只有兩把鎖（<code>L1</code> 和 <code>L2</code>），只要永遠先取得 <code>L1</code> 再取得 <code>L2</code>，就能避免 deadlock。 如此嚴格的順序能確保不會出現循環等待，因此不會 deadlock</p>
+<p>當然，在更複雜的系統中，鎖的數量往往超過兩把，因此要實現 total lock ordering 可能相當困難（甚至不必要）。 此時，partial ordering 就能作為避免 deadlock 的鎖排序問題的策略派上用場。 Linux 的記憶體映射程式碼中 [T+94]（v5.2）有一個真實且出色的 partial lock ordering 範例，原始碼最上方註解列出十組不同的鎖取得順序，包括像 「<code>i_mutex</code> before <code>i_mmap_rwsem</code>」 這類簡單順序，以及 「<code>i_mmap_rwsem</code> before <code>private_lock</code> before <code>swap_lock</code> before <code>i_pages_lock</code>」 這類複雜順序</p>
+<p>如你所見，不論是 total 還是 partial ordering，都需要謹慎設計鎖策略並小心實作。 此外，ordering 只是約定俗成的規範，若程式設計師疏忽，仍可能違反協定而引發 deadlock。 最後，鎖的排序還需要對程式庫及各種 routine 的呼叫流程有深入了解，哪怕一處失誤，就可能遇到 deadlock</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>透過鎖的位址強制執行鎖排序</p>
+<p>在某些情況下，函數必須同時取得兩把（或更多）鎖，因此我們必須小心，否則可能發生 deadlock。想像一個函數以此方式呼叫：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">do_something</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">mutex_t</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">m1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> mutex_t</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">m2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>若程式總是先鎖 <code>m1</code> 再鎖 <code>m2</code>（或總是先鎖 <code>m2</code> 再鎖 <code>m1</code>），就可能發生 deadlock，因為一個執行緒可能呼叫 <code>do_something(L1, L2)</code>，而另一個執行緒呼叫 <code>do_something(L2, L1)</code></p>
+<p>為避免此問題，聰明的程式設計師可利用鎖的位址作為取鎖的排序依據。 只要按照鎖位址的 high-to-low 或 low-to-high 順序取得鎖，<code>do_something()</code> 就能保證鎖的取得順序一致，不受參數傳入順序影響。程式碼示例如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (m1 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> m2) {</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // grab in high-to-low address order</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(m1);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(m2);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">else</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(m2);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(m1);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Code assumes that m1 != m2 (not the same lock)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>透過這個簡單技巧，程式設計師就能實現簡潔且高效的多鎖取得，並避免 deadlock</p>
+</div>
+<h4>Hold-and-wait</h4>
+<p>要避免 deadlock 的 hold-and-wait 條件，可透過一次性（原子性地）取得所有鎖來實現。 實務上，可參考如下做法：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">prevention</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // begin acquisition  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">...  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">prevention</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // end</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此程式碼先取得全域鎖 <code>prevention</code>，確保在鎖取得過程中不會發生意外的執行緒切換，從而再次避免 deadlock。 當然，這要求任何執行緒每次要取得任何鎖時，都必須先取得 <code>prevention</code> 這把全域鎖。 舉例來說，就算另一個執行緒以不同順序嘗試取得 L1 與 L2，也不會有 deadlock，因為它執行時同樣會先持有 <code>prevention</code> 這把鎖</p>
+<p>請注意，這種解法存在多項問題。 首先，如同先前所述，封裝性（encapsulation）反而成為阻礙：在呼叫的 routine 中，我們必須事先知道並取得所有必要的鎖。 其次，此技術會降低並行度，因為所有鎖都必須一開始就同時取得，而非在真正需要時再動態獲取</p>
+<h4>No Preemption</h4>
+<p>由於我們通常認為鎖會一直持有到呼叫 unlock 為止，需要取得多把鎖的狀況常常會出問題，因為你在等待一把鎖時可能手上已經持有另一把鎖了，導致互相等待。 許多執行緒函式庫提供更彈性的介面來避免這種情況，具體而言，<code>pthread_mutex_trylock()</code> 函式要麼在鎖可用時取得鎖並返回成功，要麼返回錯誤碼表示該鎖已被持有； 在後者情況下，你可以稍後再試一次以取得該鎖</p>
+<p>這類介面可用於構建一種既無 deadlock，順序性容錯又很高的取鎖協定，如下所示：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">top:</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">pthread_mutex_trylock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">L2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(L1);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    goto</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> top;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>請注意，另一個執行緒也可以遵循相同協定，但以相反地順序取得鎖（先 <code>L2</code> 再 <code>L1</code>），程式依然不會 deadlock。 不過這會產生一個新問題：livelock。 有可能（雖然或許不太常見）兩個執行緒反覆執行這段程式，卻都無法同時取得兩把鎖。 在此情況下，兩者不斷重複跑這段程式（因此這不是 deadlock），卻也沒有任何進展，因而稱為 livelock。 livelock 也有解決的方法：例如在每次重試前加入隨機延遲，以降低競爭執行緒之間的連續干擾機率</p>
+<p>不過，這種解法有一點需要注意：它無視了 trylock 方法的難點。 第一個可能出現的問題仍然源自封裝性：若其中一把鎖藏在某個被呼叫的 routine 裡，實作時要在失敗後跳回開頭的難度就更為複雜了（roll back 難度較高）。 若程式在此過程中已取得其他資源（非 <code>L1</code>），它必須在無法取得 <code>L2</code> 時，同步釋放那些資源； 例如，若在取得 <code>L1</code> 後配置了記憶體，就必須在重試前先釋放該記憶體。 不過，在某些受限情境下（如前述的 Java Vector 方法），此做法仍能帶來好處並順利運作</p>
+<p>你或許也會注意到，此方法並未真正引入 preemption（強制從持有鎖的執行緒手中奪取鎖），而是透過 trylock 機制，讓開發者能優雅地放棄自己對鎖的持有（即自行 preempt）。 儘管在這方面並不完美，但它確實具有實用性</p>
+<h4>Mutual Exclusion</h4>
+<p>最後一種預防技巧是徹底避免 mutual exclusion 的需求。 一般而言，我們知道這很困難，因為待執行的程式確實包含 critical section。 那麼，我們該怎麼做？</p>
+<p>Herlihy 提出可以在完全不使用鎖的情況下設計各種資料結構 [H91, H93]。 這些 lock-free（及相關的 wait-free）方法的核心思想很簡單：利用強大的硬體指令，以不需顯式加鎖的方式構建資料結構</p>
+<p>舉個簡單例子，假設我們有一條 compare-and-swap 指令，你或許還記得它是由硬體提供的原子性指令，其行為如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> CompareAndSwap</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">address</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> expected</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">address </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> expected) {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">address </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> new;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // success</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // failure</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>假設我們想利用 compare-and-swap 原子性地將某個值增加指定量，就可以寫出下列簡易函式：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> AtomicIncrement</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> amount</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  do</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> old </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">value;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  } </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">CompareAndSwap</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(value, old, old </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> amount) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>我們並非先加鎖再更新後解鎖，而是反覆嘗試用 compare-and-swap 將值更新到新數值。 如此一來，不需要取得任何鎖，也不會產生 deadlock（不過 livelock 仍有可能發生，因此實際可用的解法會比上述簡單程式更複雜）</p>
+<p>接著看一個稍微複雜的例子：list 的插入。 以下程式片段示範在 list head 插入節點：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> insert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">  node_t</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> malloc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">node_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">value</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> value;</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> head;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  head </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> n;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段程式完成簡單的插入，但若有多個執行緒「同時」呼叫，就會出現 race condition。 你能說出原因嗎？（想像兩個插入操作同時執行，並以最不利的排程交錯，串列會變成什麼樣子）。 當然，我們可以透過在程式周圍加上取鎖和解鎖來解決：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> insert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">  node_t</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> malloc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">node_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">value</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> value;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_lock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(listlock);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // begin critical section</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> head;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  head </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> n;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  pthread_mutex_unlock</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(listlock);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // end critical section</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在此解法中，我們採用了傳統的加鎖方式。 下面改成 lock-free 實作，僅使用 compare-and-swap 指令。 其中一種寫法如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> insert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">  node_t</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> malloc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">node_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(n </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">value</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> value;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  do</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">    n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> head;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  } </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">CompareAndSwap</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">head, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">next</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, n) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此程式先將新節點的 next 指向當前 head，然後嘗試以 compare-and-swap 將 head 換成新節點。 若此間有其他執行緒已成功換入新 head，則 compare-and-swap 會失敗，本執行緒便重試並帶入新的 head。 當然，要構建實用的串列不僅是單純插入節點； 毫不意外地，要完成能夠插入、刪除與查詢的 lock-free list 並非易事。 如欲深入了解，請參閱豐富的 lock-free 和 wait-free 同步文獻 [H01, H91, H93]</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>精明的讀者或許會好奇，為什麼我們要延遲到插入操作到快完成時才取鎖，而不是一進入 <code>insert()</code> 就上鎖？ 你能分析出這樣做為何合理嗎？ 例如，程式對 <code>malloc()</code> 有哪些前提假設？</p>
+<ul>
+<li>首先，<code>malloc()</code> 只處理私有記憶體分配，不會接觸共享資料結構，因此可在不持有鎖的情況下安全呼叫</li>
+<li>其次，插入節點的 value 與 next 欄位都是新配置、未公開給其他執行緒的記憶體，也不需要鎖保護</li>
+<li>最後，上鎖時間只要涵蓋對 head 與 next 指標的修改即可，這最小化了 critical section 的範圍，提高並行的效能</li>
+</ul>
+</div>
+<h3>Deadlock Avoidance via Scheduling</h3>
+<p>在某些情境下，我們寧可採用 deadlock avoidance 而非 prevention。 avoidance 需要對各執行緒在執行期間可能取得的鎖有全域性的了解，並以此資訊排程，確保永不發生 deadlock</p>
+<p>舉例來說，假設有兩個處理器和四個執行緒必須在其上排程；且我們知道 T1 在執行期間會取得 <code>L1</code> 與 <code>L2</code>（任意順序）、T2 同樣取得 <code>L1</code> 與 <code>L2</code>、T3 只取得 <code>L2</code>、T4 則不會取得任何鎖。 我們可將這些鎖需求以表格呈現：</p>
+<div class="center-column">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>T1</th>
+<th>T2</th>
+<th>T3</th>
+<th>T4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>聰明的排程器便可計算：只要 T1 和 T2 永不同時執行，就不會有 deadlock。 下列即為一種可行排程：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>請注意，(T3 與 T1) 或 (T3 與 T2) 同時執行是沒問題的。 儘管 T3 會取得 <code>L2</code>，但它僅持有一把鎖，無法與其他執行緒並行時引發 deadlock</p>
+<p>再來看另一個例子。 在此例中，對相同資源（即 L1 與 L2）的競爭更激烈，其鎖需求表如下：</p>
+<div class="center-column">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>T1</th>
+<th>T2</th>
+<th>T3</th>
+<th>T4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>具體而言，T1、T2、T3 都會在執行期間取得 <code>L1</code> 與 <code>L2</code>。 下方是一種可保證永不 deadlock 的排程：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>如你所見，靜態排程採取保守策略，將 T1、T2、T3 全部分配到同一處理器，導致整體執行時間大幅增加。 雖然可以考慮同時執行這些工作，但因為怕 deadlock，所以不敢，代價便是效能下降</p>
+<p>這類方法的著名範例是 Dijkstra 的 Banker’s Algorithm [D64]，文獻中也有許多類似作法。 遺憾的是，它們僅適用於非常受限的環境，例如嵌入式系統，在那裡我們能完全掌握所有待執行任務及其鎖需求； 更何況，這種方式如前例所示，也會限制並行度。 因此，透過排程避免 deadlock 並非通用的常用解法</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>不必事事完美（Tom West’s Law）</p>
+<p>Tom West 以《Soul of a New Machine》[K81] 一書主角身分知名，他的名言是：「Not everything worth doing is worth doing well」，這是一句絕佳的工程格言。 若某件壞事極罕發生，且其後果輕微，就沒必要花大把心力去預防； 但若你在打造太空梭，一旦出了錯就可能爆炸，那麼也許就該無視這句忠告</p>
+<p>有讀者可能會抗議：「這聽起來像是在提倡平庸！」或許他們有道理，我們也應謹慎對待此類建議。 不過，根據經驗，在工程領域面對緊迫時程與各種現實問題時，總得取捨哪些部分要高品質完成、哪些可留待日後。 困難之處就在於知道何時該做何種取捨，這只有透過經驗與對手上任務的投入才能獲得</p>
+</div>
+<h3>Detect and Recover</h3>
+<p>最後一種常見策略是允許 deadlock 偶爾發生，然後在偵測到 deadlock 後採取對應措施。 例如，如果作業系統一年才凍結一次，你只需重新啟動即可繼續工作。 若 deadlock 非常少見，這樣的「非解決方案」其實相當務實</p>
+<p>許多資料庫系統都採用 deadlock 偵測與復原技術。 系統會定期執行 deadlock 偵測器，建構資源圖並檢查其中是否有環路。 若發現環路（deadlock），便需重新啟動系統； 若先前需要更複雜的資料結構修復，則可能由人工介入協助</p>
+<p>欲進一步了解資料庫並行性、deadlock 及相關議題，請參考其他文獻 [B+87, K87]。 閱讀這些著作，或者更進一步，修習資料庫課程以深入探究這個豐富且有趣的領域</p>
+<h2>32.4 Summary</h2>
+<p>在本章中，我們探討了並行程式中會出現的錯誤類型。 第一類為非 deadlock 錯誤，出乎意料地相當常見，但修復起來通常比較容易。 這類錯誤包括 atomicity violation —— 原本應一起執行的指令序列未能維持原子性，以及 order violation —— 兩個執行緒之間的必要順序未被強制維護</p>
+<p>我們也簡要討論了 deadlock：它為何發生，以及可採取的對策。 deadlock 問題與並行本身一樣古老，相關論文不計其數。 實務上最佳做法是謹慎行事，制定明確的鎖取得順序，從根本上預防 deadlock。 wait-free 方法也具潛力，因為部分 wait-free 資料結構已經進入常用函式庫和關鍵系統（如 Linux）</p>
+<p>然而，這些方法因缺乏通用性且開發新型 wait-free 資料結構複雜，使用範圍可能受限。 或許最理想的解法是發展新的並行程式設計模式：如 Google 的 MapReduce [GD02]，程式設計師可以在完全不使用鎖的情況下描述某些平行計算。 由於鎖的本質上存在問題，我們應儘可能避免使用它們，除非萬不得已</p>
+<h2>References</h2>
+<ul>
+<li>
+<p>[B+87] “Concurrency Control and Recovery in Database Systems” by Philip A. Bernstein, Vassos Hadzilacos, Nathan Goodman. Addison-Wesley, 1987.</p>
+<p>資料庫管理系統中並行控制與復原的經典著作，對資料庫領域的並行、deadlock 與相關議題有深入探討</p>
+</li>
+<li>
+<p>[C+71] “System Deadlocks” by E.G. Coffman, M.J. Elphick, A. Shoshani. ACM Computing Surveys 3(2), June 1971.</p>
+<p>首度系統化闡述 deadlock 發生條件及處理方法的經典論文，後續研究紛紛引用</p>
+</li>
+<li>
+<p>[D64] “Een algorithme ter voorkoming van de dodelijke omarming” by Edsger Dijkstra. 1964.</p>
+<p>Dijkstra 最早指出並解決「致命擁抱」（deadly embrace，也即 deadlock）問題的論文</p>
+</li>
+<li>
+<p>[GD02] “MapReduce: Simplified Data Processing on Large Clusters” by Sanjay Ghemawat, Jeff Dean. OSDI ’04, October 2004.</p>
+<p>開創大規模叢集資料處理時代的 MapReduce 架構論文，提出無需鎖即可完成平行計算的思路</p>
+</li>
+<li>
+<p>[H01] “A Pragmatic Implementation of Non-blocking Linked-lists” by Tim Harris. DISC 2001.</p>
+<p>較現代的 lock-free 鏈結串列實作範例，展示不使用鎖的複雜性與挑戰</p>
+</li>
+<li>
+<p>[H91] “Wait-free Synchronization” by Maurice Herlihy. ACM TOPLAS 13(1), January 1991.</p>
+<p>開創 wait-free 同步方法的先驅性論文，提出無鎖且保證有限步驟完成的同步設計</p>
+</li>
+<li>
+<p>[H93] “A Methodology for Implementing Highly Concurrent Data Objects” by Maurice Herlihy. ACM TOPLAS 15(5), November 1993.</p>
+<p>系統性介紹 lock-free 與 wait-free 資料結構的論文，分別探討兩者的優劣與實作要點</p>
+</li>
+<li>
+<p>[J+08] “Deadlock Immunity: Enabling Systems To Defend Against Deadlocks” by Horatiu Jula, Daniel Tralamazza, Cristian Zamfir, George Candea. OSDI ’08, December 2008.</p>
+<p>針對系統層面 deadlock 防禦提出創新思路的最新論文，示範如何免於重複陷入相同的 deadlock</p>
+</li>
+<li>
+<p>[K81] “Soul of a New Machine” by Tracy Kidder. Backbay Books, 2000 (reprint of 1980).</p>
+<p>經典系統開發紀實，描述 Data General 團隊打造新機的點滴，是系統工程師必讀之作</p>
+</li>
+<li>
+<p>[K87] “Deadlock Detection in Distributed Databases” by Edgar Knapp. ACM Computing Surveys 19(4), December 1987.</p>
+<p>分散式資料庫中 deadlock 偵測與復原技術的綜覽論文，並指引相關研究方向</p>
+</li>
+<li>
+<p>[L+08] “Learning from Mistakes—A Comprehensive Study on Real World Concurrency Bug Characteristics” by Shan Lu, Soyeon Park, Eunsoo Seo, Yuanyuan Zhou. ASPLOS ’08, March 2008.</p>
+<p>首篇深入研究真實軟體中並行錯誤特性的論文，揭示非 deadlock 錯誤類型並驅動本章討論</p>
+</li>
+<li>
+<p>[T+94] “Linux File Memory Map Code” by Linus Torvalds et al. v5.2 source: mm/filemap.c.</p>
+<p>Linux 記憶體對映程式碼中的 partial lock ordering 範例，展示實務中鎖策略的複雜性</p>
+</li>
+</ul>
+]]></content>
+    <category term="OS"/>
+    <published>2025-05-31T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">OSTEP 33：Event-based Concurrency</title>
+    <id>https://mes0903.github.io/OS/OSTEP/Concurrency/33/</id>
+    <link href="https://mes0903.github.io/OS/OSTEP/Concurrency/33/"/>
+    <updated>2025-05-30T20:59:04.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>迄今我們在討論並行時，彷彿並行應用程式唯一的實現方式就是使用執行緒。 如同人生中許多事物，這並不完全正確。 具體來說，一種不同風格的並行程式設計經常被應用在 GUI 應用程式 [O96] 以及某些類型的網路伺服器 [PDZ99]。 這種風格稱為事件驅動並行，已在一些現代系統中流行，包括像 node.js [N13] 這類伺服器端框架，但它的根源可追溯到 C/UNIX 系統，下面我們將討論這些系統</p>
+<p>事件驅動並行要解決的問題有兩個方面。 首先，在多執行緒應用程式中，正確管理並行可能非常具挑戰性。 如我們先前所述，Deadlock 以及其他棘手問題都可能出現。 其次，在多執行緒應用程式中，開發者幾乎無法控制系統在任何時刻的排程。 程式設計師只能建立執行緒，然後期望底層 OS 能在可用的 CPU 核心間以合理方式排程。 考量要構建一個適用於所有工作負載並在各種情況下都表現良好的通用排程器之困難，有時 OS 的排程結果並不理想</p>]]></summary>
+    <content type="html"><![CDATA[
+<p>迄今我們在討論並行時，彷彿並行應用程式唯一的實現方式就是使用執行緒。 如同人生中許多事物，這並不完全正確。 具體來說，一種不同風格的並行程式設計經常被應用在 GUI 應用程式 [O96] 以及某些類型的網路伺服器 [PDZ99]。 這種風格稱為事件驅動並行，已在一些現代系統中流行，包括像 node.js [N13] 這類伺服器端框架，但它的根源可追溯到 C/UNIX 系統，下面我們將討論這些系統</p>
+<p>事件驅動並行要解決的問題有兩個方面。 首先，在多執行緒應用程式中，正確管理並行可能非常具挑戰性。 如我們先前所述，Deadlock 以及其他棘手問題都可能出現。 其次，在多執行緒應用程式中，開發者幾乎無法控制系統在任何時刻的排程。 程式設計師只能建立執行緒，然後期望底層 OS 能在可用的 CPU 核心間以合理方式排程。 考量要構建一個適用於所有工作負載並在各種情況下都表現良好的通用排程器之困難，有時 OS 的排程結果並不理想</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>如何在不使用執行緒的情況下建構並行伺服器</p>
+<p>我們如何在不使用執行緒的情況下建構並行伺服器，以便掌控並行機制並避免那些困擾多執行緒應用程式的問題？</p>
+</div>
+<h2>33.1 The Basic Idea: An Event Loop</h2>
+<p>我們將採用的基本方法，如前所述，稱為事件驅動並行。 這種方法非常簡單：只需等待某件事（即「事件」）發生； 當它發生時，檢查事件的類型，再執行所需的少量工作（可能包含發出 I/O 請求或排程其他事件以便日後處理等）就可以了</p>
+<p>在進入細節之前，讓我們先觀察典型的事件驅動伺服器長什麼樣子。 此類應用圍繞一個簡單的結構 —— 事件迴圈，來運作。 事件迴圈的偽程式碼如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&nbsp;&nbsp;events </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> getEvents</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&nbsp;&nbsp;for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (e in events)</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">&nbsp;&nbsp;&nbsp;&nbsp;processEvent</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(e);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>真的就是這麼簡單，主迴圈僅呼叫 <code>getEvents()</code> 等待有事可做，然後對每個回傳的事件逐一處理； 負責處理事件的程式碼被稱為事件處理器。 值得注意的是，當處理器在處理某個事件時，系統中只會剩下該事件在活動； 因此，決定下一個要處理的事件就等同於排程，這進而讓我們能夠對排程進行明確掌控，是事件驅動方法的基本優勢之一</p>
+<p>但這段討論引出了更大的疑問：事件驅動伺服器究竟如何判斷哪些事件正在發生，特別是與網路及硬碟 I/O 有關的情況？ 更確切地說，事件伺服器如何得知有訊息已經抵達？</p>
+<h2>33.2 An Important API: <code>select()</code> (or <code>poll()</code>)</h2>
+<p>考量到上述基本的事件迴圈後，我們接著必須解決如何接收事件的問題。 在大多數系統中，都提供了一個基本的 API，可透過 <code>select()</code> 或 <code>poll()</code> 系統呼叫來使用</p>
+<p>這些介面讓程式能做的事情很簡單：檢查是否有任何傳入的 I/O 需要處理。 例如，假設一個網路應用程式（如網頁伺服器）想要確認是否有網路封包已經抵達，以便進行服務。 以 <code>select()</code> 為例，在 Mac 的 man page 中，這個 API 如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> select</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> nfds</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">           fd_set </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*restrict</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> readfds</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">           fd_set </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*restrict</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> writefds</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">           fd_set </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*restrict</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> errorfds</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">           struct</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> timeval </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*restrict</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> timeout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>實際上的 man page 描述如下：<code>select()</code> 檢查傳入 readfds、 writefds 和 errorfds 的 I/O 描述符（descriptor）集合，以驗證它們的描述符是否分別準備好可讀、可寫或處於異常狀態。 接著它對每個集合中的前 <code>nfds</code> 個描述符進行檢查，也就是檢查索引從 <code>0</code> 到 <code>nfds-1</code> 的那些描述符。 返回時，<code>select()</code> 會將傳入的描述符集合替換為「已準備好執行請求操作的描述符子集合」。 <code>select()</code> 本身則回傳所有集合中已就緒描述符的總數</p>
+<p>關於 <code>select()</code> 有幾點要注意。 首先，它可讓您同時檢查描述符是否可讀或可寫，前者（可讀）能讓伺服器得知有新封包抵達並需要處理，後者（可寫）能讓服務知道何時可以回覆（也就是 outbound queue 還沒滿）</p>
+<p>其次，要注意 <code>timeout</code> 參數。 一種常見做法是將 <code>timeout</code> 設為 <code>NULL</code>，這會使 <code>select()</code> 無限期阻塞，直到有描述符就緒。 不過更穩健的伺服器通常會指定某種超時機制，一個常見技巧是將 <code>timeout</code> 設為零，讓 <code>select()</code> 被呼叫時立刻回傳；而  <code>poll()</code> 系統呼叫的行為非常相似，詳情請參閱其 man page 或 Stevens and Rago [SR05]</p>
+<p>不管哪一種方式，這些基本原語提供了一種構建非阻塞事件迴圈的方法，該迴圈僅檢查傳入封包、讀取帶有訊息的 socket，並在需要時回覆</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>阻塞介面與非阻塞（non-blocking）介面</p>
+<p>阻塞（或同步）介面會在回傳給呼叫者前完成所有工作，非阻塞（或非同步）介面則開始部分工作後立即回傳，讓需要完成的工作在背景執行。 阻塞呼叫的元凶通常是某種 I/O 操作，例如，如果一個呼叫必須從硬碟讀取以完成，它可能會因為等待已送往硬碟的 I/O 請求回傳而發生阻塞</p>
+<p>非阻塞介面可用於任何程式設計樣式（例如使用執行緒），但在事件驅動方法中是必要的，因為任何阻塞呼叫都會停止所有進度</p>
+</div>
+<h2>33.3 Using <code>select()</code></h2>
+<p>為了更具體地說明，我們來檢視如何使用 <code>select()</code> 來查看哪些網路 descriptor 上有傳入的訊息。 圖 33.1 是一個簡單的範例</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;stdio.h&gt;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;stdlib.h&gt;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;sys/time.h&gt;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;sys/types.h&gt;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;unistd.h&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // open and set up a bunch of sockets (not shown)</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // main loop</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // initialize the fd_set to all zero</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    fd_set readFDs;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    FD_ZERO</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">readFDs);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // now set the bits for the descriptors</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // this server is interested in</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // (for simplicity, all of them from min to max)</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> minFD; fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> maxFD; fd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">      FD_SET</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">readFDs);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // do the select</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> select</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(maxFD </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">readFDs, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // check which actually have data using FD_ISSET()</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> minFD; fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> maxFD; fd</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">      if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">FD_ISSET</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">readFDs))</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        processFD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 33.1: Simple Code Using <code>select()</code>）</p>
+</div>
+<p>這段程式碼其實相當容易理解，完成初始化後，伺服器進入一個無限迴圈。 在迴圈內，它先呼叫 <code>FD_ZERO()</code> 巨集清除 descriptor 集合，然後再用 <code>FD_SET()</code> 將自 <code>minFD</code> 到 <code>maxFD</code> 的所有 descriptor 加入集合。 這組 descriptor 可能代表像是伺服器正在監控的所有網路 socket。 最後，伺服器呼叫 <code>select()</code> 來檢查哪些連線上有可用資料。 接著透過在迴圈中使用 <code>FD_ISSET()</code>，事件伺服器即可得知哪些 descriptor 已就緒並處理傳入的資料</p>
+<p>當然，真正的伺服器會比這更複雜，並需要在傳送訊息、執行硬碟 I/O 以及其他許多細節時加入相應邏輯。 如需更多資訊，可參考 Stevens and Rago [SR05] 以獲得 API 資訊，或參閱 Pai 等人與 Welsh 等人的研究，了解事件驅動伺服器一般流程概覽 [PDZ99, WCB01]</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>在事件驅動伺服器中請勿造成阻塞</p>
+<p>事件驅動伺服器可讓您對任務排程進行細粒度的控制； 然而，為了維持此控制，任何會阻塞呼叫者執行的呼叫都不可使用，否則將導致整個事件驅動伺服器停擺</p>
+</div>
+<h2>33.4 Why Simpler? No Locks Needed</h2>
+<p>在單一 CPU 與事件驅動應用程式的情況下，並行程式中常見的問題不再存在。 具體來說，由於一次只處理一個事件，就不需要取得或釋放 lock。 事件驅動伺服器不會被其他執行緒中斷，因為它確實是單一執行緒的。 因此，在基本事件驅動方法中，不會出現執行緒程式中常見的並行錯誤</p>
+<h2>33.5 A Problem: Blocking System Calls</h2>
+<p>迄今為止，事件驅動程式聽起來很棒，對吧？ 你只需撰寫一個簡單的迴圈，並在事件發生時加以處理。 你甚至不需要考慮加鎖！ 但有個問題：如果某個事件需要呼叫可能造成阻塞的系統呼叫該怎麼辦</p>
+<p>例如，假設來自客戶端的請求進入伺服器，要從硬碟讀取檔案並將其內容回傳給請求端（類似於簡單的 HTTP 請求）。 為了處理此類請求，有些事件處理程式最終必須呼叫 <code>open()</code> 系統呼叫以開啟檔案，接著透過一系列的 <code>read()</code> 呼叫讀取檔案。 當檔案被讀取到記憶體後，伺服器很可能會開始將結果傳送給客戶端。 <code>open()</code> 和 <code>read()</code> 呼叫都可能向儲存系統發出 I/O 請求（當所需的 metadata 或資料尚未載入記憶體時），因此可能需要花費很長時間才能完成</p>
+<p>使用執行緒驅動的伺服器時，這不成問題：當執行 I/O 請求的執行緒被掛起（等待 I/O 完成）時，其他執行緒可以繼續運作，從而使伺服器得以持續運行。 事實上，I/O 與其他運算的自然重疊正是執行緒程式設計的直觀且簡單之處</p>
+<p>然而，採用事件驅動方法時，沒有其他執行緒可供運行：只有主要的事件迴圈。 而這意味著，如果事件處理程式發出會阻塞的呼叫，整個伺服器就會如此：阻塞直到該呼叫完成。 當事件迴圈阻塞時，系統將處於閒置狀態，因而造成大量資源浪費。 因此，在事件驅動系統中必須遵守一項規則：不可使用任何阻塞呼叫</p>
+<h2>33.6 A Solution: Asynchronous I/O</h2>
+<p>為了克服此限制，許多現代作業系統引入了一種統稱為非同步 I/O 的新機制，讓應用程式可以發出 I/O 請求後立即將控制權交還給呼叫者，而無需等到 I/O 完成。 另有介面可讓應用程式判斷多重 I/O 是否已完成，例如，我們來看看 macOS 所提供的介面（其他系統也有類似 API）。 這些 API 以 <code>struct aiocb</code>（通常稱為 AIO 控制區塊）為核心。 簡化後的結構如下（詳情請參閱 man page）：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> aiocb {  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> aio_fildes;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // File descriptor  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  off_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> aio_offset;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // File offset  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  volatile</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">aio_buf;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Location of buffer  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  size_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> aio_nbytes;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Length of transfer  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>若要對檔案執行非同步讀取，應用程式首先要填入此結構：包括要讀取檔案的描述符（<code>aio_fildes</code>）、檔案中的偏移量（<code>aio_offset</code>）、請求長度（<code>aio_nbytes</code>），以及最終要存放讀取結果的記憶體位置（<code>aio_buf</code>）。 完成填寫後，應用程式必須呼叫非同步讀取 API：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> aio_read</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> aiocb </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">aiocbp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>此呼叫嘗試發出 I/O，若成功便立即回傳，讓應用程式（即事件驅動伺服器）可繼續其工作。 接下來，我們還要解決一個問題：如何得知 I/O 已完成，並確認 <code>aio_buf</code> 指向的緩衝區已取得所需資料？ 此時，我們需要使用另一個 API，在 macOS 上，此函式名稱為 <code>aio_error()</code>，定義如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> aio_error</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> aiocb </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">aiocbp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>此系統呼叫檢查 <code>aiocbp</code> 所指請求是否已完成，若完成則回傳 0 表示成功； 否則回傳 <code>EINPROGRESS</code>。 因此，對於所有尚未完成的非同步 I/O，應用程式可定期呼叫 <code>aio_error()</code> 以判斷該 I/O 是否已完畢</p>
+<p>你可能已注意到，不斷檢查 I/O 是否完成十分麻煩； 當程式在同一時間發出數十或數百個 I/O 請求時，到底該不停地輪詢每個請求，還是先暫停一下再檢查，或……？ 為了解決此問題，部分系統採用中斷機制，透過 UNIX signal 在非同步 I/O 完成時通知應用程式，從而免除重複查詢系統的需求。 此輪詢與中斷之爭題在裝置章節也會看到（或你可能已經看到了）</p>
+<p>在不支援非同步 I/O 的系統中，無法實現純粹的事件驅動模式； 不過，研究人員想出了一些相當有效的方法來替代。 例如，Pai 等人 [PDZ99] 提出一種混合方式：使用事件處理網路封包，並透過執行緒池管理尚未完成的 I/O。 有興趣可詳讀該論文了解細節</p>
+<h2>33.7 Another Problem: State Management</h2>
+<p>另一個事件驅動方法的問題是，這類程式碼相比傳統的執行緒驅動程式碼通常更難撰寫。 原因如下：當事件處理程式發出非同步 I/O 時，它必須打包一些程式狀態，以便在 I/O 最終完成時供下一個事件處理程式使用。 這項額外工作在執行緒驅動程式中不需要，因為程式所需的狀態已存在該執行緒的堆疊上。 Adya 等人將這項工作稱為手動堆疊管理，且它是事件驅動程式設計的基礎[A+02]</p>
+<p>為了更具體說明，我們來看一個簡單範例：執行緒驅動的伺服器需要從檔案描述符（<code>fd</code>）讀取資料，讀取完成後，再將讀到的資料寫入網路 socket 描述符（<code>sd</code>）。 程式碼（忽略錯誤檢查）如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> read</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> buffer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> write</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">sd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> buffer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>如你所見，在多執行緒程式中，這類工作非常簡單； 當 <code>read()</code> 最終返回時，程式立刻知道要寫入哪個 socket，因為該資訊已存在執行緒的堆疊變數 sd 上</p>
+<p>在事件驅動系統中，情況就沒有那麼容易了。 要完成相同任務，我們首先會使用前述 AIO 呼叫以非同步方式發出讀取請求。 假設接著我們透過 <code>aio_error()</code> 週期性檢查讀取是否完成；當該呼叫告知讀取已完成時，事件驅動伺服器該如何得知接下來要執行什麼？</p>
+<h2>33.8 What Is Still Difficult With Events</h2>
+<p>還有一些其他事件驅動方法的困難值得一提。 例如，當系統從單一 CPU 轉向多 CPU 時，事件驅動方法的部分簡易性不復存在。 具體而言，為了使用多於一顆 CPU，事件伺服器必須同時執行多個事件處理程式； 如此一來，就會出現常見的同步問題（例如 critical sections），必須採用慣用解法（例如 locks）。 因此，在現代多核心系統上，不加鎖的簡單事件處理已不再可行</p>
+<p>另一個事件驅動方法的問題是，它與某些系統活動（例如 paging）整合不佳。 例如，若事件處理程式發生 page fault，則會阻塞，因而伺服器無法繼續運作直到 page fault 完成。 儘管伺服器架構已避免明確的阻塞，但由 page fault 引起的隱性阻塞難以避免，若頻繁發生便會導致嚴重的效能問題</p>
+<p>第三個問題是，隨著時間推移，各種 routine 的精確語意可能改變，事件驅動程式碼難以維護[A+02]。 例如，若某個 routine 從 non-blocking 改為 blocking，呼叫該 routine 的事件處理程式也必須做出調整，將自身拆分成兩段。 由於 blocking 對事件驅動伺服器而言極為致命，程式設計師必須時刻留意各事件所使用 API 的語意變動</p>
+<p>最後，走了很長一段路後[PDZ99]，大多數平台現已支援 asynchronous disk I/O 了，但它與 asynchronous network I/O 的整合卻始終不如想像中那般簡單統一。 例如，雖然理想上可僅使用 <code>select()</code> 介面來管理所有待處理 I/O，但通常仍須將 <code>select()</code>（用於網路）與 AIO 呼叫（用於硬碟 I/O）結合使用</p>
+<h2>33.9 Summary</h2>
+<p>我們介紹了一種基於事件的簡易並行模型。 事件驅動伺服器將排程控制權交給應用程式本身，但代價是程式複雜度提升，且與現代系統其他面向（例如 paging）的整合更為困難。 因此，現在尚無單一方法能被視為最佳解； threads 與 events 兩種方法很可能在未來多年內並存，作為解決相同並行問題的不同途徑。 建議閱讀相關論文（例如 [A+02, PDZ99, vB+03, WCB01]），或更實際地，撰寫一些事件驅動程式碼以深入瞭解</p>
+<h2>References</h2>
+<ul>
+<li>
+<p>[A+02] “Cooperative Task Management Without Manual Stack Management” by Atul Adya, Jon Howell, Marvin Theimer, William J. Bolosky, John R. Douceur. USENIX ATC ’02, Monterey, CA, June 2002</p>
+<p>這篇論文首次清楚闡述事件驅動併發的種種困難，並提出簡單的解決方案；同時探索了將執行緒與事件兩種併發管理方式融合於同一應用中的大膽構想</p>
+</li>
+<li>
+<p>[FHK84] “Programming With Continuations” by Daniel P. Friedman, Christopher T. Haynes, Eugene E. Kohlbecker. In Program Transformation and Programming Environments, Springer Verlag, 1984</p>
+<p>此篇論文是程式語言領域中關於 continuation（延續）的經典參考，對理解這一古老機制有不可或缺的價值</p>
+</li>
+<li>
+<p>[N13] “Node.js Documentation” by the folks who built node.js. Available: <a href="http://nodejs.org/api" target="_blank" rel="noopener noreferrer">nodejs.org/api</a></p>
+<p>Node.js 是眾多新興框架之一，能讓你迅速構建網路服務與應用。每位現代系統駭客都應精通此類框架（通常不只一種），投入開發並成為專家</p>
+</li>
+<li>
+<p>[O96] “Why Threads Are A Bad Idea (for most purposes)” by John Ousterhout. Invited Talk at USENIX ’96, San Diego, CA, January 1996</p>
+<p>這場演講探討了執行緒在 GUI 應用程式（以及更廣泛場景）中的局限性。Ousterhout 在開發 Tcl/Tk 時累積的經驗，成為這些見解的基礎</p>
+</li>
+<li>
+<p>[PDZ99] “Flash: An Efficient and Portable Web Server” by Vivek S. Pai, Peter Druschel, Willy Zwaenepoel. USENIX ’99, Monterey, CA, June 1999</p>
+<p>此先驅論文介紹了在網際網路初興時期如何構建高效可移植的網頁伺服器；閱讀它可理解基礎設計並學習在缺乏非同步 I/O 支援時的混合解法</p>
+</li>
+<li>
+<p>[SR05] “Advanced Programming in the UNIX Environment” by W. Richard Stevens and Stephen A. Rago. Addison-Wesley, 2005</p>
+<p>這本書是 UNIX 系統程式設計的必備經典，任何細節問題幾乎都能在其中找到答案</p>
+</li>
+<li>
+<p>[vB+03] “Capriccio: Scalable Threads for Internet Services” by Rob von Behren, Jeremy Condit, Feng Zhou, George C. Necula, Eric Brewer. SOSP ’03, Lake George, New York, October 2003</p>
+<p>本文探討如何在大規模網路服務中有效運用執行緒，以對抗當時大量出現的事件驅動方法</p>
+</li>
+<li>
+<p>[WCB01] “SEDA: An Architecture for Well-Conditioned, Scalable Internet Services” by Matt Welsh, David Culler, and Eric Brewer. SOSP ’01, Banff, Canada, October 2001</p>
+<p>這篇論文提出結合執行緒、佇列與事件驅動處理的混合架構，為可擴展網路服務提供了新思路，其概念後續被 Google、Amazon 等公司採用</p>
+</li>
+</ul>
+]]></content>
+    <category term="OS"/>
+    <published>2025-05-31T00:00:00.000Z</published>
+  </entry>
   <entry>
     <title type="text">OSTEP 31：Semaphores</title>
     <id>https://mes0903.github.io/OS/OSTEP/Concurrency/31/</id>
@@ -6586,7 +7149,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-05-30T17:44:30.264Z</updated>
+    <updated>2025-05-30T20:59:30.165Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18435,7 +18998,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-05-30T17:44:31.840Z</updated>
+    <updated>2025-05-30T20:59:31.867Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18766,7 +19329,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-05-30T17:44:31.866Z</updated>
+    <updated>2025-05-30T20:59:31.896Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -18913,7 +19476,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-05-30T17:44:31.879Z</updated>
+    <updated>2025-05-30T20:59:31.912Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -19172,7 +19735,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-05-30T17:44:31.893Z</updated>
+    <updated>2025-05-30T20:59:31.927Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20676,7 +21239,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-05-30T17:44:32.041Z</updated>
+    <updated>2025-05-30T20:59:32.086Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21065,7 +21628,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-05-30T17:44:32.073Z</updated>
+    <updated>2025-05-30T20:59:32.125Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21393,7 +21956,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-05-30T17:44:32.102Z</updated>
+    <updated>2025-05-30T20:59:32.154Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21416,7 +21979,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-05-30T17:44:32.102Z</updated>
+    <updated>2025-05-30T20:59:32.155Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21562,7 +22125,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-05-30T17:44:32.115Z</updated>
+    <updated>2025-05-30T20:59:32.160Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21960,7 +22523,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-05-30T17:44:32.154Z</updated>
+    <updated>2025-05-30T20:59:32.199Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22212,7 +22775,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-05-30T17:44:32.170Z</updated>
+    <updated>2025-05-30T20:59:32.224Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23570,7 +24133,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-05-30T17:44:32.287Z</updated>
+    <updated>2025-05-30T20:59:32.346Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24252,7 +24815,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-05-30T17:44:32.339Z</updated>
+    <updated>2025-05-30T20:59:32.405Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24581,7 +25144,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-05-30T17:44:32.458Z</updated>
+    <updated>2025-05-30T20:59:32.552Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24870,7 +25433,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-05-30T17:44:32.582Z</updated>
+    <updated>2025-05-30T20:59:32.694Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25644,7 +26207,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-05-30T17:44:32.635Z</updated>
+    <updated>2025-05-30T20:59:32.750Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25871,7 +26434,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-05-30T17:44:32.646Z</updated>
+    <updated>2025-05-30T20:59:32.763Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26298,7 +26861,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-05-30T17:44:32.857Z</updated>
+    <updated>2025-05-30T20:59:32.999Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26429,7 +26992,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-05-30T17:44:32.868Z</updated>
+    <updated>2025-05-30T20:59:33.009Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27425,7 +27988,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-05-30T17:44:33.224Z</updated>
+    <updated>2025-05-30T20:59:33.356Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
