@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-05-31T17:58:52.788Z</updated>
+  <updated>2025-06-01T14:56:17.564Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -20,10 +20,588 @@
   <category term="computer-network"/>
   <category term="security"/>
   <entry>
+    <title type="text">OSTEP 41：Fast File System (FFS)</title>
+    <id>https://mes0903.github.io/OS/OSTEP/Persistence/41/</id>
+    <link href="https://mes0903.github.io/OS/OSTEP/Persistence/41/"/>
+    <updated>2025-06-01T14:55:21.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>在 UNIX 作業系統剛推出時，UNIX 大師 Ken Thompson 親自撰寫了最早的檔案系統。 讓我們稱之為「舊式 UNIX 檔案系統」，它非常簡單。 基本上，硬碟上的資料結構長成下面這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>super block（S）儲存關於整個檔案系統的容量大小、inode 總數、指向空閒區塊的 link list 起點的指標等資訊。 硬碟上的 inode 區域則包含了該檔案系統的所有 inode。 最後，硬碟的大部分空間都被資料區塊佔據</p>]]></summary>
+    <content type="html"><![CDATA[
+<p>在 UNIX 作業系統剛推出時，UNIX 大師 Ken Thompson 親自撰寫了最早的檔案系統。 讓我們稱之為「舊式 UNIX 檔案系統」，它非常簡單。 基本上，硬碟上的資料結構長成下面這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>super block（S）儲存關於整個檔案系統的容量大小、inode 總數、指向空閒區塊的 link list 起點的指標等資訊。 硬碟上的 inode 區域則包含了該檔案系統的所有 inode。 最後，硬碟的大部分空間都被資料區塊佔據</p>
+<p>舊式檔案系統的優點在於它非常簡單，並且支援檔案系統要實現的基本抽象：檔案和目錄階層。 這個易用的系統與過去笨重的記錄式儲存系統相比是一大進步，而目錄階層也比先前僅有單層目錄結構的系統更為先進</p>
+<h2>41.1 The Problem: Poor Performance</h2>
+<p>它的問題在於效能極差，根據 Berkeley 的 Kirk McKusick 及其同事的量測 [MJLF84]，一開始的效能就很糟，隨著時間推移更是雪上加霜，以致該檔案系統最終只能達到整體硬碟頻寬的 2%</p>
+<p>主要原因在於舊式 UNIX 檔案系統將硬碟視為隨機存取記憶體，將資料散布到各處，卻忽略了硬碟本身的定位成本。 例如，檔案的資料區塊往往遠離其 inode，因此每當你先讀取 inode 再讀取檔案資料區塊時，就會觸發一次昂貴的硬碟尋道操作（而且這是相當常見的動作）</p>
+<p>更糟的是，由於沒有妥善管理空閒空間，檔案系統最終會變得非常碎片化。 空閒串列會指向散佈在整個硬碟上的各種區塊，而要分配檔案時就直接取出第一個可用區塊。 結果便是，即使某個檔案在邏輯上是連續的，但在實際讀取過程中卻要在硬碟多處跳來跳去，效能因而大幅下降</p>
+<p>舉例來說，假設下圖所示的資料區塊區域中包含四個檔案（A、B、C 和 D），每個檔案大小都佔 2 個區塊</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>若刪除 B 與 D，結果會變成下圖這樣</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>如你所見，空閒空間被碎成兩段各兩個區塊，而不是連續的四個區塊。 現在假設要分配一個大小為四個區塊的檔案 E，會看到以下情形</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>可以看到 E 被分散在整個硬碟上，因此在存取 E 時無法達到最佳（順序）效能。 你得先讀取 E1 和 E2，接著尋道，然後再讀取 E3 和 E4。 舊式 UNIX 檔案系統中這種碎片化問題經常出現，嚴重影響效能。 順帶一提：這正是硬碟重組工具的功用所在，它們會重新排列硬碟上的資料，使檔案連續存放，並為連續空間預留空間，同時更新 inode 等結構以反映這些變動</p>
+<p>還有一個問題：最初的區塊大小太小（512 位元組），因此從硬碟傳輸資料的效率低下。 雖然較小的區塊能降低內部碎片化（區塊內的浪費），但對於傳輸而言卻不利，因為每個區塊都需要一次定位開銷才能存取。 因此問題就出在：</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>CRUX：如何組織硬碟上的資料以提升效能？</p>
+<p>我們該如何組織檔案系統的資料結構，才能提升效能？ 在這些資料結構之上，我們需要什麼樣的分配策略？ 要如何讓檔案系統「瞭解」硬碟的特性？</p>
+</div>
+<h2>41.2 FFS: Disk Awareness Is The Solution</h2>
+<p>後來 Berkeley 的一組研究人員決定建構一個更優、更快的檔案系統，他們巧妙地稱之為 Fast File System（FFS）。 他們的構想是設計檔案系統的結構與分配策略，使其具備「硬碟感知」能力，從而提升效能</p>
+<p>FFS 至此開啟了檔案系統研究的新時代，它保留了原有檔案系統的介面（相同的 API，包括 <code>open()</code>、<code>read()</code>、<code>write()</code>、<code>close()</code> 及其他檔案系統呼叫），但改變了內部實作，為後續檔案系統的創新奠定了基礎，而這項工作至今仍在持續進行</p>
+<p>幾乎所有現代檔案系統都遵循這套既有介面（因此能維持與應用程式的相容性），並各自針對其內部效能、可靠性或其他需求進行改良</p>
+<h2>41.3 Organizing Structure: The Cylinder Group</h2>
+<p>FFS 的第一步是改變硬碟上的結構，其將硬碟劃分為多個柱面群，柱面指的是硬碟上不同碟面的相同軌道位置。 之所以稱為「柱面」，是因為它與幾何學上所說的圓柱形狀非常相似。 FFS 將 N 個連續的柱面聚合成一個群組，因此整個硬碟就可視為多個柱面群的集合。 下圖是一個簡單範例，顯示一個具有六片硬碟的最外側的四條軌道，以及由三個柱面組成的柱面群：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>請注意，現代硬碟並不會向檔案系統提供足夠的資訊，以讓它真正了解特定柱面是否正被使用。 如先前所述 [AD14a]，硬碟對外只呈現邏輯區塊位址空間，並將幾何細節隱藏了起來。 因此，現代檔案系統（例如 Linux ext2、ext3 與 ext4）改為將硬碟劃分為區塊群，每個群組僅是硬碟位址空間中的一段連續區塊。 下圖說明了每 8 個區塊被劃分到不同區塊群的範例（實際的群組規模會包含更多區塊）：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>無論稱之為柱面群還是區塊群，這些群組都是 FFS 提高效能的核心機制。 關鍵在於，若將兩個檔案放在同一群組內，FFS 就能確保連續存取它們時不需要跨整個硬碟大幅尋道。 為了利用這些群組來儲存檔案與目錄，FFS 必須具備將檔案和目錄放入群組並追蹤其所有必要資訊的能力。 為此，FFS 在每個群組內都包含了你對檔案系統所期望擁有的所有結構，例如：inode 空間、資料區塊，以及用來追蹤這些區塊是否已分配或仍為空閒的結構。 下圖展示了單一柱面群中所包含的內容：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>接著，我們來更詳細地檢視這個單一柱面群的組成。 FFS 出於可靠性考量，在每個群組中都保留了一份 super block（S）的副本。 由於在掛載檔案系統時必須讀取 super block，透過多份副本，即使某份損毀，也能藉由使用其他可用的複本來掛載並存取該檔案系統</p>
+<p>在每個群組內，FFS 需要追蹤該群組中的 inode 與資料區塊是否已分配。 每組都有一份 inode 位元圖（ib）與資料位元圖（db），分別用來管理各自群組中的 inode 和資料區塊。 位元圖是管理檔案系統空閒空間的絕佳方式，因為可輕易找到一大段空閒區塊並將之分配給檔案，從而避免舊式檔案系統中空閒串列導致的碎片化問題</p>
+<p>最後，inode 區域與資料區塊區域的設計與先前那個極簡檔案系統（VSFS）相同。 顧名思義，每個柱面群的大部分空間都由資料區塊構成</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：FFS 檔案建立</p>
+<p>試想建立一個新檔案時，必須更新哪些資料結構？ 假設使用者建立 <code>/foo/bar.txt</code>，且該檔案僅佔用一個區塊（4 KB）。 由於檔案是新的，所以需要一個新的 inode，這表示必須將 inode 位元圖與新分配的 inode 一併寫回硬碟。 此外，檔案還包含資料，因此也要分配資料區塊，所以要更新資料位元圖並最終將該資料區塊寫入硬碟。 因此，當前柱面群至少要執行四次寫入（記得這些寫入可能會先在記憶體緩衝一段時間）</p>
+<p>但事情還沒結束！ 當建立新檔案時，還必須將該檔案放入檔案系統階層中，也就是要更新目錄。 具體而言，必須更新父目錄 <code>foo</code>，新增 <code>bar.txt</code> 的條目。 這項更新可能能容納在 <code>foo</code> 的現有資料區塊內，或者需要分配新區塊（並更新資料位元圖）。 同時，還要更新 <code>foo</code> 的 <code>inode</code>，以反映目錄的新長度並更新時間欄位（例如最後修改時間）。 總而言之，僅僅建立一個新檔案就要做這麼多工作</p>
+</div>
+<h2>41.4 Policies: How To Allocate Files and Directories</h2>
+<p>有了這個群組結構後，FFS 必須決定如何將檔案、目錄以及相關的 metadata 安置在硬碟上以提升效能。 基本準則很簡單：將相關的東西放在一起（相對地，將不相關的東西放得遠一些）</p>
+<p>因此，為了遵循這個準則，FFS 必須判斷哪些事物是「相關」的，並將它們放入同一區塊群； 反之，將不相關的項目放到不同的區塊群。 為達到這個目的，FFS 採用了幾項簡單的啟發式規則</p>
+<p>第一項是目錄的放置。 FFS 採用簡單做法：選擇已分配目錄數目較少的柱面群（以在群組間平衡目錄數量），且空閒 inode 數目較多的柱面群（這樣後續才能分配更多檔案），並將該目錄的資料和 inode 放在該群組中。 當然，也可以使用其他啟發式規則（例如考慮空閒資料區塊的數量）</p>
+<p>對於檔案，FFS 做了兩件事。 首先，（一般情況下）FFS 會確保將檔案的資料區塊與其 inode 分配在同一個群組，從而避免 inode 與資料之間發生長時間的硬碟尋道（就像舊檔案系統那樣）。 其次，FFS 會將同一目錄下的所有檔案放在該目錄所屬的柱面群內。 因此，若使用者建立了四個檔案 <code>/a/b</code>、<code>/a/c</code>、<code>/a/d</code> 和 <code>/b/f</code>，FFS 就會嘗試將前三個檔案放在同一個群組中，並將 <code>/b/f</code> 放到另一個遠離它們的群組</p>
+<p>讓我們以一個範例來說明這樣的分配。 在此範例中，假設每個群組中只有 10 個 inode 和 10 個資料區塊（這兩個數字都不太切實際），並且有三個目錄（根目錄 <code>/</code>、<code>/a</code> 與 <code>/b</code>）及四個檔案（<code>/a/c</code>、<code>/a/d</code>、<code>/a/e</code>、<code>/b/f</code>）都依據 FFS 的策略放置在群組中。 假設這些一般檔案的大小都是兩個區塊，而目錄則只有一個資料區塊。 下例中，我們對每個檔案或目錄都使用直觀的符號（例如「<code>/</code>」代表根目錄、「<code>a</code>」代表 <code>/a</code>、「<code>f</code>」代表 <code>/b/f</code>，依此類推）</p>
+<div class="language- line-numbers-mode" data-highlighter="shiki" data-ext="" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span>group inodes     data</span></span>
+<span class="line"><span>    0 /</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div>]]></content>
+    <category term="OS"/>
+    <published>2025-06-01T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">OSTEP 40：File System Implementation</title>
+    <id>https://mes0903.github.io/OS/OSTEP/Persistence/40/</id>
+    <link href="https://mes0903.github.io/OS/OSTEP/Persistence/40/"/>
+    <updated>2025-06-01T13:25:18.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>在本章中，我們介紹一個名為 vsfs（Very Simple File System，極簡檔案系統）的簡單檔案系統實作。 這個檔案系統是典型 UNIX 檔案系統的簡化版本，因此我們拿來說明幾種基本的硬碟結構、存取方式和各種政策，這些概念在現今許多檔案系統中都能見到</p>
+<p>這個檔案系統完全由軟體實現； 不同於先前對 CPU 與記憶體虛擬化的開發，我們不會新增硬體功能來改善檔案系統（當然，我們會注意裝置特性以確保檔案系統運作良好）。 由於在構建檔案系統時有極大的彈性，現今已有許多不同的檔案系統存在，從 AFS（Andrew File System）[H+88] 到 ZFS（Sun 的 Zettabyte 檔案系統）[B07]。 各個檔案系統都有不同的資料結構，並在某些方面比同儕更優或更差。 因此，我們學習檔案系統的方式將採取案例研究：首先在本章介紹一個簡單的檔案系統（vsfs）以涵蓋大部分概念，接著針對真實檔案系統進行一系列研究，以了解它們在實務上如何各有差異</p>]]></summary>
+    <content type="html"><![CDATA[
+<p>在本章中，我們介紹一個名為 vsfs（Very Simple File System，極簡檔案系統）的簡單檔案系統實作。 這個檔案系統是典型 UNIX 檔案系統的簡化版本，因此我們拿來說明幾種基本的硬碟結構、存取方式和各種政策，這些概念在現今許多檔案系統中都能見到</p>
+<p>這個檔案系統完全由軟體實現； 不同於先前對 CPU 與記憶體虛擬化的開發，我們不會新增硬體功能來改善檔案系統（當然，我們會注意裝置特性以確保檔案系統運作良好）。 由於在構建檔案系統時有極大的彈性，現今已有許多不同的檔案系統存在，從 AFS（Andrew File System）[H+88] 到 ZFS（Sun 的 Zettabyte 檔案系統）[B07]。 各個檔案系統都有不同的資料結構，並在某些方面比同儕更優或更差。 因此，我們學習檔案系統的方式將採取案例研究：首先在本章介紹一個簡單的檔案系統（vsfs）以涵蓋大部分概念，接著針對真實檔案系統進行一系列研究，以了解它們在實務上如何各有差異</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>CRUX：如何實作簡單檔案系統？</p>
+<p>我們要如何建立一個簡單的檔案系統？ 在硬碟上需要哪些結構？ 它們需要追蹤哪些資訊？ 又該如何存取它們？</p>
+</div>
+<h2>40.1 The Way To Think</h2>
+<p>在思考檔案系統時，我們通常建議從兩個不同面向來思考。 若你能理解這兩個面向，就能大致了解檔案系統的基本運作原理</p>
+<p>第一個面向是檔案系統的資料結構。 換句話說，檔案系統採用了哪些硬碟上的結構來組織其資料與 metadata？ 我們將看到的第一批檔案系統（包括下文介紹的 vsfs）使用的是簡單的結構，例如區塊陣列或其他物件陣列，而較複雜的檔案系統，例如 SGI 的 XFS，則會採用更複雜的樹狀結構 [S+96]</p>
+<p>檔案系統的第二個面向是其存取方法。 它如何將 process 所呼叫的函式，如 <code>open()</code>, <code>read()</code>, <code>write()</code> 等，映射到其內部結構？ 在執行特定系統呼叫時，會讀取哪些結構？ 又會寫入哪些？ 所有這些步驟的效率如何？</p>
+<p>若你能掌握檔案系統的資料結構與存取方法，就可以建立能使其良好運作的抽象模型，而這正是系統思維的關鍵。 隨著我們探討本章的初步實作，請努力發展並完善你的抽象模型</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：檔案系統的抽象模型</p>
+<p>如前所述，抽象模型是你在學習系統時真正要建立的認知架構。 對於檔案系統而言，你的抽象模型最終應該回答這些問題：哪些硬碟上的結構用來儲存檔案系統的資料與 metadata？ 當 process 開啟檔案時會發生什麼？ 在執行讀取或寫入時會存取哪些硬碟上的結構？ 透過不斷建構並改進你的抽象模型，你將獲得對系統運作的抽象理解，而不只是試圖理解某段檔案系統程式碼的細節（當然，那也很有用）</p>
+</div>
+<h2>40.2 Overall Organization</h2>
+<p>接著，我們來設計 vsfs（Very Simple File System）在硬碟上的整體結構。 第一步是將硬碟劃分成許多區塊； 簡單的檔案系統通常只使用單一大小的區塊，而這裡我們也採用相同做法，選擇 4 KB 作為區塊大小。 因此，我們對於要建構檔案系統之分割區的視圖很簡單：一連串大小為 4 KB 的區塊。 這些區塊從編號 0 到 N − 1 編址，總共有 N 個 4 KB 區塊。 假設我們使用非常小的硬碟，僅有 64 個區塊：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>現在來思考要在這些區塊裡存放什麼才算是一個完整的檔案系統。 你第一個想到的可能是「使用者資料」，的確任何檔案系統中大部分的空間都應該用來存放使用者資料。 我們將這部分稱為「資料區域（data region）」。 為了簡化起見，我們就在這個 64 個區塊的硬碟中，固定保留最後 56 個區塊做為資料區域</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>如同上一章稍微提過的，檔案系統必須追蹤每個檔案的相關資訊。 這些資訊屬於重要的 metadata，其中包括了：哪些資料區塊組成了該檔案、檔案大小、擁有者與存取權限、最近存取與修改時間，以及其他類似的資訊</p>
+<p>為了儲存這些 metadata，檔案系統通常會使用一種稱為 inode 的資料結構（我們會在下方詳談 inode）。 為了放置 inode，我們還得在硬碟上保留一些空間，這部分被稱為「inode 表（inode table）」，本質上就是一個存放 on-disk inode 的陣列。 假設我們在 64 個硬碟區塊中保留 5 個區塊做 inode（在圖中以 I 標示），那麼硬碟上的結構就如同下圖所示：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>需要注意的是，inode 通常不會很大，可能會是個 128 或 256 之類的位元組大小。 如果每個 inode 使用 256 位元組，那麼一個 4 KB 的區塊可以容納 16 個 inode，而我們先前保留的 5 個區塊就可存放 80 個 inode。 在這個只有 64 個區塊的小型檔案系統中，80 個 inode 就是我們能擁有的最大檔案數量； 不過，如果同樣的檔案系統部署在更大的硬碟上，只要擴增 inode 表的區塊數，就可以支援更多檔案了</p>
+<p>目前，我們的檔案系統已有「資料區塊（D）」和「inode（I）」了，但仍缺少了幾個重要元素。 首先是：如何追蹤哪些 inode 或資料區塊是「空閒」的，哪些是「已分配」的。 這種分配追蹤結構是任何檔案系統都必須具備的。 當然，有很多方法可以用來追蹤分配狀態，例如我們可以使用「空閒串列（free list）」，串列中每個元素指向下一個空閒區塊，依此類推</p>
+<p>但這邊我們選擇另一種簡單且常見的結構：bitmap（位元圖）。 我們為「資料區域」建立一個資料位元圖（data bitmap），並為「inode 表」建立一個 inode 位元圖（inode bitmap）。 位元圖就是一個陣列，每個位元代表對應的物件／區塊是空閒（0）還是正在使用（1）。 因此，我們的全新硬碟配置現在多包含「inode 位元圖（i）」和「資料位元圖（d）」，如下圖所示：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>你可能會注意到，為這些位元圖各使用整整一個 4 KB 的區塊有些浪費； 一個 4 KB 的位元圖可以追蹤多達 32 K 個物件的分配狀態，可我們實際只需追蹤 80 個 inode 和 56 個資料區塊。 然而，為了簡化設計，我們仍分別給每個位元圖使用整個 4 KB 區塊</p>
+<p>你可能還發現硬碟結構中仍剩下一個區塊未使用。 我們將這最後一個區塊保留給「superblock」（在下圖中以 S 標示）。 superblock 用來儲存整個檔案系統的資訊，例如：檔案系統中有多少個 inode 和資料區塊（本例為 80 和 56）、inode 表從哪個區塊開始（此例為第 3 區塊），依此類推。 它還會包含某種 magic number，以識別檔案系統類型（此處為 vsfs）</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>因此，當掛載檔案系統時，作業系統會先讀取 superblock，初始化各項參數，然後才將該檔案系統掛載到整體目錄樹中。 之後，當存取該檔案系統中的任何檔案時，系統就會確切知道要到哪裡尋找所需的硬碟結構</p>
+<h2>40.3 File Organization: The Inode</h2>
+<p>在檔案系統中，最重要的硬碟結構之一是 inode，幾乎所有檔案系統都有類似的結構。 inode 一詞源自 index node，是在 UNIX [RT74]（甚至可能更早的系統）中給予它的歷史名稱，之所以如此命名，是因為這些節點最初以陣列形式排列，存取特定 inode 時需要透過索引來做對應</p>
+<p>每個 inode 都隱含地透過一個編號（稱為 i-number）來引用，我們先前也將它稱作檔案的低階名稱。 在 vsfs（以及其他簡單檔案系統）中，如果擁有一個 i-number，就能直接計算出其對應的 inode 在硬碟上的位置。 例如，假設 vsfs 的 inode 表大小為 20 KB（即五個 4 KB 的區塊），因此包含 80 個 inode（假設每個 inode 大小為 256 位元組）； 再且假設 inode 區域從 12 KB 開始（即 superblock 從 0 KB 開始、inode 位元圖位於 4 KB、資料位元圖位於 8 KB，而 inode 表緊接其後）。 在 vsfs 中，檔案系統分割區開頭的配置（放大視圖）如下</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>要讀取編號為 32 的 inode，檔案系統會先計算要進入 inode 區域的位移量（<code>32 * sizeof(inode)</code> 或 8192），再加上 inode 表在硬碟上的起始位址（<code>inodeStartAddr = 12 KB</code>），便可得到所需 inode 區塊的正確位元組位址：20 KB。 請記得，硬碟無法直接以位元組為單位編址，而是由大量可編址的區段（通常為 512 位元組）構成。 因此，要取得包含 inode 32 的那塊區塊，檔案系統會對第  號區段發出讀取請求，以取得所需的 inode 區塊。 一般來說，inode 區塊的區段編號 sector 可用下列公式計算：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">blk    </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (inumber </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">inode_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">/</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> blockSize;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">sector </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ((blk </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> blockSize) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> inodeStartAddr) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">/</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> sectorSize;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>每個 inode 內部幾乎包含了你對一個檔案所需的所有資訊：其類型（例如一般檔案、目錄等）、檔案大小、分配給它的區塊數量、保護資訊（例如檔案擁有者與可存取對象）、時間資訊，包括檔案何時建立、修改或最後存取，以及檔案的資料區塊在硬碟上的存放位置（例如各種指標）</p>
+<p>我們將這些關於檔案的資訊稱為 metadata； 事實上，任何位於檔案系統中，但不屬於純粹使用者資料的部分，都可歸類為 metadata。 下圖 40.11 是 ext2 [P09] 中的一個範例 inode：</p>
+<div class="center-column">
+<figure><figcaption>（Figure 40.1: Simplified Ext2 Inode）</figcaption></figure>
+</div>
+<p>在設計 inode 時，最重要的決策之一是它如何記錄資料區塊的位置。 一種簡單做法是在 inode 內部放置一個或多個「直接指標（disk addresses）」，每個指標對應到一個屬於該檔案的硬碟區塊。 然而此做法有其限制：例如，若要建構一個非常大的檔案（例如，其大小大於「內建直接指標數量 × 區塊大小」），這種方法就無法滿足需求</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：資料結構 — inode</p>
+<p>inode 是許多檔案系統中用來描述儲存給定檔案 metadata（例如檔案長度、權限，以及其各個區塊在硬碟上的位置）的資料結構的統稱。 此名稱至少可追溯到 UNIX（若不是更早出現在 Multics 甚至更早系統），它是 index node 的縮寫，因為 inode 編號會用於索引 on-disk inode 陣列，以找到對應編號的 inode。 如我們稍後會看到，inode 的設計是檔案系統設計的關鍵之一。 大多數現代系統都為其所追蹤的每個檔案採用類似的結構，只是可能名稱不同（例如 dnodes、fnodes 等等）</p>
+</div>
+<h3>The Multi-Level Index</h3>
+<p>為了支援更大的檔案，檔案系統設計人員必須在 inode 中引入不同的結構。 一個常見的做法是增加一個稱為間接指標（indirect pointer）的特殊指標。 它不直接指向儲存使用者資料的區塊，而是指向一個包含更多指標的區塊，每個指標都指向使用者資料。 因此，inode 可以有固定數量的直接指標（例如 12 個），以及一個間接指標</p>
+<p>若檔案變得夠大，其就會從硬碟的資料區塊區中分配出一個間接區塊，並將 inode 中的間接指標欄位設為指向該區塊。 假設區塊大小為 4 KB，而硬碟地址佔 4 位元組，則這個間接區塊可再包含 1024 個指標； 如此一來，檔案最終可擴展到 (12 + 1024) × 4 KB，約 4144 KB</p>
+<p>不出所料，使用上述做法後，你可能還會想要再支援更大的檔案，這只需要在 inode 中再增加一個指標：二層間接指標（double indirect pointer）。 此指標指向一個區塊，該區塊內保存指向間接區塊的指標，而每個間接區塊則含有指向資料區塊的指標。 因此，一個二層間接區塊可再擴展 1024 × 1024，即 1 百萬個 4 KB 區塊，換言之能夠支援超過 4 GB 大小的檔案。 當然，你可能還想要更多，我們想你已經猜到下一步：三層間接指標（triple indirect pointer）</p>
+<p>這種不平衡的樹狀結構被稱為多層索引（multi-level index）結構，用以指向檔案區塊。 以下用十二個直接指標、以及一個單層間接區塊和一個二層間接區塊為例。 假設區塊大小為 4 KB，指標佔用 4 位元組，該結構可支援一個略大於 4 GB 的檔案（也就是 ）。 那麼，如果再加上一個三層間接區塊，你能算出它能處理多大的檔案嗎？ （提示：非常大）</p>
+<p>許多檔案系統採用了多層索引結構，包括常見的 Linux ext2 [P09]、ext3、NetApp 的 WAFL，以及原始 UNIX 檔案系統。 其他檔案系統，例如 SGI XFS 和 Linux ext4，則使用範圍（extents）而非單純指標； 關於基於範圍的方案如何運作，可參考前述的側欄說明（它們類似於在虛擬記憶體討論中的區段）</p>
+<p>你可能會想：為何要使用這種不平衡的樹結構？ 為何不採取其他方式？ 事實上，許多研究者已對檔案系統及其使用模式研究許久，並且發現了一些跨年代通用的「真理」。 其中一項發現是：大部分檔案都很小。 這種不平衡的設計反映了這一事實； 若大多數檔案確實較小，那麼針對此情境做優化是合理的</p>
+<p>因此，只需少量直接指標（12 是常見數），inode 便可直接指向 48 KB 的資料，若檔案更大就再使用一個（或多個）間接區塊，這方面可參考近期 Agrawal 等人的相關研究 [A+07]，圖 40.2 是這些結果的摘要。 當然，就 inode 設計而言，還有許多其他可能性； 畢竟 inode 只是一個資料結構，任何能儲存相關資訊並有效查詢的資料結構都能勝任。 由於檔案系統軟體易於更換，若工作負載或技術有所變化，很有可能會再出現新的設計</p>
+<div class="center-column">
+<figure><figcaption>（Figure 40.2: File System Measurement Summary）</figcaption></figure>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>TIP：考慮基於範圍（extents）的做法</p>
+<p>另一種做法是使用範圍（extents）而非指標。 範圍僅包含一個硬碟指標與長度（以區塊為單位）； 因此，不再需要為檔案的每一個區塊配置一個指標，只需一個指標加長度，即可指定該檔案在硬碟上的位置。 但僅有一個範圍仍有限制，因為在分配檔案時，可能難以找到一段連續的硬碟空間。 因此，採用範圍做法的檔案系統通常允許多個範圍，以便在分配檔案時提供更大的彈性</p>
+<p>比較這兩種做法時，基於指標的方式彈性最高，但每個檔案須儲存大量 metadata（對於大型檔案尤其如此）。 而基於範圍的方式雖彈性較低，卻更為緊湊； 尤其當硬碟上有足夠空閒空間且檔案能夠連續排列時，它們的效果最好（這也是幾乎所有檔案分配策略的目標）</p>
+</div>
+<h2>40.4 Directory Organization</h2>
+<p>在 vsfs（和許多其他檔案系統）中，目錄結構相對簡單； 目錄基本上只包含一份「條目名稱」與「inode number」的對應清單。 對於給定目錄中的每個檔案或子目錄，它的資料區塊中會有一個字串與一個數值。 若名稱長度可變，則可在字串旁再附帶一個長度欄位</p>
+<p>舉例來說，假設有一個目錄 dir（inode 編號 5），裡面包含三個檔案：<code>foo</code>、<code>bar</code>，還有 <code>foobar_is_a_pretty_longname</code>，對應的 inode 編號分別是 12、13 和 24，則 dir 在硬碟上的資料可能如下所示：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>在此範例中，每個條目包含：</p>
+<ol>
+<li>inode 編號（<code>inum</code>）</li>
+<li>紀錄長度（<code>reclen</code>）：名稱佔用的位元組總數加上任何剩餘空間</li>
+<li>字串長度（<code>strlen</code>）：名稱的實際位元組數</li>
+<li>條目名稱（<code>name</code>）</li>
+</ol>
+<p>請注意，每個目錄都會多出兩個特殊條目：「.（dot）」和「..（dot-dot）」； dot 代表目前目錄（此例為 dir），而 dot-dot 代表其父目錄（此例為根目錄）</p>
+<p>另外，刪除檔案（例如呼叫 <code>unlink()</code>）可能會在目錄中留下空洞，因此還需要某種方式來標示這類空間（例如使用保留的 inode 編號，如 0）。 這也是為何要有「紀錄長度」欄位：新的條目可以復用舊的、較大的條目，並利用其中多餘的空間</p>
+<p>你可能想知道目錄究竟儲存在何處。 通常，檔案系統將目錄視為一種特殊類型的檔案。 因此，目錄本身也有一個 inode，在 inode 表中的某個位置（該 inode 的 type 欄位會標示為「directory」而非「regular file」）。 該目錄由 inode 指向其資料區塊（可能還有間接區塊）； 這些資料區塊位於我們那個簡易檔案系統的資料區塊區域內。 由此，整體硬碟結構並不改變</p>
+<p>我們也要再強調一次：這種簡單的線性目錄項目列表並非儲存這類資訊的唯一方式。 正如先前所說，各種資料結構皆可選用。 例如，XFS [S+96] 便以 B-tree 形式儲存目錄，讓建立檔案時（必須確認檔名尚未被使用）比單純掃描整個列表的系統更為快速</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：鏈結式分配法</p>
+<p>在設計 inode 時，還有一種更簡單的做法是使用鏈結串列（linked list）。 如此一來，inode 內只需一個指標，指向該檔案的第一個區塊。 要處理更大的檔案，就在該區塊的末端再加一個指標，如此反覆，就能支援更大的檔案</p>
+<p>如你所想，這種鏈結檔案分配法在某些工作負載下效能很差； 想想要讀取檔案的最後一個區塊，或是執行隨機存取時便能體會。 因此，為了改善鏈結式分配，有些系統會保留一張「鏈結資訊表」在記憶體中，而不是把下一個指標存放在資料區塊裡。 該表以資料區塊 D 的地址作為索引，而表中對應的值就是 D 的下一個指標，也就是檔案中緊跟在 D 之後區塊的地址。 若某個區塊為空閒，也可能以 null 或其他標記表示。 使用這種「下一個指標表」後，就能有效地執行隨機存取：先在（記憶體中的）表裡掃描到想要的區塊，再直接向硬碟存取它即可</p>
+<p>這張表是否似曾相識？ 我們所描述的，就是俗稱的「檔案配置表（file allocation table）」，也就是 FAT 檔案系統的基本架構，經典的舊式 Windows 檔案系統（NTFS [C94] 之前的版本）就是基於此簡單的鏈結分配法。 此外，它與傳統 UNIX 檔案系統也有其它差異，例如它根本沒有 inode，而是以目錄條目存放檔案 metadata，並直接指向檔案的第一個區塊，於是無法建立硬連結。 更多詳盡但不那麼優雅的細節可見 Brouwer [B02]</p>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：空閒空間管理</p>
+<p>管理空閒空間的方法多種多樣； 位元圖（bitmap）只是其中一種。 早期有些檔案系統採用「空閒串列（free list）」，在 superblock 中保留一個指標，指向第一個空閒區塊，而在該區塊內再存放指向下一個空閒區塊的指標，如此便形成一張空閒區塊串列。 當需要分配區塊時，就取出串列頭並更新串列即可</p>
+<p>現代檔案系統則採用更進階的資料結構。 例如，SGI 的 XFS [S+96] 就用某種形式的 B-tree 來精簡地表示哪些硬碟區塊為空閒。 與任何資料結構一樣，各種時間與空間之間的折衷皆有可能</p>
+</div>
+<h2>40.5 Free Space Management</h2>
+<p>檔案系統必須追蹤哪些 inode 與資料區塊是空閒的、哪些不是，才能在配置新檔案或目錄時找到可用空間。 由此可見，空閒空間管理對任何檔案系統都非常重要。  在 vsfs 中，我們使用兩個簡單的位元圖來執行這項工作</p>
+<p>例如，當我們建立一個檔案時，就必須為該檔案分配一個 inode。 此時，檔案系統會在 inode 位元圖中搜尋空閒的 inode，並將該 inode 分配給檔案； 接著，檔案系統要將對應位元標示為已使用（設為 1），並最終將正確資訊寫回硬碟上的位元圖。 當分配資料區塊時，也會執行類似的步驟</p>
+<p>在為新檔案分配資料區塊時，還可能需要考慮其他因素。 例如，一些 Linux 檔案系統（如 ext2 和 ext3）在建立新檔案並需要資料區塊時，會尋找一連串（例如 8 個）連續的空閒區塊； 透過找到這樣的一段連續空閒區塊並將其分配給新檔案，檔案系統可保證該檔案的部分內容在硬碟上是連續存放的，從而提升效能。 因此，這種預先分配的策略是分配資料區塊時常見的啟發式做法</p>
+<h2>40.6 Access Paths: Reading and Writing</h2>
+<p>我們已經對檔案和目錄如何儲存在硬碟上有了概念，現在可以開始追蹤讀取或寫入檔案時的操作流程了。 了解在此存取路徑上到底發生了什麼，是建立「檔案系統如何運作」理解的第二個關鍵。 在以下範例中，假設檔案系統已被掛載，因此 superblock 已在記憶體中。 其餘所有結構（例如 inode、目錄）仍然位於硬碟上</p>
+<h3>Reading A File From Disk</h3>
+<p>在這個簡單範例中，假設你只想開啟一個檔案（例如 <code>/foo/bar</code>）、讀取它，然後再關閉它。 為了說明方便，假設該檔案只有 12 KB 大小（也就是 3 個區塊）</p>
+<p>當你執行 <code>open("/foo/bar", O_RDONLY)</code> 時，檔案系統首先必須找到該檔案 <code>bar</code> 的 inode，以取得檔案的基本資訊（如權限、檔案大小等）。 要做到這點，檔案系統必須能找到這個 inode，但目前僅有的是完整路徑名稱。 檔案系統因此需要走訪（traverse）這個路徑，才能定位到目標 inode</p>
+<p>所有的走訪都從檔案系統根目錄（<code>/</code>）開始，因此檔案系統會先從硬碟中讀取根目錄的 inode。 但是這個 inode 在哪裡？ 要找到 inode，就必須知道它的 i-number。 通常，我們會在該檔案或目錄的父目錄裡找到它的 i-number，但根目錄沒有父目錄（定義如此）。 因此，根目錄的 i-number 必須是「眾所皆知」的，檔案系統在掛載時就需要知道這個值。 在大多數 UNIX 檔案系統中，根目錄的 i-number 是 2。 因此過程開始時，檔案系統會讀取包含 i-number 為 2 的那個區塊（也就是第一個 inode 區塊）</p>
+<p>一旦讀入了那個 inode，檔案系統就能查看其中的指標，找到儲存根目錄內容的資料區塊位置。 接著，檔案系統會利用這些硬碟指標逐一讀取目錄區塊，此例中是要尋找名稱為 <code>foo</code> 的條目。 透過讀取一個或多個目錄資料區塊，我們就能找到 <code>foo</code> 的條目，找到後，檔案系統就能獲得 <code>foo</code> 對應的 inode 編號（假設為 44）了</p>
+<p>接下來就是遞迴地走訪整個路徑，直到找到目標 inode 為止。 在此範例中，檔案系統先讀取儲存 <code>foo</code> 的 inode 的區塊，然後讀取 <code>foo</code> 目錄資料，最終找到 <code>bar</code> 的 inode 編號。 <code>open()</code> 的最後一步是將 <code>bar</code> 的 inode 讀到記憶體； 接著，檔案系統會進行最後的權限檢查，並在該 process 的「已開啟檔案表」中分配一個檔案描述符（file descriptor），然後將它傳回給使用者</p>
+<p>一旦完成 <code>open</code>，程式就能呼叫 <code>read()</code> 系統呼叫來讀取檔案。 第一次讀取（若沒先呼叫 <code>lseek()</code>，則從偏移量 0 開始）會讀取檔案的第一個區塊，並且參考 inode 找到該區塊在硬碟上的位置； 同時也可能更新 inode 中的「最後存取時間」。 <code>read()</code> 還會更新記憶體中「已開啟檔案表」裡這個檔案描述符對應的欄位，把檔案偏移量移到下一個位置，如此下一次 <code>read()</code> 就會讀取到第二個檔案區塊，依此類推</p>
+<p>相對地，你會發現要關閉該檔案，工作就少很多，只需要釋放掉那個檔案描述符就可以了，此時不會有任何硬碟 I/O 操作。 整個流程可參見圖 40.3，圖中時間由上至下遞增。 開啟檔案時會觸發多次讀取，才能定位到檔案的 inode。 之後，讀取每個區塊都要先查詢 inode，然後讀取該區塊，接著再以寫入方式更新 inode 中的「最後存取時間」</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>請花些時間理解這些步驟。 另外要注意，open 所產生的 I/O 數量與路徑長度成正比。 路徑中每多一層目錄，就必須讀取該目錄的 inode 及其資料。 若目錄很大，情況會更糟：此例只需讀取一個區塊即可取得目錄內容，但如果目錄內容散落在多個區塊，就可能要讀取多個資料區塊才能找到目標條目。 讀取檔案往往已夠麻煩了，但後面你將發現，寫入檔案（尤其是建立新檔案）則更為複雜</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>ASIDE：讀取時不會存取分配結構</p>
+<p>我們見過許多學生被位元圖等分配結構搞得很困惑。 特別是，很多人常以為只要在讀取檔案而沒有分配新區塊時，仍會去查詢位元圖。 事實並非如此！分配結構（例如位元圖）僅在需要分配時才會被存取。 inodes、目錄和間接區塊本身已包含執行讀取請求所需的所有資訊； 若 inode 已指向該區塊，就不必再確認它是否分配過</p>
+</div>
+<h3>Writing A File To Disk</h3>
+<p>寫入檔案的流程與讀取類似。 首先，必須先開啟該檔案（如同上例）。 接著，應用程式可呼叫 <code>write()</code> 來將新內容寫入檔案。 最後，將檔案關閉</p>
+<p>與讀取不同，寫入檔案可能也需要分配新的區塊（若不是覆寫現有區塊）。 當寫入一個新檔案時，每次的 <code>write()</code> 不僅要將資料寫到硬碟，還要先決定要分配哪個區塊給該檔案，並相應更新硬碟上的其他結構（例如資料位元圖和 inode）。 因此，對檔案的每次寫入在邏輯上會產生五次 I/O：</p>
+<ol>
+<li>先讀取資料位元圖（並將其標記為已分配）</li>
+<li>再將更新過的資料位元圖寫回硬碟</li>
+<li>接著讀取 inode</li>
+<li>再將包含新區塊位置的 inode 寫回硬碟</li>
+<li>最後才真正寫入該資料區塊本身</li>
+</ol>
+<p>若考慮到一個簡單且常見的操作 ── 建立檔案，寫入流量會更為龐大。 要建立一個檔案，檔案系統不僅要分配一個 inode，還要在包含新檔案的目錄裡分配空間。 執行這些操作所需的 I/O 數量相當驚人：</p>
+<ol>
+<li>讀取 inode 位元圖（尋找空閒 inode）</li>
+<li>將 inode 位元圖更新為已分配並寫回</li>
+<li>將新 inode 本身寫入硬碟（初始化 inode）</li>
+<li>向目錄的資料區塊寫入一筆記錄（將檔案名稱與 inode 編號連結）</li>
+<li>讀取並更新目錄的 inode（更新目錄大小或時間）</li>
+</ol>
+<p>若目錄需要擴充以容納新條目，就還要額外執行更多 I/O（例如讀取與更新資料位元圖，以及寫入新的目錄區塊）。 僅僅是為了建立一個檔案，就要做上述這麼多工作！</p>
+<p>讓我們看一個具體範例：建立檔案 <code>/foo/bar</code>，並對它寫入三個區塊。 圖 40.4 顯示在 <code>open()</code>（負責建立檔案）以及三次 4 KB 的 <code>write()</code> 期間到底發生了什麼：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>圖中將硬碟的讀/寫作業歸類到觸發它們的系統呼叫下方，並依執行順序由上而下排列。 可以看到建立這個檔案需要做多少工作：本例總共要執行 10 次 I/O，以走訪路徑並最終建立檔案。 你也會看到，每次需分配區塊的寫入都要花 5 次 I/O：先讀取並更新 inode（2 次），再讀取並更新資料位元圖（2 次），最後才將真正的資料寫入（1 次）</p>
+<p>那麼，檔案系統要如何在合理的效率下完成這些繁複工作呢？</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>CRUX：如何降低檔案系統的 I/O 成本</p>
+<p>即便是最簡單的操作，例如開啟、讀取或寫入檔案，都會產生大量散落在硬碟各處的 I/O 作業。 檔案系統該如何做，才能減少如此龐大的 I/O 成本？</p>
+</div>
+<h2>40.7 Caching and Buffering</h2>
+<p>如同上述範例所示，讀寫檔案可能非常昂貴，會引發大量對（緩慢的）硬碟的 I/O 操作。 為了解決這明顯的效能瓶頸，大多數檔案系統會積極利用系統記憶體（DRAM）來快取重要區塊</p>
+<p>試想前述 <code>open()</code> 的範例：若不使用快取，每次開啟檔案都需要在目錄階層中的每一層執行至少兩次讀取（一次讀取該目錄的 inode，還要至少一次讀取該目錄的資料）。 若路徑很長（例如 <code>/1/2/3/.../100/file.txt</code>），單單開啟檔案就要進行數百次讀取操作！</p>
+<p>早期檔案系統因此引入了固定大小的快取，用來存放熱門區塊。 就像虛擬記憶體中所討論的，會採用 LRU（最近最少使用）等策略及其變體來決定哪些區塊保留在快取中。 這個固定大小的快取通常會在開機時配置，大約佔用總記憶體的 10%</p>
+<p>然而，這種將記憶體靜態分割的做法可能會導致浪費； 如果在某段時間內檔案系統不需要那麼多記憶體，該怎麼辦？ 採用上述固定大小方式時，快取中未使用的頁面無法被重新分配做其他用途，最終只能被浪費掉</p>
+<p>相對地，現代系統採用動態分割的方式。 具體來說，許多現代作業系統將虛擬記憶體頁與檔案系統頁整合到同一個頁面快取 [S00]。 如此一來，系統可依當下虛擬記憶體或檔案系統對記憶體的需求，靈活地分配記憶體</p>
+<p>現在想像在前述的開啟檔案範例中加上快取。 第一次開啟檔案時可能會引發大量 I/O 操作，讀取目錄的 inode 與資料，但隨後若再開啟同一個檔案（或在同一個目錄下的其他檔案），大多數操作會命中快取，無需再執行額外 I/O</p>
+<p>接著考慮快取對寫入的影響。 雖然夠大的快取可以完全避免讀取 I/O，但寫入流量必須寫到硬碟才能持久化。 因此，快取對寫入流量並不像讀取那樣能充當篩選器。 不過，所謂的寫入緩衝（write buffering）確實有多項效能優勢。 首先，延遲寫入可讓檔案系統將多次更新合併成較少的 I/O； 例如，若建立一個檔案時更新了 inode 位元圖，而稍後又建立了另一個檔案再更新該位元圖，緩衝便可將首次更新的寫入延遲，省下一次 I/O</p>
+<p>其次，藉由在記憶體中緩衝多筆寫入，系統便能更有效率地排程後續 I/O，提高效能。 最後，延遲寫入更能完全避免某些寫入； 例如，若某應用程式建立一個檔案，接著又刪除它，若將寫入檔案建立的動作延遲寫到硬碟，就可直接跳過該寫入操作。 這種情況下，對硬碟寫入採取「懶惰」策略反而是一種優勢</p>
+<p>基於以上原因，大多數現代檔案系統會將寫入內容在記憶體中緩衝五到三十秒左右，這是一種折衷：若系統在更新尚未寫入硬碟前發生崩潰，更新內容就會丟失； 但若能在記憶體中保留這些寫入更長時間，就能透過批次、排程，甚至直接避免某些寫入，提升效能</p>
+<p>有些應用程式（例如資料庫）無法接受這種折衷。 因此，為了避免因寫入緩衝而導致意外資料遺失，它們會強制將寫入寫到硬碟，例如呼叫 <code>fsync()</code>、使用繞過快取的直接 I/O 介面，或直接使用原始硬碟介面而完全避開檔案系統。 雖然大多數應用程式都會接受檔案系統所做的折衷，但若預設行為不符合需求，也有足夠的控制機制可讓使用者調整</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>TIP：理解靜態與動態分割</p>
+<p>將資源分配給不同用戶時，可以採用靜態分割或動態分割。 靜態分割只在一開始就將資源劃分成固定比例； 例如，若有兩個使用者要分配記憶體，可以先給使用者 A 一定比例，剩餘部分交給使用者 B。 動態分割則更具彈性，會隨時間調整分配比例； 例如，某段時間內使用者 A 可取得較高比例的硬碟頻寬，之後系統又可改為將更大比例的頻寬分配給使用者 B</p>
+<p>兩種方式各有優缺點。靜態分割可確保每個使用者都獲得一部分資源，一般可提供更可預測的效能，而且實作較簡單。動態分割雖可提高資源利用率（讓需要大量資源的使用者使用原本閒置的資源），但實作更為複雜，且可能導致若干使用者的閒置資源被其他人取得後，在需要時只能花很長時間才能再次取得，效能反而變差。正如常見情況，沒有放諸四海皆準的最佳方法； 應視具體問題而定，選擇最合適的做法。實際上，你不應該一直這麼做嗎？</p>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>TIP：理解持久性與效能之間的折衷</p>
+<p>儲存系統經常向使用者呈現「持久性／效能」的折衷。 如果使用者希望寫入的資料能立即持久化，系統就必須完整地將新寫入的資料提交到硬碟，因而寫入速度較慢（但安全）。 然而，若使用者可以容忍少量資料遺失，系統就能在記憶體中暫緩寫入，稍後再將它們寫入硬碟（在背景執行）。 這會讓寫入動作顯得很快，進而提高表觀效能</p>
+<p>但一旦系統崩潰，尚未寫入硬碟的資料就會遺失，這便是折衷所在。 要正確做出此折衷，最好先瞭解使用該儲存系統的應用需求； 例如，你的瀏覽器下載的最後幾張影像若遺失可能還能接受，但若是銀行帳戶交易的一部分被遺失，就很難接受</p>
+</div>
+<h2>40.8 Summary</h2>
+<p>我們已經看過建構檔案系統所需的基本機制。 每個檔案都必須有一些相關資訊（也就是 metadata），通常儲存在稱為 inode 的結構中。 目錄只是一類特殊的檔案，用來儲存名稱→inode 編號的對應關係。 此外，我們還需要其他結構，例如檔案系統常會使用位元圖（bitmap）之類的結構來追蹤哪些 inode 或資料區塊是空閒或已分配</p>
+<p>檔案系統設計的精彩之處在於它的自由度； 我們在接下來章節中探索的檔案系統，都利用這種自由度來優化不同的面向。 此外，還有許多政策性決策尚未探討。 例如，當建立新檔案時，應該將它放置在硬碟的哪裡？ 這樣的政策，以及其他相關議題，也會在後續章節中進一步探討</p>
+<h2>References</h2>
+<ul>
+<li>
+<p>[A+07] “A Five-Year Study of File-System Metadata” by Nitin Agrawal, William J. Bolosky, John R. Douceur, Jacob R. Lorch. FAST ’07, San Jose, California, February 2007. An excellent recent analysis of how file systems are actually used. Use the bibliography within to follow the trail of file-system analysis papers back to the early 1980s.<br>
+對檔案系統實際使用情況的優秀近年分析，書內附有豐富書目，可追溯檔案系統分析論文至 1980 年代初期</p>
+</li>
+<li>
+<p>[B07] “ZFS: The Last Word in File Systems” by Jeff Bonwick and Bill Moore. Available from: <a href="http://www.ostep.org/Citations/zfs_last.pdf" target="_blank" rel="noopener noreferrer">http://www.ostep.org/Citations/zfs_last.pdf</a>. One of the most recent important file systems, full of features and awesomeness. We should have a chapter on it, and perhaps soon will.<br>
+最新且重要的檔案系統之一：功能強大且令人讚嘆。 值得開一章專門討論，或許不久即會成行</p>
+</li>
+<li>
+<p>[B02] “The FAT File System” by Andries Brouwer. September, 2002. Available online at: <a href="http://www.win.tue.nl/~aeb/linux/fs/fat/fat.html" target="_blank" rel="noopener noreferrer">http://www.win.tue.nl/~aeb/linux/fs/fat/fat.html</a>. A nice clean description of FAT. The file system kind, not the bacon kind. Though you have to admit, bacon fat probably tastes better.<br>
+對 FAT 檔案系統的清晰說明</p>
+</li>
+<li>
+<p>[C94] “Inside the Windows NT File System” by Helen Custer. Microsoft Press, 1994. A short book about NTFS; there are probably ones with more technical details elsewhere.<br>
+關於 NTFS 的短篇著作，可能還有其他更技術性詳盡的書籍可參考</p>
+</li>
+<li>
+<p>[H+88] “Scale and Performance in a Distributed File System” by John H. Howard, Michael L. Kazar, Sherri G. Menees, David A. Nichols, M. Satyanarayanan, Robert N. Sidebotham, Michael J. West. ACM TOCS, Volume 6:1, February 1988. A classic distributed file system; we’ll be learning more about it later, don’t worry.<br>
+經典的分散式檔案系統論文； 稍後我們會深入探討，不用擔心</p>
+</li>
+<li>
+<p>[P09] “The Second Extended File System: Internal Layout” by Dave Poirier. 2009. Available: <a href="http://www.nongnu.org/ext2-doc/ext2.html" target="_blank" rel="noopener noreferrer">http://www.nongnu.org/ext2-doc/ext2.html</a>. Some details on ext2, a very simple Linux file system based on FFS, the Berkeley Fast File System. We’ll be reading about it in the next chapter.<br>
+ext2 檔案系統的內部結構細節說明； ext2 是基於 Berkeley Fast File System (FFS) 的簡易 Linux 檔案系統，下一章將詳述</p>
+</li>
+<li>
+<p>[RT74] “The UNIX Time-Sharing System” by M. Ritchie, K. Thompson. CACM Volume 17:7, 1974. The original paper about UNIX. Read it to see the underpinnings of much of modern operating systems.<br>
+原始 UNIX 系統論文，閱讀它可了解現代作業系統許多基礎概念</p>
+</li>
+<li>
+<p>[S00] “UBC: An Efficient Unified I/O and Memory Caching Subsystem for NetBSD” by Chuck Silvers. FREENIX, 2000. A nice paper about NetBSD’s integration of file-system buffer caching and the virtual-memory page cache. Many other systems do the same type of thing.<br>
+關於 NetBSD 把檔案系統 buffer cache 與虛擬記憶體頁面快取整合的優秀論文，許多現代系統皆採用相同做法</p>
+</li>
+<li>
+<p>[S+96] “Scalability in the XFS File System” by Adan Sweeney, Doug Doucette, Wei Hu, Curtis Anderson, Mike Nishimoto, Geoff Peck. USENIX ’96, January 1996, San Diego, California. The first attempt to make scalability of operations, including things like having millions of files in a directory, a central focus. A great example of pushing an idea to the extreme. The key idea behind this file system: everything is a tree. We should have a chapter on this file system too.<br>
+首個強調作業可擴充性（例如單一目錄內可容納百萬檔案）的 XFS 系統研究。 出色地演示將概念推向極限的做法； 其核心思想：萬物皆樹。 也值得專章介紹</p>
+</li>
+</ul>
+]]></content>
+    <category term="OS"/>
+    <published>2025-06-01T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">OSTEP 39：Files and Directories</title>
+    <id>https://mes0903.github.io/OS/OSTEP/Persistence/39/</id>
+    <link href="https://mes0903.github.io/OS/OSTEP/Persistence/39/"/>
+    <updated>2025-06-01T14:55:52.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>到目前為止，我們已經見到兩個關鍵的作業系統抽象概念：process，它是對 CPU 的虛擬化，以及 address space，它是對記憶體的虛擬化。 這兩項抽象共同作用，讓程式彷彿運行在自己的私有、隔離世界中，彷彿它擁有自己的處理器（或多個處理器），彷彿它擁有自己的記憶體。 這種幻象讓程式開發大幅簡化，因此這種作法如今不僅在桌上型電腦與伺服器上盛行，也愈來愈多地用在所有可程式化平台，包括行動電話等</p>
+<p>在本節中，我們要為虛擬化拼圖再加入一塊關鍵拼圖：持久性儲存。 持久性儲存裝置，例如傳統的硬碟或較新的固態儲存裝置，會將資訊永久儲存（或至少長期保留）。 與電源中斷後內容就會遺失的記憶體不同，持久性儲存裝置可以保持資料完好不變。 因此，作業系統必須對此類裝置格外小心：使用者真正重視的資料就放在這裡</p>]]></summary>
+    <content type="html"><![CDATA[
+<p>到目前為止，我們已經見到兩個關鍵的作業系統抽象概念：process，它是對 CPU 的虛擬化，以及 address space，它是對記憶體的虛擬化。 這兩項抽象共同作用，讓程式彷彿運行在自己的私有、隔離世界中，彷彿它擁有自己的處理器（或多個處理器），彷彿它擁有自己的記憶體。 這種幻象讓程式開發大幅簡化，因此這種作法如今不僅在桌上型電腦與伺服器上盛行，也愈來愈多地用在所有可程式化平台，包括行動電話等</p>
+<p>在本節中，我們要為虛擬化拼圖再加入一塊關鍵拼圖：持久性儲存。 持久性儲存裝置，例如傳統的硬碟或較新的固態儲存裝置，會將資訊永久儲存（或至少長期保留）。 與電源中斷後內容就會遺失的記憶體不同，持久性儲存裝置可以保持資料完好不變。 因此，作業系統必須對此類裝置格外小心：使用者真正重視的資料就放在這裡</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>如何管理持久性裝置？</p>
+<p>作業系統應該如何管理持久性裝置？ API 會是什麼樣子？ 實作上有哪些重要面向？</p>
+<p>在接下來的幾章中，我們將探討管理持久性資料的關鍵技術，重點放在提升效能與可靠性的方法。 不過，我們首先會介紹 API 概觀：也就是你在與 UNIX 檔案系統互動時會看到的介面</p>
+</div>
+<h2>39.1 Files And Directories</h2>
+<p>隨著儲存虛擬化的發展，出現了兩個關鍵的抽象概念。 第一個是檔案，檔案就是一個線性位元組陣列，每一個位元組都可以讀取或寫入。 每個檔案都有某種低階名稱，通常是一個編號，而使用者通常並不知道這個名稱。 由於歷史原因，檔案的低階名稱經常被稱為 inode number（i-number）。 接下來的章節中，我們會學到更多關於 inode 的內容； 目前只要假設每個檔案都有對應的 inode number 即可</p>
+<p>在大多數系統中，作業系統並不會了解檔案的結構（例如，分辨圖片、文字檔，抑或是 C 程式碼）； 相反地，檔案系統的責任僅在於將這些資料持久地儲存在硬碟上，並確保當你再次請求這些資料時，能取回一開始所放進去的內容。 要做到這點並不像看起來那麼簡單</p>
+<p>第二個抽象是目錄，目錄與檔案相同，也有一個低階名稱（也就是 inode number），但目錄的內容相當特別，它包含一組使用者可讀名稱與低階名稱的配對。 例如，假設有一個低階名稱為 “10” 的檔案，並且使用者以 “foo” 這個可讀名稱來指它。 那麼儲存 “foo” 的目錄就會有一個條目（“foo”, “10”），將使用者可讀名稱對映到低階名稱。 目錄中的每個條目可以指向檔案或其他目錄。 透過將目錄放入其他目錄中，使用者可以建構任意的目錄樹（或目錄階層），所有的檔案和目錄都儲存在其中</p>
+<p>目錄階層從根目錄開始（在 UNIX 系統中，根目錄簡稱為 <code>/</code>），並使用某種分隔符號來為後續的子目錄命名，直到指定到目標檔案或目錄。 例如，如果使用者在根目錄 <code>/</code> 中建立了一個名為 <code>foo</code> 的目錄，然後在 <code>foo</code> 內建立了一個名為 <code>bar.txt</code> 的檔案，我們就可以透過其絕對路徑名來參考該檔案，在此情況下就是 <code>/foo/bar.txt</code>。 請參考圖 39.1 了解更複雜的目錄樹； 範例中有效的目錄有 <code>/</code>、<code>/foo</code>、<code>/bar</code>、<code>/bar/bar</code>、<code>/bar/foo</code>； 有效的檔案有 <code>/foo/bar.txt</code> 和 <code>/bar/foo/bar.txt</code></p>
+<div class="center-column">
+<figure><figcaption>（Figure 39.1: An Example Directory Tree）</figcaption></figure>
+</div>
+<p>只要位於檔案系統樹的不同位置，目錄與檔案可以使用相同的名稱（例如，圖中有兩個名為 <code>bar.txt</code> 的檔案，分別是 <code>/foo/bar.txt</code> 和 <code>/bar/foo/bar.txt</code>）</p>
+<p>你可能也注意到，本例中的檔名通常有兩個部分：<code>bar</code> 與 <code>txt</code>，以句點分隔。 第一部分是任意名稱，第二部分通常用來表明檔案類型，例如它是 C 程式碼（例如 <code>.c</code>）、影像（例如 <code>.jpg</code>）、或音樂檔（例如 <code>.mp3</code>）。 然而，這通常只是慣例：通常並不強制要求名為 <code>main.c</code> 的檔案內一定要是 C 原始程式碼</p>
+<p>由此可見，檔案系統提供了一項重要功能：為所有感興趣的檔案提供一種方便的命名方式。 命名在系統中非常重要，因為存取任何資源的第一步就是能夠對它進行命名。 在 UNIX 系統中，檔案系統提供了一種統一方式來存取位於硬碟、USB 隨身碟、光碟、許多其他裝置，甚至其他許多東西的檔案，這些都位於同一個目錄樹之下</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>仔細思考命名</p>
+<p>命名是電腦系統中重要的一環 [SK09]。 在 UNIX 系統中，幾乎所有你能想到的東西都透過檔案系統進行命名。 不僅是檔案，裝置、pipe，甚至執行緒 [K84] 都可以在看似普通的檔案系統中找到。 這種命名的一致性能使你對系統的概念模型更為簡潔，並且讓系統更簡單、更模組化。 因此，無論何時建立系統或介面，都要仔細斟酌所使用的名稱</p>
+</div>
+<h2>39.2 The File System Interface</h2>
+<p>現在讓我們更詳細地討論檔案系統介面。 我們將從建立、存取和刪除檔案的基本操作開始，過程中我們還會介紹一個用於移除檔案的系統呼叫，稱為 <code>unlink()</code></p>
+<h2>39.3 Creating Files</h2>
+<p>我們先從最基本的操作開始：建立檔案。 這可以透過 open 系統呼叫來完成； 呼叫 <code>open()</code> 並傳遞 <code>O_CREAT</code> 標誌，程式就能建立一個新的檔案。 以下是一段範例程式碼，用來在目前工作目錄中建立名為 “foo” 的檔案：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_CREAT </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_WRONLY </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_TRUNC</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">S_IRUSR </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> S_IWUSR</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p><code>open()</code> 接收多種不同的旗標。 在此範例中，第二個參數會在檔案不存在時建立檔案（<code>O_CREAT</code>），確保該檔案只能寫入（<code>O_WRONLY</code>），並且如果檔案已經存在，則將其截斷為零位元組長度，因此移除任何已存在的內容（<code>O_TRUNC</code>）。 第三個參數用來指定權限，此例中讓檔案對擁有者可讀且可寫</p>
+<p><code>open()</code> 的一個重要面向是它的回傳值：file descriptor。 file descriptor 是一個整數，每個 process 內部都會有這個成員，在 UNIX 系統中用來存取檔案； 因此，一旦檔案被開啟，就可以使用該 file descriptor 來讀取或寫入檔案，前提是你具有相應的權限。 從這個角度來看，file descriptor 就是一種 capability [L84]，也就是一個不透明的手柄，賦予你執行特定操作的能力。 另一個思考 file descriptor 的方式是，將它視為指向 file 類型物件的指標； 一旦你擁有這樣的物件，就能呼叫其他「方法」來存取檔案，例如 <code>read()</code> 和 <code>write()</code>（我們稍後將看到如何使用）</p>
+<p>如上述所述，file descriptors 由作業系統在每個 process 內部進行管理。 這表示在 UNIX 系統的 proc 結構中會保留某種簡單的結構（例如陣列）。 以下是 xv6 核心中相關的程式碼片段 [CK+08]：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> proc {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ...</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> file </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">ofile</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[NOFILE];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Open files</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ...</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這個簡單的陣列（最多可開啟 <code>NOFILE</code> 個檔案），以 file descriptor 為索引，用來追蹤每個 process 已開啟的檔案。 陣列的每個條目實際上只是一個指向 struct file 的指標，用以跟蹤關於正在讀取或寫入的檔案的資訊； 我們稍後會進一步討論此部分</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p><code>creat()</code> 系統呼叫</p>
+<p>建立檔案的舊方法是呼叫 <code>creat()</code>，如下所示：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// option: add second flag to set permissions</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> creat</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>你可以將 <code>creat()</code> 視為帶有以下旗標的 <code>open()</code>：<code>O_CREAT | O_WRONLY | O_TRUNC</code>。 由於 <code>open()</code> 能夠建立檔案，因此 <code>creat()</code> 的使用已逐漸不再流行（事實上，它可直接實作為開啟 <code>open()</code> 的函式庫呼叫）； 然而，它在 UNIX 傳奇中仍佔有特殊地位，之前有人問 Ken Thompson 如果重新設計 UNIX，他會做哪些不同的事時，他回答：「我會把 creat 拼成 c-r-e-a-t-e」</p>
+</div>
+<h2>39.4 Reading And Writing Files</h2>
+<p>一旦我們擁有了一些檔案，當然可能會想要讀取或寫入它們，讓我們先從讀取現有檔案開始。 如果我們在命令列輸入，我們可能會直接使用 cat 程式將檔案內容輸出到螢幕：</p>
+<div class="language-cmd line-numbers-mode" data-highlighter="shiki" data-ext="cmd" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> echo</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> hello</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> foo</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> cat</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> foo  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">hello  </span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在這段程式碼中，我們將 echo 程式的輸出重新導向到檔案 foo，這樣 foo 就會包含「hello」這個字串。 接著我們使用 cat 來檢視該檔案的內容。 但 cat 程式是如何存取檔案 foo 的？</p>
+<p>為了找出這個問題，我們將使用一個非常有用的工具來追蹤程式所呼叫的系統呼叫。 在 Linux 上，此工具稱為 <code>strace</code>； 其他系統也有類似的工具（例如在 Mac 上的 <code>dtruss</code>，或在某些較舊 UNIX 變體上的 <code>truss</code>）。 <code>strace</code> 的作用是在程式執行期間追蹤它所發出的每個系統呼叫，並將追蹤結果輸出到螢幕供你查看</p>
+<p>以下是一個使用 <code>strace</code> 來了解 <code>cat</code> 正在做什麼的範例（為了可讀性我們移除了部分呼叫）：</p>
+<div class="language-cmd line-numbers-mode" data-highlighter="shiki" data-ext="cmd" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> strace</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> cat foo  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">...  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> O_RDONLY</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">|</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">O_LARGEFILE</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) = </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">read</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"hello\n"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4096</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) = </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">write</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"hello\n"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) = </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">hello  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">read</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">""</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4096</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) = </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">close</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) = </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">...  </span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>cat</code> 做的第一件事是以讀取模式打開該檔案，我們需要注意幾點； 第一，此檔案僅以讀取模式開啟（未以寫入模式開啟），這由 <code>O_RDONLY</code> 標誌顯示； 第二，使用了 64 位元的偏移量（<code>O_LARGEFILE</code>）； 第三，<code>open()</code> 呼叫成功並回傳一個 file descriptor，其值為 3</p>
+<p>為什麼第一次呼叫 <code>open()</code> 會回傳 3，而不是像你預期的 0 或 1 呢？ 事實上，每個執行中的 process 已經有三個檔案被打開，分別是標準輸入（process 可透過它讀取輸入）、標準輸出（process 可寫入它以便將資訊輸出到螢幕）以及標準錯誤（process 可寫入它來輸出錯誤訊息）。 這三個分別以 file descriptor 0、1 和 2 來表示。 因此，當你第一次打開另一個檔案（如上述 <code>cat</code> 中所示），它幾乎必定會成為 file descriptor 3</p>
+<p>在 <code>open()</code> 成功之後，<code>cat</code> 會使用 <code>read()</code> 系統呼叫反覆地從檔案讀取一些位元組。 <code>read()</code> 的第一個參數是 file descriptor，告訴檔案系統要讀取哪個檔案； 一個 process 當然可以同時打開多個檔案，因此透過該 descriptor，作業系統才能知道特定的 read 呼叫指向哪個檔案</p>
+<p>第二個參數是指向一個緩衝區，<code>read()</code> 的結果將存放於此； 在上述的系統呼叫追蹤中，<code>strace</code> 顯示了 <code>read</code> 的結果（“hello”）。 第三個參數是緩衝區大小，此例中為 4 KB。 <code>read()</code> 呼叫也成功回傳，在此回傳它所讀取的位元組數（6，包括 “hello” 這五個字母與一個換行符號）</p>
+<p>此時，你會看到 <code>strace</code> 的另一個有趣結果：有個單一的 <code>write()</code> 系統呼叫，其目標是 file descriptor 1。 如我們先前所述，此 descriptor 被稱為標準輸出，因此用於將「hello」這個字串寫到螢幕上，符合 <code>cat</code> 程式的預期行為。 但它是直接呼叫 <code>write()</code> 嗎？ 也許是（若程式高度最佳化）。 但如果不是的話，<code>cat</code> 可能會呼叫函式庫例程 <code>printf()</code>； 在內部，<code>printf()</code> 會處理所有傳給它的格式化細節，最終將結果寫入標準輸出，並顯示在螢幕上</p>
+<p>接著，<code>cat</code> 程式會嘗試從該檔案讀取更多內容，但由於檔案中已經沒有剩餘位元組，<code>read()</code> 便回傳 0，程式遂藉此判斷已經讀取完整個檔案。 因此，程式呼叫 <code>close()</code>，將對應的 file descriptor 傳入，以表示已經完成對檔案 “foo” 的操作。 該檔案隨即關閉，讀取動作也隨之結束</p>
+<p>寫入檔案的操作由類似步驟完成。 首先，以寫入模式打開檔案，接著呼叫 <code>write()</code> 系統呼叫（對於較大的檔案可能會重複呼叫），最後呼叫 <code>close()</code>。 你可以使用 <code>strace</code> 追蹤對檔案的寫入動作，例如追蹤你自己撰寫的程式，或是追蹤 <code>dd</code> 工具（例如 <code>dd if=foo of=bar</code>）</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>使用 <code>strace</code>（以及類似工具）</p>
+<p><code>strace</code> 工具提供了一種很棒的方法來觀察程式在做什麼。 執行它後，你可以追蹤程式所呼叫的系統呼叫、檢視參數與回傳代碼，並大致了解系統在運作的狀況</p>
+<p>該工具還接受一些相當有用的參數。 例如，<code>-f</code> 會追蹤任何被 fork 出來的子程序； <code>-t</code> 會在每次呼叫時報告當前時間； <code>-e trace=open,close,read,write</code> 只追蹤這些系統呼叫並忽略所有其他呼叫。 旗標還有許多種； 請閱讀 man page，了解如何運用這個出色的工具</p>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>DATA STRUCTURE — 已開啟檔案表（THE OPEN FILE TABLE）</p>
+<p>每個 process 都會維護一個 file descriptor 陣列，其中每個元素都參照系統範圍內的「已開啟檔案表」中的一個條目。 此表中的每個條目都會追蹤該 descriptor 所指向的底層檔案、目前的偏移量，以及其他相關細節（如該檔案是否可讀或可寫）</p>
+</div>
+<h2>39.5 Reading And Writing, But Not Sequentially</h2>
+<p>到目前為止，我們已經討論了如何讀取和寫入檔案，但所有存取都是順序式的； 也就是說，我們要麼從頭到尾讀取檔案，要麼從頭到尾寫入檔案。 然而，有時能夠在檔案內的特定偏移位置讀取或寫入非常有用； 例如，如果你在文字文件上建立索引，並用它來查找特定字詞，你就可能需要從文件中的某些隨機偏移處開始讀取</p>
+<p>為此，我們將使用 <code>lseek()</code> 系統呼叫。 其函式原型如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">off_t</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> lseek</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> fildes</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> off_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> offset</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> whence</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>第一個參數是熟悉的 file descriptor。 第二個參數是 offset，它將檔案偏移設定位於檔案內的某個位置。 第三個參數名為 whence，出於歷史原因如此命名，它決定了如何執行 seek。 根據 man page：</p>
+<ul>
+<li>若 whence 為 <code>SEEK_SET</code>，則偏移設置為 offset 位元組</li>
+<li>若 whence 為 <code>SEEK_CUR</code>，則偏移設置為當前位置加上 offset 位元組</li>
+<li>若 whence 為 <code>SEEK_END</code>，則偏移設置為檔案大小加上 offset 位元組</li>
+</ul>
+<p>由此描述可知，對於每個 process 打開的檔案，OS 都會追蹤一個「目前」的偏移。 其更新方式有兩種：第一種是當執行 N 位元組的讀取或寫入時，就將 N 加到目前偏移； 因此每次讀取或寫入都會隱含地更新偏移。 第二種則是使用 <code>lseek</code> 顯式更改偏移，根據上述規則執行</p>
+<p>如你所料，偏移值保存在先前提到的 struct file 中，並由 struct proc 所參照。 以下是 xv6 中該結構的（簡化）定義：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> file {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ref;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> readable;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> writable;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> inode </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">ip;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  uint</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> off;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如你在結構中所見，OS 可以利用它來判斷已開啟的檔案是否可讀或可寫（或兩者皆可）、它所參照的底層檔案（由 <code>struct inode</code> 的指標 <code>ip</code> 所指向）以及目前偏移（<code>off</code>）。 此結構還包含一個參考計數（<code>ref</code>），我們稍後會進一步探討</p>
+<p>這些 file 結構代表系統中所有目前已開啟的檔案； 合在一起，有時稱為「已開啟檔案表」。 xv6 核心將它們當作一個陣列來保存，並為整個表配置一把鎖：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> spinlock lock;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> file </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">file</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[NFILE];</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} ftable</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>讓我們透過幾個範例來澄清這個概念。 首先，假設有個 process 打開了一個大小為 300 位元組的檔案，並透過重複呼叫 <code>read()</code> 系統呼叫來讀取檔案，每次讀取 100 位元組。 底下列出相關系統呼叫的追蹤結果，以及每個系統呼叫回傳的值，還有針對該檔案存取在已開啟檔案表中的目前偏移值：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>從追蹤結果中可以注意到幾項重點。 首先，你可以看到當檔案被開啟時，目前偏移會初始化為零。 接著，你會看到隨著 process 每次呼叫 <code>read()</code>，該偏移會遞增； 這讓 process 只要一直呼叫 <code>read()</code> 就能輕鬆取得下一段檔案內容。 最後，你可以看到當嘗試在檔案結尾之後執行 <code>read()</code> 時會回傳零，藉此告知 process 已經完整地讀取了整個檔案</p>
+<p>接下來，我們假設有個 process 先後兩次打開了相同的檔案，並對它們各自執行讀取的情況：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>在此範例中，會分別配置兩個 file descriptor（3 和 4），它們各自對應到已開啟檔案表中的不同條目（此例中是條目 10 和 11，如表格標題所示； OFT 代表 Open File Table）。 如果你仔細追蹤，就會看到每個目前偏移都是獨立更新的</p>
+<p>在最後一個範例中，process 在讀取之前先使用 <code>lseek()</code> 重新設定目前偏移； 在這種情況下，只需要單一的已開啟檔案表條目（就如第一個範例一樣）。 此處，首先呼叫 <code>lseek()</code> 將目前偏移設為 200。 隨後的 <code>read()</code> 就會讀取接下來的 50 位元組，並相應地更新目前偏移</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>呼叫 <code>lseek()</code> 並不會執行硬碟搜尋</p>
+<p><code>lseek()</code> 這個名稱不佳的系統呼叫讓許多試圖了解硬碟及其上層檔案系統運作方式的學生感到困惑。 請不要將兩者混淆！ <code>lseek()</code> 呼叫僅僅更改 OS 記憶體中的一個變數，用來追蹤特定 process 下一次讀取或寫入將從哪個偏移開始</p>
+<p>而硬碟搜尋會在硬碟的讀取或寫入的目標磁道與上次讀寫的磁道不同時發生，此時就需要移動磁頭。 更令人混淆的是，呼叫 <code>lseek()</code> 後如果對檔案的隨機位置進行讀寫，確實會導致更多的硬碟搜尋。 因此，呼叫 <code>lseek()</code> 可能會導致接下來的讀取或寫入產生搜尋，但它本身絕對不會引起任何硬碟 I/O operations</p>
+</div>
+<h2>39.6 Shared File Table Entries: <code>fork()</code> And <code>dup()</code></h2>
+<p>在許多情況下（如上述範例所示），file descriptor 與開啟檔案表中的條目之間是一對一的對應。 例如，當一個 process 執行時，可能會決定打開一個檔案、讀取它，然後關閉它； 在這種情況下，該檔案在開啟檔案表中會擁有唯一的條目。 即使有其他 process 同時讀取同一個檔案，它們也各自會在開啟檔案表中有自己的條目。 透過這種方式，每個對檔案的邏輯讀取或寫入都是獨立的，並且在存取該檔案時，各自都擁有自己的目前偏移</p>
+<p>不過，也有一些有趣的情況，讓開啟檔案表中的條目會被共享。其中一種情況發生在父 process 使用 fork() 建立子 process 時。 圖 39.2 顯示了一段簡短的程式碼，父 process 建立子 process 後再等待它完成。 子 process 透過呼叫 <code>lseek()</code> 調整目前偏移，然後結束。 最後，父 process 在等待子 process 後，檢查目前偏移並將其值輸出：</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argv</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">[]</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"file.txt"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, O_RDONLY);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fork</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> lseek</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, SEEK_SET);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    printf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"child: offset </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">%d</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, rc);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  else</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">wait</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    printf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"parent: offset </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">%d</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">lseek</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, SEEK_CUR));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 39.2: Shared Parent/Child File Table Entries (fork-seek.c)）</p>
+</div>
+<p>當我們執行此程式時，會看到以下輸出：</p>
+<div class="language-cmd line-numbers-mode" data-highlighter="shiki" data-ext="cmd" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt; ./</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">fork</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">seek</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">child: offset </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">parent: offset </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>圖 39.3 顯示了將每個 process 的私有 descriptor 陣列、共享的開啟檔案表條目，以及該條目對底層檔案系統 inode 之參照連結起來的關係。 請注意，我們在此終於實際使用了參考計數。 當某個檔案表條目被共享時，其參考計數會遞增； 只有當兩個 process 都關閉該檔案（或結束）時，該條目才會被移除</p>
+<div class="center-column">
+<figure><figcaption>（Figure 39.3: Processes Sharing An Open File Table Entry）</figcaption></figure>
+</div>
+<p>在父 process 與子 process 之間共享開啟檔案表條目有時相當有用。 例如，若你建立多個共同協作處理某項任務的 process，它們可以寫入同一個輸出檔案而不需額外協調。 如要進一步了解在呼叫 <code>fork()</code> 時 processes 之間會共享什麼，請參閱 man page</p>
+<p>另一個有趣且或許更實用的共享案例發生於 <code>dup()</code> 系統呼叫（及其親戚 <code>dup2()</code> 與 <code>dup3()</code>）。 <code>dup()</code> 呼叫讓 process 能建立一個新的 file descriptor，該 descriptor 指向與某現有 descriptor 相同的底層已開啟檔案。 圖 39.4 顯示了一段簡短程式碼，說明如何使用 <code>dup()</code>：</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argv</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">[]</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"README"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, O_RDONLY);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd2 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> dup</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fd);</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // now fd and fd2 can be used interchangeably</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 39.4: Shared File Table Entry With dup() (dup.c)）</p>
+</div>
+<p><code>dup()</code> 呼叫（尤其是 <code>dup2()</code>）在撰寫 UNIX shell 並執行像輸出重導向等操作時相當有用； 花點時間想想原因吧！</p>
+<h2>39.7 Writing Immediately With <code>fsync()</code></h2>
+<p>大多數情況下，當程式呼叫 <code>write()</code> 時，它只是告訴檔案系統：請在未來某個時刻，將這些資料寫入持久性儲存。 基於效能考量，檔案系統會將這些寫入先在記憶體中緩衝一段時間（例如 5 秒或 30 秒），之後這些寫入動作才會實際送到儲存裝置。 對於呼叫的應用程式而言，寫入似乎很快就完成了，只有在極少數情況下（例如機器在 <code>write()</code> 呼叫之後但在寫入硬碟之前當機）資料才會遺失</p>
+<p>然而，有些應用程式需要比這種「最終保證」更多的保障。 例如，在資料庫管理系統（DBMS）中，若要開發正確的復原協定，就需要不時強制將寫入動作同步到硬碟</p>
+<p>為了支援這類應用程式，多數檔案系統會提供一些額外的控制 API。 在 UNIX 世界中，提供給應用程式的介面稱為 <code>fsync(int fd)</code>。 當一個 process 對特定的 file descriptor 呼叫 <code>fsync()</code> 時，檔案系統就會強制將該 file descriptor 所指向的檔案中所有尚未寫入的資料（dirty）同步到硬碟。 <code>fsync()</code> 會在所有這些寫入完成後才回傳</p>
+<p>以下是一個使用 <code>fsync()</code> 的簡單範例程式碼。 該程式先開啟檔案 foo，寫入一個資料區塊，接著呼叫 <code>fsync()</code>，以確保寫入立即強制執行到硬碟。 一旦 <code>fsync()</code> 回傳，應用程式就可以放心繼續，因為資料已確實被持久化（前提是 <code>fsync()</code> 已正確實作）</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_CREAT </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_WRONLY </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_TRUNC</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> S_IRUSR </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> S_IWUSR</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> -</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> write</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> buffer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fsync</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">rc </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>有趣的是，這樣的一連串操作並不保證你所期望的一切； 在某些情況下，你還需要對包含該檔案 <code>foo</code> 的目錄執行 <code>fsync()</code>。 加入這一步驟可確保不僅只能將該檔案本身寫入硬碟，若該檔案是新建立的，還可以確保它穩定地成為目錄的一部分。 不出所料，這類細節經常被忽略，導致許多應用程式層級的錯誤 [P+13,P+14]</p>
+<h2>39.8 Renaming Files</h2>
+<p>一旦我們擁有了一個檔案，有時能夠為該檔案給予不同的名稱非常有用。 在命令列輸入時，我們可以使用 <code>mv</code> 指令達成此目的； 在此範例中，檔案 <code>foo</code> 被重新命名為 <code>bar</code>：</p>
+<div class="language-cmd line-numbers-mode" data-highlighter="shiki" data-ext="cmd" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> mv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> foo bar</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>使用 <code>strace</code>，我們可以看到 <code>mv</code> 會呼叫系統呼叫 <code>rename(char *old, char *new)</code>，該呼叫僅接受兩個參數：檔案的原始名稱（<code>old</code>）與新名稱（<code>new</code>）</p>
+<p><code>rename()</code> 呼叫提供了一個有趣的保證：在系統當機時，它（通常）會以原子方式實作。 如果系統在重新命名過程中當機，該檔案要麼保留舊名稱，要麼已用新名稱，永遠不會出現奇怪的中間狀態，因此，<code>rename()</code> 對於支援需要對檔案狀態進行原子更新的某些應用程式非常關鍵</p>
+<p>讓我們更具體一點來說明。 假設你正在使用一個檔案編輯器（例如 emacs），並將一行文字插入到檔案的中間，此範例中，檔案名稱為 <code>foo.txt</code>，編輯器可能會透過下列方式更新檔案，以保證新檔案在原始內容之後插入該行文字（此處簡化，不考慮錯誤檢查）：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo.txt.tmp"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_WRONLY </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_CREAT </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> O_TRUNC</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> S_IRUSR </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> S_IWUSR</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">write</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> buffer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // write out new version of file</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">fsync</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">close</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rename</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"foo.txt.tmp"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "foo.txt"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此範例中，編輯器所做的動作很簡單：先將檔案的新版本以暫時名稱（<code>foo.txt.tmp</code>）寫出，然後呼叫 <code>fsync()</code> 強制將其同步到硬碟，當應用程式確定新的檔案內容與元資料已在硬碟上時，再將暫時檔案重新命名為原始檔案名稱。 此最後步驟可原子地將新檔案替換到原位，同時刪除舊版本，從而達成原子性檔案更新</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p><code>mmap()</code> 與持久性記憶體（Guest Aside by Terence Kelly）</p>
+<p>記憶體映射是一種存取檔案中持久性資料的替代方式，<code>mmap()</code> 系統呼叫可在檔案的位元組偏移量與呼叫 process 的虛擬地址之間建立對應； 前者稱為 backing file，後者稱為其在記憶體中的映像</p>
+<p>接著，process 可使用 CPU 指令（即 <code>load</code> 與 <code>store</code>）來存取這個 backing file 的記憶體映像。 透過將檔案的持久性與記憶體的存取語意結合，檔案輔助的記憶體映射支援一種名為 persistent memory 的軟體抽象。 採用 persistent memory 程式設計風格，可消除記憶體與儲存之間不同資料格式的轉換，從而簡化應用程式 [K19]</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">p </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> mmap</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">NULL</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> file_size</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> PROT_READ </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">|</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> PROT_WRITE</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> MAP_SHARED</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">p </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> MAP_FAILED</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> argc; i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">strcmp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i], </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"pop"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // pop</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">n</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &gt;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // stack not empty</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">      printf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">%d</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">stack</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">--</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  else</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                                                          // push</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">pstack_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> +</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">n</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> file_size)</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // stack not full</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">      p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">stack</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">p</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">n</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> atoi</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[i]);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>程式 <code>pstack.c</code>（包含於 OSTEP 程式碼 GitHub 倉庫中，上方片段即此程式）會在檔案 <code>ps.img</code> 中儲存一個持久性堆疊（stack），該檔案的一開始即為一堆零位元組，這可於命令列中使用 <code>truncate</code> 或 <code>dd</code> 工具建立</p>
+<p>該檔案包含堆疊大小的計數，以及一個存放堆疊內容的整數陣列。 在對 backing file 進行 <code>mmap()</code> 映射之後，我們可以使用指向記憶體映像的指標來存取堆疊，例如 <code>p-&gt;n</code> 可存取堆疊中的項目數量，<code>p-&gt;stack</code> 即是整數陣列。 由於該堆疊是持久性堆疊，因此一次 <code>pstack</code> 執行 <code>push</code> 的資料可由下一次執行 <code>pop</code></p>
+<p>若在執行 <code>push</code> 的遞增與指派之間發生當機，可能會導致我們的持久性堆疊處於不一致狀態。 應用程式可透過使用在面對失敗時能原子性更新持久性記憶體的機制來防止此類損害 [K20]</p>
+</div>
+<h2>39.9 Getting Information About Files</h2>
+<p>超越一般的檔案存取，我們期望檔案系統能保存相當多關於每個檔案的資訊，這些關於檔案的資料通常稱為 metadata。 要查看某個檔案的 metadata，可以使用 <code>stat()</code> 或 <code>fstat()</code> 這兩個系統呼叫。 這些呼叫會接收一個檔案的路徑名稱（或 file descriptor），並將相關資訊填入如圖 39.5 所示的 <code>stat</code> 結構中：</p>
+<div class="center-column">
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> stat {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  dev_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_dev;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // ID of device containing file</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  ino_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_ino;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // inode number</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  mode_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_mode;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // protection</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  nlink_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_nlink;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">     // number of hard links</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  uid_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_uid;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // user ID of owner</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  gid_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_gid;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // group ID of owner</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  dev_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_rdev;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">        // device ID (if special file)</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  off_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_size;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">        // total size, in bytes</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  blksize_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_blksize;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // blocksize for filesystem I/O</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  blkcnt_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_blocks;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">   // number of blocks allocated</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  time_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_atime;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">      // time of last access</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  time_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_mtime;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">      // time of last modification</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  time_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> st_ctime;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">      // time of last status change</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>（Figure 39.5 : The stat structure.）</p>
+</div>
+<p>可以看到，關於每個檔案儲存了很多資訊，包括檔案大小（以位元組為單位）、其低階名稱（也就是 inode number）、部分所有權資訊，以及檔案何時被存取或修改的時間等。 若想查看這些資訊，可以使用命令列工具 <code>stat</code>。 以下範例中，我們先建立一個名為 file 的檔案，然後使用 <code>stat</code> 命令列工具來檢視該檔案的一些資訊</p>
+<p>以下是在 Linux 上的輸出範例：</p>
+<div class="language-cmd line-numbers-mode" data-highlighter="shiki" data-ext="cmd" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> echo</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> hello</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> file</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">prompt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> stat</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> file</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  File: ‘file’</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  Size: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">6</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Blocks: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">8</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> IO Block: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4096</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> regular file</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Device: 811h/2065d Inode: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">67158084</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Links: </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Access: (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0640</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">/-</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">rw</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">r</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div>]]></content>
+    <category term="OS"/>
+    <published>2025-06-01T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">OSTEP 38：Redundant Disk Arrays (RAID)</title>
     <id>https://mes0903.github.io/OS/OSTEP/Persistence/38/</id>
     <link href="https://mes0903.github.io/OS/OSTEP/Persistence/38/"/>
-    <updated>2025-05-31T17:58:25.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>當我們使用硬碟時，有時會希望它更快，因為 I/O 操作速度較慢，可能成為整個系統的瓶頸。 有時我們會希望它容量更大，隨著越來越多的資料上線，我們的硬碟變得越來越滿。 還有時候我們會希望它更可靠，若硬碟故障，且資料沒有備份，那些珍貴的資料將化為烏有</p>
 <p>因此，我們的問題是：</p>
@@ -148,7 +726,7 @@
 <p>想像有一筆寫入請求送到 RAID，之後 RAID 決定必須將該資料寫入硬碟 0 和硬碟 1。 RAID 先向硬碟 0 發出寫請求，但在 RAID 還沒來得及向硬碟 1 發送寫請求之前，卻發生斷電（或系統當機）。 在這種不幸情況下，我們假設對硬碟 0 的寫入已經完成（而顯然對硬碟 1 的寫入則未完成，因為從未發出請求）</p>
 <p>這樁突如其來的斷電導致兩份複製開始不一致；硬碟 0 上的複製已經是新版本，硬碟 1 上仍是舊版本。 我們期望的是：兩份硬碟上的狀態要麼同時變為新版本，要麼都維持舊版本，也就是原子性更新（atomic）</p>
 <p>解決此問題的一般做法，是使用某種預寫式日誌（write-ahead log）的機制，在實際執行更新前，先把 RAID 將要做的動作（例如，把某筆資料同時寫到兩顆硬碟）紀錄下來。 如此一來，即便發生當機，也能透過事後執行一次「重做（replay）所有待處理操作」的復原程序，確保鏡像系統中的兩份複製（在 RAID-1 的情況下）不會出現不同步的狀態</p>
-<p>最後要注意，如果每次寫入都要把日誌寫入硬碟，那成本會太高，因此多數 RAID 硬體會內建一小塊非揮發性記憶體（例如帶電池備援的 RAM），用來進行這種日誌紀錄。 因此，RAID 能在不耗費大量磁碟 I/O 的情況下，提供一致性更新機制</p>
+<p>最後要注意，如果每次寫入都要把日誌寫入硬碟，那成本會太高，因此多數 RAID 硬體會內建一小塊非揮發性記憶體（例如帶電池備援的 RAM），用來進行這種日誌紀錄。 因此，RAID 能在不耗費大量硬碟 I/O 的情況下，提供一致性更新機制</p>
 </div>
 <h2>38.6 RAID Level 4: Saving Space With Parity</h2>
 <p>接下來介紹另一種向硬碟陣列中加入冗餘的方法，稱為校驗（parity）。 基於校驗的方案嘗試使用更少的容量，以彌補鏡像系統所付出的巨大空間代價。 但這必然要付出一個代價：效能</p>
@@ -546,7 +1124,7 @@ Seagate 官方提供之 Cheetah 15K.5 系列硬碟規格表；同樣屬於資料
     <title type="text">OSTEP 36：I/O Devices</title>
     <id>https://mes0903.github.io/OS/OSTEP/Persistence/36/</id>
     <link href="https://mes0903.github.io/OS/OSTEP/Persistence/36/"/>
-    <updated>2025-05-31T09:58:36.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>在深入 persistence 的主要內容之前，我們先介紹 I/O 裝置的概念，並說明作業系統如何與此類實體互動。 I/O 對電腦系統當然至關重要； 想像一個沒有任何輸入的程式（每次都產生相同結果），或是一個沒有任何輸出的程式（它執行的目的何在？）。 明顯地，要使電腦系統具有意義，就必須同時具備輸入與輸出</p>
 <p>因此，我們的問題是：如何將 I/O 整合到系統中？ 一般的機制是什麼？ 我們如何讓它們更有效率？</p>
@@ -587,7 +1165,7 @@ Seagate 官方提供之 Cheetah 15K.5 系列硬碟規格表；同樣屬於資料
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>協定包含四個步驟：</p>
 <ol>
 <li>第一步，作業系統不斷讀取狀態暫存器，直到裝置準備好接收命令，我們稱此為輪詢（polling）裝置（基本上就是詢問它目前狀況）</li>
-<li>第二步，作業系統將資料寫入資料暫存器； 例如，若此裝置為磁碟，可能需要多次寫入才能將一個磁碟區塊（例如 4KB）傳送到裝置。 當主 CPU 有參與資料傳輸（如本範例協定所示）時，我們稱之為 programmed I/O（PIO）</li>
+<li>第二步，作業系統將資料寫入資料暫存器； 例如，若此裝置為硬碟，可能需要多次寫入才能將一個硬碟區塊（例如 4KB）傳送到裝置。 當主 CPU 有參與資料傳輸（如本範例協定所示）時，我們稱之為 programmed I/O（PIO）</li>
 <li>第三步，作業系統將命令寫入命令暫存器； 如此做會隱含地告知裝置資料已就緒，並應開始處理該命令</li>
 <li>最後，作業系統再度通過迴圈輪詢裝置，等待其完成（此時可能會取得錯誤代碼以表示成功或失敗）</li>
 </ol>
@@ -665,10 +1243,10 @@ Seagate 官方提供之 Cheetah 15K.5 系列硬碟規格表；同樣屬於資料
 <p>我們在此來快速看看一個實際的裝置：IDE 硬碟驅動器 [L94]。 我們根據此參考文獻 [W10] 摘要描述該協定，並且也會查看 xv6 原始碼，以示範一個可運作 IDE 驅動程式的簡單範例 [CK+08]</p>
 <p>IDE 硬碟對系統提供了一個簡單介面，由四種暫存器組成：control、command block、status 以及 error。 這些暫存器可透過在特定「I/O 位址」（例如下方的 <code>0x3F6</code>）上使用 x86 架構的 <code>in</code> 與 <code>out</code> I/O 指令進行讀寫。 假設裝置已完成初始化，那與之互動的基本協定如下</p>
 <ul>
-<li>等待磁碟準備就緒：讀取 Status Register (<code>0x1F7</code>)，直到磁碟為 <code>READY</code> 且不為 <code>BUSY</code></li>
-<li>將參數寫入 command 暫存器：寫入扇區數量、要存取的扇區的 logical block address (LBA)，以及磁碟編號（<code>master=0x00</code> 或 <code>slave=0x10</code>，因為 IDE 僅允許兩顆磁碟）至 command 暫存器 (<code>0x1F2 ~ 0x1F6</code>)</li>
+<li>等待硬碟準備就緒：讀取 Status Register (<code>0x1F7</code>)，直到硬碟為 <code>READY</code> 且不為 <code>BUSY</code></li>
+<li>將參數寫入 command 暫存器：寫入扇區數量、要存取的扇區的 logical block address (LBA)，以及硬碟編號（<code>master=0x00</code> 或 <code>slave=0x10</code>，因為 IDE 僅允許兩顆硬碟）至 command 暫存器 (<code>0x1F2 ~ 0x1F6</code>)</li>
 <li>啟動 I/O：向 command 暫存器 (<code>0x1F7</code>) 寫入 <code>READ | WRITE</code> 指令</li>
-<li>資料傳輸（寫入時）：等待磁碟狀態為 <code>READY</code> 且 <code>DRQ</code>（磁碟請求資料），然後將資料寫入 data 埠</li>
+<li>資料傳輸（寫入時）：等待硬碟狀態為 <code>READY</code> 且 <code>DRQ</code>（硬碟請求資料），然後將資料寫入 data 埠</li>
 <li>處理中斷：最簡單的情況是每傳輸一個扇區處理一次中斷； 更複雜的做法則允許批次傳輸，直到整個傳輸完成後再觸發最後一次中斷</li>
 <li>錯誤處理：每次操作後都讀取 status 暫存器； 若 ERROR 位元為 1，就讀取 error 暫存器以取得詳細資訊</li>
 </ul>
@@ -762,9 +1340,9 @@ Seagate 官方提供之 Cheetah 15K.5 系列硬碟規格表；同樣屬於資料
 </div>
 <p>該程式（初始化後）透過四個主要函式運作：</p>
 <ul>
-<li>第一個是 <code>ide_rw()</code>，它會將請求排入佇列（若還有其他請求在待處理），或直接透過 <code>ide_start_request()</code> 發送到磁碟； 在任一情況下，此例程都會等待請求完成，並將呼叫的 Process 置於 sleep</li>
-<li>第二個是 <code>ide_start_request()</code>，用來向磁碟發送請求（如果是寫入則同時傳送資料）； 此時會分別呼叫 x86 的 <code>in</code> 與 <code>out</code> 指令來讀取和寫入裝置暫存器</li>
-<li><code>ide_start_request()</code> 會用到第三個函式 <code>ide_wait_ready()</code>，以確保在發出請求前磁碟已經準備就緒</li>
+<li>第一個是 <code>ide_rw()</code>，它會將請求排入佇列（若還有其他請求在待處理），或直接透過 <code>ide_start_request()</code> 發送到硬碟； 在任一情況下，此例程都會等待請求完成，並將呼叫的 Process 置於 sleep</li>
+<li>第二個是 <code>ide_start_request()</code>，用來向硬碟發送請求（如果是寫入則同時傳送資料）； 此時會分別呼叫 x86 的 <code>in</code> 與 <code>out</code> 指令來讀取和寫入裝置暫存器</li>
+<li><code>ide_start_request()</code> 會用到第三個函式 <code>ide_wait_ready()</code>，以確保在發出請求前硬碟已經準備就緒</li>
 <li>最後，當發生中斷時會調用 <code>ide_intr()</code>； 此函式在請求為讀取時會從裝置讀取資料，並喚醒等待 I/O 完成的 Process，若 I/O 佇列中還有其他請求，則會透過 <code>ide_start_request()</code> 啟動下一次 I/O</li>
 </ul>
 <h2>36.9 Historical Notes</h2>
@@ -783,7 +1361,7 @@ Seagate 官方提供之 Cheetah 15K.5 系列硬碟規格表；同樣屬於資料
 </li>
 <li>
 <p>[AD14] “Operating Systems: Three Easy Pieces” (Chapters: Crash Consistency: FSCK and Journaling and Log-Structured File Systems) by Remzi Arpaci-Dusseau and Andrea Arpaci-Dusseau. Arpaci-Dusseau Books, 2014.<br>
-關於檔案系統檢查與日誌結構檔案系統運作原理的章節，深入說明如何在低階層級檢測與修復磁碟裝置錯誤</p>
+關於檔案系統檢查與日誌結構檔案系統運作原理的章節，深入說明如何在低階層級檢測與修復硬碟裝置錯誤</p>
 </li>
 <li>
 <p>[C01] “An Empirical Study of Operating System Errors” by Andy Chou, Junfeng Yang, Benjamin Chelf, Seth Hallem, Dawson Engler. SOSP ’01.<br>
@@ -811,7 +1389,7 @@ xv6 作業系統教學範例，IDE 裝置驅動程式（ide.c）提供了簡潔�
 </li>
 <li>
 <p>[L94] “AT Attachment Interface for Disk Drives” by Lawrence J. Lamers. Reference number: ANSI X3.221, 1994. Available: <a href="ftp://ftp.t10.org/t13/project/d0791r4c-ATA-1.pdf" target="_blank" rel="noopener noreferrer">ftp://ftp.t10.org/t13/project/d0791r4c-ATA-1.pdf</a>.<br>
-關於磁碟驅動器介面標準的官方規範文件，內容較為艱澀，但對深入理解裝置介面非常重要</p>
+關於硬碟驅動器介面標準的官方規範文件，內容較為艱澀，但對深入理解裝置介面非常重要</p>
 </li>
 <li>
 <p>[MR96] “Eliminating Receive Livelock in an Interrupt-driven Kernel” by Jeffrey Mogul, K. K. Ramakrishnan. USENIX ’96, January 1996.<br>
@@ -838,7 +1416,7 @@ Swift 等人重新點燃了微核心式作業系統設計的研究熱潮，並�
     <title type="text">OSTEP 32：Concurrency Bugs</title>
     <id>https://mes0903.github.io/OS/OSTEP/Concurrency/32/</id>
     <link href="https://mes0903.github.io/OS/OSTEP/Concurrency/32/"/>
-    <updated>2025-05-31T10:01:46.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>研究人員多年來投入大量時間與精力研究並行錯誤。 早期研究多聚焦於 deadlock，我們在前章已稍作提及，接下來將深入探討這些主題 [C+71]。 近年則著重於其他常見並行錯誤（即非 deadlock 的錯誤）的研究。 本章將簡要檢視真實程式碼庫中出現的一些並行問題範例，以更清楚了解應注意哪些問題。 因此，本章的核心議題為：</p>
 <div class="hint-container info">
@@ -979,7 +1557,7 @@ Swift 等人重新點燃了微核心式作業系統設計的研究熱潮，並�
 </div>
 <h3>Why Do Deadlocks Occur?</h3>
 <p>如你所想，上述這類簡單 deadlock 看似很容易避免。 例如，只要 Thread 1 和 2 保持相同的鎖取得順序，就不會發生 deadlock。 那麼，為什麼 deadlock 還是會出現？</p>
-<p>其中一個原因是，在大型程式碼庫中，各組件間會產生複雜的相依關係。 以作業系統為例：虛擬記憶體系統可能需要存取檔案系統，將磁碟區塊換入； 而檔案系統又可能需要一頁記憶體來讀取該區塊，進而聯絡虛擬記憶體系統。 因此，在大型系統中設計鎖策略時，必須謹慎考量，以避免程式中自然形成的循環相依導致 deadlock</p>
+<p>其中一個原因是，在大型程式碼庫中，各組件間會產生複雜的相依關係。 以作業系統為例：虛擬記憶體系統可能需要存取檔案系統，將硬碟區塊換入； 而檔案系統又可能需要一頁記憶體來讀取該區塊，進而聯絡虛擬記憶體系統。 因此，在大型系統中設計鎖策略時，必須謹慎考量，以避免程式中自然形成的循環相依導致 deadlock</p>
 <p>另一個原因源自封裝（encapsulation）的本質。 作為軟體開發者，我們被教導要隱藏實作細節，以便以模組化方式建構軟體。 可惜，這種模組化與鎖的機制並不相容。 如 Jula 等人所述 [J+08]，某些看似無害的介面幾乎會誘發 deadlock。 例如，Java 中的 Vector 類別及其 <code>AddAll()</code> method，使用方式如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Vector v1, v2;  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">v1.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">AddAll</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">v2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
@@ -3510,7 +4088,7 @@ Scott 教授與其團隊多年來一直走在並行演算法與資料結構的�
     <title type="text">OSTEP 26：Concurrency and Threads</title>
     <id>https://mes0903.github.io/OS/OSTEP/Concurrency/26/</id>
     <link href="https://mes0903.github.io/OS/OSTEP/Concurrency/26/"/>
-    <updated>2025-05-30T17:44:04.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>到目前為止，我們已經了解作業系統所提供的基本抽象層的演進。 我們看過如何把單一實體 CPU 轉變成多個虛擬 CPU，從而營造出多個程式同時執行的錯覺。 我們也了解如何為每個 process 建立一個龐大且私有的 virtual memory 的假象； 這個 address space 的抽象層讓每個程式都能表現得彷彿擁有自己的記憶體，但實際上 OS 正在背地裡把多個 address space multiplex 到同一份 physical memory（有時甚至 multiplex 到 disk）</p>
 <p>在本章中，我們會為單一執行中的 process 引入一個新的抽象層：thread。 傳統上，我們認為程序裡只有一個執行點（也就是只有一個 PC 負責抓取並執行指令），而一個 multi-threaded 程式則擁有不只一個執行點（也就是多個 PC，各自抓取並執行指令）。 或者換個說法，你可以把每個 thread 想成一個獨立的 process，唯一的差別是它們共享同一個 address space，因此可以存取相同的資料</p>]]></summary>
@@ -3685,7 +4263,7 @@ Scott 教授與其團隊多年來一直走在並行演算法與資料結構的�
 <p>使用原子操作</p>
 <p>原子操作是建構電腦系統時最強大的一種底層技巧，從電腦架構，到 concurrent 程式碼（我們目前的主題），再到檔案系統（很快就會學到）、資料庫管理系統，甚至是 distributed system 都會用到 [L+93]</p>
 <p>把一連串動作設計成「原子」的概念可以用一句話來總結：「要嘛全做，要嘛全不做」； 它看起來應該要像是，你想一起執行的所有動作要麼全發生了，要麼完全沒有發生，而不應該出現任何中間的過渡狀態。 有時候，我們會把多個動作合併成單一個原子操作，稱為 transaction（交易），這個概念在資料庫與交易處理的領域中被深入發展 [GR92]</p>
-<p>在我們探索 concurrency 的主題中，我們會使用同步原語（synchronization primitives）來把短小的指令序列變成原子執行區段（atomic blocks of execution）； 但「原子性」這個概念其實遠不止如此，接下來你會看到它的更廣泛應用。 例如，檔案系統會用 journaling 或 copy-on-write 等技術來讓磁碟上的狀態轉換具備原子性，這對於在系統故障時維持正確運作至關重要。 如果你現在還無法理解這些沒關係，在後面的章節你就會明白了</p>
+<p>在我們探索 concurrency 的主題中，我們會使用同步原語（synchronization primitives）來把短小的指令序列變成原子執行區段（atomic blocks of execution）； 但「原子性」這個概念其實遠不止如此，接下來你會看到它的更廣泛應用。 例如，檔案系統會用 journaling 或 copy-on-write 等技術來讓硬碟上的狀態轉換具備原子性，這對於在系統故障時維持正確運作至關重要。 如果你現在還無法理解這些沒關係，在後面的章節你就會明白了</p>
 </div>
 <h2>26.5 The Wish For Atomicity</h2>
 <p>解決這個問題的一種方式，是設計更強大的指令，讓我們能在單一步驟中完成所需的所有操作，從而消除中斷發生在不合時宜時刻的可能性。 比方說，假設我們有一條超級指令如下：</p>
@@ -3718,7 +4296,7 @@ Scott 教授與其團隊多年來一直走在並行演算法與資料結構的�
 </div>
 <h2>26.7 Summary: Why in OS Class?</h2>
 <p>在結束之前，你可能會有個問題：為什麼我們要在作業系統課程中學這些東西？ 答案可以用一個字來概括：「歷史」。 作業系統是第一個 concurrent 程式，許多相關技術都是為了 OS 而誕生。 後來，隨著 multi-threaded process 的出現，應用程式開發者也不得不開始面對這些問題</p>
-<p>舉例來說，想像有兩個 processes 正在執行。 假設它們都呼叫 <code>write()</code> 來寫入同一個檔案，並都希望是 append，也就是把資料加到檔案的尾端，使其長度變大。 為了做到這件事，它們都必須配置新的磁碟區塊、更新該檔案 inode 中的區塊位置紀錄，並修改檔案大小來反映新的長度（還有其他細節，我們會在本書第三部分深入討論檔案系統）</p>
+<p>舉例來說，想像有兩個 processes 正在執行。 假設它們都呼叫 <code>write()</code> 來寫入同一個檔案，並都希望是 append，也就是把資料加到檔案的尾端，使其長度變大。 為了做到這件事，它們都必須配置新的硬碟區塊、更新該檔案 inode 中的區塊位置紀錄，並修改檔案大小來反映新的長度（還有其他細節，我們會在本書第三部分深入討論檔案系統）</p>
 <p>由於中斷隨時可能發生，凡是負責更新這些共享結構（像是配置用的 bitmap、或是檔案的 inode）的程式碼都屬於 critical section； 因此，自從中斷這個機制被引入開始，OS 設計者就必須非常小心 OS 如何更新其內部資料結構。 如果中斷發生在不合時宜的時候，就會導致上面所描述的各種問題</p>
 <p>因此，也就不令人意外地，像是 page table、process list、檔案系統結構，以及幾乎所有的 kernel data structures 都必須非常小心地存取，並透過適當的同步原語來保證其正確性</p>
 <h2>References</h2>
@@ -7964,7 +8542,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-05-31T17:58:53.416Z</updated>
+    <updated>2025-06-01T14:56:18.353Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -9015,7 +9593,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">OSTEP 23：Complete VM Systems</title>
     <id>https://mes0903.github.io/OS/OSTEP/Virtualization/23/</id>
     <link href="https://mes0903.github.io/OS/OSTEP/Virtualization/23/"/>
-    <updated>2025-05-28T16:54:33.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>在結束對 virtual memory 虛擬化的章節前，讓我們來更深入地看看整個 virtual memory 系統是如何組合起來的。 我們已經看過這些系統中的關鍵元素，包括許多不同設計的 page table、與 TLB 的互動（有時甚至是由 OS 自己處理的）、以及用來決定哪些 page 保留在記憶體、哪些要被踢出去的策略。 然而，要組成一個完整的 virtual memory 系統還有許多其他特性，包括為了效能、功能性與安全性所設計的各種功能</p>
 <div class="hint-container info">
@@ -9041,7 +9619,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>位址空間的下半部稱為「process space」，是每個 process 獨有的。 在 process space 的前半段（P0）中有使用者的程式與往下增長的 heap。 在後半段（P1）則有往上增長的 stack。 位址空間的上半部稱為 system space（S），不過只有其中一半會使用。受保護的 OS code 與資料就放在這裡，OS 也因此能跨 process 共享</p>
 <p>VMS 設計者的一大擔憂是 VAX 硬體中的 page 太小（只有 512 bytes）。 這個歷史原因導致簡單的 linear page table 變得過大。 因此，VMS 設計者的首要目標之一就是避免 page table 吃掉太多記憶體</p>
 <p>VMS 用兩種方式減輕 page table 對記憶體的壓力。 第一是將 user address space 分成兩段，VAX-11 為每個 process 提供 P0 與 P1 各一張 page table，這樣位於 stack 與 heap 之間未使用的空間就不需要配置 page table。 base 與 bounds register 的使用方式一樣，base register 存放該 segment 的 page table 起始位址，bounds 則存放大小（即 page-table entry 的數量）</p>
-<p>第二是 OS 進一步將 user 的 page tables（P0 與 P1）放入 kernel virtual memory 中。 這樣在配置或擴展 page table 時，kernel 就從自己的 virtual memory 中分配空間，也就是 segment S。 如果記憶體壓力太大，kernel 還可以把這些 page table 的 page swap 到磁碟，釋放出 physical memory</p>
+<p>第二是 OS 進一步將 user 的 page tables（P0 與 P1）放入 kernel virtual memory 中。 這樣在配置或擴展 page table 時，kernel 就從自己的 virtual memory 中分配空間，也就是 segment S。 如果記憶體壓力太大，kernel 還可以把這些 page table 的 page swap 到硬碟，釋放出 physical memory</p>
 <p>將 page table 放入 kernel virtual memory 會使得 address translation 更為複雜。 例如，要轉換 P0 或 P1 中的 virtual address 時，硬體要先去找對應的 PTE（在該 process 的 P0 或 P1 表中）；但要做到這點，硬體可能要先查 system page table（位於 physical memory），完成後才能知道 page table 本身在哪裡，最後再完成目標記憶體位置的查詢。 所幸這整個流程大多可由 VAX 的硬體 TLB 加速</p>
 <h3>A Real Address Space</h3>
 <p>研究 VMS 有個很棒的地方是可以看到一個真實的 address space 是怎麼構成的（Figure 23.1）。 到目前為止，我們假設的 address space 都很簡單，只有 user code、data、heap，但實際上如上所示的 address space 要複雜得多</p>
@@ -9065,7 +9643,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 </ul>
 </div>
 <p>將 kernel 映射進每個 address space 有多個理由。 這種做法讓 kernel 的運作更容易，舉例來說，當 OS 接收到 user program 傳進來的 pointer（例如 <code>write()</code> system call）時，要從該 pointer 複製資料到 kernel 的結構就變得容易。 OS 的程式碼也能在不必擔心資料來自哪裡的情況下撰寫與編譯</p>
-<p>反過來說，如果 kernel 完全放在 physical memory 中，要做類似將 page table swap 出磁碟的操作會變得非常麻煩，若 kernel 有自己的 address space，從 user app 與 kernel 之間搬資料也會變得困難與痛苦。 透過這種設計（如今已普遍使用），kernel 幾乎就像是應用程式的一個受保護函式庫</p>
+<p>反過來說，如果 kernel 完全放在 physical memory 中，要做類似將 page table swap 出硬碟的操作會變得非常麻煩，若 kernel 有自己的 address space，從 user app 與 kernel 之間搬資料也會變得困難與痛苦。 透過這種設計（如今已普遍使用），kernel 幾乎就像是應用程式的一個受保護函式庫</p>
 <p>關於這個 address space 的最後一點是保護機制。 顯然 OS 不希望 user app 任意存取 OS 的資料或程式碼，因此，硬體必須支援 page 的不同保護層級來達成這點。 VAX 會透過 page table 中的 protection bits 來指定存取某個 page 所需的 CPU 權限等級。 系統資料與程式碼會設成較高的保護等級，user code 嘗試存取這些內容時會觸發 trap 進入 OS，通常就會終止該 process</p>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
@@ -9086,8 +9664,8 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>為了解決這兩個問題，開發者提出了 segmented FIFO replacement policy [RL81]。 想法很簡單，每個 process 都有一個最多可保留在記憶體中的 page 數量上限，稱為其 resident set size（RSS）。 這些 pages 都會被維護在一個 FIFO list 上，當某個 process 超過其 RSS 時，就會淘汰最早進來的 page。 FIFO 顯然不需要硬體支援，因此很容易實作</p>
 <p>當然，如我們前面所見，純粹的 FIFO 效能並不特別好。 為了改善 FIFO 的效能，VMS 引入了兩個 second-chance lists，pages 在被逐出記憶體前會先放到這些 list 中，分別是 global clean-page free list 與 dirty-page list。 當某個 process P 超過其 RSS 時，會從其 per-process FIFO 中移除一個 page，若是乾淨的（未被修改），就放到 clean-page list 的末端，若是髒的（已被修改），就放到 dirty-page list 的末端</p>
 <p>若另一個 process Q 需要一個 free page，就從 global clean list 的開頭拿一個。 不過，如果原本的 process P 在該 page 被回收前又發生 page fault，P 就能從 free list 或 dirty list 中把該 page 搶回來，從而避免一次昂貴的 disk access。 這些 global second-chance list 越大，segmented FIFO 的效能就越接近 LRU [RL81]</p>
-<p>VMS 使用的另一個最佳化方式，也有助於克服其小 page size 的缺點。 具體來說，因為 page 太小，swap 時的 disk I/O 容易變得效率低落，畢竟磁碟在進行大型傳輸時效率比較好。 為了提升 swap 時的 I/O 效率，VMS 加入了數個最佳化手法，其中最重要的是 clustering</p>
-<p>透過 clustering，VMS 可以從 global dirty list 中一次抓出一大批 pages 並同時寫到磁碟（讓它們變成 clean 的）。 clustering 在現代系統中也很常見，因為 OS 可以在 swap space 中隨意安排 pages 的位置，從而將 pages 分群、減少寫入次數、增加單次寫入量，進而提升效能</p>
+<p>VMS 使用的另一個最佳化方式，也有助於克服其小 page size 的缺點。 具體來說，因為 page 太小，swap 時的 disk I/O 容易變得效率低落，畢竟硬碟在進行大型傳輸時效率比較好。 為了提升 swap 時的 I/O 效率，VMS 加入了數個最佳化手法，其中最重要的是 clustering</p>
+<p>透過 clustering，VMS 可以從 global dirty list 中一次抓出一大批 pages 並同時寫到硬碟（讓它們變成 clean 的）。 clustering 在現代系統中也很常見，因為 OS 可以在 swap space 中隨意安排 pages 的位置，從而將 pages 分群、減少寫入次數、增加單次寫入量，進而提升效能</p>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
 <p>ASIDE: EMULATING REFERENCE BITS</p>
@@ -9107,7 +9685,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
 <p>TIP: BE LAZY</p>
-<p>偷懶在生活和作業系統中都可以是一種美德。 延後處理一些工作，有時會對 OS 帶來很多好處。 第一，延後工作可以減少目前操作的 latency，提升反應速度，例如 OS 通常會馬上回報檔案寫入成功，但其實只是把資料存在記憶體中，稍後才真的寫入磁碟</p>
+<p>偷懶在生活和作業系統中都可以是一種美德。 延後處理一些工作，有時會對 OS 帶來很多好處。 第一，延後工作可以減少目前操作的 latency，提升反應速度，例如 OS 通常會馬上回報檔案寫入成功，但其實只是把資料存在記憶體中，稍後才真的寫入硬碟</p>
 <p>第二，延後工作有時會讓某些工作變得根本不需要做，例如如果某個檔案在寫入前就被刪除了，那就不用寫入了。 偷懶在生活中也有幫助，例如你拖延你的 OS 專題，可能會發現同學已經幫你發現 spec 中的 bug。 不過，要是你太懶，專題就趕不出來，分數會變差，老師會變得難過。不要讓老師難過</p>
 </div>
 <h2>23.2 The Linux Virtual Memory System</h2>
@@ -11393,7 +11971,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">RISC-V Supervisor-Level ISA</title>
     <id>https://mes0903.github.io/risc-v/Supervisor-Level-ISA/</id>
     <link href="https://mes0903.github.io/risc-v/Supervisor-Level-ISA/"/>
-    <updated>2025-05-13T10:31:22.000Z</updated>
+    <updated>2025-06-01T14:55:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>本篇為 RISC-V Supervisor-Level ISA（Version 20241101）的中文翻譯與筆記，原文可於<a href="https://github.com/riscv/riscv-isa-manual/tree/main" target="_blank" rel="noopener noreferrer">官方 github</a> 的第 12 章中看到。 大部分的情況下我會直接直譯，但有些地方我覺得文件實在寫得很繞，那種地方我就會直接用我自己的話寫了，或是多補一個 Tips Block 做解釋</p>
 <p>本篇內的 Info block 為原文中的補充段落，我全部都有翻，但會依照前後文的語境來決定要不要安插 Info block 進來，也就是說雖然本文中有些段落不在藍色的 Info 區塊內，但在原文中其屬於補充段落。 至於綠色的 Tips block 則是我個人的補充筆記</p>]]></summary>
@@ -19813,7 +20391,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-05-31T17:58:54.949Z</updated>
+    <updated>2025-06-01T14:56:20.026Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20144,7 +20722,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-05-31T17:58:54.973Z</updated>
+    <updated>2025-06-01T14:56:20.053Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20291,7 +20869,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-05-31T17:58:54.987Z</updated>
+    <updated>2025-06-01T14:56:20.066Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20550,7 +21128,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-05-31T17:58:55.000Z</updated>
+    <updated>2025-06-01T14:56:20.080Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22054,7 +22632,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-05-31T17:58:55.146Z</updated>
+    <updated>2025-06-01T14:56:20.226Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22443,7 +23021,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-05-31T17:58:55.183Z</updated>
+    <updated>2025-06-01T14:56:20.268Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22771,7 +23349,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-05-31T17:58:55.210Z</updated>
+    <updated>2025-06-01T14:56:20.338Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22794,7 +23372,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-05-31T17:58:55.211Z</updated>
+    <updated>2025-06-01T14:56:20.339Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22940,7 +23518,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-05-31T17:58:55.222Z</updated>
+    <updated>2025-06-01T14:56:20.348Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23338,7 +23916,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-05-31T17:58:55.255Z</updated>
+    <updated>2025-06-01T14:56:20.438Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23590,7 +24168,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-05-31T17:58:55.278Z</updated>
+    <updated>2025-06-01T14:56:20.456Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24948,7 +25526,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-05-31T17:58:55.384Z</updated>
+    <updated>2025-06-01T14:56:20.553Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25630,7 +26208,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-05-31T17:58:55.437Z</updated>
+    <updated>2025-06-01T14:56:20.596Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25959,7 +26537,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-05-31T17:58:55.556Z</updated>
+    <updated>2025-06-01T14:56:20.708Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26248,7 +26826,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-05-31T17:58:55.691Z</updated>
+    <updated>2025-06-01T14:56:20.828Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27022,7 +27600,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-05-31T17:58:55.748Z</updated>
+    <updated>2025-06-01T14:56:20.869Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27249,7 +27827,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-05-31T17:58:55.760Z</updated>
+    <updated>2025-06-01T14:56:20.878Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27676,7 +28254,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-05-31T17:58:55.992Z</updated>
+    <updated>2025-06-01T14:56:21.080Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27807,7 +28385,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-05-31T17:58:55.997Z</updated>
+    <updated>2025-06-01T14:56:21.089Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -28803,7 +29381,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-05-31T17:58:56.417Z</updated>
+    <updated>2025-06-01T14:56:21.427Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
