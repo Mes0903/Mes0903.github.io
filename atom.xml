@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-06-02T03:50:47.738Z</updated>
+  <updated>2025-06-03T13:07:58.172Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -8542,7 +8542,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">(WIP) 礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-06-02T03:50:48.532Z</updated>
+    <updated>2025-06-03T13:07:58.964Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -9758,7 +9758,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">Games101：Shading（著色）</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/Shading/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/Shading/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
+    <updated>2025-06-03T12:50:43.000Z</updated>
     <summary type="html"><![CDATA[
 <p>到目前為止，給一個模型，我們已經可以定義一個相機，通過 MVP 變換將其轉換到 NDC 中，再透過 viewport 將其變到二維的螢幕空間中了，接著我們也知道要如何利用取樣來將這個結果畫到螢幕上了：</p>
 <div class="center-column">
@@ -9790,7 +9790,11 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>在這張圖中，我們可以看到每個茶杯特別亮的部分，這杯稱為高光。 除了高光，我們還可以在茶杯的表面看到一些變化相對緩和的部分，像是茶杯的中間部分，被稱為漫反射。 而對於沒有直接被光源照到的部分，像是圖中茶杯的左下角，則被稱為環境光</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>Specular 我其實不確定該翻成什麼，好像沒聽過有人把它翻成反光，所以這邊就還是先翻成高光了</p>
+</div>
+<p>在這張圖中，我們可以看到每個茶杯特別亮的部分，這被稱為高光。 除了高光，我們還可以在茶杯的表面看到一些變化相對緩和的部分，像是茶杯的中間部分，被稱為漫反射。 而對於沒有直接被光源照到的部分，像是圖中茶杯的左下角，則被稱為環境光</p>
 <p>如果你還記得以前上物理課提到的漫反射，就可以知道光線打到粗糙的牆面上會反射到四面八方去，而高光也可以用相同的原理來理解，只是這個表面不再是個粗糙表面，而是個光滑表面，此時光線會沿著所謂的鏡面反射方向去做反射，這就是所謂的高光。 同時由於光線會反射，因此總是會有一部分的光達到茶杯的左下角，之後再反射回人眼，從而就形成了環境光。 把這三部分組合起來，我們就可以做出一種材質，使其與杯子長的很像，讓我們覺得圖中的這三個物體是杯子</p>
 <h3>shading point（著色點）</h3>
 <p>在講 Blinn-Phong 之前我們需要先定義一些相關的術語：</p>
@@ -9836,17 +9840,17 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>上圖中將出射方向記為 ，可見我們只有在觀察方向接近鏡面反射方向的時候，才能夠看見高光，其它時候都看不到。 換句話說  和  要足夠接近，而我們可以利用半程向量（Halfway Vector）來描述這件事情：</p>
+<p>上圖中將反射的出射方向記為 ，可見我們只有在觀察方向接近鏡面反射方向的時候，才能夠看見高光，其它時候都看不到。 換句話說  和  要足夠接近，我們可以利用半程向量（Halfway Vector）來描述這件事情：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>半程向量  為入射方向  與觀測方向  的角平分線向量，要求角平分線很簡單，只要兩個向量加起來，根據平行四邊形法則我們知道加出來的方向一定會沿著中間的方向，接著我們再做 normalize，就可以得到半程向量了</p>
+<p>半程向量  為入射方向  與觀測方向  的角平分線向量，要求角平分線很簡單，只要兩個向量加起來即可，根據平行四邊形法則我們知道加出來的方向一定會沿著中間的方向，接著我們再做 normalize，就可以得到半程向量了</p>
 <p>當  和  接近的時候，其實就代表  和  接近，因此在計算的時候我們就可以不去求  和  的夾角，而是求  與  的夾角</p>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
 <p>你可以不使用  與  來判斷，而是直接使用  與  來判斷兩向量是否接近，這個模型則被稱為 Phong Model。 Blinn-Phong 在這裡使用半程向量是一種優化，因為半程向量比較好算，但反射方向  不好算出來，計算量會多很多</p>
 </div>
-<p>而與前面漫反射當中提到的相同，要看兩向量是否足夠接近，用內積即可，如果足夠接近，那結果就接近 1，如果離比較遠就接近 0，同樣地我們會 ，不考慮反方向來的向量。 另外，公式中的  被稱為鏡面反射係數，由於大家通常認為高光是白色的，因此通常會設為一個較近 1 的值。 通過上圖中的式子就可以得出有多少能量到達了著色點</p>
+<p>而與前面漫反射當中提到的相同，要看兩向量是否足夠接近，用內積即可，如果足夠接近，那結果就接近 1，如果離比較遠就接近 0，同樣地我們會取 ，不考慮反方向來的向量。 另外，公式中的  被稱為鏡面反射係數，由於大家通常認為高光是白色的，因此通常會設為一個較近 1 的值。 通過上圖中的式子就可以得出有多少能量到達了著色點</p>
 <p>前面漫反射的公式中我們還考慮到了有多少能量被著色點吸收了，也就是當中的  項，但在高光這邊沒有，這是因為 Blinn-Phong 是經驗模型，把這部分簡化掉了，這邊關注的主要是我們能否看見高光，而沒有太關心它的亮度</p>
 <p>再來，你可能會發現在高光的公式中，cosine 處多了一個指數 ，這是為了將能看見高光的範圍縮小，我們看一下它數值上的表現：</p>
 <div class="center-column">
@@ -9877,6 +9881,13 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>由於 Blinn-Phong 是個經驗模型，所以你可以看見有很多東西都被簡化了。 假設一個模型中間有個凹進去的點，那照理說該部分應該會暗一些，但在 Blinn-Phong 的角度就不是如此，由於環境光是個常數，在 Blinn-Phong 中凹進去的部分並不會變暗</p>
 <p>再來 Blinn-Phong 也沒有考慮物體到觀察點的距離造成的能量損失，一般來說看一個較遠的物體應該要會比較暗，但在這裡就沒有這種現象</p>
 <p>要更精確地描述這些現象，要到後面講 Radiometry 的時候才會解釋了</p>
+</div>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>以大部分的教學來說光照會在 world space 中計算，因此在 Fragment Shader 中物體的座標只會乘上 model transformation，而不會做完完整的 model-view transformation</p>
+<p>而由於 model transformation 裡面包含了伸縮，如果它不是做均勻縮放，我們又直接將法線向量乘上 Model matrix 的話，就會破壞法線向量「與表面切平面垂直」的屬性，轉換出來的結果不會垂直於三角形面，導致光照計算失真。 因此在把法線向量傳進 Fragment Shader 的時候我們需要額外做處理，而不會跟模型一樣乘上 model matrix</p>
+<p>法線向量會乘上另一種矩陣，這個矩陣被稱為法線矩陣（Normal Matrix），這邊只講結果，他的值是 ，其中  是 model matrix，推導比較多這邊就不講了，查一下應該很多資料可以看，不難找</p>
+<p>當然並不是一定要在 world space 內計算光照，也有可能會在 view space 或是 tangent space 裡面計算，甚至還有 Deferred Shading 之類的技術。 但不管如何，在做轉換的時候你最好要清楚自己在算什麼</p>
 </div>
 <h2>著色頻率（Shading Frequencies）</h2>
 <p>考慮完了一個最基礎的著色模型，接下來我們要來看著色點要怎麼取，這被稱為著色頻率（Shading Frequencies），看個例子：</p>
@@ -10145,11 +10156,12 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>假設上圖原本是個平面，因此原先目標點  的法向量會是 ，而藍色的波浪線是凹凸貼圖定義出來的，此時若要算任意一個點的方向量，就相當於是要求該點的導數，換句話說就是要求該點切線。 而這個計算很簡單，只要算下一個點  和目標點  的高度差就可以了（差分法），上圖中還引入了參數  來定義這個凹凸貼圖的影響到底大不大，只是做一個簡單的縮放而已</p>
-<p>而要將切線變為法向量，從這個例子你可以看到法向量垂直於切線，而上例中切線的向量為 ，因此垂直方向的向量為切線逆時鐘轉 90 度，因此只要把 、 對調，並把  加上個負號，最後做個 Normalize 即可</p>
+<p>假設上圖原本是個平面，因此原先目標點  的法向量會是 ，而藍色的波浪線是凹凸貼圖定義出來的，此時若要算任意一個點的法向量，就相當於是要求該點的導數，換句話說就是要求該點切線。 而這個計算很簡單，只要算下一個點  和目標點  的高度差就可以了（差分法），上圖中還引入了參數  來定義這個凹凸貼圖的影響到底大不大，只是做一個簡單的縮放而已</p>
+<p>而要將切線變為法向量，從這個例子你可以看到法向量垂直於切線，而上例中切線的向量為 ，因此垂直方向的向量為切線逆時鐘轉 90 度，因此只要把  加上個負號，並把 、 對調，最後做個 Normalize 即可</p>
 <p>上面的例子是一維的，而在實際的情況下我們有二維的貼圖，因此計算時會變為在求該點的梯度，假設目標點在 ，則各方向的變化量為：</p>
 <p>因此法向量為</p>
 <p>這邊我們假設法向量是 ，但在實際情況下法向量會往各個不同的方向，因此通常會在局部定義一個座標系，並將其法向量設為 ，並且會有兩個垂直的分量  和 ，之後利用紋理映射將法向量算出來，再將算出來的法向量重新計算回世界座標裡面</p>
+<p>藉由改變法向量，我們就能夠進而影響光照，從而在不改動頂點位置的情況下完成凹凸貼圖的目的了</p>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
 <p>一維的例子通常會被稱為 Flatland Case，對應到 3D Case</p>
@@ -10879,7 +10891,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">Games101：Rasterization (光柵化)</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/Rasterization/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/Rasterization/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
+    <updated>2025-06-03T10:37:07.000Z</updated>
     <summary type="html"><![CDATA[
 <p>在 MVP Transformation 一節中我們已經介紹了要如何將整個坐標系投影的螢幕坐標上，同時也先簡單介紹了螢幕空間，如果你還不曉得這些是什麼，那記得先去看前一節</p>
 <p>這些轉換後得到的信息此時還只是空間中描述的一堆三角形，還沒有真正的變成圖片，因此這節我們就要講如何讓它變成圖片，也就是要怎麼將這些空間中的三角形轉化成像素，將多邊形打碎成像素的過程就是我們所說的光柵化</p>
@@ -10894,20 +10906,21 @@ A. Rago. Addison-Wesley, 2005.<br>
 <figure><figcaption></figcaption></figure>
 </div>
 <p>這些電子在打的時候是通過一種類似掃描的方式，從左上角開始往右填滿一整個 row，接著換到下一列再重複這個動作，當這些線足夠密集的時候就可以覆蓋整個螢幕了</p>
-<p>有時候為了畫快一點，對於每張圖像上可以只挑選奇數或偶數行畫，例如第一張圖只畫奇數行，第二張圖只畫偶數行，如此交替，由於人眼的視覺暫留，看起來就與全畫差不多，不過這對於一些高速運動的畫面會有撕裂感。 這個做法被稱為隔行掃描，現今仍有一些壓縮技術在使用</p>
+<p>有時候為了畫快一點，每張圖像上可以只挑選奇數或偶數行畫，例如第一張圖只畫奇數行，第二張圖只畫偶數行，如此交替，由於人眼的視覺暫留，看起來就與全畫差不多，不過這對於一些高速運動的畫面會有撕裂感。 這個做法被稱為隔行掃描，現今仍有一些壓縮技術在使用</p>
 <h2>三角形</h2>
-<p>前面有提到我們基本上是用三角形在表示物體的，這是因為三角形的表現能力很強，也有很多不錯的性質，例如它是最基礎的多邊形，沒有比三角形邊更少的多邊形了，否則就退化為線段了；再來多邊形都可以被拆成三角形，因此三角形相當於是所有多邊形的基礎</p>
-<p>再來，如果我們給定三角形的三個點，連成了一個三角形，其內部一定會是平面的；如果是四邊形，想像沿著某個對角線一折，它就不是平面的了，但三角形不會，除非你把它折成兩個三角形。 而且三角形的內外定義是非常清晰的，我們可以通過向量的外積來判斷一個點是不是在三角形內的</p>
-<p>另外，假設三角形的三個頂點有不同的屬性，那在三角形內，我們是可以透過內差來達到漸變的效果的，也就是可以把三角形內任何一個點的屬性給猜出來</p>
+<p>前面有提到我們基本上是用三角形在表示物體的，這是因為三角形的表現能力很強，也有很多不錯的性質，例如它是最基礎的多邊形，沒有比三角形邊更少的多邊形了，否則就退化為線段了；再來所有的多邊形都可以被拆成三角形，因此三角形相當於是所有多邊形的基礎</p>
+<p>還有，如果我們給定三角形的三個點，連成了一個三角形，其內部一定會是個平面；如果是四邊形，想像沿著某個對角線一折，它就不是平面的了，但三角形不會，除非你把它折成兩個三角形。 而且三角形的內外定義是非常清晰的，我們可以通過向量的外積來判斷一個點是不是在三角形內的</p>
+<p>另外，假設三角形的三個頂點有不同的屬性，那在三角形內，我們是可以透過內插來達到漸變的效果的，也就是可以把三角形內任何一個點的屬性給猜出來</p>
 <h2>Sampling introduction (取樣/採樣)</h2>
 <p>所以我們現在就盯著三角形來看，我們知道不管原先的三角形在哪裡，經過 MVP 和 Viewport 變換後現在都在螢幕座標中，透過其  與  座標我們就可以找到它在螢幕上的什麼位置</p>
 <p>現在看左邊這幅圖，它是一個三角形，三個頂點的座標我們都可以寫出來，現在我們想要把三角形給變成真正的像素</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<blockquote>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
 <p>圖中的坐標系原點是在左上角，但這沒關係，不影響我們解釋概念</p>
-</blockquote>
+</div>
 <p>但像素的內部是不可能有顏色變化的，整個像素需要維持同一個顏色，因此像是底下這種情況：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11010,10 +11023,9 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>這兩個函數的唯一區別是他們兩個之間相位有一點不一樣，左右平移了一些，那用這兩個波有什麼好處呢?</p>
 <p>如果你把正弦和余弦的係數，例如  的  考慮進去，你就會發現通過調整  前面的係數，我們可以得到不同週期的波：</p>
 <div class="center-column">
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>(係數分別為  和  的結果)</figcaption></figure>
 </div>
-<p>(係數分別為  和  的結果)</p>
-<p>從這裡我們可以再定義一個事情， 前面再乘以  再乘以 ，或者說  後面再乘以 ，這個  等於多少，我們就說他的頻率是多少，因此對於  來說  等於 ，因此其為一個頻率為  的余弦波， 同理頻率就為 </p>
+<p>從這裡我們可以再定義一個事情，對於余弦波來說， 的  等於多少，我們就說他的頻率是多少，因此對於  來說  等於 ，因此其為一個頻率為  的余弦波， 同理頻率就為 </p>
 <p>通過頻率我們可以分辨出余弦波的變化有多快，例如上圖中很明顯的可以發現頻率為  的就比  的還快。 再來利用頻率，我們也可以將週期定義為頻率分之一，物理上的意義是每隔多少區間函數會重複自己一次，其為頻率的倒數</p>
 <p>那為什麼要提到正弦波和余弦波呢? 這邊要回想一下大一微積分裡面提的概念，當中有提到函數的展開，課程裡面會提到各種不同的展開，像是泰勒展開，還有一些其他的展開，但有一個我們會用到的是傅立葉級數展開</p>
 <p>傅立葉級數展開說的是任何一個週期性的函數，都可以被寫成一系列正弦和余弦函數的線性組合加上一個常數項：</p>
@@ -11021,9 +11033,10 @@ A. Rago. Addison-Wesley, 2005.<br>
 <figure><figcaption></figcaption></figure>
 </div>
 <p>上圖中有一個週期性的方波，可以看見其能被描述為一系列的正弦和余弦函數，當用了更多的項去近似時，其結果也會更接近原先的函數</p>
-<blockquote>
-<p>其中的 ， 是方波的高度， 相當於把整個函數的中心往上提</p>
-</blockquote>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>其中第一項的 ， 是方波的高度， 相當於把整個函數的中心往上提</p>
+</div>
 <p>傅立葉級數展開與另一個概念 ── 傅立葉變換的關係是緊密相關的，它在講的是給定任何一個函數，都可以讓它經過一個相當複雜的操作，從而轉變成另一個函數：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11034,7 +11047,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <figure><figcaption></figcaption></figure>
 </div>
 <p>上圖中有五個不同的函數，頻率從低到高為  ~ ，然後假設我們使用完全相同的取樣方法，每隔一個相同的段落進行一次取樣，會發現對於頻率較低的 ，把取樣的點連起來時，其恢復出來的函數與原先大致相同， 也是，但到  時就開始不太對了， 就更明顯了，其結果與原先的函數相差許多</p>
-<p>我們可以發現對於一個函數來說，取樣的頻率能通過上圖的段落間隔反映出來，如果間隔很小，就是取樣的頻率很高，那如果原函數的頻率較高，像是  變化的速度很快，如果我們取樣的頻率太低，那就會跟不上它的變化，沒有辦法把原先的訊號給恢復出來</p>
+<p>我們可以發現對於一個函數來說，取樣的頻率能通過上圖的段落間隔反映出來，如果間隔很小，代表取樣的頻率很高，那如果原函數的頻率較高，像是  變化的速度很快，如果我們取樣的頻率太低，那就會跟不上它的變化，沒有辦法把原先的訊號給恢復出來</p>
 <p>接著我們再想另一個問題，假設如下圖我們有一個藍色的函數與一個黑色的函數：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11050,18 +11063,20 @@ A. Rago. Addison-Wesley, 2005.<br>
 </div>
 <p>左邊這幅圖是一個人，不管是什麼樣的圖像，我們都可以利用傅立葉變換將其把圖像從時域轉到頻域，雖然圖像本身不代表任何時間的信息，但我們認為空間上的不同位置也算是時域，這只是它的一個名字。 總之，我們可以把圖像的空間轉換成頻域的空間，也就是右圖</p>
 <p>對於右圖，我們把其中心定義為最低頻的區域，周圍則是高頻的區域，也就是說從中心到周圍，頻率會越來越高。 我們使用亮度來表示有多少信息分布在不同頻域的位置上，例如看右圖的頻率，你會發現大部分的信息都是集中在低頻的訊號，因為中間比較亮，對於高頻訊號，不是沒有，但比低頻訊號少太多了，事實上對於自然的圖片來說分布基本上都是長這樣的，這種頻域的圖我們將其稱為頻譜</p>
-<blockquote>
-<p>你可能會發現有兩條水平和豎直的線特別明顯，這是因為在分析一個訊號的時候，我們會將其當作一個周期性重複的訊號，換句話說就是把這張相片無限複製貼上延伸，到了右邊界之後又開始重複左邊的內容，然後繼續往右走，像是這張圖片在水平方向重複了無限次，豎直方向同理<br><br></p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>你可能會發現有兩條水平和豎直的線特別明顯，這是因為在分析一個訊號的時候，我們會將其當作一個周期性重複的訊號，換句話說就是把這張相片無限複製貼上延伸，到了右邊界之後又開始重複左邊的內容，然後繼續往右走，像是這張圖片在水平方向重複了無限次，豎直方向同理</p>
 <p>而在正常情況下，很少會有圖像的左邊界和右邊界是完全一致的，因此在圖像的交界處就會產生劇烈的訊號變化，也就是一個極為高頻的訊號，這就是為什麼會有這兩條線</p>
-</blockquote>
+</div>
 <p>剛才提到濾波可以去掉一些頻率的內容，現在我們可以試著做一下濾波，再將其變換回時域 (照片) 看一下差別，首先是「高通」濾波，把「低」頻的訊號(靠中心) 刪除掉：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
 <p>我們把低頻訊號都刪掉了，只留下了高頻訊號，此時透過左圖，我們能發現高頻訊號在圖像上代表了輪廓，或說更精確地說法是邊界。 邊界的意義在於其左邊與右邊，或者上面與下面發生了一個突變，差的很多，這時候我們就會認為這是一個邊界，像是圖中的衣服輪廓，或是人物與背景的分界，都發生了劇烈的變化</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p>「高」頻能「通」過 ⇒ 低頻被刪除，因此稱為高通濾波</p>
-</blockquote>
+</div>
 <p>接下來換實驗低通濾波：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11078,7 +11093,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>至此，我們就把不同的頻率與訊號的變化聯結在一起了</p>
 <p>對於濾波的介紹先到這裡，如果想要學更多可以去修一下數學影像處理，那門課會教不同的濾波方法會產生出怎樣的效果。 另外，現在的影像操作更多是利用機器學習來進行的，頻率方面的操作已經比較少做了，但不管怎麼樣，這個分析的效果還是在的</p>
 <h4>Convolution (卷積)</h4>
-<p>介紹完了濾波，也知道了傅立葉變換能給我們怎麼樣的幫助，接下來我們再來細看濾波的過程。 我們剛剛是說綠波可以去掉一段頻率，但還可以從另一個角度上來分析，濾波約等於平均約等於卷積，例如低通濾波器會讓圖片模糊，但模糊本身就是一種平均操作</p>
+<p>介紹完了濾波，也知道了傅立葉變換能給我們怎麼樣的幫助，接下來我們再來細看濾波的過程。 我們剛剛是說濾波可以去掉一段頻率，但還可以從另一個角度上來分析，濾波約等於平均約等於卷積，例如低通濾波器會讓圖片模糊，但模糊本身就是一種平均操作</p>
 <p>而卷積在圖學中我們簡化了很多定義，直接用例子來看，比如我們有一個一維的訊號，也就是一個一維陣列，而濾波器(Filter) 就像是一個窗口，可以左右滑動，見下圖：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11093,33 +11108,35 @@ A. Rago. Addison-Wesley, 2005.<br>
 </div>
 <p>如此重複下去，說白了就是在做加權平均，當然這個定義是圖學中簡化過的定義，而不是數學的嚴謹定義，但這對我們來說就夠用了</p>
 <p>而卷積有一個很好用的定理，它的證明比較難，所以這邊只簡單講一下結論 ── 時域上如果我想對兩個訊號進行卷積，那麼它其實對應到兩個訊號在頻域中的乘積</p>
-<blockquote>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
 <p>另外，反之亦然，時域上的乘積也可以反過來用頻域上的卷積來操作</p>
-</blockquote>
+</div>
 <p>因此卷積和乘積這兩個操作其實是挺接近的，通過這個定理，當我們拿到一張圖時，可以直接用某個濾波器去做卷積操作，或是可以把這張圖先傅立葉變換到頻域上，再把濾波器變換到頻域上，然後兩者相乘，最後把結果逆變換回時域上，結果是一樣的：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
 <p>上圖中我們利用一個  的窗口，對圖片中的每個像素，取其周圍  的格子，也就是 9 個數來做平均，然後再把它寫回像素本身，這樣就會得到一張模糊處理後的圖像了</p>
 <p>而我們也可以先將圖片傅立葉變換到頻域，再將卷積也變換到頻域，接著把兩個訊號乘起來，此時你會發現大部分的地方都變成黑的了，只有中間這塊留下了一些白的部分，將其轉換回時域後就回得到一張模糊過的圖了</p>
-<p>從這裡你會發現卷積定理之所以有道理是因為當你把頻率上的兩個訊號乘起來，其效果就相當於在做濾波，以上突來說就是一個低通濾波，因此圖像自然會變模糊了</p>
-<blockquote>
-<p>上例中除了  的窗口，我們還乘了一個 ，這是為了讓圖像整體的顏色值不會發生變化，不然你每一個像素都取它周圍 9 個像素之和，它會越來越亮<br><br></p>
+<p>從這裡你會發現卷積定理之所以有道理是因為當你把頻率上的兩個訊號乘起來，其效果就相當於在做濾波，以上圖來說就是一個低通濾波，因此圖像自然會變模糊了</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>上例中除了  的窗口，我們還乘了一個 ，這是為了讓圖像整體的顏色值不會發生變化，不然你每一個像素都取它周圍 9 個像素之和，它會越來越亮</p>
 <p>這個  的窗口有個名字叫 Box Filter，它的效果是低通濾波，當你窗口的大小變大，例如變為  時，其會加劇模糊的效果，因此在轉換到頻域時白色的部分就會變少 (保留的低頻訊號更少)</p>
-</blockquote>
+</div>
 <h2>Antialiasing (抗混疊/抗鋸齒)</h2>
 <h3>Principle of sampling (取樣的原理)</h3>
 <p>接下來我們再重新從頻域的角度來看一下什麼是取樣，取樣其實就是在重複頻域上的內容，以下圖為例：</p>
 <div class="center-column">
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>(img src : <a href="https://www.researchgate.net/figure/a-The-F-OTDR-traces-demodulate-form-the-raw-data-b-The-detail-of-the-vibration_fig5_301556095" target="_blank" rel="noopener noreferrer">link</a>)</figcaption></figure>
 </div>
-<p>(img src : <a href="https://www.researchgate.net/figure/a-The-F-OTDR-traces-demodulate-form-the-raw-data-b-The-detail-of-the-vibration_fig5_301556095" target="_blank" rel="noopener noreferrer">link</a>)</p>
-<p>左上角的是一個連續函數，假設他在頻域上長右上角那樣 (傅立葉變換的結果)，而因為取樣就是要把這些函數變成一系列離散的點，因此我們就留下這個函數在某一些位置上的值就可以了</p>
+<p>左上角是一個連續函數，假設他在頻域上長右上角那樣 (傅立葉變換的結果)，而因為取樣就是要把這些函數變成一系列離散的點，因此我們就留下這個函數在某一些位置上的值就可以了</p>
 <p>這就好像我們將兩個函數相乘，以上圖為例，我們拿 <code>(c)</code> 函數與 <code>(a)</code> 函數相乘，得到的就是 <code>(a)</code> 函數上一些離散的點，也就是 <code>(e)</code> 的結果，和我們前面講頻域時那一系列的白色空心點是一樣的道理</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p><code>(c)</code> 這一個一個的箭頭是有名字的，叫做脈衝函數 (Impulse response)，可以簡單定義為只在這個位置上有值，其他位置上都沒有值</p>
 <p>脈衝函數在經過傅立葉變換後會變成另一個脈衝函數，不過間隔會不一樣，間隔的長度為頻率的大小，因此頻率越高，間隔越大</p>
-</blockquote>
+</div>
 <p>圖中的左邊是在時域上，而前面有提到時域上的乘積可以用頻域上的卷積來操作，也就是說我們要把 <code>(b)</code> 和 <code>(d)</code> 做卷積，其結果為 <code>(f)</code>，相當於把原始的函數複製貼上了很多遍</p>
 <p>因此，所謂的取樣，就是在重複原始信號的頻譜</p>
 <h3>Principle of Aliasing (混疊/鋸齒的原理)</h3>
@@ -11166,7 +11183,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <figure><figcaption></figcaption></figure>
 </div>
 <p>這相當於是我們用一系列的 box 去模糊了這個三角形，做完後要取樣就很簡單了，因為每個格子都是同一個顏色，因此得出來的結果與 MSAA 做完的結果基本一樣，因此取樣的操作相當於是隱含在 MSAA 的過程內了</p>
-<p>這邊要提一點是 MSAA 解決的是計算像素內三角形的覆蓋率，也就是解決信號模糊的計算，而不是透過提高解析度來解決鋸齒問題</p>
+<p>這邊要提一點是 MSAA 解決的是計算像素內三角形的覆蓋率，也就是解決了「信號模糊的計算」，是一種計算模糊的方法，而不是透過提高解析度解決了鋸齒問題</p>
 <p>再來看一下實際的效果</p>
 <p>原圖：</p>
 <div class="center-column">
@@ -11183,19 +11200,21 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>簡單來說，假設以 2x2 的 SuperSampling 為例，SSAA 會生成一個 4 倍大的 frame buffer 與 z-buffer，但 MSAA 只會生成一個 4 倍大的 z-buffer</p>
 <p>上例中因為三角形的顏色都相同，所以感受不太出來差別，等到讀完 Shading 部分再回來看應該會懂一些</p>
 <p>以下節錄自文刀秋二的回答：</p>
+<ul>
+<li>
 <p>最直接的抗鋸齒方法就是 SSAA（Super Sampling AA）。 拿 4xSSAA 舉例子，假設最終螢幕輸出的解析度是 800x600， 4xSSAA 就會先渲染到一個解析度 1600x1200 的 buffer 上，然後再直接把這個放大 4 倍的 buffer 下取樣致 800x600。 這種做法在數學上是最完美的抗鋸齒，但劣勢也很明顯，光柵化和著色的計算負荷都比原來多了4倍，render target 的大小也漲了 4 倍</p>
 <p>MSAA（Multi-Sampling AA）則很聰明的只是在光柵化階段，判斷一個三角形是否被像素覆蓋的時候會計算多個覆蓋樣本（Coverage sample），但是在 pixel shader 著色階段計算像素顏色的時候每個像素還是只計算一次。 例如下圖是 4xMSAA，三角形只涵蓋了 4 個 coverage sample 中的 2 個：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>所以這個三角形需要產生一個 fragment 在 pixel shader 裡著色，只不過生成的 fragment 還是在像素中央（位置，法向量等資訊插值到像素中央），然後只運行一次 pixel shader，最後得到的結果在 resolve 階段會乘以 0.5，因為這個三角形隻 cover 了一半的 sample</p>
+<p>所以這個三角形需要產生一個 fragment 在 pixel shader 裡著色，只不過生成的 fragment 還是在像素中央（位置，法向量等資訊插值到像素中央），然後只運行一次 pixel shader，最後得到的結果在 resolve 階段會乘以 0.5，因為這個三角形只 cover 了一半的 sample</p>
 <p>現代所有 GPU 都在硬體上實作了這個演算法，而且在 shading 的運算量遠大於光柵化的今天，這個方法遠比 SSAA 快很多。 順便提一下之前 NV 的 CSAA，它就是更進​​一步的把 coverage sample 和 depth，stencil test 分開了</p>
-<blockquote>
-<p>連結：<a href="https://www.zhihu.com/question/20236638" target="_blank" rel="noopener noreferrer">請問FXAA、FSAA與MSAA有什麼不同？效果和性能上哪個好？</a></p>
-</blockquote>
+</li>
+</ul>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
-<p>「而且在 shading 的運算量遠大於光柵化的今天」原作者說打反了，但我沒看懂是哪裡反了，大家自己注意一下吧，如果搞懂了也拜託告訴我XD</p>
+<p>原文連結：<a href="https://www.zhihu.com/question/20236638" target="_blank" rel="noopener noreferrer">請問FXAA、FSAA與MSAA有什麼不同？效果和性能上哪個好？</a></p>
+<p>這句「而且在 shading 的運算量遠大於光柵化的今天」原作者說打反了，但我沒看懂是哪裡反了，大家自己注意一下吧，如果搞懂了也拜託告訴我XD</p>
 </div>
 <h3>其他相關</h3>
 <p>這邊再多簡單提兩個現代常用的抗鋸齒方法，除了 MSAA，較為重要的兩種為 FXAA 與 TAA，這兩個得到了工業界的廣泛應用</p>
@@ -11228,8 +11247,8 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>上圖的左側為我們 Rendering 的主目標，其結果為 frame buffer，而引入 z-buffer 後的副產物就是右圖，用來記錄所有像素對應的深度，並將其反映在顏色上，越近越黑，包括地板的顏色也是</p>
-<p>接下來來談如何實作，上一節我們在討論變換的時候提到一個事情 — 相機放在原點，並看向負 Z 方向。 這邏輯上代表我們看到的所有 Z 值都小於 0，因此數字如果越小，代表離我們越遠，反之數字越大就越近。 由於這個特性，同時為了方便計算，我們還可以將深度可以理解為相機到該像素紀錄的點的距離，距離永遠是正的，而且距離越小越近，與前面的特性相襯</p>
+<p>上圖的左側為我們 Rendering 的主目標，其為 frame buffer 的結果，而引入 z-buffer 後的副產物就是右圖，用來記錄所有像素對應的深度，並將其反映在顏色上，越近越黑，包括地板的顏色也是</p>
+<p>接下來來談如何實作，上一節我們在討論變換的時候提到一個事情：相機放在原點，並看向負 Z 方向。 這邏輯上代表我們看到的所有 Z 值都小於 0，因此數字如果越小，代表離我們越遠，反之數字越大就越近。 由於這個特性，同時為了方便計算，我們還可以將深度可以理解為相機到該像素紀錄的點的距離，距離永遠是正的，而且距離越小越近，與前面的特性相襯</p>
 <p>實作上兩種方法都有人用，寫 code 的時候要注意其是如何判斷深度的，下面是一個簡單的範例：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> each triangle T</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> each </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sample</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (x,y,z) in T</span></span>
@@ -11250,10 +11269,10 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>上圖中有兩個三角形，一個紅的一個藍的，紅的三角形深度都為 5，藍色三角形擺的有個角度所以深度各不相同。 我們先判斷了紅色的三角形，因此 Z-Buffer 將紅色三角形的深度更新了進去，接著開始判斷藍色三角形，你可以看到只有深度小於 5 的像素會被更新進去。 如果我們先考慮藍色的三角形，那結果基本上會是一樣的，由此你也可以發現 Z-Buffer 的演算法和順序是沒有關係的，這是一個不錯的特性</p>
 <p>你可以發現上圖中兩個三角形互相覆蓋了彼此的一部分，實務上我們通常用浮點數來表示深度，所以很少會出現深度相同的狀況，因此透過維護一張這樣的表，我們就可以得到一個準確的深度關係了</p>
 <p>Z-Buffer 的核心思想是以像素為單位來考慮深度，但由於走訪的單位是物體，因此複雜度為 ， 為三角形的數量（這個算法不需要排序，只記錄最小值，所以不會是 ）</p>
-<p>另外，對於 MSAA，如果我們要應用 Z-Buffer，那就還要再考慮其是要以像素為單位，還是以 MSAA 裡面的每個取樣點為單位來建表，通常是會以小的取樣點建表，詳細可見 GAMES101 作業二的 issue：<a href="https://zhuanlan.zhihu.com/p/454001952" target="_blank" rel="noopener noreferrer">Games101｜作業2 + 光柵化+ SSAA vs MSAA + 黑邊問題</a></p>
+<p>另外，對於 MSAA，如果我們要應用 Z-Buffer，那就還要再考慮其是要以像素為單位，還是以 MSAA 裡面的每個取樣點為單位來建表，通常是會以小的取樣點建表，詳細可見 GAMES101 作業二的 issue（我後來發現他的 code 好像寫錯了XD 不過至少對問題的描述是有幫助的）：<a href="https://zhuanlan.zhihu.com/p/454001952" target="_blank" rel="noopener noreferrer">Games101｜作業2 + 光柵化+ SSAA vs MSAA + 黑邊問題</a></p>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
-<p>Z-Buffer 處理不了透明物體，透明物體要特殊處理，後面再說</p>
+<p>另外，Z-Buffer 處理不了透明物體，透明物體要特殊處理，後面再說</p>
 </div>
 ]]></content>
     <category term="computer-graphic"/>
@@ -11649,37 +11668,55 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">Games101：MVP Transformation</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/MVPTransformation/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/MVPTransformation/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
+    <updated>2025-06-03T13:07:35.000Z</updated>
     <summary type="html"><![CDATA[
 <p>我們的最終目的是將三維的世界顯示在二維的螢幕上，在現實生活中我們可以透過相機拍照來達到這個效果，而在電腦內我們就要試著把這個過程變成一個轉換寫出來</p>
-<p>首先我們要決定場景、物品要擺在哪裡，這個我們稱為 model transformation</p>
-<p>接下來要找一個好的位置，橋一個好的角度來放相機，這個我們稱為 view transformation</p>
-<p>這兩步完成後我們就可以準備拍照了，把三維的東西投影到二維，這個動作我們稱為 projection transformation</p>
-<p>這三個轉換我們常合起來簡稱為 MVP 轉換。 而前兩個變換通常會一起做，也因此會被合稱為 model-view transformation</p>]]></summary>
+<p>首先我們要決定場景、物品要擺在哪裡，這個我們稱為 model transformation。 這會將物體從自己的座標系轉換到世界座標系（世界空間）中</p>
+<p>接下來要找一個好的位置，橋一個好的角度來放相機，這個我們稱為 view transformation。 這會將物體從世界空間轉換到相機空間（camera space），也有人稱之為視圖空間（view space），是以相機為原點的座標系</p>
+<p>這兩步完成後我們就可以準備拍照了，所以要將三維的東西投影到二維，這個動作我們稱為 projection transformation。 這會將物體從相機空間轉換到剪裁空間（clip space）中，其會將相機視角外的物體裁剪掉，並保留深度的效果</p>]]></summary>
     <content type="html"><![CDATA[
 <p>我們的最終目的是將三維的世界顯示在二維的螢幕上，在現實生活中我們可以透過相機拍照來達到這個效果，而在電腦內我們就要試著把這個過程變成一個轉換寫出來</p>
-<p>首先我們要決定場景、物品要擺在哪裡，這個我們稱為 model transformation</p>
-<p>接下來要找一個好的位置，橋一個好的角度來放相機，這個我們稱為 view transformation</p>
-<p>這兩步完成後我們就可以準備拍照了，把三維的東西投影到二維，這個動作我們稱為 projection transformation</p>
-<p>這三個轉換我們常合起來簡稱為 MVP 轉換。 而前兩個變換通常會一起做，也因此會被合稱為 model-view transformation</p>
+<p>首先我們要決定場景、物品要擺在哪裡，這個我們稱為 model transformation。 這會將物體從自己的座標系轉換到世界座標系（世界空間）中</p>
+<p>接下來要找一個好的位置，橋一個好的角度來放相機，這個我們稱為 view transformation。 這會將物體從世界空間轉換到相機空間（camera space），也有人稱之為視圖空間（view space），是以相機為原點的座標系</p>
+<p>這兩步完成後我們就可以準備拍照了，所以要將三維的東西投影到二維，這個動作我們稱為 projection transformation。 這會將物體從相機空間轉換到剪裁空間（clip space）中，其會將相機視角外的物體裁剪掉，並保留深度的效果</p>
+<p>下面這張是圖來自 Learn OpenGL：</p>
+<div class="center-column">
+<figure><figcaption>（img src：<a href="https://learnopengl.com/Getting-started/Coordinate-Systems%EF%BC%89" target="_blank" rel="noopener noreferrer">https://learnopengl.com/Getting-started/Coordinate-Systems）</a></figcaption></figure>
+</div>
+<p>這三個轉換我們常合起來簡稱為 MVP 轉換。 而前兩個變換通常會一起做，也因此會被合稱為 model-view transformation，接下來我們就來詳細看一下這三個轉換</p>
 <h2>Model-View Transformation</h2>
-<p>先來看 model-view transformation，我們要想，該如何在電腦裡面擺放一個相機，它需要三個資訊：</p>
+<p>先來看 model-view transformation，我們的目的是要生出一個以相機為原點的座標系。 首先先講 model transoformation，由於 model transformation 一般來說比較隨意，所以老師也沒多提，這邊補充一下</p>
+<p>model transformation 取決於你想把物體放到世界座標系的哪裡，同時套用你要做的旋轉跟伸縮即可，因此你可以用上一章學到的三種矩陣來組合而成，直接給大家看 code 可能比較好理解：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">glm::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#E5C07B"> GameObject</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">calculateTransformMatrix_</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	glm::mat4 t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">	// Apply transformations in the order: Scale -&gt; Rotate -&gt; Translate</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">translate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(t, position);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(t, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">x</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">), glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(t, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">y</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">), glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(t, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">z</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">), glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">	t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">scale</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(t, scale);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">	return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> t;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這是我自己引擎裡面更新 model matrix 的函式，基本上就是把 Identity matrix 依序乘上平移、旋轉、伸縮矩陣就可以了。 這裡面的參數串接到了 ImGUI 的介面上，所以在引擎裡面是可以用拉桿之類的元件調整模型位置的</p>
+<p>那接下來我們就繼續來看 view transformation，首先思考一下，該如何在電腦裡面擺放一個相機，這需要三個資訊：</p>
 <ul>
 <li>Position <br>
 相機的位置</li>
 <li>Look-at / gaze direction <br>
 這個相機面向哪裡，往哪邊看</li>
 <li>Up direction <br>
-相機的上下，這很重要，例如閃光燈要裝在相機上方，拿的時候閃光燈要在上面，不能拿反，有時候我們會將相機旋轉 45 度，這個我們稱為 Up direction，用一個向量表示向上方向</li>
+相機的上下，這很重要，例如閃光燈要裝在相機上方，拿的時候閃光燈要在上面，不能拿反，有時候我們會也會將相機旋轉 45 度之類的。 這個我們稱為 Up direction，用一個向量表示向上方向</li>
 </ul>
 <p>如此一來我們就可以把相機給定義下來了，那要這些東西幹嘛呢?</p>
 <p>這邊要先提一個問題，在現實生活中當大家坐在車上，如果不往窗戶外面看，是感覺不到自己在移動的，這在物理上稱為相對運動，大家肯定都學過或聽過</p>
 <p>那在我們相機的觀察上面也是同一個道理，假如大家是在攝影棚裡拍照，那相同的人與相機，只要相對位置相同，不管實際上在哪個攝影棚拍，拍出來的效果都是一樣的</p>
-<p>這個現象可以幫助我們得出一個結果，當相機在移動時，我們是可以改為移動周圍的物體來達到相同效果的，只要保證他們之間沒有相對運動就可以，因此我們可以進一步的讓相機固定在同一位置上</p>
-<p>在習慣上，我們會將相機移動到  的位置，並看向  方向，並以  為向上方向，將世界的座標系轉換為相機的座標系</p>
+<p>這個現象可以幫助我們得出一個結果，要達到相機看起來在移動的效果，我們是可以透過改成移動周圍的物體來達到相同目的的，只要保證他們之間沒有相對運動就行，這樣我們就可以讓相機固定在同一位置上了</p>
+<p>在習慣上，我們會將相機移動到  的位置，看向  方向，並以  為向上方向，將世界的座標系轉換為相機的座標系</p>
 <div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(這三個相機拍出來的照片會一模一樣)</p>
+<figure><figcaption>(這三個相機拍出來的照片會一模一樣)</figcaption></figure>
 </div>
 <p>這裡用的是右手坐標系，X 外積 Y 為 Z 方向</p>
 <p>那就開始操作看看，繼續沿用前方的符號，假設相機原本是在點 ，朝向 ，向上為 ，我們現在想要把它放到原點，看向 ，向上方向為 ，該怎麼做呢?</p>
@@ -11695,14 +11732,14 @@ A. Rago. Addison-Wesley, 2005.<br>
 </div>
 <p>我們可以將 model-view transformation 的矩陣記為 ，其由一個平移與一個旋轉矩陣構成：</p>
 <p>對於平移，很簡單的就是將相機原本的位置  移到原點上：</p>
-<p>重點在旋轉，這裡其實不好寫，你要將任意軸給旋轉到一個規範化的軸上，這個計算很複雜。 但是有一個事情很好寫，那就是反過來將  軸旋轉到  方向上，再將  軸旋轉到  方向，最後再求逆變換就好</p>
-<p>所以我們先將  與  旋轉到對應的方向上，因為是反過來寫所以記作 ：</p>
+<p>重點在旋轉，這裡其實不好寫，你要將任意軸給旋轉到一個規範化的軸上，這個計算很複雜。 但是反過來寫卻很好寫：先將  軸旋轉到  方向上，再將  軸旋轉到  方向，最後再求逆變換就好</p>
+<p>所以我們先將  與  旋轉到對應的方向上，因為是反過來寫的，所以這邊記作 ：</p>
 <p>隨便拿個方向看一下效果，例如  方向，注意它第四個元素應當為 ，因為是向量：</p>
 <p>的確可以轉到  方向</p>
 <p>如此一來我們就非常輕鬆地將這個矩陣寫出來了，但我們想要的是把  旋轉到 ，那要怎麼樣才能得到我們真正想要的矩陣呢?</p>
 <p>這時就要再用到一個很重要的性質了，旋轉矩陣是正交矩陣！ 因此</p>
 <p>換句話說我們只要再將這個矩陣轉置就可以得到我們想要的矩陣了：</p>
-<p>至此，我們就成功完成 model-view transformation 了</p>
+<p>接著只要把它與 model matrix 組合起來就可以了。 至此，我們就成功完成 model-view transformation 了</p>
 <h2>Projection Transformation</h2>
 <p>將相機擺好後我們就要將相機面向的東西全部投影到感光元件上，換句話說我們要將面前 3D 的東西全部投影到一個 2D 平面上，這個 3D -&gt; 2D 的轉換就是 Projection Transformation 在做的事情</p>
 <p>我們有兩種不同的投影方式：</p>
@@ -11714,47 +11751,46 @@ A. Rago. Addison-Wesley, 2005.<br>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
-<p>左邊和右邊分別使用了兩種不同的投影方式，你可以看到一個現象，立方體不同的面上有不同組的平行線，一個面有兩組不同的平行線組成</p>
+<p>左邊和右邊分別使用了兩種不同的投影方式，你可以看到一個現象，立方體不同的面上有不同組的平行線，一個面由兩組不同的平行線組成</p>
 <p>左邊這個立方體的平行線看上去還是平行的，但右邊的立方體就不是了，如果你延長任意一組平行線，你會發現最終它們會相交於某一個點上</p>
-<p>如果你學習過素描，或是畫畫，就會知道說右邊的這種投影方式更接近餘人眼的成像，它會有一個性質：看到的平行線不再平行，最終都會相交到某一個點去，也因此其可以反映近大遠小的特性</p>
+<p>如果你學習過素描，或是畫畫，就會知道說右邊的這種投影方式更接近人眼的成像，它會有一個性質：看到的平行線不再平行，最終都會相交到某一個點去，也因此其可以反映近大遠小的特性</p>
 <div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(img src: <a href="https://stackoverflow.com/questions/36573283/from-perspective-picture-to-orthographic-picture" target="_blank" rel="noopener noreferrer">From perspective picture to orthographic picture</a>)</p>
+<figure><figcaption>(img src: <a href="https://stackoverflow.com/questions/36573283/from-perspective-picture-to-orthographic-picture" target="_blank" rel="noopener noreferrer">From perspective picture to orthographic picture</a>)</figcaption></figure>
 </div>
-<p>那現在就來看看在數學上要怎麼說這件事情，所謂的透視投影，我們就認為是把相機放在某一個位置，並近似的將相機認為是一個點，再從這個點連出一個空間中的錐</p>
-<p>這是一個四稜錐，在這個四稜錐裡面，我們把近平面到遠平面的區域內的所有東西都顯示出來，並且顯示在近平面上</p>
-<p>而對於正交投影，其實就是假設相機離的無限遠。 假設我們從透視投影那個例子中，將相機拿得越來越遠，此時近平面與遠平面看起來就會越來越接近，當我們把相機拿到無限遠時，就會發現近平面與遠平面變的一樣大了。 因此在投影出來的結果就會看到，無論物體有多遠，投影到近平面上是不會有近大遠小的效果的</p>
+<p>那現在就來看看在數學上要怎麼說這件事情，所謂的透視投影，我們可以認為是把相機放在某一個位置，並近似的將相機認為是一個點，再從這個點連出一個空間中的錐</p>
+<p>這是一個四稜錐，在這個四稜錐裡面，我們把近平面到遠平面的區域內的所有東西都顯示出來，並畫在近平面上</p>
+<p>而對於正交投影，其實就是假設相機離的無限遠。 以我們上面透視投影的例子來說，將相機拿得越來越遠，近平面與遠平面看起來就會越來越接近，當我們把相機拿到無限遠時，就會發現近平面與遠平面變的一樣大了。 因此在投影出來的結果就會看到，無論物體有多遠，投影到近平面上是不會有近大遠小的效果的</p>
 <h3>Orthographic projection（正交投影）</h3>
 <p>那我們就從正交投影開始講，其非常好理解，只要不管遠近，統一將物體擠到某個平面上去就可以了，那這要怎麼做呢?</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
 <p>假設相機已被放在了原點，往  看，向上方向為 ，也許我們僅需要將 Z 座標給扔掉就可以得到正交投影的結果了?</p>
-<p>上途中可以看到有一個三維空間中的字母 E，還有一個小方塊，它們兩個在不同的方向上，如果我們直接把 Z 丟掉，只剩下 X 跟 Y，那得到的結果就是上圖中右下角的結果了。 但這時會有個問題，也就是無法區分物體的前後，因此實際的步驟並不會僅僅是將 Z 丟掉，而是再更複雜一點</p>
-<p>此外，我們還需要做個約定俗成的操作，把所有物體都移到  至  之間，這可以方便之後的計算，再看個例子，假設空間中有個立方體，如下圖：</p>
+<p>上圖中可以看到有一個三維空間中的字母 E，還有一個小方塊，它們兩個在不同的方向上，如果我們直接把 Z 丟掉，只剩下 X 跟 Y，那得到的結果就是上圖中右下角的結果了。 但這時會有個問題，也就是無法區分物體的前後，因此實際的步驟並不會僅僅是將 Z 丟掉，而是再更複雜一點</p>
+<p>此外，我們還需要做個約定俗成的操作：把所有物體都移到  至  之間，這可以方便之後的計算。 我們再看個例子，假設空間中有個立方體，如下圖：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
 </div>
 <p>我們只需要定義立方體的左右在 X 軸上是多少，上下在 Y 軸上是多少，遠近在 Z 軸上各占多少的範圍，就可以將這個立方體給描述出來了</p>
-<p>我們的目的是將最左方的立方體映射為最右方的標準立方體，英文叫 canonical cube。 可以看到中間經過了一個過程，首先將立方體的中心移到原點，然後把 XYZ 軸都拉成  到  就可以了，換句話說就是先做平移再做縮放</p>
-<blockquote>
-<p>在 X 軸上我們定義左比右小，Y 軸上定義下比上小，但對於 Z 軸的遠近會有點不一樣，仔細看圖中的 Z 是向外的(出螢幕方向)，我們是看向  方向的，所以如果一個物體離我們較遠，其實代表它的 Z 值較小，較近則 Z 值較大<br></p>
-<blockquote>
-<p>注意坐標系，這裡我們用的是右手系所以會有這個問題，如果是左手系，在這點上會比較方便，但左手系的 X 外積 Y 不再等於 Z，因此我們還是偏好左手系</p>
-</blockquote>
-</blockquote>
-<p>那我們現在就來把這個變換寫成數學的形式，用矩陣來做：</p>
+<p>我們的目的是將最左方的立方體映射為最右方的標準立方體，英文叫 canonical cube。 可以看到中間多了一個步驟，要先將立方體的中心移到原點，然後把 XYZ 軸都拉伸到  到  的範圍就可以了，換句話說就是先做平移再做縮放</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>在 X 軸上我們定義左比右小，Y 軸上定義下比上小，但對於 Z 軸的遠近會有點不一樣，仔細看圖中的 Z 是向外的(出螢幕方向)，我們是看向  方向的，所以如果一個物體離我們較遠，其實代表它的 Z 值較小，較近則 Z 值較大</p>
+<p>要注意你用的是哪種座標系，這裡我們用的是右手系所以會有這個問題，如果是左手系，在這點上會比較方便，但左手系的 X 外積 Y 不再等於 Z，因此我們還是偏好右手系</p>
+</div>
+<p>我們現在就來把這個變換寫成數學的形式，用矩陣來做：</p>
 <p>右邊的矩陣將立方體平移到中心，左邊的矩陣則將立方體伸縮為長度為 2 的立方體</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <ul>
 <li>立方體的中心為各組頂點相加除以二</li>
-<li>平移矩陣內填的為負數是因為要將立方體移到原點</li>
+<li>平移矩陣內填的是負數是因為要將立方體移到原點</li>
 <li>伸縮為長度為 2 的立方體是因為目標立方體覆蓋各軸的  至 </li>
 </ul>
-</blockquote>
+</div>
 <h3>Perspective projection（透視投影）</h3>
 <p>理解的正交投影後，透視投影並不難，透視投影是用得最廣泛的一種投影，如前面所說的它滿足近大遠小的性質，帶來平行線不再平行的視覺效果</p>
-<p>在說透視投影之前，我們要再回憶一下齊次座標，它有一個定義，看向量 ，它表示空間中的點 ，當我將四個數同乘任何一個數 ，只要  不等於 ，那這個  表示的點就與  是同一個點。 現在我們更進一步，不要乘 ，而是乘以 ，此時向量會變成 ，仍然是表示空間中的同一個點，等等我們會用到這個性質所以要先有個印象</p>
+<p>在說透視投影之前，我們要再回憶一下齊次座標，它有一個定義，向量 ，表示空間中的點 。 當我將四個數同乘任何一個數 ，只要  不等於 ，那這個  表示的點就與  是同一個點。 現在我們更進一步，不要乘 ，而是乘以 ，此時向量會變成 ，仍然是表示空間中的同一個點，等等我們會用到這個性質所以要先有個印象</p>
 <p>回到透視投影，它是由一個點開始往外延伸出來的四稜錐所形成的，這個形狀和長方體的差別在於遠平面相對大一點：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -11764,7 +11800,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <li>把左邊區域中的線拉成右邊的樣子</li>
 <li>進行正交投影</li>
 </ul>
-<p>至於第一步要怎麼拉呢?，我們把遠平面及中間的區域往裡面擠，就可以把四角錐擠成長方體的形狀了，在這個過程中有三點要注意</p>
+<p>至於第一步要怎麼拉呢? 我們把遠平面及中間的區域往裡面擠，就可以把四角錐擠成長方體的形狀了，在這個過程中有三點要注意</p>
 <ul>
 <li>近平面上的點座標不變</li>
 <li>遠平面上的點 Z 值不變</li>
@@ -11772,10 +11808,9 @@ A. Rago. Addison-Wesley, 2005.<br>
 </ul>
 <p>現在就開始擠它，我們從側面來看這個四角錐的話它長這樣(省略下面部分)：</p>
 <div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(n 為近平面距離相機的距離，z 為遠平面距離相機的距離)</p>
+<figure><figcaption>(n 為近平面距離相機的距離，z 為遠平面距離相機的距離)</figcaption></figure>
 </div>
-<p>我們想知道對於任何一個點 ，經過了擠壓之後座標會如何變化，以上突來說  因為是頂點，因此我們知道他最後的高度與近平面的高度要是一樣的，也就是說  經過擠壓後會變為 </p>
+<p>我們想知道對於任何一個點 ，經過了擠壓之後座標會如何變化，以上圖來說  因為是頂點，因此我們知道他最後的高度與近平面的高度要是一樣的，也就是說  經過擠壓後會變為 </p>
 <p>再來透過這個側面的視圖，我們可以發現近平面形成的三角形，與遠平面形成的三角形是相似三角形。 因此我們可得</p>
 <p>按照這個關係，對於任意 Z 值，我們都可以算出對應平面的比值，因此任意一個點的  會如何變化是相對簡單的，對於  也同理，<span class="yellow">但對於  則不一樣</span>，我們先忽略  值，將式子寫出來：</p>
 <p>我們可以將擠壓這個變換以矩陣  表示，並將上式寫為矩陣形式：</p>
@@ -11792,9 +11827,10 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>這個  顯然與  和  都沒有關係，所以我們可以第三個 row 的左邊兩個元素為 ：</p>
 <p>也就是</p>
 <p>此時我們再將遠平面的中心點  代入，同理可得</p>
-<blockquote>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p>這邊為了避免符號的問題將遠平面的 Z 值由符號  改為 </p>
-</blockquote>
+</div>
 <p>將這個聯立方程式解開後我們可得：</p>
 <p>至此，我們便能將這個矩陣填完了：</p>
 <p>利用這個矩陣，我們就能將透視投影的四角錐擠成一個長方體了，這之後再繼續做正交投影即可</p>
@@ -11826,10 +11862,11 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>雖然我們是用整數的坐標來描述它，但你可以很明顯地看到像素的中心，以藍色的像素為例，是 ，因此對於每個像素，其寬度為 ，中心應該要準確地在  上</p>
 <p>到這邊就可以來表示螢幕空間了，我們現在有一個 -1 ~ 1 的立方體，要把它轉換到 <code>0 ~ width</code> 乘以 <code>0 ~ height</code> 上。 我們知道 -1 ~ 1 的立方體寬度和高度都為 2，因此首先將其除以 2，再乘以對應的 width 和 height，這就是所謂的 Viewport Transformation：</p>
 <p>記得這會先做拉伸再做平移</p>
-<p>左上角的  矩陣是個對角矩陣，把寬度變成 width，並把高度變成 height，但此時中心還在原點 ，但螢幕空間的左下角才是原點，因此要把中心移到螢幕空間對應的中心上，而這個位移稍微想一下我們很快就可以得到要移動  與 </p>
-<blockquote>
+<p>左上角的  矩陣是個對角矩陣，把寬度變成 width，並把高度變成 height，但此時中心還在原點 ，但螢幕空間的左下角才是原點，因此要把中心移到螢幕空間對應的中心上，所以要移動  與 </p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
 <p>你可能會想到一個問題， 怎麼辦，立方體是三維的，但螢幕是二維的，這個我們先暫時不管，後面會再提到</p>
-</blockquote>
+</div>
 ]]></content>
     <category term="computer-graphic"/>
     <published>2025-03-14T00:00:00.000Z</published>
@@ -11838,7 +11875,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">Games101：Homogeneous Coordinates(齊次座標)</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/HomogeneousCoordinates/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/HomogeneousCoordinates/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
+    <updated>2025-06-03T12:55:55.000Z</updated>
     <summary type="html"><![CDATA[
 <p>一般的轉換可以寫成矩陣的形式，像是</p>
 <p>我們可以寫成</p>
@@ -11902,7 +11939,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>我們可以將不同的轉換先依序相乘組合成一個矩陣，這樣跟把轉換矩陣一個一個乘上去的結果會一樣，在寫的時候要注意轉換的順序</p>
 <p>舉個例子，將點  先旋轉 45 度，然後進行一個單位的平移，那可以寫成這樣：</p>
 <p>因為矩陣有結合率，我們可以將其組合，寫成：</p>
-<p>這裡有個重點是，當我們把它合成一個矩陣的時候，要記住它是先做線性變換再做平移，如果你要先做平移，就要分開寫成兩個矩陣</p>
+<p>這裡有個重點是，當我們把它合成一個矩陣的時候，要記住它是<span class="yellow">先做線性變換再做平移，如果你要先做平移，就要分開寫成兩個矩陣</span></p>
 <h2>舉個簡單的應用範例</h2>
 <p>假設我們想要將左圖透過轉換變成右圖：</p>
 <div class="center-column">
@@ -17313,6 +17350,295 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <published>2021-10-16T00:00:00.000Z</published>
   </entry>
   <entry>
+    <title type="text">PE file format</title>
+    <id>https://mes0903.github.io/security/PE_file_format/</id>
+    <link href="https://mes0903.github.io/security/PE_file_format/"/>
+    <updated>2025-06-02T03:50:24.000Z</updated>
+    <summary type="html"><![CDATA[
+<h2>前言</h2>
+<p>PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等</p>
+<p>PE File 內部的格式是規定好的，也就是所謂的 PE file format，大致可以分為兩部分，Header 與 Section：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+<p>(圖片<a href="https://www.researchgate.net/figure/Portable-executable-file-format_fig6_338355873" target="_blank" rel="noopener noreferrer">連結</a>)</p>
+</div>]]></summary>
+    <content type="html"><![CDATA[
+<h2>前言</h2>
+<p>PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等</p>
+<p>PE File 內部的格式是規定好的，也就是所謂的 PE file format，大致可以分為兩部分，Header 與 Section：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+<p>(圖片<a href="https://www.researchgate.net/figure/Portable-executable-file-format_fig6_338355873" target="_blank" rel="noopener noreferrer">連結</a>)</p>
+</div>
+<p>Header 是用來管理 PE file 的，包含了一些執行檔的重要資訊，而 Section 則包含了程式碼、常量、資料和圖片資源等等</p>
+<p>為了後續講解，這邊用 asm 寫了一個很簡單的 Windows Program，執行檔名為 demo.exe：</p>
+<div class="language-asm line-numbers-mode" data-highlighter="shiki" data-ext="asm" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">; demo.asm</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    .</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">386</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    .model flat, stdcall</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    option </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">casemap:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">none</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\windows.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\kernel32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\user32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\masm32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\kernel32.lib</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\user32.lib</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\masm32.lib</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    .data</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">szCaptions  </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">db</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> 'hello', </span><span style="--shiki-light:#986801;--shiki-dark:#C678DD">0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">szText  </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">db</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> 'Hello World!', </span><span style="--shiki-light:#986801;--shiki-dark:#C678DD">0</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    .code</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">start:</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    lea</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, szCaptions</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    lea</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, szText</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    call</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> MessageBox</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    call</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ExitProcess</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    end start</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>由於我是用 masm 組譯，所以指令就下</p>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">\masm32\bin\ml</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /c</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /Zd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /coff</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> demo.asm</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">\masm32\bin\Link</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /SUBSYSTEM:CONSOLE</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> demo.obj</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>我們可以用 PE-bear 這個軟體來看 PE file 的內容，這是我用 PEbear 將 demo.exe 開起來的樣貌：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>可以看見 demo.exe 由 DOS Header, DOS stub, NT Headers, Section Headers 與幾個 Sections 組成，那接下來就會依序介紹這些東西</p>
+<h2>DOS Header</h2>
+<p>PE file 最一開始的部分是 Dos Header，PE-bear 可以幫我們把這段 binary：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>解析為這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>DOS Header 是 PE File 中的起始位置，以前的功用是用來保持與 DOS 的兼容性與定位 NT Header，而現在的功用只剩下後者</p>
+<p>DOS Header 是一個 C struct，在 <code>winnt.h</code> 中的定義如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _IMAGE_DOS_HEADER {</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">      // DOS .EXE header</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_magic;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // EXE 簽名 mz</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cblp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Bytes on last page of file</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Pages in file</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_crlc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Relocations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cparhdr;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // Size of header in paragraphs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_minalloc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Minimum extra paragraphs needed</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_maxalloc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Maximum extra paragraphs needed</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ss;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial (relative) SS value</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_sp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial SP value</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_csum;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Checksum</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ip;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial IP value</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cs;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial (relative) CS value</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_lfarlc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // File address of relocation table</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ovno;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Overlay number</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">e_res</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // Reserved words</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_oemid;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // OEM identifier (for e_oeminfo)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_oeminfo;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // OEM information; e_oemid specific</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">e_res2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Reserved words</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  LONG   e_lfanew;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // NT Header 位址</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} IMAGE_DOS_HEADER, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">PIMAGE_DOS_HEADER;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>它的大小為 <code>40h</code>(h 代表用十六進位表示)，其中 <code>WORD</code> 是 2bytes，<code>LONG</code> 是 4bytes。 我們關心的只有兩個成員：<code>e_magic</code> 與 <code>e_lfanew</code></p>
+<p><code>e_magic</code> 是一個簽名，ASCII 的轉換結果為 <code>MZ</code>，所有的 PE file 都要以這個 <code>MZ</code> 開頭；而 <code>e_lfanew</code> 指向 NT Header 的位址。 其它的元素是在 DOS 環境下要使用的，在 Windows 下就無關</p>
+<p>而 DOS Stub 也是在 DOS 環境下使用的，主要功能就是拿來報錯，這邊也就不詳細介紹</p>
+<h2>NT Headers (PE Headers)</h2>
+<p>NT Headers 也是一個 C struct，它在 <code>winnt.h</code> 的定義如下：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#ifdef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _WIN64</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> IMAGE_NT_HEADERS64                  IMAGE_NT_HEADERS;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PIMAGE_NT_HEADERS64                 PIMAGE_NT_HEADERS;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#else</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> IMAGE_NT_HEADERS32                  IMAGE_NT_HEADERS;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PIMAGE_NT_HEADERS32                 PIMAGE_NT_HEADERS;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#endif</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>其中的 <code>32</code> 與 <code>64</code> 就代表 32 位元和 64 位元，在編譯期的時候就會選擇好了</p>
+<p>而 <code>IMAGE_NT_HEADERS64</code> 與 <code>IMAGE_NT_HEADERS32</code> 的差異也很小：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD Signature;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // PE 簽名</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_FILE_HEADER FileHeader;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_OPTIONAL_HEADER64 OptionalHeader;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_NT_HEADERS</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD Signature;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_FILE_HEADER FileHeader;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_OPTIONAL_HEADER32 OptionalHeader;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_NT_HEADERS32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_NT_HEADERS32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>可以看見基本上一樣的，差異只在 Optional Header</p>
+<p>第一個成員 <code>Signature</code> 是 <code>PE File</code> 的簽名，簽名為 <code>PE</code>，用 PE-bear 可以看見其 binary 為<br>
+<code>00 00 45 50</code>(此 exe 為 little endian)</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<h3>FileHeader</h3>
+<p>FileHeader 的定義如下：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    Machine;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // 平台，intel 386 為 0x014c，intel 64 為 0x0200</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    NumberOfSections;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">              // Section 數量，最多 96 個字節</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   TimeDateStamp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 編譯日期</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   PointerToSymbolTable;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   NumberOfSymbols;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    SizeOfOptionalHeader;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // OptionalHeader 大小, 32 位通常為 E0，64 位通常為 F0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    Characteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 檔案屬性，EXE 通常為 010f，DLL 通常為 210e</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>Machine</code> 表示平台，可能得值如下：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_UNKNOWN</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">           0</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_TARGET_HOST</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0001</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Useful for indicating we want to interact with the host and not a WoW guest.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_I386</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">014c</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Intel 386.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R3000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0162</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian, 0x160 big-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R4000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0166</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R10000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0168</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_WCEMIPSV2</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0169</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian WCE v2</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ALPHA</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0184</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Alpha_AXP</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a2</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH3 little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3DSP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a3</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3E</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a4</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH3E little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH4</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a6</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH4 little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH5</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a8</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH5</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c0</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Little-Endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_THUMB</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c2</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Thumb/Thumb-2 Little-Endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARMNT</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c4</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Thumb-2 Little-Endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AM33</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01d3</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_POWERPC</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01F0</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // IBM PowerPC Little-Endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_POWERPCFP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01f1</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_IA64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0200</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Intel 64</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPS16</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0266</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ALPHA64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0284</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ALPHA64</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPSFPU</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0366</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPSFPU16</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0466</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AXP64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">             IMAGE_FILE_MACHINE_ALPHA64</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_TRICORE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0520</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Infineon</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_CEF</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0CEF</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_EBC</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0EBC</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // EFI Byte Code</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AMD64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">8664</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // AMD64 (K8)</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_M32R</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">9041</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // M32R little-endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARM64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">AA64</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM64 Little-Endian</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_CEE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">C0EE</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>以 demo.exe 來說，其值為 <code>014c</code></p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>這很長一串，用到的時候再查就好</p>
+<p><code>TimeDateStamp</code> 表示編譯日期；<code>SizeOfOptionalHeader</code> 表示 Optional Header 的大小，32 bit 的電腦通常為 <code>0xE0</code>，64 bit 通常為 <code>0xF0</code></p>
+<p>Characteristics 記錄了這個檔案的屬性，會是以下這些值去做 <code>or</code> 運算：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_RELOCS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0001</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Relocation info stripped from file.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_EXECUTABLE_IMAGE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">          0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0002</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File is executable  (i.e. no unresolved external references).</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LINE_NUMS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">        0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0004</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Line nunbers stripped from file.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LOCAL_SYMS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0008</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Local symbols stripped from file.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_AGGRESIVE_WS_TRIM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0010</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Aggressively trim working set</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LARGE_ADDRESS_AWARE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0020</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // App can handle &gt;2gb addresses</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_BYTES_REVERSED_LO</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0080</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Bytes of machine word are reversed.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_32BIT_MACHINE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0100</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // 32 bit word machine.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_DEBUG_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0200</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Debugging info stripped from file in .DBG file</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">   0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0400</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // If Image is on removable media, copy and run from the swap file.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_NET_RUN_FROM_SWAP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0800</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // If Image is on Net, copy and run from the swap file.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_SYSTEM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">                    0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // System File.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_DLL</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">                       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File is a DLL.</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_UP_SYSTEM_ONLY</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File should only be run on a UP machine</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_BYTES_REVERSED_HI</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">8000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Bytes of machine word are reversed.</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>以 demo.exe 來說其值為 <code>0x010f</code>，因此是 1, 2, 4, 8, 100 做 <code>or</code> 運算</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<h3>Optional Header (可選頭)</h3>
+<p>Optional Header 雖然有 <code>Optional</code> 這詞在裡面，但它是一定要有的，其定義如下：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_OPTIONAL_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Standard fields.</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    Magic;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // 簽名， 107h = ROM Image， 10Bh = EXE Image，20Bh = PE32+</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    MajorLinkerVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // Linker 版本號</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    MinorLinkerVersion;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfCode;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 所有含有程式碼的 Section 大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfInitializedData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 所有含有初始化數據的 Section 大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfUninitializedData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">     // 所有含位未始化數據的 Section 大小(不佔用檔案空間，載入記憶體後才會分配空間)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   AddressOfEntryPoint;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // Process 執行入口 RVA(距離 PE 載入後地址的距離，病毒和加密程式都會修改其值，從而獲得程式的控制權；對於 DLL，如果沒有入口函式，那麼就是 0；對於驅動其值為初始化的函式地址)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   BaseOfCode;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 程式碼的 Section 的起始 RVA(通常跟在 NT Header 後)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   BaseOfData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 數據的 Section 的起始 RVA </span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // NT additional fields.</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   ImageBase;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // Process 建議的載入地址</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SectionAlignment;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">            // 記憶體中的 Section 對齊值</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   FileAlignment;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 檔案中的 Section 對齊值</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorOperatingSystemVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // OS 版本號</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorOperatingSystemVersion;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorImageVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // PE 版本號</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorImageVersion;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorSubsystemVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 需要的 Subsystem 版本號</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorSubsystemVersion;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   Win32VersionValue;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 未使用，必須為 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfImage;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 記憶體中整個 PE 檔案的 image 大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeaders;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 所有的 Header 與 Section Header 加起來的大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   CheckSum;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // 檢驗值，一般文件為 0，DLL 和 SYS 則會有其設定的值</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    Subsystem;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // 檔案子系統</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    DllCharacteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // DLL 檔案特性</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfStackReserve;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // 初始化時保留的 stack 大小 (預設 1M)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfStackCommit;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 初始化時實際給予的 stack 大小 (預設 4K)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeapReserve;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 初始化時保留的 Heap 大小 (預設 1M)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeapCommit;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">            // 初始化時實際給予的 Heap 大小 (預設 4K)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   LoaderFlags;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 加載旗幟，通常是 0</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   NumberOfRvaAndSizes;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // 數據目錄的數量</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_DATA_DIRECTORY </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">DataDirectory</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // 數據目錄的陣列</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_OPTIONAL_HEADER32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_OPTIONAL_HEADER32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2>Section Headers (區段頭)</h2>
+<p>Section Header 會記錄每個 Section 的資訊，定義如下：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_SIZEOF_SHORT_NAME</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">              8</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">Name</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[IMAGE_SIZEOF_SHORT_NAME];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 區段名，如 .text 或 .data</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    union</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">            DWORD   PhysicalAddress;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">            DWORD   VirtualSize;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 區段大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    } Misc;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   VirtualAddress;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // 區段的位移 (RVA)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfRawData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // Section 在檔案中對齊後的大小</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToRawData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // Section 在檔案中的偏移量 (FOA)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToRelocations;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                // 在 OBJ 文件中使用</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToLinenumbers;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                // 行號表的位置(debug 時使用)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    NumberOfRelocations;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 在 OBJ 文件中使用</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    NumberOfLinenumbers;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 行號表中行號的數量</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   Characteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // Section 屬性</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_SIZEOF_SECTION_HEADER</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">          40</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>每個 Section Header 會指向對應的 Section，像是這樣</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+<p>(圖片<a href="https://tech-zealots.com/malware-analysis/pe-portable-executable-structure-malware-analysis-part-2/" target="_blank" rel="noopener noreferrer">連結</a>)</p>
+</div>
+<p>Section Header 只負責記錄對應 Section 的重要屬性，像是 Section 的名字，大小，RVA 等等</p>
+<h2>Section(區段)</h2>
+<p>在 Headers 之後接的就是各個 Section，像是大家熟悉的 <code>.text</code>、<code>.data</code> 等等都是個 Section</p>
+<p><code>.text</code> 通常會是第一個 Section，是你可執行程式碼所在的位置，執行檔的進入點通常也會在這裡</p>
+<p><code>.data</code> 段則是放你的數據，像是我們 <code>std::cout &lt;&lt; "Hello";</code>，那麼 <code>"Hello"</code> 這個資料就會放在 <code>.data</code> 裡面</p>
+<p>其他還有很多，上面的圖也可以大概看到，有興趣的可以查一下，這邊就不贅述</p>
+<h2>VA、RVA、FOA</h2>
+<p>而一個 PE 在硬碟與在記憶體中的偏移量會有所不同，這邊會有三個名詞先介紹一下：</p>
+<ul>
+<li>VA: 虛擬位址(Virtual Address)，指 PE 檔案載入「記憶體」後的位址</li>
+<li>RVA: 相對虛擬位址(Relative Virtual Address)，是 PE 檔案中資料、Section 等在「記憶體」中的偏移量</li>
+<li>FOA: 文件偏移位址(File Offset Address)，是 PE 檔案中資料、Section 等在「硬碟」中的偏移量</li>
+</ul>
+<p>我們看張圖來解釋：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>這邊假設每個 Section 的大小都小於 Alignment 的大小，所以一個 Section 的大小就是一個 Alignment 的大小。x86 下 FileAlignment 通常是 <code>0x200</code>，也就是 512 bytes，這也是一個硬碟扇區的大小。而 x86 下 SectionAlignment 通常是 <code>0x1000</code></p>
+<p>而 Section 開始的位址為 Base 的位址加上其偏移量，在硬碟中，Base 的位址為 0，偏移量則是 <code>PointerToRawData</code> 決定的，也就是 FOA</p>
+<p>在記憶體中，Base 的位址為 Imagebase 的位址，然而這是對第一個載入記憶體的 PE 而言，當 Imagebase 處已經有 PE 載入時，OS 會介入調整載入位址，因此我們常說 Imagebase 為「建議載入」位址，而記憶體中 Section 的偏移量則是 <code>VirtualAddress</code> 的數值，也就是 RVA，RVA 的數值加上 Base 的位址則是 Section 在記憶體上的位址，稱為 VA，因此 VA = RVA + Imagebase</p>
+]]></content>
+    <category term="security"/>
+    <published>2023-01-09T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">RVOS OSDI 筆記</title>
     <id>https://mes0903.github.io/risc-v/OSDI/</id>
     <link href="https://mes0903.github.io/risc-v/OSDI/"/>
@@ -19280,295 +19606,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <published>2023-06-01T00:00:00.000Z</published>
   </entry>
   <entry>
-    <title type="text">PE file format</title>
-    <id>https://mes0903.github.io/security/PE_file_format/</id>
-    <link href="https://mes0903.github.io/security/PE_file_format/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
-    <summary type="html"><![CDATA[
-<h2>前言</h2>
-<p>PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等</p>
-<p>PE File 內部的格式是規定好的，也就是所謂的 PE file format，大致可以分為兩部分，Header 與 Section：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(圖片<a href="https://www.researchgate.net/figure/Portable-executable-file-format_fig6_338355873" target="_blank" rel="noopener noreferrer">連結</a>)</p>
-</div>]]></summary>
-    <content type="html"><![CDATA[
-<h2>前言</h2>
-<p>PE 是 Portable Executable 的縮寫，它是根據 UNIX 系統的 COFF 來設計的，在 Windows 下所有的可執行文件都是 PE File，像是 EXE、DLL、SYS、OCX 等等</p>
-<p>PE File 內部的格式是規定好的，也就是所謂的 PE file format，大致可以分為兩部分，Header 與 Section：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(圖片<a href="https://www.researchgate.net/figure/Portable-executable-file-format_fig6_338355873" target="_blank" rel="noopener noreferrer">連結</a>)</p>
-</div>
-<p>Header 是用來管理 PE file 的，包含了一些執行檔的重要資訊，而 Section 則包含了程式碼、常量、資料和圖片資源等等</p>
-<p>為了後續講解，這邊用 asm 寫了一個很簡單的 Windows Program，執行檔名為 demo.exe：</p>
-<div class="language-asm line-numbers-mode" data-highlighter="shiki" data-ext="asm" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">; demo.asm</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    .</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">386</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    .model flat, stdcall</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    option </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">casemap:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">none</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\windows.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\kernel32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\user32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">include \masm32\include\masm32.</span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">inc</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\kernel32.lib</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\user32.lib</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">includelib \masm32\lib\masm32.lib</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    .data</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">szCaptions  </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">db</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> 'hello', </span><span style="--shiki-light:#986801;--shiki-dark:#C678DD">0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">szText  </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">db</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> 'Hello World!', </span><span style="--shiki-light:#986801;--shiki-dark:#C678DD">0</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    .code</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">start:</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    lea</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, szCaptions</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    lea</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, szText</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> eax</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    call</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> MessageBox</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    push</span><span style="--shiki-light:#986801;--shiki-dark:#C678DD"> 0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">    call</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ExitProcess</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    end start</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>由於我是用 masm 組譯，所以指令就下</p>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">\masm32\bin\ml</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /c</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /Zd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /coff</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> demo.asm</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">\masm32\bin\Link</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> /SUBSYSTEM:CONSOLE</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> demo.obj</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>我們可以用 PE-bear 這個軟體來看 PE file 的內容，這是我用 PEbear 將 demo.exe 開起來的樣貌：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>可以看見 demo.exe 由 DOS Header, DOS stub, NT Headers, Section Headers 與幾個 Sections 組成，那接下來就會依序介紹這些東西</p>
-<h2>DOS Header</h2>
-<p>PE file 最一開始的部分是 Dos Header，PE-bear 可以幫我們把這段 binary：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>解析為這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>DOS Header 是 PE File 中的起始位置，以前的功用是用來保持與 DOS 的兼容性與定位 NT Header，而現在的功用只剩下後者</p>
-<p>DOS Header 是一個 C struct，在 <code>winnt.h</code> 中的定義如下：</p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _IMAGE_DOS_HEADER {</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">      // DOS .EXE header</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_magic;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // EXE 簽名 mz</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cblp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Bytes on last page of file</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Pages in file</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_crlc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Relocations</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cparhdr;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // Size of header in paragraphs</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_minalloc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Minimum extra paragraphs needed</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_maxalloc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Maximum extra paragraphs needed</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ss;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial (relative) SS value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_sp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial SP value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_csum;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Checksum</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ip;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial IP value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_cs;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // Initial (relative) CS value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_lfarlc;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // File address of relocation table</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_ovno;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // Overlay number</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">e_res</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // Reserved words</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_oemid;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // OEM identifier (for e_oeminfo)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   e_oeminfo;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // OEM information; e_oemid specific</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD   </span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">e_res2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // Reserved words</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  LONG   e_lfanew;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // NT Header 位址</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} IMAGE_DOS_HEADER, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">PIMAGE_DOS_HEADER;</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>它的大小為 <code>40h</code>(h 代表用十六進位表示)，其中 <code>WORD</code> 是 2bytes，<code>LONG</code> 是 4bytes。 我們關心的只有兩個成員：<code>e_magic</code> 與 <code>e_lfanew</code></p>
-<p><code>e_magic</code> 是一個簽名，ASCII 的轉換結果為 <code>MZ</code>，所有的 PE file 都要以這個 <code>MZ</code> 開頭；而 <code>e_lfanew</code> 指向 NT Header 的位址。 其它的元素是在 DOS 環境下要使用的，在 Windows 下就無關</p>
-<p>而 DOS Stub 也是在 DOS 環境下使用的，主要功能就是拿來報錯，這邊也就不詳細介紹</p>
-<h2>NT Headers (PE Headers)</h2>
-<p>NT Headers 也是一個 C struct，它在 <code>winnt.h</code> 的定義如下：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#ifdef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _WIN64</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> IMAGE_NT_HEADERS64                  IMAGE_NT_HEADERS;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PIMAGE_NT_HEADERS64                 PIMAGE_NT_HEADERS;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#else</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> IMAGE_NT_HEADERS32                  IMAGE_NT_HEADERS;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> PIMAGE_NT_HEADERS32                 PIMAGE_NT_HEADERS;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#endif</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>其中的 <code>32</code> 與 <code>64</code> 就代表 32 位元和 64 位元，在編譯期的時候就會選擇好了</p>
-<p>而 <code>IMAGE_NT_HEADERS64</code> 與 <code>IMAGE_NT_HEADERS32</code> 的差異也很小：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD Signature;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // PE 簽名</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_FILE_HEADER FileHeader;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_OPTIONAL_HEADER64 OptionalHeader;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_NT_HEADERS64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_NT_HEADERS</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD Signature;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_FILE_HEADER FileHeader;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_OPTIONAL_HEADER32 OptionalHeader;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_NT_HEADERS32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_NT_HEADERS32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>可以看見基本上一樣的，差異只在 Optional Header</p>
-<p>第一個成員 <code>Signature</code> 是 <code>PE File</code> 的簽名，簽名為 <code>PE</code>，用 PE-bear 可以看見其 binary 為<br>
-<code>00 00 45 50</code>(此 exe 為 little endian)</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<h3>FileHeader</h3>
-<p>FileHeader 的定義如下：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    Machine;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // 平台，intel 386 為 0x014c，intel 64 為 0x0200</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    NumberOfSections;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">              // Section 數量，最多 96 個字節</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   TimeDateStamp;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 編譯日期</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   PointerToSymbolTable;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  DWORD   NumberOfSymbols;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    SizeOfOptionalHeader;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // OptionalHeader 大小, 32 位通常為 E0，64 位通常為 F0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  WORD    Characteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 檔案屬性，EXE 通常為 010f，DLL 通常為 210e</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_FILE_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>Machine</code> 表示平台，可能得值如下：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_UNKNOWN</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">           0</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_TARGET_HOST</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0001</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Useful for indicating we want to interact with the host and not a WoW guest.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_I386</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">014c</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Intel 386.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R3000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0162</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian, 0x160 big-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R4000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0166</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_R10000</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0168</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_WCEMIPSV2</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0169</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS little-endian WCE v2</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ALPHA</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0184</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Alpha_AXP</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a2</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH3 little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3DSP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a3</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH3E</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a4</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH3E little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH4</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a6</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH4 little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_SH5</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01a8</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // SH5</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c0</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Little-Endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_THUMB</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c2</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Thumb/Thumb-2 Little-Endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARMNT</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01c4</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM Thumb-2 Little-Endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AM33</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01d3</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_POWERPC</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01F0</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // IBM PowerPC Little-Endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_POWERPCFP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">01f1</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_IA64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0200</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Intel 64</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPS16</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0266</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ALPHA64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0284</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ALPHA64</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPSFPU</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0366</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_MIPSFPU16</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0466</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // MIPS</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AXP64</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">             IMAGE_FILE_MACHINE_ALPHA64</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_TRICORE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0520</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Infineon</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_CEF</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0CEF</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_EBC</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0EBC</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // EFI Byte Code</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_AMD64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">8664</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // AMD64 (K8)</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_M32R</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">              0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">9041</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // M32R little-endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_ARM64</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">AA64</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // ARM64 Little-Endian</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_MACHINE_CEE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">               0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">C0EE</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>以 demo.exe 來說，其值為 <code>014c</code></p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>這很長一串，用到的時候再查就好</p>
-<p><code>TimeDateStamp</code> 表示編譯日期；<code>SizeOfOptionalHeader</code> 表示 Optional Header 的大小，32 bit 的電腦通常為 <code>0xE0</code>，64 bit 通常為 <code>0xF0</code></p>
-<p>Characteristics 記錄了這個檔案的屬性，會是以下這些值去做 <code>or</code> 運算：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_RELOCS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">           0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0001</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Relocation info stripped from file.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_EXECUTABLE_IMAGE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">          0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0002</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File is executable  (i.e. no unresolved external references).</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LINE_NUMS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">        0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0004</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Line nunbers stripped from file.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LOCAL_SYMS_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0008</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Local symbols stripped from file.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_AGGRESIVE_WS_TRIM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0010</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Aggressively trim working set</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_LARGE_ADDRESS_AWARE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0020</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // App can handle &gt;2gb addresses</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_BYTES_REVERSED_LO</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0080</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Bytes of machine word are reversed.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_32BIT_MACHINE</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">             0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0100</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // 32 bit word machine.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_DEBUG_STRIPPED</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0200</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Debugging info stripped from file in .DBG file</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">   0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0400</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // If Image is on removable media, copy and run from the swap file.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_NET_RUN_FROM_SWAP</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0800</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // If Image is on Net, copy and run from the swap file.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_SYSTEM</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">                    0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // System File.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_DLL</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">                       0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File is a DLL.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_UP_SYSTEM_ONLY</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">            0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // File should only be run on a UP machine</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_FILE_BYTES_REVERSED_HI</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">         0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">8000</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Bytes of machine word are reversed.</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>以 demo.exe 來說其值為 <code>0x010f</code>，因此是 1, 2, 4, 8, 100 做 <code>or</code> 運算</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<h3>Optional Header (可選頭)</h3>
-<p>Optional Header 雖然有 <code>Optional</code> 這詞在裡面，但它是一定要有的，其定義如下：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_OPTIONAL_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Standard fields.</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    Magic;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // 簽名， 107h = ROM Image， 10Bh = EXE Image，20Bh = PE32+</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    MajorLinkerVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // Linker 版本號</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    MinorLinkerVersion;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfCode;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 所有含有程式碼的 Section 大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfInitializedData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 所有含有初始化數據的 Section 大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfUninitializedData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">     // 所有含位未始化數據的 Section 大小(不佔用檔案空間，載入記憶體後才會分配空間)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   AddressOfEntryPoint;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // Process 執行入口 RVA(距離 PE 載入後地址的距離，病毒和加密程式都會修改其值，從而獲得程式的控制權；對於 DLL，如果沒有入口函式，那麼就是 0；對於驅動其值為初始化的函式地址)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   BaseOfCode;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 程式碼的 Section 的起始 RVA(通常跟在 NT Header 後)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   BaseOfData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                  // 數據的 Section 的起始 RVA </span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // NT additional fields.</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    //</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   ImageBase;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // Process 建議的載入地址</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SectionAlignment;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">            // 記憶體中的 Section 對齊值</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   FileAlignment;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 檔案中的 Section 對齊值</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorOperatingSystemVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // OS 版本號</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorOperatingSystemVersion;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorImageVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // PE 版本號</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorImageVersion;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MajorSubsystemVersion;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 需要的 Subsystem 版本號</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    MinorSubsystemVersion;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   Win32VersionValue;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 未使用，必須為 0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfImage;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 記憶體中整個 PE 檔案的 image 大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeaders;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">               // 所有的 Header 與 Section Header 加起來的大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   CheckSum;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // 檢驗值，一般文件為 0，DLL 和 SYS 則會有其設定的值</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    Subsystem;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                   // 檔案子系統</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    DllCharacteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // DLL 檔案特性</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfStackReserve;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">          // 初始化時保留的 stack 大小 (預設 1M)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfStackCommit;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 初始化時實際給予的 stack 大小 (預設 4K)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeapReserve;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // 初始化時保留的 Heap 大小 (預設 1M)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfHeapCommit;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">            // 初始化時實際給予的 Heap 大小 (預設 4K)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   LoaderFlags;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 加載旗幟，通常是 0</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   NumberOfRvaAndSizes;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">         // 數據目錄的數量</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    IMAGE_DATA_DIRECTORY </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">DataDirectory</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // 數據目錄的陣列</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_OPTIONAL_HEADER32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_OPTIONAL_HEADER32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2>Section Headers (區段頭)</h2>
-<p>Section Header 會記錄每個 Section 的資訊，定義如下：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_SIZEOF_SHORT_NAME</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">              8</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typedef</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> _IMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    BYTE    </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">Name</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[IMAGE_SIZEOF_SHORT_NAME];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 區段名，如 .text 或 .data</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    union</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">            DWORD   PhysicalAddress;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">            DWORD   VirtualSize;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 區段大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    } Misc;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   VirtualAddress;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                      // 區段的位移 (RVA)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   SizeOfRawData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // Section 在檔案中對齊後的大小</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToRawData;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // Section 在檔案中的偏移量 (FOA)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToRelocations;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                // 在 OBJ 文件中使用</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   PointerToLinenumbers;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                // 行號表的位置(debug 時使用)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    NumberOfRelocations;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 在 OBJ 文件中使用</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    WORD    NumberOfLinenumbers;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                 // 行號表中行號的數量</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    DWORD   Characteristics;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // Section 屬性</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">IMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">PIMAGE_SECTION_HEADER</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> IMAGE_SIZEOF_SECTION_HEADER</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">          40</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>每個 Section Header 會指向對應的 Section，像是這樣</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-<p>(圖片<a href="https://tech-zealots.com/malware-analysis/pe-portable-executable-structure-malware-analysis-part-2/" target="_blank" rel="noopener noreferrer">連結</a>)</p>
-</div>
-<p>Section Header 只負責記錄對應 Section 的重要屬性，像是 Section 的名字，大小，RVA 等等</p>
-<h2>Section(區段)</h2>
-<p>在 Headers 之後接的就是各個 Section，像是大家熟悉的 <code>.text</code>、<code>.data</code> 等等都是個 Section</p>
-<p><code>.text</code> 通常會是第一個 Section，是你可執行程式碼所在的位置，執行檔的進入點通常也會在這裡</p>
-<p><code>.data</code> 段則是放你的數據，像是我們 <code>std::cout &lt;&lt; "Hello";</code>，那麼 <code>"Hello"</code> 這個資料就會放在 <code>.data</code> 裡面</p>
-<p>其他還有很多，上面的圖也可以大概看到，有興趣的可以查一下，這邊就不贅述</p>
-<h2>VA、RVA、FOA</h2>
-<p>而一個 PE 在硬碟與在記憶體中的偏移量會有所不同，這邊會有三個名詞先介紹一下：</p>
-<ul>
-<li>VA: 虛擬位址(Virtual Address)，指 PE 檔案載入「記憶體」後的位址</li>
-<li>RVA: 相對虛擬位址(Relative Virtual Address)，是 PE 檔案中資料、Section 等在「記憶體」中的偏移量</li>
-<li>FOA: 文件偏移位址(File Offset Address)，是 PE 檔案中資料、Section 等在「硬碟」中的偏移量</li>
-</ul>
-<p>我們看張圖來解釋：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>這邊假設每個 Section 的大小都小於 Alignment 的大小，所以一個 Section 的大小就是一個 Alignment 的大小。x86 下 FileAlignment 通常是 <code>0x200</code>，也就是 512 bytes，這也是一個硬碟扇區的大小。而 x86 下 SectionAlignment 通常是 <code>0x1000</code></p>
-<p>而 Section 開始的位址為 Base 的位址加上其偏移量，在硬碟中，Base 的位址為 0，偏移量則是 <code>PointerToRawData</code> 決定的，也就是 FOA</p>
-<p>在記憶體中，Base 的位址為 Imagebase 的位址，然而這是對第一個載入記憶體的 PE 而言，當 Imagebase 處已經有 PE 載入時，OS 會介入調整載入位址，因此我們常說 Imagebase 為「建議載入」位址，而記憶體中 Section 的偏移量則是 <code>VirtualAddress</code> 的數值，也就是 RVA，RVA 的數值加上 Base 的位址則是 Section 在記憶體上的位址，稱為 VA，因此 VA = RVA + Imagebase</p>
-]]></content>
-    <category term="security"/>
-    <published>2023-01-09T00:00:00.000Z</published>
-  </entry>
-  <entry>
     <title type="text">Ch1 基礎概論</title>
     <id>https://mes0903.github.io/OS/NTHU/Introduction/</id>
     <link href="https://mes0903.github.io/OS/NTHU/Introduction/"/>
@@ -20416,7 +20453,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-06-02T03:50:50.252Z</updated>
+    <updated>2025-06-03T13:08:02.286Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20747,7 +20784,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-06-02T03:50:50.281Z</updated>
+    <updated>2025-06-03T13:08:02.316Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20894,7 +20931,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-06-02T03:50:50.288Z</updated>
+    <updated>2025-06-03T13:08:02.331Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21153,7 +21190,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-06-02T03:50:50.302Z</updated>
+    <updated>2025-06-03T13:08:02.345Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22657,7 +22694,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-06-02T03:50:50.464Z</updated>
+    <updated>2025-06-03T13:08:02.503Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23046,7 +23083,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-06-02T03:50:50.496Z</updated>
+    <updated>2025-06-03T13:08:02.537Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23374,7 +23411,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-06-02T03:50:50.525Z</updated>
+    <updated>2025-06-03T13:08:02.566Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23397,7 +23434,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-06-02T03:50:50.526Z</updated>
+    <updated>2025-06-03T13:08:02.574Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23543,7 +23580,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-06-02T03:50:50.541Z</updated>
+    <updated>2025-06-03T13:08:02.580Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23941,7 +23978,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-06-02T03:50:50.581Z</updated>
+    <updated>2025-06-03T13:08:02.620Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24193,7 +24230,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-06-02T03:50:50.599Z</updated>
+    <updated>2025-06-03T13:08:02.637Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25551,7 +25588,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-06-02T03:50:50.718Z</updated>
+    <updated>2025-06-03T13:08:02.765Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26233,7 +26270,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-06-02T03:50:50.775Z</updated>
+    <updated>2025-06-03T13:08:02.821Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26562,7 +26599,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-06-02T03:50:50.907Z</updated>
+    <updated>2025-06-03T13:08:02.953Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26851,7 +26888,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-06-02T03:50:51.041Z</updated>
+    <updated>2025-06-03T13:08:03.087Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27625,7 +27662,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-06-02T03:50:51.092Z</updated>
+    <updated>2025-06-03T13:08:03.145Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27852,7 +27889,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-06-02T03:50:51.106Z</updated>
+    <updated>2025-06-03T13:08:03.156Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -28279,7 +28316,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-06-02T03:50:51.341Z</updated>
+    <updated>2025-06-03T13:08:03.387Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -28410,7 +28447,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 值類別 Value Categoraries</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Value_Categories/"/>
-    <updated>2025-06-02T03:50:51.346Z</updated>
+    <updated>2025-06-03T13:08:03.393Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -29195,7 +29232,7 @@ default : statement (3)</p>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> a </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, b </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> c </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> func</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(a, b);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok</span></span>
 <span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> d </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#61AFEF"> func</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A626A4;--shiki-light-font-style:inherit;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> d </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> func</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>++a</code> 被擋了下來，這也很正常，因為它是唯讀的，那麼要怎麼做才可以讓它像這樣呢：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {</span></span>
@@ -29406,7 +29443,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 結構化綁定 Structured Binding Declaration</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Structured_Binding/"/>
-    <updated>2025-06-02T03:50:52.409Z</updated>
+    <updated>2025-06-03T13:08:03.863Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
