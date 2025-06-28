@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Fri, 27 Jun 2025 20:55:36 GMT</pubDate>
-    <lastBuildDate>Fri, 27 Jun 2025 20:55:36 GMT</lastBuildDate>
+    <pubDate>Sat, 28 Jun 2025 14:51:16 GMT</pubDate>
+    <lastBuildDate>Sat, 28 Jun 2025 14:51:16 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>risc-v</category>
@@ -8013,7 +8013,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p>原本會有這篇是因為 MISRA C/C++ spec 內規定不能用 heap allocation，朋朋剛好遇到了這個需求，所以來問了一下能不能把 data 全部放在 stack 段上的 memory pool，剛好要讀書會了，就拿這個主題來寫一篇</p>
 <p>Allocator 與 PMR 讓你能在 stack 上開一個 memory pool，利用 STL 給的 API 去操控它，STL 的容器也可以將 data 配置於其中，不必再使用到 heap，進而避免 heap allocation，帶來一些加速的效果，尤其是對樹狀結構的 heap allocation 而言，在 free memory 時其也會有一定的負擔，對於這種結構的加速會更好</p>
 <p>這篇文會參考 Jason Turner 的影片（應該很多人看過?），還有 C++17 Complete Guide 裡面的章節，順便再整理一下幾場 CppCon 與 <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3916.pdf" target="_blank" rel="noopener noreferrer">N3916</a> 的內容</p>
-<p>底下是一個 Jason Turner 在影片底下給的 <code>std::list</code> 的例子（<a href="https://www.youtube.com/redirect?event=video_description&amp;redir_token=QUFFLUhqbkVWWEppM3NqTl9pWmRQQXJIcHpUMDNxcFlSUXxBQ3Jtc0ttX1d5TGRXSEluTU1PWWZlcHhCLUNwUE9LdUlYVml5ODNvNGZRdUVYX1R0N1kwYnpTYjBnT1k1bzlQeU05c1pBQ3kzb0ZVckdFLVAtdHlEcUtCM1RjeVNiOU5EX0RQYkFDb2E1OENKeTdpTlN4UE5qTQ&amp;q=https%3A%2F%2Fquick-bench.com%2Fq%2FgyRE6p5EdZ-2P0XOAUwO99JRN7g&amp;v=q6A7cKFXjY0" target="_blank" rel="noopener noreferrer">Quick C++ Benchmark 連結</a>）：</p>
+<p>底下是一個 Jason Turner 在影片底下給的 <code>std::list</code> 的例子（<a href="https://quick-bench.com/q/gyRE6p5EdZ-2P0XOAUwO99JRN7g" target="_blank" rel="noopener noreferrer">Quick C++ Benchmark 連結</a>）：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;memory_resource&gt;</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;list&gt;</span></span>
 <span class="line"></span>
