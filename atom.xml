@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-06-28T14:51:16.486Z</updated>
+  <updated>2025-07-14T19:57:37.432Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -23,7 +23,7 @@
     <title type="text">（WIP）RISC-V Machine-Level ISA</title>
     <id>https://mes0903.github.io/risc-v/Machine-Level-ISA/</id>
     <link href="https://mes0903.github.io/risc-v/Machine-Level-ISA/"/>
-    <updated>2025-06-28T14:51:16.490Z</updated>
+    <updated>2025-07-14T19:57:09.000Z</updated>
     <summary type="html"><![CDATA[
 <p>本篇為 RISC-V Machine-Level ISA（Version 20241101）的中文翻譯與筆記，原文可於<a href="https://github.com/riscv/riscv-isa-manual/tree/main" target="_blank" rel="noopener noreferrer">官方 github</a> 的第 3 章中看到。 大部分的情況下我會直接直譯，但有些地方我覺得文件實在寫得很繞，那種地方我就會直接用我自己的話寫了，或是多補一個 Tips Block 做解釋</p>
 <p>本篇內的 Info block 為原文中的補充段落，我全部都有翻，但會依照前後文的語境來決定要不要安插 Info block 進來，也就是說雖然本文中有些段落不在藍色的 Info 區塊內，但在原文中其屬於補充段落。 至於綠色的 Tips block 則是我個人的補充筆記</p>]]></summary>
@@ -33,8 +33,60 @@
 <h2>3.1. Machine-Level CSRs</h2>
 <p>除了本節所描述的 machine-level 的 CSR 外，M-mode 的程式碼也可以存取所有較低權限等級的 CSR</p>
 <h3>3.1.1. Machine ISA (<code>misa</code>) Register</h3>
-<p>misa 這個 CSR 是一個 WARL 類型的可讀寫暫存器，用來回報該 hart 所支援的 ISA。 每個實作都必須要讓這個暫存器可以被讀取，但也可以回傳 0，代表 misa 暫存器未被實作，這種情況下需要透過額外的非標準機制來判斷 CPU 的能力</p>
-]]></content>
+<p><code>misa</code> 這個 CSR 是一個 WARL 類型的可讀寫暫存器，用來回報該 hart 所支援的 ISA。 每個實作都要確保這個暫存器可以被讀取。 如果其回傳 0，代表 <code>misa</code> 暫存器未被實作，這種情況下需要透過額外的非標準機制來判斷 CPU 的能力。 misa CSR 的寬度為 MXLEN 位元（見下一段）</p>
+<figure><figcaption>（Figure 2. Machine ISA register (misa)）</figcaption></figure>
+<p>MXL（Machine XLEN）欄位會編碼這顆 hart 所使用的整數基礎 ISA 的寬度，如表 9 所示。 MXL 是唯讀欄位。 若 <code>misa</code> 的值不為 0，則 MXL 欄位代表 M-mode 下的有效 XLEN，這個值會被稱為 MXLEN。 XLEN 永遠不會大於 MXLEN，但在較低權限的模式中，XLEN 可能小於 MXLEN</p>
+<span class="center-column">
+<table>
+<thead>
+<tr>
+<th>MXL</th>
+<th>XLEN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>32</td>
+</tr>
+<tr>
+<td>2</td>
+<td>64</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Reserved</td>
+</tr>
+</tbody>
+</table>
+<p>（Table 9. Encoding of MXL field in <code>misa</code>）</p>
+</span>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>如同 S-mode ISA 裡面提到的，XLEN 是 CPU 處理整數時的位元寬度，可能是 32、64 或 128。 而 MXL 會告訴你 M-mode 底下的實際位寬是什麼，這對後續要解碼其他 CSR 或資料有幫助</p>
+</div>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>我們可以透過檢查讀取到的 <code>misa</code> 值的正負號，或是透過將該值左移一位並再檢查一次正負號，來判斷基礎位寬。 這些檢查可以用組合語言寫，不需要事先知道該 hart 的 register 寬度（MXLEN）。 基礎位寬的公式是 </p>
+<p>如果 <code>misa</code> 為 0，也可以用另一種方法來推得基礎位寬：將立即數 2 放入一個暫存器，然後將其左移 31 位元。 若結果為 0，則該 hart 是 RV32；否則就是 RV64</p>
+</div>
+<p>Extensions 欄位用來代表標準 extension 是否存在，每個英文字母對應一個 bit（bit 0 表示 extension "A" 是否存在，bit 1 表示 "B"，一直到 bit 25 表示 "Z"）。 例如，RV32I 或 RV64I 的 base ISA，"I" 這個 bit 會被設成 1； 而 RV32E 或 RV64E，則 "E" 會被設成 1。 Extensions 欄位是 WARL 類型的欄位，如果實作上允許修改所支援的 ISA，這些 bit 就可以被寫入。 在 reset 時，Extensions 欄位應該要包含該 hart 所支援的最大 extension 集合，且當 "I" 與 "E" 同時可用時，應該選擇 "I"</p>
+<p>當在 <code>misa</code> 中把某個標準 extension 對應的 bit 清除（設為 0）時，該 extension 所定義或修改的指令與 CSR 會回復為其預設或保留的行為，就好像該 extension 根本沒有被實作一樣</p>
+<div class="hint-container info">
+<p class="hint-container-title">Info</p>
+<p>對於一個給定的 RISC-V 執行環境，是否實作某個指令、extension，或其他 RISC-V ISA 的特性，通常是根據該環境中可觀察到的執行行為來判斷。 例如，只有當 RISC-V Unprivileged ISA 中為 F extension 所定義的指令能如規範所述執行時，F extension 才能算是有在該執行環境中被實作</p>
+<p>根據上述對「實作」的定義，若在 <code>misa</code> 中清除某個 extension 對應的 bit，該 extension 在 M-mode 中就會被視為「未實作」。 例如，把 <code>misa.F</code> 設成 0，就代表在 M-mode 中 F extension 沒有被實作，因為 F extension 的指令將不會依照 Unprivileged ISA 的要求執行，反而可能會觸發 illegal-instruction exception</p>
+<p>將「實作」這個詞定義為完全根據可觀察的執行行為，可能會與一般常見的用法產生衝突。 特別是，一般說法可能會接受「實作了但停用」這種說法，但在本文件中，這被視為詞義上的矛盾，因為「停用」代表該功能的執行行為不會如其規範所要求，因此不能算是「實作」。 同樣地，「已實作且啟用」在這裡也是多餘的說法，用「實作」就已經包含其啟用的意思</p>
+</div>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>在這份文件中，「implemented（實作）」這個詞是非常嚴格的，只要功能沒有依照規範執行，就不算實作。 所以你不能說「我有實作但現在把它關掉了」，在這邊這會被視為語意上的矛盾</p>
+<p>而 <code>misa</code> 只是表達你「打算」支援哪些 extension，一旦你把某個 bit 清掉（即使電路還在），它的指令行為就不是照規範走，因此就不算有「實作」該 extension。 比如把 <code>misa.F</code> 清掉後，即使硬體能跑浮點指令，CPU 也會當作這些指令是非法的，這就是「未實作」。 這讓 <code>misa</code> 不只是資訊回報用途，也可以讓實作端支援切換功能</p>
+</div>
+<span class="center-column">
+<p>| Bit | Character | Description                                                |<br>
+| --: | :</p>
+</span>]]></content>
     <category term="risc-v"/>
     <published>2025-06-19T00:00:00.000Z</published>
   </entry>
@@ -8649,7 +8701,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-06-28T14:51:17.387Z</updated>
+    <updated>2025-07-14T19:57:38.309Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -16794,42 +16846,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <published>2024-10-08T00:00:00.000Z</published>
   </entry>
   <entry>
-    <title type="text">ReRAM 與 Smith-Waterman Algorithm 介紹</title>
-    <id>https://mes0903.github.io/memory/sw_reram/</id>
-    <link href="https://mes0903.github.io/memory/sw_reram/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
-    <summary type="html"><![CDATA[
-<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
-<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
-<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>]]></summary>
-    <content type="html"><![CDATA[
-<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
-<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
-<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>
-<p>但我這學期實在是太忙了，所以我的想法很簡單，找一些別人還沒有在 Non-volatile memory 這塊做過的演算法，我用 Non-volatile memory 做一些 in-memory computing 看看，這樣一來演算法不會太難，而且會有在別的地方做過的相關論文可以參考，這大概也勉強算在「還沒被解過」的範疇內</p>
-<p>而很剛好的，張家華學長對生物工程這方面有所涉略，真的是太猛了，我不管跑去玩什麼有的沒的，他好像都可以給我建議，真的是大神。總之，學長看了看說可以考慮把 systolic array 加進來，因為 systolic array 上面每個 cell 都是一個 memory unit，而我們又能做 in-memory computing，理論上可以做得到，而且這樣可以讓題目更落在「還沒被解過」的圈圈裡面</p>
-<p>因此和老師和學長討論後，選的演算法就是 Smith-Waterman Algorithm 了，演算法不會太 hardcode</p>
-<p>整個過程可以被分為兩部分：</p>
-<ol>
-<li>利用 systolic array 實作 Smith-waterman Algorithm</li>
-<li>利用 ReRAM 實作 systolic array</li>
-</ol>
-<p>雖然我們因為沒有空所以沒有去實作，但經過這一兩個月的 paper survey，覺得我們的想法是可行的，整個過程的主要困難點在於 ReRAM 的 program，說實話 systolic array 的部份並不難，systolic array 可以使用很簡單的結構來做，當然也有看到弄得很漂亮的 systolic array，但內部電路就會複雜起來了</p>
-<p>但重點還是在 ReRAM 的 program part 我們完全沒摸過，雖然知道只要能夠 program ReRAM 內的電阻部份，就能實作出基本邏輯閘，整個專案基本上就沒問題了，但礙於時間我們就沒去研究怎麼去 program 這部份了</p>
-<p>當初老師的建議是可以使用 gem5 + NVMain 來進行模擬，google 搜了一下感覺這東西光是 build 起來就有一堆點要注意，而且目前還沒看到有哪個教學有寫說該怎麼使用，可能之後有閒再來摸摸吧 XD</p>
-<p>Smith-Waterman Algorithm 是一個用在生物工程的演算法，由 Needleman-Wunsch 變化而來，用來做基因序列的比對，所以我們這篇文就從基因序列比對開始介紹起吧~</p>
-<h2>基因序列比對</h2>
-<p>這一段介紹轉載自<a href="https://hackmd.io/@UlvydjoQQKafa4iwBkJ9lg/BkGumVZtu" target="_blank" rel="noopener noreferrer">基因序列比對演算法</a>，寫得很好，我只小改了一些用詞，有興趣的可以去看看原文</p>
-<p>一般而言，我們會把 DNA 和蛋白質分別看成是由 4 和 20 個英文字母所組成的序列或字串，因為他們分別是由 4 種核苷酸和 20 種胺基酸所組成的。對 DNA 而言，突變是非常平常的事情，也是自然的演化過程。藉由基因的突變，生物可以適應自然環境的改變</p>
-<h3>DNA突變的類型</h3>
-<p>常見的DNA突變有3種，分別是取代、插入及刪除</p>
-<p>| DNA突變行為 | 意義                                          |<br>
-|</p>
-]]></content>
-    <category term="memory"/>
-    <published>2023-11-14T00:00:00.000Z</published>
-  </entry>
-  <entry>
     <title type="text">Conjugate Gradient Method</title>
     <id>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</id>
     <link href="https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/"/>
@@ -17522,6 +17538,42 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content>
     <category term="numerical-algebra"/>
     <published>2021-10-16T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">ReRAM 與 Smith-Waterman Algorithm 介紹</title>
+    <id>https://mes0903.github.io/memory/sw_reram/</id>
+    <link href="https://mes0903.github.io/memory/sw_reram/"/>
+    <updated>2025-06-02T03:50:24.000Z</updated>
+    <summary type="html"><![CDATA[
+<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
+<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
+<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>]]></summary>
+    <content type="html"><![CDATA[
+<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
+<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
+<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>
+<p>但我這學期實在是太忙了，所以我的想法很簡單，找一些別人還沒有在 Non-volatile memory 這塊做過的演算法，我用 Non-volatile memory 做一些 in-memory computing 看看，這樣一來演算法不會太難，而且會有在別的地方做過的相關論文可以參考，這大概也勉強算在「還沒被解過」的範疇內</p>
+<p>而很剛好的，張家華學長對生物工程這方面有所涉略，真的是太猛了，我不管跑去玩什麼有的沒的，他好像都可以給我建議，真的是大神。總之，學長看了看說可以考慮把 systolic array 加進來，因為 systolic array 上面每個 cell 都是一個 memory unit，而我們又能做 in-memory computing，理論上可以做得到，而且這樣可以讓題目更落在「還沒被解過」的圈圈裡面</p>
+<p>因此和老師和學長討論後，選的演算法就是 Smith-Waterman Algorithm 了，演算法不會太 hardcode</p>
+<p>整個過程可以被分為兩部分：</p>
+<ol>
+<li>利用 systolic array 實作 Smith-waterman Algorithm</li>
+<li>利用 ReRAM 實作 systolic array</li>
+</ol>
+<p>雖然我們因為沒有空所以沒有去實作，但經過這一兩個月的 paper survey，覺得我們的想法是可行的，整個過程的主要困難點在於 ReRAM 的 program，說實話 systolic array 的部份並不難，systolic array 可以使用很簡單的結構來做，當然也有看到弄得很漂亮的 systolic array，但內部電路就會複雜起來了</p>
+<p>但重點還是在 ReRAM 的 program part 我們完全沒摸過，雖然知道只要能夠 program ReRAM 內的電阻部份，就能實作出基本邏輯閘，整個專案基本上就沒問題了，但礙於時間我們就沒去研究怎麼去 program 這部份了</p>
+<p>當初老師的建議是可以使用 gem5 + NVMain 來進行模擬，google 搜了一下感覺這東西光是 build 起來就有一堆點要注意，而且目前還沒看到有哪個教學有寫說該怎麼使用，可能之後有閒再來摸摸吧 XD</p>
+<p>Smith-Waterman Algorithm 是一個用在生物工程的演算法，由 Needleman-Wunsch 變化而來，用來做基因序列的比對，所以我們這篇文就從基因序列比對開始介紹起吧~</p>
+<h2>基因序列比對</h2>
+<p>這一段介紹轉載自<a href="https://hackmd.io/@UlvydjoQQKafa4iwBkJ9lg/BkGumVZtu" target="_blank" rel="noopener noreferrer">基因序列比對演算法</a>，寫得很好，我只小改了一些用詞，有興趣的可以去看看原文</p>
+<p>一般而言，我們會把 DNA 和蛋白質分別看成是由 4 和 20 個英文字母所組成的序列或字串，因為他們分別是由 4 種核苷酸和 20 種胺基酸所組成的。對 DNA 而言，突變是非常平常的事情，也是自然的演化過程。藉由基因的突變，生物可以適應自然環境的改變</p>
+<h3>DNA突變的類型</h3>
+<p>常見的DNA突變有3種，分別是取代、插入及刪除</p>
+<p>| DNA突變行為 | 意義                                          |<br>
+|</p>
+]]></content>
+    <category term="memory"/>
+    <published>2023-11-14T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">RVOS OSDI 筆記</title>
@@ -20627,7 +20679,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-06-28T14:51:19.680Z</updated>
+    <updated>2025-07-14T19:57:40.496Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -20958,7 +21010,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-06-28T14:51:19.712Z</updated>
+    <updated>2025-07-14T19:57:40.525Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21105,7 +21157,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-06-28T14:51:19.720Z</updated>
+    <updated>2025-07-14T19:57:40.532Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -21364,7 +21416,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-06-28T14:51:19.736Z</updated>
+    <updated>2025-07-14T19:57:40.547Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -22868,7 +22920,7 @@ B：1-&gt;int</li>
     <title type="text">礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-06-28T14:51:19.913Z</updated>
+    <updated>2025-07-14T19:57:40.707Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23257,7 +23309,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-06-28T14:51:19.949Z</updated>
+    <updated>2025-07-14T19:57:40.739Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23585,7 +23637,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 黑魔法前言</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/"/>
-    <updated>2025-06-28T14:51:19.981Z</updated>
+    <updated>2025-07-14T19:57:40.769Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23608,7 +23660,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-06-28T14:51:19.982Z</updated>
+    <updated>2025-07-14T19:57:40.769Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -23754,7 +23806,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── Small String Optimization (SSO)</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/SSO/"/>
-    <updated>2025-06-28T14:51:19.996Z</updated>
+    <updated>2025-07-14T19:57:40.783Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24152,7 +24204,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 四個你不該用 &amp;quot;const&amp;quot; 的時機</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/NoConst/"/>
-    <updated>2025-06-28T14:51:20.034Z</updated>
+    <updated>2025-07-14T19:57:40.824Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -24404,7 +24456,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">C++ 教學系列 ── Class &amp; 物件導向</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/OO/"/>
-    <updated>2025-06-28T14:51:20.062Z</updated>
+    <updated>2025-07-14T19:57:40.842Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -25762,7 +25814,7 @@ access specifier : public、protected、private</p>
     <title type="text">C++ 教學系列 ── Class</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Class/"/>
-    <updated>2025-06-28T14:51:20.186Z</updated>
+    <updated>2025-07-14T19:57:40.960Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26444,7 +26496,7 @@ the constructor's class is not a union, and, if the entity is a member of an ano
     <title type="text">C++ 教學系列 ── Function 與 Memory</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Function_Memory/"/>
-    <updated>2025-06-28T14:51:20.251Z</updated>
+    <updated>2025-07-14T19:57:41.019Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -26773,7 +26825,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Array 與 Pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Array_Pointer/"/>
-    <updated>2025-06-28T14:51:20.394Z</updated>
+    <updated>2025-07-14T19:57:41.146Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27062,7 +27114,7 @@ system 段拿來儲存跟系統有關的環境變數與命令列參數。</p>
     <title type="text">C++ 教學系列 ── Object、Expression、Statement</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Object_Expression_Statement/"/>
-    <updated>2025-06-28T14:51:20.539Z</updated>
+    <updated>2025-07-14T19:57:41.342Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -27836,7 +27888,7 @@ default : statement (3)</p>
     <title type="text">C++ 教學系列 ── Windows 內的 C++ 與 VSCode 環境建置</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Environment_Building/"/>
-    <updated>2025-06-28T14:51:20.601Z</updated>
+    <updated>2025-07-14T19:57:41.397Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -28063,7 +28115,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── std::function</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Std_Function/"/>
-    <updated>2025-06-28T14:51:20.616Z</updated>
+    <updated>2025-07-14T19:57:41.403Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
@@ -28490,7 +28542,7 @@ default : statement (3)</p>
     <title type="text">礦坑系列 ── 序</title>
     <id>https://mes0903.github.io/Cpp-Miner/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/"/>
-    <updated>2025-06-28T14:51:20.980Z</updated>
+    <updated>2025-07-14T19:57:41.614Z</updated>
     <summary type="html"><![CDATA[
 <p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
 <p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
