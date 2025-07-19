@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Mon, 14 Jul 2025 19:57:37 GMT</pubDate>
-    <lastBuildDate>Mon, 14 Jul 2025 19:57:37 GMT</lastBuildDate>
+    <pubDate>Sat, 19 Jul 2025 20:35:00 GMT</pubDate>
+    <lastBuildDate>Sat, 19 Jul 2025 20:35:00 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>risc-v</category>
@@ -69,7 +69,7 @@
 </div>
 <div class="hint-container info">
 <p class="hint-container-title">Info</p>
-<p>我們可以透過檢查讀取到的 <code>misa</code> 值的正負號，或是透過將該值左移一位並再檢查一次正負號，來判斷基礎位寬。 這些檢查可以用組合語言寫，不需要事先知道該 hart 的 register 寬度（MXLEN）。 基礎位寬的公式是 </p>
+<p>我們可以透過檢查讀取到的 <code>misa</code> 值的正負號，或是透過將該值左移一位並再檢查一次正負號，來判斷基礎位寬。 這些檢查可以用組合語言寫，不需要事先知道該 hart 的 register 寬度（MXLEN）。 基礎位寬的公式是 <code>MXLEN = 2<sup>MXL + 4</sup></code></p>
 <p>如果 <code>misa</code> 為 0，也可以用另一種方法來推得基礎位寬：將立即數 2 放入一個暫存器，然後將其左移 31 位元。 若結果為 0，則該 hart 是 RV32；否則就是 RV64</p>
 </div>
 <p>Extensions 欄位用來代表標準 extension 是否存在，每個英文字母對應一個 bit（bit 0 表示 extension "A" 是否存在，bit 1 表示 "B"，一直到 bit 25 表示 "Z"）。 例如，RV32I 或 RV64I 的 base ISA，"I" 這個 bit 會被設成 1； 而 RV32E 或 RV64E，則 "E" 會被設成 1。 Extensions 欄位是 WARL 類型的欄位，如果實作上允許修改所支援的 ISA，這些 bit 就可以被寫入。 在 reset 時，Extensions 欄位應該要包含該 hart 所支援的最大 extension 集合，且當 "I" 與 "E" 同時可用時，應該選擇 "I"</p>
@@ -15897,6 +15897,39 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
+      <title>ReRAM 與 Smith-Waterman Algorithm 介紹</title>
+      <link>https://mes0903.github.io/memory/sw_reram/</link>
+      <guid>https://mes0903.github.io/memory/sw_reram/</guid>
+      <source url="https://mes0903.github.io/rss.xml">ReRAM 與 Smith-Waterman Algorithm 介紹</source>
+      <description>ReRAM 與 Smith-Waterman Algorithm 介紹 這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的 而這門課有專題，也就是需要找個題目研讀一下，雖...</description>
+      <category>memory</category>
+      <pubDate>Tue, 14 Nov 2023 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
+<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
+<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>
+<p>但我這學期實在是太忙了，所以我的想法很簡單，找一些別人還沒有在 Non-volatile memory 這塊做過的演算法，我用 Non-volatile memory 做一些 in-memory computing 看看，這樣一來演算法不會太難，而且會有在別的地方做過的相關論文可以參考，這大概也勉強算在「還沒被解過」的範疇內</p>
+<p>而很剛好的，張家華學長對生物工程這方面有所涉略，真的是太猛了，我不管跑去玩什麼有的沒的，他好像都可以給我建議，真的是大神。總之，學長看了看說可以考慮把 systolic array 加進來，因為 systolic array 上面每個 cell 都是一個 memory unit，而我們又能做 in-memory computing，理論上可以做得到，而且這樣可以讓題目更落在「還沒被解過」的圈圈裡面</p>
+<p>因此和老師和學長討論後，選的演算法就是 Smith-Waterman Algorithm 了，演算法不會太 hardcode</p>
+<p>整個過程可以被分為兩部分：</p>
+<ol>
+<li>利用 systolic array 實作 Smith-waterman Algorithm</li>
+<li>利用 ReRAM 實作 systolic array</li>
+</ol>
+<p>雖然我們因為沒有空所以沒有去實作，但經過這一兩個月的 paper survey，覺得我們的想法是可行的，整個過程的主要困難點在於 ReRAM 的 program，說實話 systolic array 的部份並不難，systolic array 可以使用很簡單的結構來做，當然也有看到弄得很漂亮的 systolic array，但內部電路就會複雜起來了</p>
+<p>但重點還是在 ReRAM 的 program part 我們完全沒摸過，雖然知道只要能夠 program ReRAM 內的電阻部份，就能實作出基本邏輯閘，整個專案基本上就沒問題了，但礙於時間我們就沒去研究怎麼去 program 這部份了</p>
+<p>當初老師的建議是可以使用 gem5 + NVMain 來進行模擬，google 搜了一下感覺這東西光是 build 起來就有一堆點要注意，而且目前還沒看到有哪個教學有寫說該怎麼使用，可能之後有閒再來摸摸吧 XD</p>
+<p>Smith-Waterman Algorithm 是一個用在生物工程的演算法，由 Needleman-Wunsch 變化而來，用來做基因序列的比對，所以我們這篇文就從基因序列比對開始介紹起吧~</p>
+<h2>基因序列比對</h2>
+<p>這一段介紹轉載自<a href="https://hackmd.io/@UlvydjoQQKafa4iwBkJ9lg/BkGumVZtu" target="_blank" rel="noopener noreferrer">基因序列比對演算法</a>，寫得很好，我只小改了一些用詞，有興趣的可以去看看原文</p>
+<p>一般而言，我們會把 DNA 和蛋白質分別看成是由 4 和 20 個英文字母所組成的序列或字串，因為他們分別是由 4 種核苷酸和 20 種胺基酸所組成的。對 DNA 而言，突變是非常平常的事情，也是自然的演化過程。藉由基因的突變，生物可以適應自然環境的改變</p>
+<h3>DNA突變的類型</h3>
+<p>常見的DNA突變有3種，分別是取代、插入及刪除</p>
+<p>| DNA突變行為 | 意義                                          |<br>
+|</p>
+]]></content:encoded>
+    </item>
+    <item>
       <title>Conjugate Gradient Method</title>
       <link>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</link>
       <guid>https://mes0903.github.io/numerical_algebra/Conjugate-Gradient/</guid>
@@ -15965,6 +15998,54 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
+      <title>Gauss-Seidel Metheod</title>
+      <link>https://mes0903.github.io/numerical_algebra/Gauss-Seidel/</link>
+      <guid>https://mes0903.github.io/numerical_algebra/Gauss-Seidel/</guid>
+      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
+      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
+      <category>numerical-algebra</category>
+      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h3>Gauss-Seidel Metheod</h3>
+<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
+<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
+<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
+<p>上次我們把原本的矩陣分成 D、L、U：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>那我們做了優化之後，可以把它寫成這樣：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
+<p>輸入(input)：n、矩陣A、rhs 向量 、初始猜測值(initial guess) 、誤差(tolerance) TOL、最大跌代次數 </p>
+<p>輸出：估計出來的 </p>
+<p>:</p>
+<h3>Lemma7.18</h3>
+<p>如果 T 的譜半徑() 小於 1，那麼會存在 </p>
+<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
+<p>證明：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<h3>Thm 7.19</h3>
+<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
+<p>證明：</p>
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+]]></content:encoded>
+    </item>
+    <item>
       <title>Error Bounds</title>
       <link>https://mes0903.github.io/numerical_algebra/Error-Bound/</link>
       <guid>https://mes0903.github.io/numerical_algebra/Error-Bound/</guid>
@@ -16027,54 +16108,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <figure><figcaption></figcaption></figure>
 </div>
 <p>這時我們就會發現電腦裡面算出來的  和我們實際上的 x 的相對誤差是上圖下面那樣，一樣取決於 K(A)</p>
-<p>證明：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>Gauss-Seidel Metheod</title>
-      <link>https://mes0903.github.io/numerical_algebra/Gauss-Seidel/</link>
-      <guid>https://mes0903.github.io/numerical_algebra/Gauss-Seidel/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
-      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
-      <category>numerical-algebra</category>
-      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
-<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
-<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
-<p>上次我們把原本的矩陣分成 D、L、U：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>那我們做了優化之後，可以把它寫成這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
-<p>輸入(input)：n、矩陣A、rhs 向量 、初始猜測值(initial guess) 、誤差(tolerance) TOL、最大跌代次數 </p>
-<p>輸出：估計出來的 </p>
-<p>:</p>
-<h3>Lemma7.18</h3>
-<p>如果 T 的譜半徑() 小於 1，那麼會存在 </p>
-<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
-<p>證明：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<h3>Thm 7.19</h3>
-<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
 <p>證明：</p>
 <div class="center-column">
 <figure><figcaption></figcaption></figure>
@@ -16507,39 +16540,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <figure><figcaption></figcaption></figure>
 </div>
 <p>可以看見我們一樣要解一個下三角矩陣的問題，那也一樣可以用 forward substitution 來快速解這個問題</p>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>ReRAM 與 Smith-Waterman Algorithm 介紹</title>
-      <link>https://mes0903.github.io/memory/sw_reram/</link>
-      <guid>https://mes0903.github.io/memory/sw_reram/</guid>
-      <source url="https://mes0903.github.io/rss.xml">ReRAM 與 Smith-Waterman Algorithm 介紹</source>
-      <description>ReRAM 與 Smith-Waterman Algorithm 介紹 這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的 而這門課有專題，也就是需要找個題目研讀一下，雖...</description>
-      <category>memory</category>
-      <pubDate>Tue, 14 Nov 2023 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<p>這學期(大四上) 修了一門課叫新興記憶儲存系統元件設計，主要在講一些現代 Non-volatile memory，如 FRAM 和 ReRAM，還有一些較新的 Disk 的設計，如 Open-channel SSD 和 ZNS 等等的</p>
-<p>而這門課有專題，也就是需要找個題目研讀一下，雖然老師說不需要實作出來，找個還沒被解過的問題，然後試著提解法就好，但我是個喜歡實作的人，沒有實作出來就覺得哪裡怪怪的，所以就希望能找個實作來做，不過到了期末發現真的沒有空XD</p>
-<p>由於當初想要實作，所以要選「還沒被解過的題目」這件事變成了一個困難，首先我只有大概 2 個月的時間，要想出一個解法並實作他比單獨的理解後實作難很多，依照我的經驗，過程中如果遇到一些預期外的問題很容易找不到解法而卡住，之前有看到一篇好文可以供大家參考：<a href="https://hackmd.io/@jserv/HkyCt0hqb?type=view" target="_blank" rel="noopener noreferrer">因為自動飲料機而延畢的那一年</a></p>
-<p>但我這學期實在是太忙了，所以我的想法很簡單，找一些別人還沒有在 Non-volatile memory 這塊做過的演算法，我用 Non-volatile memory 做一些 in-memory computing 看看，這樣一來演算法不會太難，而且會有在別的地方做過的相關論文可以參考，這大概也勉強算在「還沒被解過」的範疇內</p>
-<p>而很剛好的，張家華學長對生物工程這方面有所涉略，真的是太猛了，我不管跑去玩什麼有的沒的，他好像都可以給我建議，真的是大神。總之，學長看了看說可以考慮把 systolic array 加進來，因為 systolic array 上面每個 cell 都是一個 memory unit，而我們又能做 in-memory computing，理論上可以做得到，而且這樣可以讓題目更落在「還沒被解過」的圈圈裡面</p>
-<p>因此和老師和學長討論後，選的演算法就是 Smith-Waterman Algorithm 了，演算法不會太 hardcode</p>
-<p>整個過程可以被分為兩部分：</p>
-<ol>
-<li>利用 systolic array 實作 Smith-waterman Algorithm</li>
-<li>利用 ReRAM 實作 systolic array</li>
-</ol>
-<p>雖然我們因為沒有空所以沒有去實作，但經過這一兩個月的 paper survey，覺得我們的想法是可行的，整個過程的主要困難點在於 ReRAM 的 program，說實話 systolic array 的部份並不難，systolic array 可以使用很簡單的結構來做，當然也有看到弄得很漂亮的 systolic array，但內部電路就會複雜起來了</p>
-<p>但重點還是在 ReRAM 的 program part 我們完全沒摸過，雖然知道只要能夠 program ReRAM 內的電阻部份，就能實作出基本邏輯閘，整個專案基本上就沒問題了，但礙於時間我們就沒去研究怎麼去 program 這部份了</p>
-<p>當初老師的建議是可以使用 gem5 + NVMain 來進行模擬，google 搜了一下感覺這東西光是 build 起來就有一堆點要注意，而且目前還沒看到有哪個教學有寫說該怎麼使用，可能之後有閒再來摸摸吧 XD</p>
-<p>Smith-Waterman Algorithm 是一個用在生物工程的演算法，由 Needleman-Wunsch 變化而來，用來做基因序列的比對，所以我們這篇文就從基因序列比對開始介紹起吧~</p>
-<h2>基因序列比對</h2>
-<p>這一段介紹轉載自<a href="https://hackmd.io/@UlvydjoQQKafa4iwBkJ9lg/BkGumVZtu" target="_blank" rel="noopener noreferrer">基因序列比對演算法</a>，寫得很好，我只小改了一些用詞，有興趣的可以去看看原文</p>
-<p>一般而言，我們會把 DNA 和蛋白質分別看成是由 4 和 20 個英文字母所組成的序列或字串，因為他們分別是由 4 種核苷酸和 20 種胺基酸所組成的。對 DNA 而言，突變是非常平常的事情，也是自然的演化過程。藉由基因的突變，生物可以適應自然環境的改變</p>
-<h3>DNA突變的類型</h3>
-<p>常見的DNA突變有3種，分別是取代、插入及刪除</p>
-<p>| DNA突變行為 | 意義                                          |<br>
-|</p>
 ]]></content:encoded>
     </item>
     <item>
