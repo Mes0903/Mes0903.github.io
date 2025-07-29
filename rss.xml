@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Tue, 29 Jul 2025 10:22:15 GMT</pubDate>
-    <lastBuildDate>Tue, 29 Jul 2025 10:22:15 GMT</lastBuildDate>
+    <pubDate>Tue, 29 Jul 2025 10:39:36 GMT</pubDate>
+    <lastBuildDate>Tue, 29 Jul 2025 10:39:36 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>essay</category>
@@ -26,12 +26,12 @@
       <link>https://mes0903.github.io/essay/AboutTranslation/</link>
       <guid>https://mes0903.github.io/essay/AboutTranslation/</guid>
       <source url="https://mes0903.github.io/rss.xml">有關翻譯的小心得</source>
-      <description>有關翻譯的小心得 （鹽寶的會員好像要關了，紀錄一下，可惜沒滿 4 年）（鹽寶的會員好像要關了，紀錄一下，可惜沒滿 4 年） 最近由於在看 jserv 老師那邊要我協助做 code review，因此開始閱讀 linmo 的 codebase，但 pull 下來後發現我對 RISC-V 的 ISA 還不夠熟，離上次刻 OS 也有點久遠了，所以在閱讀 co...</description>
+      <description>有關翻譯的小心得 （鹽寶的會員好像要關了，紀錄一下，可惜沒滿 4 年）（鹽寶的會員好像要關了，紀錄一下，可惜沒滿 4 年） 前陣子由於 jserv 老師那邊要我協助做 code review（結果過了一個半月我還沒開始==），因此開始閱讀 linmo 的 codebase，但 pull 下來後發現我對 RISC-V 的 ISA 還不夠熟，離上次刻 OS...</description>
       <category>essay</category>
       <pubDate>Tue, 29 Jul 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
 <figure><figcaption>（鹽寶的會員好像要關了，紀錄一下，可惜沒滿 4 年）</figcaption></figure>
-<p>最近由於在看 jserv 老師那邊要我協助做 code review，因此開始閱讀 <a href="https://github.com/sysprog21/linmo" target="_blank" rel="noopener noreferrer">linmo</a> 的 codebase，但 pull 下來後發現我對 RISC-V 的 ISA 還不夠熟，離上次刻 OS 也有點久遠了，所以在閱讀 codebase 前想先回去閱讀一下文件和教材</p>
+<p>前陣子由於 jserv 老師那邊要我協助做 code review（結果過了一個半月我還沒開始==），因此開始閱讀 <a href="https://github.com/sysprog21/linmo" target="_blank" rel="noopener noreferrer">linmo</a> 的 codebase，但 pull 下來後發現我對 RISC-V 的 ISA 還不夠熟，離上次刻 OS 也有點久遠了，所以在閱讀 codebase 前想先回去閱讀一下文件和教材</p>
 <p>由於之前正在準備 <a href="https://github.com/sysprog21/semu" target="_blank" rel="noopener noreferrer">semu</a> SMP 相關的議題，所以有先閱讀過 <a href="https://mes0903.github.io/risc-v/Supervisor-Level-ISA/" target="_blank" rel="noopener noreferrer">S-mode 的 ISA</a>，但當時閱讀發現自己對於 M-mode ISA 的掌握也是東漏西漏的，所以這次就決定先把 M-mode ISA 讀一下。 而由於我的腦袋實在不太好使，只是讀過去的話往往當天就會忘掉了，加上 RISC-V 的 ISA 裡面大大小小的規則加起來其實也不少，所以就還是寫了<a href="https://mes0903.github.io/risc-v/Machine-Level-ISA/" target="_blank" rel="noopener noreferrer">翻譯與筆記</a></p>
 <p>大概花了三周才把他寫完，但寫完後發現自己不懂的東西好像更多了，所以就打算先把 linmo 上的 References 讀一下，順便再把之前想看的 <a href="https://github.com/mit-pdos/xv6-riscv-book" target="_blank" rel="noopener noreferrer">xv6-riscv-book</a> 讀一下。 另外之前還有其他要翻的東西，像是要跟 karnage 寫 <a href="https://github.com/cpp-gamedev/learn-vulkan" target="_blank" rel="noopener noreferrer">vulkan tutorial</a>，最近他那邊完工了剛好換我翻譯； 或是因為讀書會要做開源 EVB 所以想讀一下 LDD3 和 lkmpg 之類的</p>
 <p>總之最近突然間翻了好多東西，剛好來把一些我會注意到的東西記錄下來，寫一下心得，還有一些心路歷程。 約莫在前年年初（2023）的時期，那時候我還需要以人工翻譯為主，遇到一些翻不好、不順暢的段落時才會以 GPT 輔助，當時曾試過以 GPT 為主的翻譯模式，但結果總差強人意，品質不太好</p>
