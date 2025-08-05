@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Tue, 05 Aug 2025 12:19:57 GMT</pubDate>
-    <lastBuildDate>Tue, 05 Aug 2025 12:19:57 GMT</lastBuildDate>
+    <pubDate>Tue, 05 Aug 2025 13:18:07 GMT</pubDate>
+    <lastBuildDate>Tue, 05 Aug 2025 13:18:07 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>OS</category>
@@ -42,6 +42,10 @@
 </li>
 </ul>
 <p>原文用於 MIT 6.828 及 6.1810 的課堂教學中，共有 1~10 章，最後一章為非常短的 Summary 所以我就沒翻了</p>
+<p>最後是 Blog 上的文章連結，畢竟是以放在 Blog 上為前提寫的，因此也會比較好閱讀</p>
+<ul>
+<li><a href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/" target="_blank" rel="noopener noreferrer">blog link</a></li>
+</ul>
 <h2>LICENSE</h2>
 <p>LICENSE 遵循原 repo 使用 MIT：</p>
 <p>The xv6 book sources are:</p>
