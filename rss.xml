@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Tue, 05 Aug 2025 12:09:37 GMT</pubDate>
-    <lastBuildDate>Tue, 05 Aug 2025 12:09:37 GMT</lastBuildDate>
+    <pubDate>Tue, 05 Aug 2025 12:19:57 GMT</pubDate>
+    <lastBuildDate>Tue, 05 Aug 2025 12:19:57 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>OS</category>
@@ -1274,7 +1274,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
 <h2>7.2 Code: Context switching</h2>
 <p>圖 7.1 說明了從一個 user process 切換到另一個時所經歷的步驟：首先是從 user space 發出 trap（可能是 system call 或 interrupt），轉入舊 process 的 kernel thread； 接著切換到目前 CPU 的 scheduler thread； 然後切換到新 process 的 kernel thread； 最後從 trap return 回到新的 user-level process</p>
 <p>xv6 為 scheduler 使用了獨立的 thread（各自擁有暫存器與 stack 的保存空間），因為讓 scheduler 在任意 process 的 kernel stack 上執行並不安全：其他 CPU 可能會在這段期間喚醒該 process 並開始執行，若兩個 CPU 共用同一個 stack，會造成災難性的後果。 為了處理多顆 CPU 同時執行、並有 process 要放棄 CPU 的情況，xv6 為每個 CPU 配置了獨立的 scheduler thread。 在這一節中，我們將會詳細探討 kernel thread 與 scheduler thread 之間切換的具體實作方式</p>
-<figure><figcaption>Figure 7.1: Switching from one user process to another. In this example, xv6 runs with one CPU (and thus one scheduler thread).</figcaption></figure>
+<figure><figcaption>（Figure 7.1: Switching from one user process to another. In this example, xv6 runs with one CPU (and thus one scheduler thread).）</figcaption></figure>
 <p>從一個 thread 切換到另一個 thread 的過程，需要將舊 thread 的 CPU 暫存器儲存下來，並還原新 thread 先前儲存的那些暫存器。 由於 stack pointer 和 program counter 都會被儲存與還原，這也表示 CPU 將會切換至新的 stack，並且執行新的程式碼</p>
 <p><code>swtch</code> 函式負責儲存與還原暫存器，實作 kernel thread 間的切換。 <code>swtch</code> 並不直接知道所謂的「thread」是什麼，它只負責儲存與還原一組 RISC-V 的暫存器，這組暫存器的集合被稱作「context」。 當某個 process 要放棄 CPU 時，它的 kernel thread 會呼叫 <code>swtch</code>，把自己的 context 儲存起來，並還原 scheduler 的 context</p>
 <p>每個 context 都存在 <code>struct context</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/proc.h#L2" target="_blank" rel="noopener noreferrer">kernel/proc.h:2</a>）裡，這個結構會被放在某個 process 的 <code>struct proc</code> 或某個 CPU 的 <code>struct cpu</code> 中。 <code>swtch</code> 會接收 <code>struct context *old</code> 和 <code>struct context *new</code> 這兩個引數，並將目前的暫存器儲存到 <code>old</code>，從 <code>new</code> 中載入先前儲存的暫存器，然後 return</p>
@@ -1574,7 +1574,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
 <p>這邊用一個例子來說明為何我們需要鎖：假設有兩個 process，它們各自都有已結束（exited）的子行程，且這兩個 parent 在不同的 CPU 上呼叫了 <code>wait</code>。 由於 <code>wait</code> 會釋放子行程的記憶體，因此在每個 CPU 上，kernel 都會呼叫 <code>kfree</code> 來釋放這些子行程的記憶體 page</p>
 <p>kernel 的記憶體分配器維護一個 linked list：<code>kalloc()</code> 會從 free list 中彈出一個 page，<code>kfree()</code> 則會把一個 page 推回 free list。 為了最佳效能，我們或許會希望這兩個 parent process 的 <code>kfree</code> 能同時並行執行，互不等待，但以 xv6 的 <code>kfree</code> 實作來說，這樣做是不正確的</p>
 <p>圖 6.1 更詳細地說明了這個情境：free page 的 linked list 位於兩個 CPU 共享的記憶體中，而它們使用 load 與 store 指令來操作這個 list（實際上處理器內會有 cache，但概念上多處理器系統的行為就像是共享單一記憶體一樣）</p>
-<figure><figcaption>Figure 6.1: Simplified SMP architecture</figcaption></figure>
+<figure><figcaption>（Figure 6.1: Simplified SMP architecture）</figcaption></figure>
 <p>如果沒有並行的請求，則 list 的 push 實作可能如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> element {</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> data;</span></span>
@@ -1594,7 +1594,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  list </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> l;</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段實作在單獨執行時是正確的，然而當多個實例同時執行時，這段程式就不正確了。 如果兩個 CPU 同時執行 <code>push</code>，那麼它們都可能如圖 6.1 所示地執行 <code>l-&gt;next = list</code>，這會導致在它們都還沒來得及執行 <code>list = l</code> 之前，就出現如圖 6.2 所示的錯誤結果：兩個 list 節點的 <code>next</code> 都指向原本的 list，而當這兩次 <code>list = l</code> 被執行時，第二次的賦值會覆蓋第一次的結果，導致第一次的節點遺失</p>
-<figure><figcaption>Figure 6.2: Example race</figcaption></figure>
+<figure><figcaption>（Figure 6.2: Example race）</figcaption></figure>
 <p>在 <code>list = l</code> 發生的資料遺失就是一個競爭（race）的例子。 race 是指某個記憶體位置被多個執行緒或 CPU 同時存取，而且其至少有一個是寫入操作。 race 通常代表有 bug，要麼是更新被遺失（如果是多次寫入），要麼是讀到尚未完整更新的資料結構。 race 的結果會受到編譯器產生的機器碼、兩個 CPU 執行的時序，以及記憶體系統安排這些操作順序的方式影響，因此 race 導致的錯誤常常很難重現與除錯。 舉例來說，在 debug <code>push</code> 時加上 print statement 可能就改變了執行時序，使 race 的情況消失</p>
 <p>避免 race 最常見的方法就是使用 lock。 lock 可以保證互斥（mutual exclusion），也就是在任一時間點，只有一個 CPU 能執行 <code>push</code> 中敏感的程式碼部分，這樣就能完全避免發生上述錯誤情況。 正確加上 lock 的版本只需要新增幾行：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> element </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">list </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
