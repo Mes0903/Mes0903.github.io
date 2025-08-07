@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Tue, 05 Aug 2025 13:18:07 GMT</pubDate>
-    <lastBuildDate>Tue, 05 Aug 2025 13:18:07 GMT</lastBuildDate>
+    <pubDate>Thu, 07 Aug 2025 13:43:24 GMT</pubDate>
+    <lastBuildDate>Thu, 07 Aug 2025 13:43:24 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>OS</category>
@@ -10588,12 +10588,10 @@ A. Rago. Addison-Wesley, 2005.<br>
       <link>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</guid>
       <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── Allocator &amp; PMR</source>
-      <description>礦坑系列 ── Allocator &amp; PMR 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 （ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了） 原本會有這篇是因為 MISRA C/C++ spec 內規定不能用 heap allocation，朋朋剛好遇到了...</description>
+      <description>礦坑系列 ── Allocator &amp; PMR 前言 （ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了） 原本會有這篇是因為 MISRA C/C++ spec 內規定不能用 heap allocation，朋朋剛好遇到了這個需求，所以來問了一下能不能把 data 全部...</description>
       <category>C++ Miner</category>
       <pubDate>Sat, 12 Apr 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
 <p>原本會有這篇是因為 MISRA C/C++ spec 內規定不能用 heap allocation，朋朋剛好遇到了這個需求，所以來問了一下能不能把 data 全部放在 stack 段上的 memory pool，剛好要讀書會了，就拿這個主題來寫一篇</p>
@@ -22122,12 +22120,10 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
       <link>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</guid>
       <source url="https://mes0903.github.io/rss.xml">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</source>
-      <description>(WIP) 礦坑系列 ── Dependent Name 與 Name lookup 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子： 在 C++ 中，根據 t 的含意，這個 statement 可能會產生不同的解釋。 如果 t 是一個型態，那這個會是指標 f 的...</description>
+      <description>(WIP) 礦坑系列 ── Dependent Name 與 Name lookup 前言 在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子： 在 C++ 中，根據 t 的含意，這個 statement 可能會產生不同的解釋。 如果 t 是一個型態，那這個會是指標 f 的宣告；但如果 t 不是類型，那就會是一個乘法操作...</description>
       <category>C++ Miner</category>
       <pubDate>Sat, 15 Feb 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">t </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> f;</span></span></code></pre>
@@ -22449,12 +22445,10 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
       <link>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</guid>
       <source url="https://mes0903.github.io/rss.xml">C++ 教學系列 ── 淺談計算機概論</source>
-      <description>C++ 教學系列 ── 淺談計算機概論 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開 由於 Miner 的前置是針對新手在寫的，所以還是先來閒聊一下，在閆令琪老師的 GAMES202 的第一堂課...</description>
+      <description>C++ 教學系列 ── 淺談計算機概論 前言 首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開 由於 Miner 的前置是針對新手在寫的，所以還是先來閒聊一下，在閆令琪老師的 GAMES202 的第一堂課中，老師有一段話我覺得講得蠻好的： 我們在學 2...</description>
       <category>C++ Miner</category>
       <pubDate>Sun, 13 Oct 2024 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開</p>
 <p>由於 Miner 的前置是針對新手在寫的，所以還是先來閒聊一下，在閆令琪老師的 GAMES202 的第一堂課中，老師有一段話我覺得講得蠻好的：</p>
@@ -22536,7 +22530,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <h2>圖靈機 Turing machine</h2>
 <p>圖靈機基本上是一系列的自動機所建構出來的理論模型，因為是計概所以我這邊就不講太多，也不寫它的數學定義，有興趣的可以看一下自動機理論和計算理論的課：</p>
 <div class="center-column">
-<img src="https://github.com/Mes0903/Cpp-Miner/blob/standard-markdown/Miner_Tutorial/Computer_Introduction/image/automata.png?raw=true"> 
+<figure><figcaption></figcaption></figure>
 <p>(source：<a href="https://en.wikipedia.org/wiki/Combinational_logic" target="_blank" rel="noopener noreferrer">Wikipedia</a>)</p>
 </div>
 <p>這裡可以提一下的是上圖中最內層的組合邏輯(Combinational logic)，這是一種由 <a href="https://en.wikipedia.org/wiki/Boolean_circuit" target="_blank" rel="noopener noreferrer">Boolean Circuit</a> 所組成的數位邏輯，這裡的 <a href="https://en.wikipedia.org/wiki/Boolean_circuit" target="_blank" rel="noopener noreferrer">Boolean Circuit</a> 是一種於計算理論中的數學模型，用來描述形式語言，所以並非真實的電路。 提這個的主要原因是，計算機內部的電路為組合邏輯與時序邏輯(<a href="https://en.wikipedia.org/wiki/Sequential_logic" target="_blank" rel="noopener noreferrer">Sequential logic</a>)混合的實作，所以可以稍微知道一下有這個東西</p>
@@ -22592,12 +22586,10 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
       <link>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</guid>
       <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── Indirect through null pointer</source>
-      <description>礦坑系列 ── Indirect through null pointer 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&amp;gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的...</description>
+      <description>礦坑系列 ── Indirect through null pointer 前言 事情起於 jserv 的講義裡面有個 &amp;((data*)0)-&amp;gt;c) 這樣的操作，作用是求 c 在 data 這個 struct 中的偏移量，但那個 0 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee pa...</description>
       <category>C++ Miner</category>
       <pubDate>Sat, 12 Aug 2023 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>事情起於 jserv 的講義裡面有個 <code>&amp;((data*)0)-&gt;c)</code> 這樣的操作，作用是求 <code>c</code> 在 <code>data</code> 這個 struct 中的偏移量，但那個 <code>0</code> 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)</p>
 <p>雖然問題本身莫名其妙變得很複雜，但其實結論很簡單：因為 standard 沒有要求，所以是 UB</p>
@@ -22847,12 +22839,10 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
       <link>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</guid>
       <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── Concept と SFINAE と Detection Idiom</source>
-      <description>礦坑系列 ── Concept と SFINAE と Detection Idiom 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD Detection Idiom 中文翻譯為偵測語意，其他的名字還有 Member Detector 和 Template type con...</description>
+      <description>礦坑系列 ── Concept と SFINAE と Detection Idiom 前言 ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD Detection Idiom 中文翻譯為偵測語意，其他的名字還有 Member Detector 和 Template type constraint 等等 主要的目的是偵測一個傳進 ...</description>
       <category>C++ Miner</category>
       <pubDate>Thu, 01 Dec 2022 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p>ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD</p>
 <div class="center-column">
@@ -23066,7 +23056,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'c'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>對於同樣 function name 的 function call，Compiler 會透過 return type 與 argument type 來判別要呼叫哪個 function，不熟的朋友可以看看之前的文章：<a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FMinerT_function_and_memory#%E5%87%BD%E5%BC%8F%E9%87%8D%E8%BC%89-Function-Overloading" target="_blank" rel="noopener noreferrer">函式重載 Function Overloading</a></p>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>對於同樣 function name 的 function call，Compiler 會透過 return type 與 argument type 來判別要呼叫哪個 function，不熟的朋友可以看看之前的文章：<a href="https://github.com/Mes0903/Cpp-Miner/tree/main/Miner_Tutorial/Function_Memory#%E5%87%BD%E5%BC%8F%E9%87%8D%E8%BC%89-function-overloading" target="_blank" rel="noopener noreferrer">函式重載 Function Overloading</a></p>
 <p>在這裡，你大概就可以感受到那個味道了，<code>fn(c)</code> 在嘗試 <code>fn(int i)</code> 時失敗了，但因為還有 <code>fn(char c)</code>，因此並沒有給出 compile error，只有當完全沒有可以使用的 function 時才會給出 compile error</p>
 <p>換句話說你可以把他理解為類似 switch case 的存在，像是這樣：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">switch</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (argument type) {</span></span>
@@ -24344,16 +24334,14 @@ B：1-&gt;int</li>
 ]]></content:encoded>
     </item>
     <item>
-      <title>礦坑系列 ── malloc、new 與 POD Type</title>
+      <title>（WIP）礦坑系列 ── malloc、new 與 POD Type</title>
       <link>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</guid>
-      <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── malloc、new 與 POD Type</source>
-      <description>礦坑系列 ── malloc、new 與 POD Type 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 new 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 malloc，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 new 比 malloc 多做了一些事情 本篇大部分內容為整理 Effect...</description>
+      <source url="https://mes0903.github.io/rss.xml">（WIP）礦坑系列 ── malloc、new 與 POD Type</source>
+      <description>（WIP）礦坑系列 ── malloc、new 與 POD Type 前言 new 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 malloc，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 new 比 malloc 多做了一些事情 本篇大部分內容為整理 Effective C++ 而來，並額外補上一些細...</description>
       <category>C++ Miner</category>
       <pubDate>Mon, 19 Sep 2022 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>前言</h2>
 <p><code>new</code> 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 <code>malloc</code>，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 <code>new</code> 比 <code>malloc</code> 多做了一些事情</p>
 <p>本篇大部分內容為整理 Effective C++ 而來，並額外補上一些細節</p>
@@ -24733,12 +24721,10 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
       <link>https://mes0903.github.io/Cpp-Miner/Miner_main/</link>
       <guid>https://mes0903.github.io/Cpp-Miner/Miner_main/</guid>
       <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── C++03 ~ C++17 主要變化介紹</source>
-      <description>礦坑系列 ── C++03 ~ C++17 主要變化介紹 礦坑系列首頁：首頁 hackmd 版首頁：首頁 Modern Cpp 在追求什麼? 來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static/compile time error 等議題，並包含了如 f...</description>
+      <description>礦坑系列 ── C++03 ~ C++17 主要變化介紹 Modern Cpp 在追求什麼? 來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static/compile time error 等議題，並包含了如 functional language 的特性進來...</description>
       <category>C++ Miner</category>
       <pubDate>Mon, 23 May 2022 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
 <h2>Modern Cpp 在追求什麼?</h2>
 <p>來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static/compile time error 等議題，並包含了如 functional language 的特性進來，已經與以往的 Cpp 長的完全不一樣了。</p>
 <p>如果要我講個我認為 Modern C++ 最重要的東西出來，我會選 RAII 與 move，在 modern C++ 前你會在 code 裡面發現許多的 new/delete 與複製，這代表我們時常需要手動確保我們資源的生命週期，而 RAII 與 move 幫助我們做了這件事，而且做得很好，但也因此 C++ 的核心觀念有些改動。</p>
@@ -25054,23 +25040,144 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
       <enclosure url="https://i.imgur.com/CKnBgQN.png" type="image/png"/>
     </item>
     <item>
-      <title>礦坑系列 ── 黑魔法前言</title>
-      <link>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</link>
-      <guid>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/</guid>
-      <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── 黑魔法前言</source>
-      <description>礦坑系列 ── 黑魔法前言 礦坑系列首頁：首頁 hackmd 版首頁：首頁 前言 這是黑魔法系列的第一篇，基本上就是把那些篇幅不長，但又很有趣的東西另外開一個地方放，內容可能是有關 coding 上的建議，或者是一些很酷的語言端優化，然而有些可能實用性很小，什麼時候該用主要還是要大家自己判斷，我盡量不讓篇幅太長，分多篇一點講，大家讀起來比較輕鬆，我也可...</description>
+      <title>礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
+      <link>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</link>
+      <guid>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</guid>
+      <source url="https://mes0903.github.io/rss.xml">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</source>
+      <description>礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製 用 &amp;quot;explicit&amp;quot; 來偵測複製 source：C++ Weekly - Ep 241 - Using explicit to Find Expensive Accidental Copies source：C++ Weekly - Ep - 198 - Surprise Uses For ex...</description>
       <category>C++ Miner</category>
       <pubDate>Sun, 22 May 2022 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>礦坑系列首頁：<strong><a href="https://github.com/Mes0903/Cpp-Miner/tree/hackmd" class="redlink">首頁</a></strong></p>
-<p>hackmd 版首頁：<strong><a href="https://hackmd.io/@Mes/Cpp_Miner/https%3A%2F%2Fhackmd.io%2F%40Mes%2FPreface" class="redlink">首頁</a></strong></p>
-<h2>前言</h2>
-<p>這是黑魔法系列的第一篇，基本上就是把那些篇幅不長，但又很有趣的東西另外開一個地方放，內容可能是有關 coding 上的建議，或者是一些很酷的語言端優化，然而有些可能<span class="yellow">實用性很小</span>，什麼時候該用主要還是要大家自己判斷，<span class="yellow">我盡量不讓篇幅太長</span>，分多篇一點講，大家讀起來比較輕鬆，我也可以拖稿 (x</p>
-<p>我想大部分的內容會來自 cppcon、C++ Weekly 和 The Cherno 的翻譯，因為這三個頻道是我主要看一些酷酷的東西的來源，我會在最一開始附上連結，有興趣的可以進去看看</p>
-<p>會突然開始寫這個的原因是因為有些朋友來問 Code 的時候不是問什麼東西怎麼用，而是「該什麼時候用」，這讓我很需要情境和例子來解釋，剛好市面上這樣的書其實不多。再來就是下周三的演講稿還沒寫，所以趕快來整理一下有哪些可以分享的，最後就是最近被 marty 大神邀請去當 C++20 cookbook 的 co-author，真的是嚇到我了XD</p>
-<p>在這麼多的因緣際會下，想說來寫一篇有關這方面的書。反正那些有趣的東西在頭腦裡擺著也是擺著，不如把它拿出來當一篇筆記，順便整理一下思緒</p>
-<p>話說今天是 ina 生日，ina 生日快樂 😄</p>
-<div class="center-column"><img src="https://i.imgur.com/auJ1VTp.png" width="400"></div>]]></content:encoded>
+<h2>用 "explicit" 來偵測複製</h2>
+<p>source：<a href="https://www.youtube.com/watch?v=5wJ-jKK_Zy0" target="_blank" rel="noopener noreferrer">C++ Weekly - Ep 241 - Using explicit to Find Expensive Accidental Copies</a></p>
+<p>source：<a href="https://www.youtube.com/watch?v=Q4SXFkTzD28" target="_blank" rel="noopener noreferrer">C++ Weekly - Ep - 198 - Surprise Uses For explicit Constructors</a></p>
+<p>複製常常是我們傳資料的一種選擇，如把某個東西傳到 thread 內時，這樣就不用去擔心 sharing 的問題，通常這會是一個很好的解法</p>
+<p>又或有時候我們會有小物件，像是 string view，使用 copy 來傳遞參數也是一個很好的選擇，因為他的大小只有 2 個 pointer 的大小，在現代的 x64 calling convention 架構下這可以用 2 個 register 來包裝，這比把參數 push 進 stack 或透過 pointer/reference 來存取某段位址等等的更有效率</p>
+<p>因此 copy 常常是一個更好的選擇，至於該如何有效的使用複製，寫出 cache friendly 的 code 可以再去看看 Jserv 老師的課程</p>
+<p>不過有時候某些型態的物件的 copy 非常的貴，所以我們不會希望他在每個地方都被複製一次，造成效能上的損失，這時我們可以使用 <code>explicit</code> 來看我們是否有不小心造成物件的複製</p>
+<p>先看一下 <code>explicit</code> 用在建構子上的狀況：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  explicit</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {}</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">){};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // fn(10);    // error, prohibit implicit call constructor by integer</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(S{ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> });</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上例中我們在 <code>S(int)</code> 前用了 <code>explicit</code> 修飾，因為沒有可用的轉型把 <code>10</code> 轉為 <code>S</code>，因此 <code>fn(10)</code> 被擋掉了，除非我們顯式的做了轉型，把 <code>10</code> 作為 <code>S</code> 傳入，否則不會過編譯</p>
+<p>這可以幫助我們去檢查不小心造成的複製，例如下面這個例子：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;string&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">string</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">s</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF"> static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">s</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">c_str</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::string s </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "123"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF"> static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">s</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">c_str</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(s);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // same</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">s</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">c_str</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">());</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // different, the address is the address</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                    // of the copy object</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>輸出：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">a1155ffc00</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">a1155ffc00</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">a1155ffc30</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>藉由上例你可以發現 <code>fn(s.c_str())</code> 會導致複製產生，這是因為 <code>std::string</code> 內有一個吃 <code>const char*</code> 參數的建構子可以被 implicit 呼叫：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// mingw-gcc 11.2.0</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">basic_string</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _CharT</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __s, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _Alloc</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __a </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> _Alloc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">())</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">: </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">_M_dataplus</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">_M_local_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(), __a)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _CharT</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __end </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __s </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">?</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __s </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> traits_type::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">length</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(__s)</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // We just need a non-null pointer here to get an exception:</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  :</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF"> reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> _CharT</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">__alignof__</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(_CharT));</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">_M_construct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(__s, __end, </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">random_access_iterator_tag</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">());</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> }</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這有時候不是我們想要的，因為這自動產生了複製，此時我們可以透過在對應的複製建構子前面加上 <code>explicit</code> 來看是否有複製產生：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> default</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  explicit</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">){};</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  S s;</span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // fn(s);    // error</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(s));</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // okay</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>可以看見我們需要顯式的呼叫 copy 才可以，否則會被擋下來</p>
+<p>這在 <code>S</code> 這個物件的複製非常貴的時候有用，不過可能會在 code 的可讀性上帶來一定程度的影響，因此我自己覺得最好的辦法還是把 copy 的優化寫好，並且讓其是 implicit safe 的設計最好，但不管如何，這還是個很有用的工具，在你需要一次性的檢查到底哪裡有複製時很有用</p>
+<p>另外，對於 one single argument 的建構子來說，加上 explicit 是個很好的習慣，這可以幫助你避免很多意外的隱式轉換，這大概也是 C++ 有那麼多奇怪的 cast 的原因之一</p>
+<p>想像一下如果 <code>&gt;&gt;</code> 的 bool conversion 不是 explicit 會發生什麼事：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i{};</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // 註：是 `&gt;&gt;` 沒錯，沒打錯</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>那麼這件事會自動發生：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i{};</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">  static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;bool&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(std::cout) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這是個合法的行為，但幾乎是個災難ㄏㄏ，尤其當你手殘把 <code>&lt;&lt;</code> 打成 <code>&gt;&gt;</code> 的時候，要找這個小 bug 大概會找到中風，但因為這個 conversion 是 explicit 的，所以一切安好 😄</p>
+<h3>小缺點</h3>
+<p>雖然前面講了那麼多，但在建構子前加上 <code>explicit</code> 可能會有些壞處：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> default</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  explicit</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) { std::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"copy"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">S</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> foo</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  S a;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> a;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // error</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">char</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[])</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  S a </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> foo</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上面這個例子由於 <code>explicit</code>，他破壞了 NRVO 優化，此時他想要去用 move，但我們沒有寫，所以無法通過編譯</p>
+<p>此時<span class="yellow">黑魔法</span>來了，我們把移動建構子加上：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> default</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  explicit</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) { std::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"copy"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  S</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">S</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) { std::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"move"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">S</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> foo</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  S a;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> a;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">char</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[])</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  S a </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> foo</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>結果你會發現他不去呼叫移動，NRVO 回來了，我第一次看到的時候真的覺得太神奇了，不過 NRVO 畢竟不保證發動，但最少仍會有移動，所以這樣是 OK 的，由此可見還是要<span class="yellow">遵守 Rule of three/five</span></p>
+<p>總之最後的結果就是可以用這個來測試、偵測，若要拿來<span class="yellow">避免</span>複製還是有一些難度，但至少可以拿來避免隱式轉型，在 one single argument 的建構子前加上 <code>explicit</code> 會是個很好的習慣</p>
+<div class="center-column">
+<p>(感謝社團內的 <em>Actual Wizard</em> wreien 提供例子)</p>
+</div>
+]]></content:encoded>
     </item>
   </channel>
 </rss>
