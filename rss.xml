@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Thu, 07 Aug 2025 13:43:24 GMT</pubDate>
-    <lastBuildDate>Thu, 07 Aug 2025 13:43:24 GMT</lastBuildDate>
+    <pubDate>Thu, 07 Aug 2025 17:32:56 GMT</pubDate>
+    <lastBuildDate>Thu, 07 Aug 2025 17:32:56 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>OS</category>
@@ -11348,7 +11348,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <ul>
 <li><code>allocate()</code> 函式使用 <code>::operator new</code> 來分配記憶體</li>
 <li><code>deallocate()</code> 函式使用 <code>::operator delete</code> 來刪除記憶體</li>
-<li>對於任何 <code>memory_resource</code> r ，<code>p-&gt;is_equal(r)</code> 會返回 <code>&amp;r == p</code></li>
+<li>對於任何 <code>memory_resource</code> r，<code>p-&gt;is_equal(r)</code> 會返回 <code>&amp;r == p</code></li>
 </ul>
 <p>它底層做的事基本上就是像這樣：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void*</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> do_allocate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> bytes</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> alignment</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">override</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
@@ -16123,6 +16123,35 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 ]]></content:encoded>
     </item>
     <item>
+      <title>作業系統 ── 序</title>
+      <link>https://mes0903.github.io/OS/NTHU/</link>
+      <guid>https://mes0903.github.io/OS/NTHU/</guid>
+      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
+      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
+      <category>OS</category>
+      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
+<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
+<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
+<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
+<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
+<p>然後這邊推一下 Jserv 的兩篇回文：</p>
+<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
+<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
+<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
+<p>再來是一些其他的資源：</p>
+<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
+<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
+<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
+]]></content:encoded>
+    </item>
+    <item>
       <title>The mind behind Linux 筆記 &amp; 心得</title>
       <link>https://mes0903.github.io/Linux/The_mind_behind_Linux/</link>
       <guid>https://mes0903.github.io/Linux/The_mind_behind_Linux/</guid>
@@ -17030,35 +17059,6 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 |</p>
 </li>
 </ul>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>作業系統 ── 序</title>
-      <link>https://mes0903.github.io/OS/NTHU/</link>
-      <guid>https://mes0903.github.io/OS/NTHU/</guid>
-      <source url="https://mes0903.github.io/rss.xml">作業系統 ── 序</source>
-      <description>作業系統 ── 序 2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD 這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統 課程網址：10501 資訊工程學系 作業系統 影片 YT 連結：【10510周志遠教授：作業系統】 課本：Operatin...</description>
-      <category>OS</category>
-      <pubDate>Fri, 10 Dec 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
-<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
-<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
-<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
-<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
-<p>然後這邊推一下 Jserv 的兩篇回文：</p>
-<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
-<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
-<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
-<p>再來是一些其他的資源：</p>
-<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
-<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
-<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
-<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
 ]]></content:encoded>
     </item>
     <item>
@@ -23307,7 +23307,7 @@ B：1-&gt;int</li>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;&gt;</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> func</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"Hello"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // (3)</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這個例子中 <code>(1)</code> 是個通用的版本，而 <code>(2)</code> 是對 <code>double</code> 的特化， <code>(3)</code> 是對 <code>int</code> 的特化，依照我們呼叫 <code>func()</code> 給的參數會執行這三個 function 的其中一種，目的在於給予 <code>double</code> 或 <code>int</code> 當參數時我們想要印出 <code>Hello</code>，其他想印出 <code>General</code></p>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這個例子中 <code>(1)</code> 是個通用的版本，而 <code>(2)</code> 是對 <code>double</code> 的特化，<code>(3)</code> 是對 <code>int</code> 的特化，依照我們呼叫 <code>func()</code> 給的參數會執行這三個 function 的其中一種，目的在於給予 <code>double</code> 或 <code>int</code> 當參數時我們想要印出 <code>Hello</code>，其他想印出 <code>General</code></p>
 <p>有了 <code>std::enable_if</code> 我們可以把 <code>(2)</code> 和 <code>(3)</code> 寫在一起：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
 <span class="line"></span>
@@ -24183,7 +24183,7 @@ B：1-&gt;int</li>
 <code>dector&lt;nonesuch, void, has_mem_t, S1&gt;</code>，若 <code>has_mem_t</code> 為 valid 的 type，則 <code>value_t</code> 為 <code>std::true_type</code>，<code>Op&lt;Args...&gt;</code> 為 <code>has_mem_t&lt;S1&gt;</code></p>
 <p>可以看見它實際上就只是另一種包裝的方法，內部就是個 traits class，只是做了一點調整變得更 general 了</p>
 <h2>古典 C++ 的做法(C++11 以前)</h2>
-<p>如果你有嘗試找過 Detected Idiom 相關的東西，像是 google 搜尋 「C++ check if template class has member」之類的，你可能會發現還有另一種神奇的作法，用了兩個 char array，並以 array 大小判斷是否有指定 member，這其實是 C++11 前還沒有 <code>std::enable_if</code> 的精典做法，我們通常稱之為 Member Detector</p>
+<p>如果你有嘗試找過 Detected Idiom 相關的東西，像是 google 搜尋「C++ check if template class has member」之類的，你可能會發現還有另一種神奇的作法，用了兩個 char array，並以 array 大小判斷是否有指定 member，這其實是 C++11 前還沒有 <code>std::enable_if</code> 的精典做法，我們通常稱之為 Member Detector</p>
 <p>我這邊從 <a href="https://stackoverflow.com/questions/1005476/how-to-detect-whether-there-is-a-specific-member-variable-in-class" target="_blank" rel="noopener noreferrer">stack overflow</a> 上找到了一個還不錯的例子：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt; </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> HasX</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span></span>
@@ -24320,17 +24320,41 @@ B：1-&gt;int</li>
 <p>template 真的是個大坑，畢竟<s>實作泛型就是為了接受更多的苦難</s>，沒有啦是更多型態啦ㄏㄏ</p>
 <figure><figcaption></figcaption></figure>
 <h2>參考資料</h2>
-<p><strong><a href="https://zhuanlan.zhihu.com/p/21314708" class="redlink">1. C++模板进阶指南：SFINAE</a></strong></p>
-<p><strong><a href="https://tjsw.medium.com/%E6%BD%AE-c-20-concepts-c-%E7%B7%A8%E8%AD%AF%E6%9C%9F%E6%AA%A2%E6%9F%A5%E7%9A%84%E6%AD%A3%E6%B4%BE%E9%81%93%E8%B7%AF-3db8bec914a4" class="redlink">2. C++20 | Concepts - C++ 編譯期檢查的正派道路</a></strong></p>
-<p><strong><a href="https://en.cppreference.com/w/cpp/language/constraints" class="redlink">3. Constraints and concepts (since C++20)</a></strong></p>
-<p><strong><a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1452r2.html" class="redlink">4. P1452R2</a></strong></p>
-<p><strong><a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1084r2.pdf" class="redlink">5. P1048R2</a></strong></p>
-<p><strong><a href="https://tjsw.medium.com/%E6%BD%AE-c-17-constexpr-if-part-2-%E5%86%8D%E6%9C%83%E4%BA%86-std-enable-if-%E5%86%8D%E4%B9%9F%E4%B8%8D%E7%94%A8%E6%A8%A3%E7%89%88%E7%89%B9%E5%8C%96%E4%BA%86-86f06ac768da" class="redlink">6. 潮．C++17 | constexpr if (2) 再會了 enable_if !? 再也不用樣版特化了</a></strong></p>
-<p><strong><a href="https://www.youtube.com/watch?v=b5Kbzgx1w9A&amp;t=2204s" class="redlink">7. Back To Basics: Overload Resolution - CppCon 2021</a></strong></p>
-<p><strong><a href="https://hedzr.com/c++/algorithm/cxx-is_detected-and-detection-idioms/#%E5%85%B3%E4%BA%8E-stdis_detected" class="redlink">8. 实作中的 std::is_detected 和 Detection Idioms (C++17)</a></strong></p>
-<p><strong><a href="https://stackoverflow.com/questions/87372/check-if-a-class-has-a-member-function-of-a-given-signature" class="redlink">9. Check if a class has a member function of a given signature</a></strong></p>
-<p><strong><a href="https://stackoverflow.com/questions/1005476/how-to-detect-whether-there-is-a-specific-member-variable-in-class" class="redlink">10. How to detect whether there is a specific member variable in class?</a></strong></p>
-<p><strong><a href="https://cpptalk.wordpress.com/2009/09/12/substitution-failure-is-not-an-error-2/" class="redlink">11. Substitution failure is not an error, part II</a></strong></p>
+<ul>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/21314708" target="_blank" rel="noopener noreferrer">1. C++模板进阶指南：SFINAE</a></p>
+</li>
+<li>
+<p><a href="https://tjsw.medium.com/%E6%BD%AE-c-20-concepts-c-%E7%B7%A8%E8%AD%AF%E6%9C%9F%E6%AA%A2%E6%9F%A5%E7%9A%84%E6%AD%A3%E6%B4%BE%E9%81%93%E8%B7%AF-3db8bec914a4" target="_blank" rel="noopener noreferrer">2. C++20 | Concepts - C++ 編譯期檢查的正派道路</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/language/constraints" target="_blank" rel="noopener noreferrer">3. Constraints and concepts (since C++20)</a></p>
+</li>
+<li>
+<p><a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1452r2.html" target="_blank" rel="noopener noreferrer">4. P1452R2</a></p>
+</li>
+<li>
+<p><a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1084r2.pdf" target="_blank" rel="noopener noreferrer">5. P1048R2</a></p>
+</li>
+<li>
+<p><a href="https://tjsw.medium.com/%E6%BD%AE-c-17-constexpr-if-part-2-%E5%86%8D%E6%9C%83%E4%BA%86-std-enable-if-%E5%86%8D%E4%B9%9F%E4%B8%8D%E7%94%A8%E6%A8%A3%E7%89%88%E7%89%B9%E5%8C%96%E4%BA%86-86f06ac768da" target="_blank" rel="noopener noreferrer">6. 潮．C++17 | constexpr if (2) 再會了 enable_if !? 再也不用樣版特化了</a></p>
+</li>
+<li>
+<p><a href="https://www.youtube.com/watch?v=b5Kbzgx1w9A&amp;t=2204s" target="_blank" rel="noopener noreferrer">7. Back To Basics: Overload Resolution - CppCon 2021</a></p>
+</li>
+<li>
+<p><a href="https://hedzr.com/c++/algorithm/cxx-is_detected-and-detection-idioms/#%E5%85%B3%E4%BA%8E-stdis_detected" target="_blank" rel="noopener noreferrer">8. 实作中的 std::is_detected 和 Detection Idioms (C++17)</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/87372/check-if-a-class-has-a-member-function-of-a-given-signature" target="_blank" rel="noopener noreferrer">9. Check if a class has a member function of a given signature</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/1005476/how-to-detect-whether-there-is-a-specific-member-variable-in-class" target="_blank" rel="noopener noreferrer">10. How to detect whether there is a specific member variable in class?</a></p>
+</li>
+<li>
+<p><a href="https://cpptalk.wordpress.com/2009/09/12/substitution-failure-is-not-an-error-2/" target="_blank" rel="noopener noreferrer">11. Substitution failure is not an error, part II</a></p>
+</li>
+</ul>
 ]]></content:encoded>
     </item>
     <item>
@@ -24706,14 +24730,20 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此處的 <code>alignas(T) unsigned char buf[sizeof(T)];</code> 就為我們分配的 memory pool，大小為一個 <code>T</code> 的大小，前方的 <code>alignas</code> 是幫助對齊的，不是我們這邊的重點，而這裡使用 <code>unsigned char</code> 的原因是因為 <code>sizeof(char) == 1</code>，你也可以用 <code>char</code> 或 <code>std::byte</code> 等等，我自己傾向使用 <code>std::byte</code></p>
 <p>需要注意的是物件使用完畢後需要自己手動呼叫解構子，所以上例使用了 <code>tptr-&gt;~T();</code>，如此一來前面建構的物件會被解構，但先前分配好的 <code>buf</code> 不會被釋放</p>
 <h2>參考資料</h2>
-<p><strong><a href="https://www.dsi.fceia.unr.edu.ar/downloads/informatica/info_II/c++/Effective%20C++%20+%20More%20Effective%20C++.pdf" class="redlink">1. Effective C++</a></strong></p>
-<p><strong><a href="https://stackoverflow.com/questions/184537/in-what-cases-do-i-use-malloc-and-or-new" class="redlink">2. In what cases do I use malloc and/or new?</a></strong></p>
-<p><strong><a href="https://stackoverflow.com/questions/146452/what-are-pod-types-in-c" class="redlink">3. What are POD types in C++?</a></strong></p>
-<p><strong><a href="https://stackoverflow.com/questions/4178175/what-are-aggregates-and-pods-and-how-why-are-they-special/7189821#7189821" class="redlink">4. What are Aggregates and PODs and how/why are they special?</a></strong></p>
-<p><strong><a href="" class="redlink"></a></strong></p>
-<p><strong><a href="" class="redlink"></a></strong></p>
-<p><strong><a href="" class="redlink"></a></strong></p>
-<p><strong><a href="" class="redlink"></a></strong></p>
+<ul>
+<li>
+<p><a href="https://www.dsi.fceia.unr.edu.ar/downloads/informatica/info_II/c++/Effective%20C++%20+%20More%20Effective%20C++.pdf" target="_blank" rel="noopener noreferrer">1. Effective C++</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/184537/in-what-cases-do-i-use-malloc-and-or-new" target="_blank" rel="noopener noreferrer">2. In what cases do I use malloc and/or new?</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/146452/what-are-pod-types-in-c" target="_blank" rel="noopener noreferrer">3. What are POD types in C++?</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/4178175/what-are-aggregates-and-pods-and-how-why-are-they-special/7189821#7189821" target="_blank" rel="noopener noreferrer">4. What are Aggregates and PODs and how/why are they special?</a></p>
+</li>
+</ul>
 ]]></content:encoded>
     </item>
     <item>
@@ -24729,7 +24759,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
 <p>來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static/compile time error 等議題，並包含了如 functional language 的特性進來，已經與以往的 Cpp 長的完全不一樣了。</p>
 <p>如果要我講個我認為 Modern C++ 最重要的東西出來，我會選 RAII 與 move，在 modern C++ 前你會在 code 裡面發現許多的 new/delete 與複製，這代表我們時常需要手動確保我們資源的生命週期，而 RAII 與 move 幫助我們做了這件事，而且做得很好，但也因此 C++ 的核心觀念有些改動。</p>
 <p>這種例子在近代 C++ 內很多，然後在眾多改動中我覺得這個是最重要的改動，且其他大部分的改動其實都是語法糖，不過 spec 會對這個語法糖進行類似「語意」上的定義，或說某些條件，有點像在自己定義出新的概念，並繼續在此概念上疊上新的概念，但本質上整個都是語法糖，也因此語意在 C++ 內是個很重要的因素，但我有看見許多人並不清楚他在使用的語意為何，又或說「味道」更為精確。</p>
-<p>這邊提供一個工具叫做 C++ Insights <a href="https://cppinsights.io/" target="_blank" rel="noopener noreferrer">(連結)</a>，這個網站可以看見 Compiler 實際上看到的 code 「大概」長怎樣，這解析出來的結果基本上都很接近了，不過因為這還是一個 interpretation 的東西，所以可能還是有小差別，但很好用了，舉個例子，大家常說的 lambda 其實是語法糖，本質上是個匿名 class：</p>
+<p>這邊提供一個工具叫做 C++ Insights <a href="https://cppinsights.io/" target="_blank" rel="noopener noreferrer">(連結)</a>，這個網站可以看見 Compiler 實際上看到的 code「大概」長怎樣，這解析出來的結果基本上都很接近了，不過因為這還是一個 interpretation 的東西，所以可能還是有小差別，但很好用了，舉個例子，大家常說的 lambda 其實是語法糖，本質上是個匿名 class：</p>
 <p>輸入：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24742,19 +24772,19 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  public:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    inline</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> /*constexpr */</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    using</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> retType_3_2</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)();  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    inline</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> /*constexpr */</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> retType_3_2() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> noexcept</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">      return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> __invoke;  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    };  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    };</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  private:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    static</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> inline</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> __invoke</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  } __lambda_3_2{};  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  } __lambda_3_2{};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;  </span></span>
@@ -24773,21 +24803,21 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這裡 <code>T()</code> 就是一種建構子，而 <code>~T()</code> 就是一種解構子。</p>
 <h3>RAII</h3>
 <p>RAII 全名為 Resource Acquisition Is Initialization，意思為資源取得即初始化，是由 C++ 之父 Bjarne Stroustrup 提出的，這裡的 Resource 指的主要是指系統中有限的東西，像是記憶體、socket 等等，利用 RAII 可以很好的自動管理這類資源。</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"T()"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }  </span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  ~T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"~T()"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"before scope"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);  </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"before scope"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  {  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    T t;  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // use RAII to destruct object  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // use RAII to destruct object</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"after scope"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);  </span></span>
 <span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // t = {};    // error  </span></span>
@@ -24817,7 +24847,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
 <h3>algorithm</h3>
 <p>在 C++98 後我們可以使用 standard algorithm：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24832,7 +24862,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <h3>auto</h3>
 <p>在某些情況下我們可能並不是特別在意某個物件的型態，在 C++11 後我們可以使用 auto，舉個例子：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_things</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">vector</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24840,7 +24870,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在這邊 <code>count</code> 是什麼型態我們可能不是那麼在意，這時候直接使用 <code>auto</code> 就好，<code>auto</code> 會自動幫我們推斷出他的型態，這在 generic programming 時非常有用：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_things</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24849,7 +24879,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在 C++14 後我們可以使用 <code>auto</code> 來當作 return type，他會幫我們推斷 function 回傳的型態：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">auto</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_things</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24860,7 +24890,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>當然他還是有一些的規則和限制，不過這邊就只先簡單介紹。</p>
 <h3>ranged-for loop</h3>
 <p>ranged-for loop 可以幫助我們很簡單的遍歷一個可以使用 <code>std::begin</code> 與 <code>std::end</code> 的容器，在 C++98 時我們會這樣寫：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> travel_thing</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">vector</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24872,7 +24902,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而在 C++11 後可以使用 ranged-for，這常搭配 <code>auto</code> 使用，因為元素的型態在這裡常常不是這麼的重要：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> travel_thing</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">vector</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24884,7 +24914,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <h3>lambda</h3>
 <p>lambda 可以幫助我們增加可讀性與便利性，看一下這個例子：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_things_less_than_3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24896,7 +24926,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>原先我們可能需要有額外的 function 來當作第三個參數，C++11 後可以直接使用 lambda，這樣可以避免汙染名稱空間，同時別人也比較好找你的比較方法。lambda 對於我們在寫 functional programming 的時候也有一定的幫助。</p>
 <p>在 C++14 後我們可以使用 generic lambda，在上例中，我們可以傳進 lambda 的參數可以不只是 int，這時候我們就可以使用 generic lambda，也就是在 lambda 中使用 auto：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_things_less_than_3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24907,7 +24937,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>另外在 lambda 的捕捉清單內也可以使用 generalized capture expression，長的會像這樣：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24918,7 +24948,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>也就是說我們可以在前面的 <code>[]</code> 內寫初始化了，這是因為 C++11 的時候只提供了 by copy 和 by reference 兩種方式，沒有提供 move，因此在 C++14 的時候被完善了，這讓我們可以寫出很多神奇的東西：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;algorithm&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">template</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">typename</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">&gt;  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> count_value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">vec</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)  </span></span>
@@ -24938,7 +24968,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如此一來無論我們傳了多少參數進 <code>caller</code>，他都會幫我們轉送進我們指定的函式。</p>
 <h3>智慧指標 (smart pointer)</h3>
 <p>智慧指標可以幫助我們控制物件的資源，這邊挑了比較有代表性的 <code>unique_ptr</code> 介紹，<code>unique_ptr</code> 是一種 move only types，也就是說不能複製只能移動，用起來會像這樣：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;memory&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;memory&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> allocate_memory</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24957,7 +24987,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">constexpr</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> get_value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 5</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">constexpr</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> auto</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> value </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> get_value</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上例中在編譯時期 <code>value</code> 的值就可以被確定為 15。</p>
@@ -24978,12 +25008,12 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"T()"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }  </span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  ~T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">puts</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"~T()"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">); }  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">T</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();  </span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}  </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()  </span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{  </span></span>
@@ -24999,7 +25029,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">constexpr</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> auto</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> l </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> [](){};</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>這在 C++17 後是合法的了。</p>
 <h3>string_view</h3>
-<p><code>string_view</code> 是 <code>string</code> 的一個 「view」，也就是說唯讀，不可修改，以往可能會利用 <code>const std::string&amp;</code> 來傳遞，C++17 後可以使用 <code>string_view</code> 來更好的符合語意，且更解簡潔：</p>
+<p><code>string_view</code> 是 <code>string</code> 的一個「view」，也就是說唯讀，不可修改，以往可能會利用 <code>const std::string&amp;</code> 來傳遞，C++17 後可以使用 <code>string_view</code> 來更好的符合語意，且更解簡潔：</p>
 <div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;string_view&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  </span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">constexpr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::string_view name </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "Hello"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>有關 <code>view</code> 的概念可以看看 TJSW 寫的這篇：<a href="https://tjsw.medium.com/%E6%BD%AE-c-20-ranges-views-%E4%BD%BF%E7%94%A8-stl-%E7%9A%84%E5%85%A8%E6%96%B0%E5%A7%BF%E5%8B%A2-8007777a8da6" target="_blank" rel="noopener noreferrer">潮．C++20 | Ranges &amp; Views：使用 STL 的全新姿勢</a></p>
