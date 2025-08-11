@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-08-07T17:32:56.078Z</updated>
+  <updated>2025-08-11T09:39:19.075Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -23,7 +23,7 @@
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2025-08-07T17:32:56.080Z</updated>
+    <updated>2025-08-11T09:39:19.077Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -92,7 +92,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2025-08-07T17:32:56.087Z</updated>
+    <updated>2025-08-11T09:39:19.081Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -1196,7 +1196,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2025-08-07T17:32:56.220Z</updated>
+    <updated>2025-08-11T09:39:19.202Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -1263,7 +1263,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2025-08-07T17:32:56.223Z</updated>
+    <updated>2025-08-11T09:39:19.205Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -1584,7 +1584,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2025-08-07T17:32:56.345Z</updated>
+    <updated>2025-08-11T09:39:19.321Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -1681,7 +1681,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2025-08-07T17:32:56.374Z</updated>
+    <updated>2025-08-11T09:39:19.344Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -1814,7 +1814,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2025-08-07T17:32:56.381Z</updated>
+    <updated>2025-08-11T09:39:19.355Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -2026,7 +2026,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2025-08-07T17:32:56.396Z</updated>
+    <updated>2025-08-11T09:39:19.368Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -2510,7 +2510,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2025-08-07T17:32:56.428Z</updated>
+    <updated>2025-08-11T09:39:19.395Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -2535,7 +2535,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2025-08-07T17:32:56.442Z</updated>
+    <updated>2025-08-11T09:39:19.408Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -2658,7 +2658,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">（WIP）Games101：Geometry（幾何）</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/Geometry/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/Geometry/"/>
-    <updated>2025-07-24T08:11:34.000Z</updated>
+    <updated>2025-08-11T09:38:48.000Z</updated>
     <summary type="html"><![CDATA[
 <p>這章我們要來看一些具體的幾何的例子，和一些不同的幾何表示方法，像是下圖玻璃的杯子，上面有各種不同的曲線，這些曲線該如何被描述呢？</p>
 <figure><figcaption></figcaption></figure>
@@ -2744,6 +2744,82 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
 <p>要用三角形去描述各種各樣的物體，最主要的問題就是三角形的連接關係，通常我們會用一些特定的文件格式來描述它，像是 wavefront object file，一般簡稱為 object file，後綴為 .obj，它是一個文本文件，裡面會把空間中的一堆點、法線和紋理座標分開來表示，然後再將它們組織起來，形成一個模型，看下面的例子：</p>
 <figure><figcaption></figcaption></figure>
 <p>這個例子描述的是一個立方體，我們知道一個立方體共有八個空間中的點，我們用 <code>v</code> 來表示它，後面接對應的 x, y, z 座標。 而立方體有六個面，換句話說立方體有六個不同的法線，文件中以 <code>vn</code> 來表示，這邊會有 8 行是因為這個是自動建模生出的文件，所以會有一些冗餘。 <code>vt</code> 表示紋理座標，而 <code>f</code> 用來表示哪三個點會形成一個三角形。 具體的格式可以去看 wavefront object file format 的 spec</p>
+<h2>Curves</h2>
+<h2>Bézier curves</h2>
+<p>接下來是一個大重點：曲線。 無論是在動畫中要描述相機的運動軌跡，還是在一些字體上要描述他的曲邊等，都會需要曲線，可以說曲線的應用面非常多。 這章會提一個很有名的曲線的顯式表示法：貝塞爾曲線（Bézier Curves）</p>
+<p>貝塞爾曲線會利用一系列的控制點去定義一條曲線，並用這些控制點去定義一條曲線的性質。 比如下面這個例子，曲線會從 p<sub>0</sub> 開始，沿著 p<sub>0</sub> 到 p<sub>1</sub> 的方向出發，並在點 p<sub>3</sub>，沿著 p<sub>2</sub> 到 p<sub>3</sub> 的方向結束：</p>
+<figure><figcaption></figcaption></figure>
+<p>上圖中的參數式內有個係數「3」，這表示它對切線的長度也有定義，等等會再詳細解釋。 通過這四個控制點，我們可以定義這條曲線它的起始點和終點，一定得在 p<sub>0</sub> 和 p<sub>3</sub> 上，並且也有辦法定義這兩點的切線方向，如此一來我們便可以得到一條唯一的曲線了。 要注意它並不要求曲線本身要經過控制點</p>
+<h3>de Casteljau Algorithm</h3>
+<p>現在就來看貝塞爾曲線要怎麼畫，其名稱為 de Casteljau Algorithm。 剛剛的圖裡面有四個控制點，但其實控制點的數可以自己定義，現在假設我們只有三個控制點，如下圖：</p>
+<figure><figcaption></figcaption></figure>
+<p>用三個控制點生成的貝塞爾曲線是有名字的，叫做二次貝塞爾曲線（Quadratic Bezier）。 從上圖你可以猜到，我們的曲線要從 b<sub>0</sub> 開始，在 b<sub>2</sub> 結束，而 b<sub>1</sub> 則決定它要往哪個方向彎</p>
+<p>在 de Casteljau 的算法中，會有個代表時間且介於 0 至 1 之間的參數 ，當  為 0 的時候輸出要在點  上，當  為 1 的時候輸出要在  上。 接下來就來看看要怎麼算輸出的位置吧</p>
+<p>de Casteljau 會在每條邊上用線性插值找出一個點，目前我們有給定的時間 ，首先我們要在  這條邊上，我們認為  為 0 時該邊上的插值點位於 ， 為 1 時該邊上的插值點位於 。 假設  現在大概為 ，那插值點就會在該邊上從  出發大概  的位置：</p>
+<figure><figcaption></figcaption></figure>
+<p>接著對另一個邊  也做一樣的事情，這邊要注意我們是照著  的順序來做插值的要注意，所以第二個邊上的插值點會比較靠近 ，而不是 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>接下來，把這兩個新得到的點連起來，再做一次插值：</p>
+<figure><figcaption></figcaption></figure>
+<p>而因為不可能再有更多的線段了（剩一個點），因此這個點就是我們的輸出點了，這條貝塞爾曲線在時間  的時候，就是在這個位置。 若要畫出完整的曲線，只需要把所有時間  所對應的位置都畫出來就可以了：</p>
+<figure><figcaption></figcaption></figure>
+<p>接下來看個四個控制點的例子：</p>
+<figure><figcaption></figcaption></figure>
+<p>與三個控制點的步驟一樣，找到每個邊上的插值點，並依序將其連起來形成一個個的邊，因此四條線段會先變成三個線段，接著就和前面三個控制點的例子一樣了，等到最後只剩一個插值點，就是該貝塞爾曲線在時間  的輸出了</p>
+<h3>Evaluating Bézier Curves Algebraic Formula</h3>
+<p>前面有提到貝塞爾曲線是顯示的表示法，所以接下來就講一下它的代數形式。 由於貝塞爾曲線會由控制點，決定時間  時的點在哪裡，因此一定有一個代數的表示方法，讓我們給定任意一個時間 ，就能得到對應點的位置。 假設仍然是 、、 與  這四個控制點，由於是做線性插值，因此在  上的插值點就為 ，標記為 ，其中上標代表層數。 接著依此類推，就能找到最後的點了：</p>
+<figure><figcaption></figcaption></figure>
+<p>讓我們再用一個三個控制點的貝塞爾曲線來幫助理解：</p>
+<figure><figcaption></figcaption></figure>
+<p>依序把每一層的插值點給組合起來，你就可以最終輸出點的參數式了。 這邊你會看到它的係數其實是伯恩施坦多項式，上例的係數是  的展開</p>
+<p>下圖列出了有  個控制點的貝塞爾曲線的參數式，其中  為對應的係數：</p>
+<figure><figcaption></figcaption></figure>
+<p>由於它良好的性質，我們其實也不用限定控制點要在一個平面上，下圖舉了一個在三維空間中的例子：</p>
+<figure><figcaption></figcaption></figure>
+<p>貝塞爾有一些不錯的性質，以四個控制點的曲線為例：</p>
+<ul>
+<li> 的時候一定在起點， 的時候一定在終點：
+<ul>
+<li></li>
+<li></li>
+</ul>
+</li>
+<li>起點與終點的切線向量可以直接算出來：
+<ul>
+<li></li>
+<li></li>
+</ul>
+</li>
+<li>可以直接對控制點作仿射變換，其畫出來的曲線，與將原曲線作仿射變換，會是同一條曲線
+<ul>
+<li>但投影之類的就不同了，得是仿射變換</li>
+</ul>
+</li>
+<li>凸包性質（Convex hull）：你畫出來的曲線一定會位在控制點形成的凸包內</li>
+</ul>
+<h3>Piecewise Bézier Curves</h3>
+<p>雖然前面已經說了可以有任意多的控制點，但當控制點的數量上升時，畫出來的曲線並不直觀。 另外當控制點的數量一多，你就沒辦法那麼方便地操作控制點來得到想要的曲線了（單個控制點的影響會變小）。 底下是一個有十個控制點的貝塞爾曲線：</p>
+<figure><figcaption></figcaption></figure>
+<p>你可以看到它變得十分平滑，不利於使用控制點來取得你想要的形狀。 為了更好的操控貝塞爾曲線，人們就使用了逐段（piecewise）的方法，利用多個使用三、四個控制點的貝塞爾曲線來組合出一個想要的曲線：</p>
+<figure><figcaption>（David Eck, <a href="http://math.hws.edu/eck/cs424/notes2013/canvas/bezier.html%EF%BC%89" target="_blank" rel="noopener noreferrer">http://math.hws.edu/eck/cs424/notes2013/canvas/bezier.html）</a></figcaption></figure>
+<p>你會在連接處可能會有轉折，如果要保持曲線的光滑，由於前面提到的貝塞爾切線的特性，你需要讓連接處的三個控制點共線，且和兩段的控制線段的長度是一樣的，這樣才能有 C<sup>1</sup>連續</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>老師在課堂上還對連續性做了一些解釋，這邊就不提了</p>
+</div>
+<p>圖學中還有一些其他的曲線，例如 Spline，他是一種曲線的類別，也會有一系列的控制點，並能滿足一定的連續性。 其中用的比較多的是 B-splines，其中的 B 為 Basis 的縮寫，指基函數，所謂的基函數就類似我們剛剛的伯恩施坦多項式</p>
+<p>B-splines 類似於對貝塞爾曲線的擴展，他的能力比貝塞爾曲線更強。 我們剛剛有看到在有十個控制點的情況下，其實每動一個控制點，都會導致整個曲線的所有位置都會跟著變化。 在設計領域中大家不喜歡這個性質，而是比較想要針對某一個點的周圍做修正，也就是說希望有局部性，而 B-splines 就能做到這件事</p>
+<p>雖然其與貝塞爾曲線的方法非常類似，不管是從幾何角度，還是代數角度，它們的分析方法都類似，只是 B-splines 的幾何數更加複雜而已。 但由於這門課是入門課，所以這裡就不提了。 另外要再更進一步的曲線還有 NURBS，這邊就只提個名詞，不多做著墨了，有興趣的可以看看<a href="https://www.bilibili.com/video/av66548502?from=search&amp;seid=65256805876131485" target="_blank" rel="noopener noreferrer">清華胡志明老師的課程</a></p>
+<h2>Surfaces</h2>
+<p>接著來討論曲面，曲面也是一種顯示的表示方法</p>
+<h3>Bézier Surfaces</h3>
+<p>貝塞爾曲面的概念與貝塞爾曲線類似，一樣會有一系列的控制點，如下圖有 16 個控制點：</p>
+<figure><figcaption></figcaption></figure>
+<p>做法也非常簡單，類似之前我們對於雙線性插值的作法，在兩個方向分別用上貝塞爾曲線的方法就可以了，以下圖來說，、 軸上各有四個控制點，從而組成了 16 個控制點。 接著先將  軸上的四個控制點所組成的貝塞爾曲線算出來，由於  方向有四個控制點，因此會算出四條貝塞爾曲線，也就是下圖灰色部分的曲線</p>
+<p>而藍色部分的點就是為四條貝塞爾曲線上同一  值的各個控制點，此時再將不同  位置處，這四個控制點形成的貝塞爾曲線算出來，就可以形成一個曲面了：</p>
+<figure><figcaption></figcaption></figure>
+<p>老師的上課錄影中有個 demo 影片，但我找不到下載的網址，<a href="https://youtu.be/Zkx1aKv2z8o?t=1114" target="_blank" rel="noopener noreferrer">具體來說可以看這段影片</a>，看完影片應該會比較好理解。 另外由於有兩個方向，因此也需要有兩個  參數，講義上將他們計作  與 ，透過時間  算出  方向的曲線，並透過  算出  方向的曲線：</p>
+<figure><figcaption></figcaption></figure>
 ]]></content>
     <category term="computer-graphic"/>
     <published>2025-06-04T00:00:00.000Z</published>
@@ -11271,7 +11347,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-08-07T17:32:57.381Z</updated>
+    <updated>2025-08-11T09:39:20.265Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -17047,40 +17123,6 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
     <published>2021-11-15T00:00:00.000Z</published>
   </entry>
   <entry>
-    <title type="text">作業系統 ── 序</title>
-    <id>https://mes0903.github.io/OS/NTHU/</id>
-    <link href="https://mes0903.github.io/OS/NTHU/"/>
-    <updated>2025-04-02T09:54:23.000Z</updated>
-    <summary type="html"><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>]]></summary>
-    <content type="html"><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
-<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
-<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
-<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
-<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
-<p>然後這邊推一下 Jserv 的兩篇回文：</p>
-<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
-<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
-<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
-<p>再來是一些其他的資源：</p>
-<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
-<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
-<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
-<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
-]]></content>
-    <category term="OS"/>
-    <published>2021-12-10T00:00:00.000Z</published>
-  </entry>
-  <entry>
     <title type="text">The mind behind Linux 筆記 &amp; 心得</title>
     <id>https://mes0903.github.io/Linux/The_mind_behind_Linux/</id>
     <link href="https://mes0903.github.io/Linux/The_mind_behind_Linux/"/>
@@ -18001,6 +18043,40 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 ]]></content>
     <category term="Linux"/>
     <published>2023-11-20T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">作業系統 ── 序</title>
+    <id>https://mes0903.github.io/OS/NTHU/</id>
+    <link href="https://mes0903.github.io/OS/NTHU/"/>
+    <updated>2025-04-02T09:54:23.000Z</updated>
+    <summary type="html"><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>]]></summary>
+    <content type="html"><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
+<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
+<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
+<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
+<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
+<p>然後這邊推一下 Jserv 的兩篇回文：</p>
+<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
+<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
+<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
+<p>再來是一些其他的資源：</p>
+<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
+<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
+<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
+]]></content>
+    <category term="OS"/>
+    <published>2021-12-10T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">Ros Install (noetic)</title>
@@ -23247,7 +23323,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-08-07T17:32:59.830Z</updated>
+    <updated>2025-08-11T09:39:22.507Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子：</p>
@@ -23576,7 +23652,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-08-07T17:32:59.851Z</updated>
+    <updated>2025-08-11T09:39:22.530Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開</p>
@@ -23726,7 +23802,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-08-07T17:32:59.864Z</updated>
+    <updated>2025-08-11T09:39:22.541Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>事情起於 jserv 的講義裡面有個 <code>&amp;((data*)0)-&gt;c)</code> 這樣的操作，作用是求 <code>c</code> 在 <code>data</code> 這個 struct 中的偏移量，但那個 <code>0</code> 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)</p>
@@ -23982,7 +24058,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-08-07T17:32:59.877Z</updated>
+    <updated>2025-08-11T09:39:22.554Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD</p>
@@ -25512,7 +25588,7 @@ B：1-&gt;int</li>
     <title type="text">（WIP）礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-08-07T17:33:00.013Z</updated>
+    <updated>2025-08-11T09:39:22.674Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p><code>new</code> 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 <code>malloc</code>，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 <code>new</code> 比 <code>malloc</code> 多做了一些事情</p>
@@ -25906,7 +25982,7 @@ Arithmetic types, enumeration types, pointer types, pointer to member types, std
     <title type="text">礦坑系列 ── C++03 ~ C++17 主要變化介紹</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/"/>
-    <updated>2025-08-07T17:33:00.047Z</updated>
+    <updated>2025-08-11T09:39:22.704Z</updated>
     <summary type="html"><![CDATA[
 <h2>Modern Cpp 在追求什麼?</h2>
 <p>來到 Modern Cpp，Cpp 已經不僅僅是個有物件導向的 C 了，其還追求 type-safe, metaprograming 與 static/compile time error 等議題，並包含了如 functional language 的特性進來，已經與以往的 Cpp 長的完全不一樣了。</p>
@@ -26231,7 +26307,7 @@ source：<a href="https://www.youtube.com/watch?v=mXxNvaEdNHI" target="_blank" r
     <title type="text">礦坑系列 ── 用 &amp;quot;explicit&amp;quot; 來偵測複製</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Explicit_Detect_Copy/"/>
-    <updated>2025-08-07T17:33:00.072Z</updated>
+    <updated>2025-08-11T09:39:22.726Z</updated>
     <summary type="html"><![CDATA[
 <h2>用 "explicit" 來偵測複製</h2>
 <p>source：<a href="https://www.youtube.com/watch?v=5wJ-jKK_Zy0" target="_blank" rel="noopener noreferrer">C++ Weekly - Ep 241 - Using explicit to Find Expensive Accidental Copies</a></p>
