@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-09-03T16:47:28.692Z</updated>
+  <updated>2025-09-05T13:42:07.082Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -23,7 +23,7 @@
     <title type="text">The Linux graphics stack in a nutshell 翻譯 &amp; 筆記</title>
     <id>https://mes0903.github.io/Linux/linux-graphic-stack/</id>
     <link href="https://mes0903.github.io/Linux/linux-graphic-stack/"/>
-    <updated>2025-09-03T16:46:56.000Z</updated>
+    <updated>2025-09-05T13:37:25.000Z</updated>
     <summary type="html"><![CDATA[
 <p>原文連結：</p>
 <ul>
@@ -42,34 +42,34 @@
 <p>圖形輸出從應用程式開始，應用程式會處理並保存要視覺化的格式化資料。 用於視覺化的常見資料結構是「<a href="https://en.wikipedia.org/wiki/Scene_graph" target="_blank" rel="noopener noreferrer">場景圖（scene graph）</a>」：它是一棵樹，其中的每個節點要麼存放三維空間中的模型，要麼存放模型的屬性</p>
 <p>模型節點包含要呈現的資料，例如遊戲的場景，或科學模擬的元素； 屬性節點則設定模型的朝向或位置，每個屬性節點都會影響其下方的節點。 為了把場景圖算繪成螢幕上的影像，應用程式會自上而下、由左到右走訪這棵樹，依序設定或清除屬性，並相應地算繪 3D 模型</p>
 <p>在下方的範例場景圖裡，算繪從根節點開始，根節點會準備算繪器（renderer）並設定輸出位置。 應用程式先走左側分支，在座標  算繪「Rectangle 1」，並套用上存放於「Texture 1」裡面的表面圖樣。 接著應用程式回到根節點，改走右側分支，進入名為「Transform」的屬性節點</p>
-<p>應用程式以 4×4 矩陣描述各種變換（例如定位或縮放），演算法會在算繪過程中套用這些矩陣。 此例中，該變換節點將其所有子節點等比例縮放為 0.5 倍，因此算繪「Rectangle 2」與「Rectangle 3」時，大小會呈現為原來的一半，位置分別調整為  與 。 這兩個矩形使用了不同的紋理：分別為 2 與 3</p>
+<p>應用程式以 4×4 矩陣描述各種變換（例如定位或縮放），演算法會在算繪過程中套用這些矩陣。 此例中，該變換節點會將其所有子節點等比例縮放為 0.5 倍，因此算繪「Rectangle 2」與「Rectangle 3」時，大小會呈現為原來的一半，位置分別調整為  與 。 這兩個矩形使用了不同的紋理：分別為 2 與 3</p>
 <figure><figcaption></figcaption></figure>
-<p>為了簡化算繪並利用硬體加速，大多數應用程式會使用標準 API，例如 <a href="https://opengl.org/" target="_blank" rel="noopener noreferrer">OpenGL</a> 或 <a href="https://vulkan.org/" target="_blank" rel="noopener noreferrer">Vulkan</a>。 不同 API 的細節各有差異，但它們都提供介面來管理圖形記憶體、把資料寫入其中，並算繪已保存的資訊。 最終會得到一張影像，應用程式可以直接顯示，或再把它當成輸入做後續處理</p>
-<p>所有圖形資料都放在「緩衝物件」裡，每個緩衝物件都是一段圖形記憶體，並附有控制代碼或 ID。 例如，3D 模型會存放在對應的「<a href="https://en.wikipedia.org/wiki/Vertex_buffer_object" target="_blank" rel="noopener noreferrer">頂點緩衝物件（vertex-buffer object）</a>」中，紋理會存放在「<a href="https://www.khronos.org/opengl/wiki/Texture" target="_blank" rel="noopener noreferrer">紋理緩衝物件（texture-buffer object）</a>」中，物件的<a href="https://en.wikipedia.org/wiki/Normal_(geometry)" target="_blank" rel="noopener noreferrer">表面法線</a>也會放在緩衝物件裡，而輸出的影像本身也<a href="https://www.khronos.org/opengl/wiki/Framebuffer_Object" target="_blank" rel="noopener noreferrer">存放在一個緩衝物件裡</a>。 因此，圖形算繪在很大程度上其實是記憶體管理的工作</p>
+<p>為了簡化算繪並利用硬體加速，大多數應用程式會使用標準 API，例如 <a href="https://opengl.org/" target="_blank" rel="noopener noreferrer">OpenGL</a> 或 <a href="https://vulkan.org/" target="_blank" rel="noopener noreferrer">Vulkan</a>。 不同 API 的細節各有差異，但它們都會提供介面來管理圖形記憶體、把資料寫入其中，並算繪已保存的資訊。 最終會得到一張影像，應用程式可以直接顯示，或再把它當成輸入做後續處理</p>
+<p>所有圖形資料都放在「緩衝物件」裡，每個緩衝物件都是一段附有控制代碼或 ID 的圖形記憶體。 例如，3D 模型會存放在對應的「<a href="https://en.wikipedia.org/wiki/Vertex_buffer_object" target="_blank" rel="noopener noreferrer">頂點緩衝物件（vertex-buffer object）</a>」中，紋理會存放在「<a href="https://www.khronos.org/opengl/wiki/Texture" target="_blank" rel="noopener noreferrer">紋理緩衝物件（texture-buffer object）</a>」中，物件的<a href="https://en.wikipedia.org/wiki/Normal_(geometry)" target="_blank" rel="noopener noreferrer">表面法線</a>也會放在緩衝物件裡，而輸出的影像本身也<a href="https://www.khronos.org/opengl/wiki/Framebuffer_Object" target="_blank" rel="noopener noreferrer">存放在一個緩衝物件裡</a>。 因此，圖形算繪在很大程度上其實是在做記憶體管理的工作</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
-<p>在 OpenGL 名稱裡，VBO（Vertex Buffer Object）是常見的頂點資料容器，它只是「緩衝物件」在作為頂點來源時的慣稱。 紋理一般對應到「紋理物件（texture object）」，另有一種稱為 Buffer Texture / Texture Buffer Object（TBO）的機制，讓紋理直接使用一個緩衝物件作為儲存體、供著色器索引大量資料，因此原文內提到的「紋理緩衝物件」可視為泛指「與紋理相關的（含 TBO 在內的）物件/緩衝」</p>
+<p>在 OpenGL 名稱裡，VBO（Vertex Buffer Object）是常見的頂點資料容器，它只是「緩衝物件」在作為頂點來源時的慣稱。 紋理一般對應到「紋理物件（texture object）」，另有一種稱為 Buffer Texture / Texture Buffer Object（TBO）的機制，讓紋理能直接使用一個緩衝物件作為儲存體、供著色器索引大量資料，因此原文內提到的「紋理緩衝物件」可視為泛指「與紋理相關的（含 TBO 在內的）物件/緩衝」</p>
 <p>至於「輸出影像」在實作上可能是附著於 framebuffer 的紋理或 renderbuffer，但要點是一切最終都落在由句柄/控制代碼管理的 GPU 記憶體區塊上，這也是為何圖形程式設計很大一部分在處理資源與記憶體生命週期</p>
 </div>
 <p>只要圖形<a href="https://en.wikipedia.org/wiki/Shader" target="_blank" rel="noopener noreferrer">著色器（shader）</a>能處理，應用程式就可以用任何格式提供輸入資料。 著色器是一種程式，其中包含把輸入資料轉換成輸出影像的指令，它由應用程式提供，並由顯示卡來執行</p>
-<p>實際的的著色器程式可能會實作複雜的 multi-pass 演算法，但在此範例中只會介紹必要的部分。 著色器中最常見的兩種操作，大概是頂點變換與紋理查詢。 我們可以把頂點想成多邊形的角。 用 <a href="https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language" target="_blank" rel="noopener noreferrer">OpenGL Shading Language（GLSL）</a>撰寫時，頂點變換看起來像這樣：</p>
+<p>實際的的著色器程式可能會實作複雜的 multi-pass 演算法，但在此範例中只會介紹必要的部分。 著色器中最常見的兩種操作是頂點變換與紋理查詢。 我們可以把頂點想成多邊形的角。 用 <a href="https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language" target="_blank" rel="noopener noreferrer">OpenGL Shading Language（GLSL）</a>撰寫時，頂點變換看起來像這樣：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">uniform mat4 Matrix;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // same for all of a rectangles's vertices</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">in vec4 inVertexCoord;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // contains a different vertex coordinate on each invocation</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">gl_Position </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> Matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> inVertexCoord;</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>變數 <code>inVertexCoord</code> 是來自應用程式場景圖的輸入座標。 變數 <code>gl_Position</code> 則是在應用程式輸出緩衝中的座標。 簡單來說，前者屬於顯示中的場景座標系，後者屬於應用程式視窗內的座標系。 <code>Matrix</code> 是描述這兩個座標系之間的變換的 4×4 矩陣</p>
-<p>這段著色器操作會對場景圖中的每個頂點執行一次。 在前述的矩形場景圖例子裡，每個矩形的每一個頂點都至少會被 <code>inVertexCoord</code> 包含一次。 而矩陣 <code>Matrix</code> 會包含該頂點的變換，例如如何把它移到正確的位置，或依照變換節點指定的 0.5 比例進行縮放</p>
-<p>當頂點被變換到輸出座標系之後，著色器程式會計算被覆蓋的「片段（fragment）」的各種數值，這是圖形領域的術語，指的是一個帶有 Z 軸深度值與其他資訊的輸出像素。 每個片段都需要顏色，在 GLSL 中，著色器的 <code>texture()</code> 函式會像這樣從紋理取回顏色：</p>
+<p>這段著色器操作會對場景圖中的每個頂點執行一次。 在前述的矩形場景圖例子裡，<code>inVertexCoord</code> 內會含有所有頂點，其中某些矩形的頂點可能會被多次包含在內。 而矩陣 <code>Matrix</code> 會包含這些頂點的變換，例如要如何把它移到正確的位置，或依照變換節點指定的 0.5 比例進行縮放</p>
+<p>當頂點被變換到輸出座標系之後，著色器程式會計算被覆蓋的「片段（fragment）」的各種數值，這是圖形領域的術語，指的是一個帶有 Z 軸深度值與其他資訊的輸出像素。 每個片段都需要顏色，在 GLSL 中，可以利用 <code>texture()</code> 函式從紋理取回顏色：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">uniform sampler2D Tex;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // the texture object of the current rectangle</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">in vec2 vsTexCoord;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // interpolated texture coordinate for the fragment</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Color </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> texture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">Tex</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> vsTexCoord</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這裡 <code>Tex</code> 代表一個紋理緩衝（texture buffer）。 <code>vsTexCoord</code> 的值是紋理座標，也就是在紋理中要讀取的位置。 透<code>texture()</code> 會回傳一個顏色值，把它指定給 <code>Color</code>，就能把一個帶顏色的像素寫入輸出緩衝</p>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這裡 <code>Tex</code> 代表一個紋理緩衝（texture buffer）。 <code>vsTexCoord</code> 的值是紋理座標，也就是在紋理中要讀取的位置。 <code>texture()</code> 會回傳一個顏色值，將該顏色值指定給 <code>Color</code>，就能把一個帶顏色的像素寫入輸出緩衝</p>
 <p>為了將像素資料填滿輸出緩衝，這段著色器程式碼會對每個片段各執行一次。 正被繪製的模型會指定要使用的紋理緩衝，而紋理座標則由 OpenGL 的內部計算提供。 以上述的場景圖為例，應用程式會對每個矩形各自呼叫這段程式碼，並使用該矩形所對應的紋理緩衝</p>
 <p>把這些著色器指令套用到整棵場景圖之後，就能生成應用程式的完整輸出影像了</p>
 <h3>Mesa</h3>
 <p>到目前為止我們談到的內容都不是特定於 Linux 的，不過這些內容提供了我們檢視實作方式的框架。 在 Linux 上，<a href="https://mesa3d.org/" target="_blank" rel="noopener noreferrer">Mesa 3D</a> 函式庫（簡稱 Mesa）實作了 3D 算繪的各種介面，並支援多種圖形硬體。 對應用程式來說，它提供了用於桌面圖形的 OpenGL 或 Vulkan、用於行動系統的 <a href="https://www.khronos.org/opengles/" target="_blank" rel="noopener noreferrer">OpenGL ES</a>，以及用於計算的 <a href="https://www.khronos.org/opencl/" target="_blank" rel="noopener noreferrer">OpenCL</a>。 至於硬體端，Mesa 替當今多數的圖形硬體實作了驅動程式</p>
-<p>Mesa 的驅動通常不會自己從零實作這些應用程式介面，因為 Mesa 內建了大量的協助元件與抽象。 對於像 OpenGL 這類有狀態的介面，Mesa 的 <a href="https://www.freedesktop.org/wiki/Software/gallium/" target="_blank" rel="noopener noreferrer">Gallium3D</a> 架構會把介面與驅動彼此連接，這被稱為狀態追蹤器（state tracker）。 Mesa 內含了對多個版本的 OpenGL、OpenGL ES 與 OpenCL 的狀態追蹤器。 當應用程式使用某個 API 時，它其實是在修改該介面的狀態追蹤器</p>
+<p>Mesa 的驅動通常不會自己從零實作這些應用程式介面，因為 Mesa 內建了大量的輔助元件與抽象。 對於像 OpenGL 這類有狀態的介面，Mesa 的 <a href="https://www.freedesktop.org/wiki/Software/gallium/" target="_blank" rel="noopener noreferrer">Gallium3D</a> 架構會把介面與驅動彼此連接，這被稱為狀態追蹤器（state tracker）。 Mesa 內含多個 OpenGL、OpenGL ES 與 OpenCL 版本的的狀態追蹤器。 當應用程式使用某個 API 時，它其實是在修改該介面的狀態追蹤器</p>
 <p>Mesa 內的硬體驅動還會把狀態追蹤器的資訊進一步轉成硬體狀態與算繪指令。 舉例來說，OpenGL 的 <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindTexture.xhtml" target="_blank" rel="noopener noreferrer">glBindTexture()</a> 會在 OpenGL 的狀態追蹤器中選定當前的紋理緩衝。 接著硬體驅動會把該紋理緩衝物件載入到圖形記憶體，並把啟用中的著色器程式與之連結，讓紋理能參照該緩衝物件。 在我們前面的例子裡，這個紋理就是該著色器程式中的 <code>Tex</code></p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
@@ -81,7 +81,7 @@
 <p class="hint-container-title">Tips</p>
 <p>官方文件把 Vulkan 驅動放在 Mesa 的 Vulkan runtime 之上，以共用的執行期與工具幫助各廠撰寫 Vulkan 驅動。 另一方面，Zink 這個 Gallium 驅動則把 OpenGL（具狀態）映射到 Vulkan（無狀態）呼叫，以便在「只有 Vulkan」的硬體上提供 OpenGL 相容層，詳見 <a href="https://docs.mesa3d.org/vulkan/index.html" target="_blank" rel="noopener noreferrer">https://docs.mesa3d.org/vulkan/index.html</a></p>
 </div>
-<p>除了 Gallium3D 之外，Mesa 還為硬體驅動提供了許多協助元件，例如 winsys 或 GBM。 winsys 用於把視窗系統的細節包裝起來，GBM（Generic Buffer Manager）則簡化了緩衝物件的配置。 應用程式也可以使用多種著色器語言，例如 GLSL 或 <a href="https://www.khronos.org/spir/" target="_blank" rel="noopener noreferrer">SPIR-V</a>。 Mesa 會把應用程式提供的著色器程式碼編譯成「New Intermediate Representation（NIR）」，接著 Mesa 的驅動會再把它轉換為硬體指令。 為了讓 Mesa 的硬體加速處理這些著色器與其相關資料，這些緩衝物件必須存放在顯示卡能存取到的記憶體位置</p>
+<p>除了 Gallium3D 之外，Mesa 還為硬體驅動提供了許多輔助元件，例如 winsys 或 GBM。 winsys 用於把視窗系統的細節包裝起來，GBM（Generic Buffer Manager）則簡化了緩衝物件的配置。 應用程式也可以使用多種著色器語言，例如 GLSL 或 <a href="https://www.khronos.org/spir/" target="_blank" rel="noopener noreferrer">SPIR-V</a>。 Mesa 會把應用程式提供的著色器程式碼編譯成「New Intermediate Representation（NIR）」，接著 Mesa 的驅動會再把它轉換為硬體指令。 為了讓 Mesa 的硬體加速處理這些著色器與其相關資料，這些緩衝物件必須存放在顯示卡能存取到的記憶體位置</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p>winsys 是把裝置無關的 Gallium 驅動連到不同平台（例如 Linux 上的 DRM、Windows 上的 GDI、X11 的 xlib 等）的橋接層。 GBM 是 Mesa 的「通用緩衝管理器」，負責分配/管理可供掃描輸出與算繪使用的緩衝物件</p>
@@ -103,10 +103,10 @@
 <p class="hint-container-title">Tips</p>
 <p>TTM 是早期/泛用的圖形記憶體管理層，提供多「記憶體域」之間的置換/遷移能力（例如 VRAM ↔ GART ↔ 系統 RAM），並維護 page 映射與釘住（pin）的狀態。 這種「驅逐/回收」機制讓 VRAM 可聚焦於熱資料，把冷資料暫置於系統 RAM</p>
 </div>
-<p>簡單的 framebuffer 裝置的驅動通常會使用 SHMEM 的輔助元件（helpers），它會在共享記憶體裡配置緩衝物件。 在這裡，一般的系統記憶體會充當該裝置的有限資源的「影子緩衝（shadow buffer）」。 圖形驅動的內部會管理裝置的圖形記憶體，但對外則以位於系統記憶體中的緩衝物件來呈現。 這也讓位於 USB 或 I2C 匯流排上的裝置能被記憶體映射其緩衝物件，即便這些匯流排本身不支援裝置記憶體的 page 映射，也能改為映射影子緩衝來達成</p>
+<p>簡單的 framebuffer 裝置的驅動通常會使用 SHMEM 的輔助元件（helpers），它會在共享記憶體裡配置緩衝物件。 在這裡，一般的系統記憶體會充當該裝置的有限資源的「影子緩衝（shadow buffer）」。 圖形驅動的內部會管理裝置的圖形記憶體，但對外則以位於系統記憶體中的緩衝物件來呈現。 這也讓對 USB 或 I2C 匯流排上的裝置的緩衝物件能被記憶體映射，即便這些匯流排本身不支援裝置記憶體的 page 映射，也能改為映射到影子緩衝來達成</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
-<p>SHMEM（shared memory）協助驅動用一般 RAM 做後備存儲，對外提供可 mmap 的區塊。 像 USB/I2C 這類週邊匯流排沒有 MMU 風格的裝置記憶體映射能力，因此會以「影子緩衝」的方式把資料放在可映射的系統 RAM，避免直接對裝置記憶體做 page-level 的映射</p>
+<p>SHMEM（shared memory）輔助驅動用一般的 RAM 做為後備存儲，對外提供可 mmap 的區塊。 像 USB/I2C 這類週邊匯流排沒有 MMU 風格的裝置記憶體映射能力，因此會以「影子緩衝」的方式把資料放在可映射的系統 RAM，避免直接對裝置記憶體做 page-level 的映射</p>
 </div>
 <p>另一個常見的配置器是 DMA helper，它負責管理實體記憶體中位於可進行 DMA 的區域中的緩衝物件。 這種設計常見於 SoC 板上，圖形晶片會透過 DMA 操作來擷取與儲存資料。 當然，若 DRM 驅動有更多需求，也可以擴充現有的記憶體管理器，或自行實作專用的管理器</p>
 <div class="hint-container tip">
@@ -122,20 +122,20 @@
 <p>BO 的「建立/配置」通常是驅動自訂的 <code>ioctl</code>（例如指定大小、對齊、平鋪/壓縮模式、快取屬性、記憶體域、掃描輸出相容性等）。 Mesa 的驅動前端會依用途（像做 render target、texture、scanout）決定參數後，向核心驅動發出建立請求，建立完成再以通用 GEM/dma-buf 介面做映射與共享</p>
 </div>
 <h3>Rendering operations</h3>
-<p>光是擁有用來存放輸出影像、輸入資料與著色器程式的緩衝物件還不夠。 要開始算繪時，Mesa 會指示 DRM 把所有必要的緩衝物件放進圖形記憶體，並啟動目前啟用的著色器程式。 這些流程同樣完全取決於硬體，由各個 DRM 驅動程式分別透過 <code>ioctl()</code> 操作提供。 和緩衝配置一樣，Mesa 內的硬體驅動會呼叫 DRM 驅動的 <code>ioctl()</code> 操作。 對於基於 Gallium3D 的 Mesa 驅動，這一步發生在驅動把 state tracker 的資訊轉換成硬體狀態的時候</p>
+<p>光是擁有用來存放輸出影像、輸入資料與著色器程式的緩衝物件還不夠。 要開始算繪時，Mesa 會指示 DRM 把所有必要的緩衝物件放進圖形記憶體，並啟動目前啟用的著色器程式。 這些流程同樣完全取決於硬體，由各個 DRM 驅動程式分別透過 <code>ioctl()</code> 操作提供。 和緩衝配置一樣，Mesa 內的硬體驅動會呼叫 DRM 驅動的 <code>ioctl()</code> 操作。 對於基於 Gallium3D 的 Mesa 驅動，這一步發生在驅動把狀態追蹤器（state tracker）的資訊轉換成硬體狀態的時候</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
-<p>實作面上會涉及：將 BO 置入適當的記憶體域（例如 VRAM/系統記憶體）、建立/更新硬體狀態（綁定著色器、紋理、頂點來源等）、提交「繪圖命令」。 Gallium3D 的 state tracker 會先彙整 API 狀態，再由硬體特定（HW-specific）的 Mesa 驅動把這些狀態轉成底層 <code>ioctl()</code> 呼叫與命令緩衝（command buffer），交給 DRM 驅動送往 GPU</p>
+<p>實作面上會涉及：將 BO 置入適當的記憶體域（例如 VRAM/系統記憶體）、建立/更新硬體狀態（綁定著色器、紋理、頂點來源等）、提交「繪圖命令」。 Gallium3D 的狀態追蹤器會先彙整 API 狀態，再由硬體特定（HW-specific）的 Mesa 驅動把這些狀態轉成底層 <code>ioctl()</code> 呼叫與命令緩衝（command buffer），交給 DRM 驅動送往 GPU</p>
 </div>
-<p>理想情況下，圖形驅動程式只是在 user space 的應用程式與硬體之間充當代理。 硬體算繪器會與圖形堆疊的其餘部分非同步地運作，只有在發生錯誤或成功完成時才回報給驅動。 有點像系統 CPU 在遇到 page fault 或 illegal instructions 時才會通知作業系統，只要沒有需要回報的事情，驅動的額外負擔就很小</p>
+<p>理想情況下，圖形驅動程式只是充當 user space 的應用程式與硬體之間的代理。 硬體算繪器會與圖形堆疊的其餘部分非同步地運作，只有在發生錯誤或成功完成時才回報給驅動。 有點像系統 CPU 在遇到 page fault 或 illegal instructions 時才會通知作業系統，只要沒有需要回報的事情，驅動的額外負擔就很小</p>
 <p>不過也有例外，例如較舊型號的 Intel 圖形晶片不支援頂點變換，因此 Mesa 內的驅動必須以軟體來實作。 在 Raspberry Pi 上，由於 VideoCore 4 晶片沒有 I/O MMU 可將著色器與系統隔離，核心的 DRM 驅動必須驗證每個著色器的記憶體存取</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p>GPU 一旦接手命令便獨立執行，通常以中斷/訊號回報完成或錯誤，期間驅動維持低開銷。 若硬體某些階段缺失（如早期 GPU 無頂點變換），Mesa 需以軟體補齊。 若缺乏 I/O MMU，著色器可能任意存取系統記憶體，因此驅動需在提交前檢查著色器的存取範圍以確保系統安全</p>
 </div>
 <h3>Software rendering</h3>
-<p>到目前為止，我們都假設有硬體支援圖形算繪。 如果沒有這種支援，或 user space 的應用程式無法使用它，會發生什麼事呢？ 例如，對於某個 user space 的 GUI 工具組，由於像 OpenGL 這樣以硬體為中心的介面不符合它的需求，而可能會偏好使用軟體算繪。 還有在開機時顯示開機標誌並提示輸入磁碟加密密碼的程式 Plymouth，它通常無法使用完整的圖形堆疊。 針對這些情境，DRM 提供了 dumb-buffer 的 <code>ioctl()</code> 介面</p>
-<p>透過使用 dumb buffer，應用程式會在圖形記憶體中配置緩衝物件，但不具備任何硬體加速支援，因此回傳的緩衝物件只能用於軟體算繪。 像 GUI 工具組或 Plymouth 這類 user space 的應用程式，會把該緩衝物件的 page 映射到自己的位址空間，然後把輸出影像複製進去</p>
+<p>到目前為止，我們都假設有硬體支援圖形算繪。 如果沒有這種支援，或 user space 的應用程式無法使用它，會發生什麼事呢？ 例如，對於某個 user space 的 GUI 工具組，由於像 OpenGL 這樣以硬體為中心的介面不符合它的需求，其可能會偏好使用軟體算繪。 還有在開機時顯示開機標誌並提示輸入磁碟加密密碼的程式 Plymouth，它通常無法使用完整的圖形堆疊。 針對這些情境，DRM 提供了 dumb-buffer 的 <code>ioctl()</code> 介面</p>
+<p>透過使用 dumb buffer，應用程式會在圖形記憶體中配置緩衝物件，但不具備任何硬體加速的支援，因此回傳的緩衝物件只能用於軟體算繪。 像 GUI 工具組或 Plymouth 這類 user space 的應用程式，會把該緩衝物件的 page 映射到自己的位址空間，然後把輸出影像複製進去</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p>dumb buffer 通常是線性、可 <code>mmap</code> 的顏色緩衝，沒有平鋪/壓縮與 GPU 特化格式。 CPU 把畫面資料（或由 Mesa 的 llvmpipe/softpipe 產生）寫入其中，再交由顯示路徑取用。 效能有限，但通用性高、依賴少</p>
@@ -146,21 +146,21 @@
 <p>要把應用程式的圖形輸出顯示到螢幕上，必須進行合成（compositing）與模式設定（mode-setting），而且要在各個元件之間正確同步，並維持較低的額外開銷。 接下來我們將檢視 Linux 圖形堆疊中的這些元件。 上一章我們沿著圖形流程從應用程式走到了 Mesa，還使用了核心 <a href="https://en.wikipedia.org/wiki/Direct_Rendering_Manager" target="_blank" rel="noopener noreferrer">Direct Rendering Manager（DRM）</a>子系統的記憶體管理功能。 最終我們得到了存放在輸出緩衝（output buffer）中的應用程式圖形資料，現在是時候將這張影像顯示給使用者了</p>
 <h3>Compositing</h3>
 <p>user space 的應用程式幾乎不會自己把輸出顯示出來，而是交給螢幕合成器來完成。 合成器（compositor）是一個系統服務，它會接收每個應用程式的輸出緩衝，並把它們繪製成螢幕上的影像。 視窗的配置方式取決於合成器的實作，但最常見的是堆疊（<a href="https://en.wikipedia.org/wiki/Stacking_window_manager" target="_blank" rel="noopener noreferrer">stacking</a>）與平鋪（<a href="https://en.wikipedia.org/wiki/Tiling_window_manager" target="_blank" rel="noopener noreferrer">tiling</a>）。 合成器也負責收集使用者的輸入，並把輸入轉送給目標應用程式</p>
-<p>過去，合成以及圖形堆疊中的幾乎所有其他事情，都由 <a href="https://en.wikipedia.org/wiki/X_Window_System" target="_blank" rel="noopener noreferrer">X Window System</a> 提供，X 實作了一種用於把圖形顯示到螢幕上的網路協定。 由於「其他事情」包含繪圖、mode-setting、螢幕分享，甚至<a href="https://www.x.org/releases/X11R6.8.2/doc/Xprint.7.html" target="_blank" rel="noopener noreferrer">列印</a>，X 因此承受了軟體臃腫的問題，也難以因應圖形硬體與 Linux 系統的變化，於是需要一個更輕量的替代方案</p>
+<p>過去，合成以及圖形堆疊中的幾乎所有其他事情，都由 <a href="https://en.wikipedia.org/wiki/X_Window_System" target="_blank" rel="noopener noreferrer">X Window System</a> 提供，X 實作了一種用於把圖形顯示到螢幕上的網路協定。 由於「其他事情」包含繪圖、mode-setting、螢幕分享，甚至<a href="https://www.x.org/releases/X11R6.8.2/doc/Xprint.7.html" target="_blank" rel="noopener noreferrer">列印</a>，X 因此承受了軟體臃腫的問題，也難以因應圖形硬體與 Linux 系統的變化，於是人們便開始尋找一個更輕量的替代方案</p>
 <p>它的現代接班人是 <a href="https://wayland.freedesktop.org/" target="_blank" rel="noopener noreferrer">Wayland</a>，其同樣採用了 client‑server 的設計，應用程式會作為用戶端，向合成器所提供的顯示服務提出請求。 Wayland 的參考合成器是 Weston，但實務上更常見的是 GNOME 的 <a href="https://gitlab.gnome.org/GNOME/mutter" target="_blank" rel="noopener noreferrer">Mutter</a> 或 KDE 的 <a href="https://invent.kde.org/plasma/kwin" target="_blank" rel="noopener noreferrer">KWin</a></p>
-<p>Wayland 並不提供繪圖或列印，這個<a href="https://wayland-book.com/" target="_blank" rel="noopener noreferrer">協定</a>僅提供合成所需的功能。 Wayland 的 surface 代表一個應用程式視窗，它是應用程式用來顯示其輸出、並從合成器接收輸入事件的介面。 附掛在 surface 上的是一個 Wayland buffer，其中包含可顯示的像素資料，以及顏色格式與尺寸資訊</p>
+<p>Wayland 並不提供繪圖或列印，這個<a href="https://wayland-book.com/" target="_blank" rel="noopener noreferrer">協定</a>僅提供合成所需的功能。 Wayland 的 surface 代表一個應用程式視窗，它是應用程式用來顯示其輸出、並從合成器接收輸入事件的介面。 surface 上會附掛一個 Wayland buffer，其中包含可顯示的像素資料，以及顏色格式與尺寸資訊</p>
 <p>這些像素資料位於用戶端應用程式先前算繪完成的輸出緩衝中。 當變更某個 surface 所附掛的緩衝物件或其內容時，應用程式會透過 Wayland 協定送出 surface-damage 訊息給合成器，後者據此更新螢幕上的內容，也可能會改用新緩衝物件的內容。 也就是說，應用程式的輸出緩衝會成為 Wayland 合成器的輸入緩衝</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p>Wayland 把視窗抽象為 surface，把像素載體抽象為 buffer。 應用程式會把已算繪的像素附掛到 surface，並宣告「damage」區域告知哪裡需要重繪。 合成器接到通知後，取用該 buffer（通常為可 zero-copy 共享的 dma-buf），再把它放到合成場景中。 協定不會管要「如何繪圖」，只管「如何交付像素與事件」</p>
 </div>
-<p>合成器中的算繪流程，與第一章介紹的應用程式算繪完全相同。 合成器會維護一份代表應用程式視窗的 Wayland surface 清單。 這些視窗與合成器自身的介面元素，又會形成另一棵<a href="https://en.wikipedia.org/wiki/Scene_graph" target="_blank" rel="noopener noreferrer">場景圖</a>。 背景可以是桌布影像、背景圖樣或顏色。 在背景之上，合成器繪製各個應用程式視窗。 實作上最簡單的方式是為每個視窗繪製一個矩形，並將應用程式提供的緩衝區物件當作紋理影像來使用</p>
-<p>在應用程式視窗之上，合成器還會繪製它自己的使用者介面，例如讓使用者能與合成器本身互動的工作列。 最後、最上層的是用來指示使用者目前正在互動對象的元素，在桌面系統上通常就是鼠標。 與應用程式一樣，合成器同樣使用一般的 user space 介面進行算繪，例如透過 Mesa 的 OpenGL 或 Vulkan</p>
+<p>合成器中的算繪流程，與第一章介紹的應用程式算繪完全相同。 合成器會維護一份代表應用程式視窗的 Wayland surface 清單。 這些視窗與合成器自身的介面元素，又會形成另一棵<a href="https://en.wikipedia.org/wiki/Scene_graph" target="_blank" rel="noopener noreferrer">場景圖</a>。 背景可以是桌布影像、背景圖樣或顏色，合成器會在背景之上繪製各個應用程式視窗。 實作上最簡單的方式是為每個視窗繪製一個矩形，並將應用程式提供的緩衝區物件當作紋理影像來使用</p>
+<p>在應用程式視窗之上，合成器還會繪製它自己的使用者介面，例如讓使用者能與合成器本身互動的工作列。 最後、最上層的是用來目前正在與使用者互動的元素，在桌面系統上通常就是鼠標。 與應用程式一樣，合成器同樣使用一般的 user space 介面進行算繪，例如透過 Mesa 的 OpenGL 或 Vulkan</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p>合成器會把每個視窗視為一個「貼上紋理的矩形」，用 GPU 將它們依疊放/平鋪與 Z 順序、透明度等參數合成出最終畫面，同時也把自身 UI（面板、鼠標、提示等）納入同一場景圖中。 這讓合成器能沿用與應用程式相同的圖形管線與資源管理模式來完成顯示</p>
 </div>
-<p>讓這一切成真的最後一塊拼圖，是「緩衝物件」的傳輸機制。 與 X 不同，Wayland 應用程式一律會在與其合成器相同的主機上執行。 因此實作上可以針對這種情況做最佳化：不需要任何網路編碼、緩衝壓縮等額外處理</p>
+<p>讓這一切成真的最後一塊拼圖，是「緩衝物件」的傳輸機制。 與 X 不同，Wayland 應用程式和其合成器會在相同的主機上執行。 因此實作上可以針對這種情況做最佳化：不需要任何網路編碼、緩衝壓縮等額外處理</p>
 <p>若要傳輸一個位於系統記憶體中的緩衝物件，應用程式會建立一個指向該緩衝記憶體的檔案描述符，透過連線所使用的串流 socket 傳送出去（只需一則低成本的訊息），並讓合成器把這個檔案描述符所對應的記憶體 page 映射到它自己的位址空間</p>
 <p>這樣應用程式與合成器之間就建立了低開銷的像素資料交換通道：應用程式把影像畫進共享記憶區，合成器則從該處取用並進行算繪。 實務上也常同時使用多個緩衝物件做雙緩衝。 Wayland 的 surface-damage 訊息則以低開銷的方式扮演同步機制</p>
 <div class="hint-container tip">
@@ -173,9 +173,9 @@
 <li><a href="https://man7.org/tlpi/code/online/dist/sockets/scm_rights_send.c.html" target="_blank" rel="noopener noreferrer">sockets/scm_rights_send.c</a></li>
 </ul>
 </div>
-<p>對於軟體算繪，透過共享記憶體傳輸資料就足以滿足它了，但對高效能的硬體算繪而言還不夠。 因為那種情況下，應用程式必須先在圖形硬體上算繪，然後再透過相對較慢的硬體匯流排把結果回讀到共享記憶體區域</p>
+<p>對於軟體算繪，透過共享記憶體傳輸資料就足以滿足它了，但因為應用程式必須先在圖形硬體上算繪，然後再透過相對較慢的硬體匯流排把結果回讀到共享記憶體區域，因此這還不能滿足高效能的硬體算繪需求</p>
 <p>為了避免上述代價，圖形緩衝必須維持在圖形記憶體中。 Wayland 提供了一個協定的擴充，透過 Linux 的 <a href="https://www.kernel.org/doc/html/latest/driver-api/dma-buf.html" target="_blank" rel="noopener noreferrer">dma-buf</a> 來共享緩衝物件。 dma-buf 代表了一個可在硬體裝置、驅動與 user-space 程式之間共享的記憶體緩衝</p>
-<p>應用程式如同第一部分所述，會透過 Mesa 介面以硬體加速算繪其場景圖，但它不是傳遞指向共享記憶體的參照，而是傳送一個指向該緩衝物件（且仍位於圖形記憶體中的）dma-buf 物件。 Wayland 合成器可以直接使用其中的像素資料，而無需經由硬體匯流排把資料回讀出來</p>
+<p>應用程式如同第一部分所述，會透過 Mesa 介面以硬體加速算繪其場景圖，但它不是傳遞指向共享記憶體的參照，而是傳送一個指向該緩衝物件（且仍位於圖形記憶體中）的 dma-buf 物件。 Wayland 合成器可以直接使用其中的像素資料，而無需經由硬體匯流排把資料回讀出來</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
 <p><code>linux-dmabuf</code> Wayland 擴充允許客戶端把 GPU 端緩衝以 dma-buf（可跨驅動/裝置的共享 FD）形式交給合成器，這樣像素自始至終都留在「GPU/顯示」可直接存取的記憶體範圍，達成 zero-copy 的傳遞。 dma-buf 是 Linux 核心提供的跨裝置緩衝共享/同步框架，被 DRM/顯示子系統廣泛地使用</p>
@@ -210,9 +210,9 @@
 <p class="hint-container-title">Tips</p>
 <p>framebuffer 是被 scanout 讀取的像素來源，它同時攜帶像素格式、寬高等屬性。 驅動會將這些屬性寫入對應暫存器，並提供記憶體起始位址，硬體據此讀取像素</p>
 </div>
-<p>依硬體能力而定，framebuffer 可以比輸出的顯示模式更大或更小。 舉例來說，假設顯示器設定為 1920×1080 像素，如果 framebuffer 大於顯示模式，則它可能只會該 framebuffer 中的某個區域； 反之，若 framebuffer 小於顯示模式，它可能只會覆蓋螢幕上的一小塊，其他區域則留白</p>
-<p>因此，管線的下一階段會在整體畫面中定位這個 scanout buffer。 在 DRM 術語裡，這個階段稱為 plane，它負責設定該 scanout buffer 的位置、方向與縮放參數。 視硬體而定，系統可能會有多個使用不同framebuffer 的 plane。 所有啟用中的 plane 都會把它們的像素輸出送往管線的第三階段，因歷史因素該階段被稱為 CRTC（cathode-ray tube controller）</p>
-<p>CRTC 負責所有與顯示模式的設定相關的事項。 DRM 驅動會以某個顯示模式來設定（program）CRTC 的硬體，並將它與所有啟用中的 plane 與輸出端相連。 系統也可以同時存在多個設定各異的 CRTC，具體配置僅受限於硬體特性</p>
+<p>依硬體能力而定，framebuffer 可以比輸出的顯示模式更大或更小。 舉例來說，假設顯示器設定為 1920×1080 像素，如果 framebuffer 大於顯示模式，則顯示器上可能只會顯示該 framebuffer 內的某個區域； 反之，若 framebuffer 小於顯示模式，則它可能只會覆蓋顯示器上的一小塊，其他區域則留白</p>
+<p>因此，管線的下一階段會在整體畫面中定位這個 scanout buffer。 在 DRM 術語裡，這個階段稱為 plane，它負責設定該 scanout buffer 的位置、方向與縮放參數。 視硬體而定，系統可能會有多個使用不同 framebuffer 的 plane。 所有啟用中的 plane 都會把它們的像素輸出送往管線的第三階段，因歷史因素該階段被稱為 CRTC（cathode-ray tube controller）</p>
+<p>CRTC 負責所有與顯示模式的設定相關的事項。 DRM 驅動會以某個顯示模式來設定（program）CRTC 的硬體，並將它與所有啟用中的 plane 及輸出端相連。 系統也可以同時存在多個設定各異的 CRTC，具體配置僅受限於硬體特性</p>
 <p>各個 plane 會以疊放的方式排列，因此它們可以彼此重疊，或覆蓋輸出畫面的不同區域。 依據已設定的顯示模式與各 plane 的位置，CRTC 硬體會從這些 plane 取出像素資料，在需要時對重疊的 plane 進行混合，然後把結果傳遞到其輸出端</p>
 <div class="hint-container tip">
 <p class="hint-container-title">Tips</p>
@@ -255,8 +255,8 @@
 <h3>Additional features</h3>
 <p>在先前討論 plane 時，我們假設所有硬體上的 plane 都是相同的，但這其實不一定是對的。 通常會有一個稱為 primary plane 的平面用於類 RGB 的色彩格式，且覆蓋整個顯示畫面。 合成器會設定 primary plane 來顯示它的螢幕影像</p>
 <p>但多數硬體還會提供一個額外的鼠標用平面，稱為 cursor plane。 這個平面只會覆蓋一小塊區域，並位於 primary plane 之上。 顧名思義，合成器使用 cursor plane 來顯示滑鼠指標影像，因此能在不改變 primary plane 的情況下自由移動該指標</p>
-<p>位於 primary 與 cursor plane 之間的是 overlay planes，它們大小各異，且常支援類 YUV 的色彩格式。 這讓它很適合用較低的 CPU 開銷來顯示視訊資料串流。 因此，通常視訊播放器應用程式會提供含有 YUV 基礎像素資料的緩衝物件給合成器</p>
-<p>合成器會用該像素資料建立一個 framebuffer 並配置給 overlay plane。 此平面會在硬體中掃描 YUV 的像素資料，並將其轉換為 RGB 的色彩。 透過 dma-buf，視訊播放器可以把硬體視訊解碼器產生的各個 YUV 幀直接轉交給合成器，讓整個視訊處理都交由硬體完成</p>
+<p>位於 primary 與 cursor plane 之間的是 overlay planes，它們大小各異，且常支援類 YUV 的色彩格式。 這讓它很適合用較低的 CPU 開銷來顯示影像資料串流。 因此，通常影像播放器應用程式會提供含有 YUV 基礎像素資料的緩衝物件給合成器</p>
+<p>合成器會用該像素資料建立一個 framebuffer 並配置給 overlay plane。 此平面會在硬體中掃描 YUV 的像素資料，並將其轉換為 RGB 的色彩。 透過 dma-buf，影像播放器可以把硬體影像解碼器產生的各個 YUV 幀直接轉交給合成器，讓整個影像處理都交由硬體完成</p>
 <p>若顯示更新的延遲為關鍵考量，將 mode-setting 能力直接交給單一應用程式會更有幫助。 為此，合成器會把該功能出租（lease）給應用程式。 當某個應用持有有效的 DRM lease 時，它便能完全控制整條 mode-setting 管線。 這對需要嚴格協調其內建顯示器的輸出頻率與延遲、以維持 3D 幻覺效果的 3D 頭戴式裝置特別有用。 DRM lease 的租約可能會到期或被撤銷，因此最終 mode-setting 的主控權仍在合成器手上</p>
 <p>雖然現代合成器使用 Wayland 作為協定，但 X Window System 的應用程式還是很常見。 Xwayland 是在 Wayland 工作階段中執行的 X 伺服器，它透過在 Wayland 與 X 協定之間做轉譯，讓 X 應用程式得以透明地參與 Wayland 工作階段。 大多數的使用情境而言，這種方式是可行的，但還是有些例外</p>
 <p>例如 Xwayland 無法模擬螢幕擷取與螢幕分享。 X 應用可以存取 X 工作階段的整棵視窗樹，因此很容易進行螢幕擷取。 基於安全考量，Wayland 協定不允許應用程式讀取整個螢幕或其他應用程式的視窗。 於是 Wayland 合成器會提供專門的實作來擷取或分享螢幕內容，常見實作包含 <a href="https://www.pipewire.org/" target="_blank" rel="noopener noreferrer">PipeWire</a>、<a href="https://en.wikipedia.org/wiki/Virtual_Network_Computing" target="_blank" rel="noopener noreferrer">VNC</a> 或 <a href="https://en.wikipedia.org/wiki/Remote_Desktop_Protocol" target="_blank" rel="noopener noreferrer">RDP</a></p>
@@ -272,7 +272,7 @@
     <title type="text">利用 qemu 搭建學習 kernel module 的環境</title>
     <id>https://mes0903.github.io/Linux/qemu_kernel_module/</id>
     <link href="https://mes0903.github.io/Linux/qemu_kernel_module/"/>
-    <updated>2025-08-22T09:12:37.000Z</updated>
+    <updated>2025-09-05T13:41:38.000Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>起因是最近在閱讀 lkmpg，原本是使用 UML 來做練習，但由於 UML 缺了一些東西，例如它不會有 <code>read_cr0()</code> 這類依賴於硬體平台的函式，所以後來就決定還是用 qemu 來做練習，也因此本文會以 lkmpg 當中的例子來示範</p>
@@ -433,7 +433,7 @@
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2025-09-03T16:47:28.727Z</updated>
+    <updated>2025-09-05T13:42:07.120Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -502,7 +502,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2025-09-03T16:47:28.729Z</updated>
+    <updated>2025-09-05T13:42:07.122Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -1606,7 +1606,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2025-09-03T16:47:28.859Z</updated>
+    <updated>2025-09-05T13:42:07.231Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -1673,7 +1673,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2025-09-03T16:47:28.870Z</updated>
+    <updated>2025-09-05T13:42:07.242Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -1994,7 +1994,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2025-09-03T16:47:28.988Z</updated>
+    <updated>2025-09-05T13:42:07.352Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -2091,7 +2091,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2025-09-03T16:47:29.012Z</updated>
+    <updated>2025-09-05T13:42:07.374Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -2224,7 +2224,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2025-09-03T16:47:29.024Z</updated>
+    <updated>2025-09-05T13:42:07.385Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -2436,7 +2436,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2025-09-03T16:47:29.040Z</updated>
+    <updated>2025-09-05T13:42:07.399Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -2920,7 +2920,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2025-09-03T16:47:29.069Z</updated>
+    <updated>2025-09-05T13:42:07.427Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -2945,7 +2945,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2025-09-03T16:47:29.075Z</updated>
+    <updated>2025-09-05T13:42:07.440Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -2995,7 +2995,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">RISC-V Machine-Level ISA</title>
     <id>https://mes0903.github.io/risc-v/Machine-Level-ISA/</id>
     <link href="https://mes0903.github.io/risc-v/Machine-Level-ISA/"/>
-    <updated>2025-07-23T20:58:33.000Z</updated>
+    <updated>2025-09-05T13:41:38.000Z</updated>
     <summary type="html"><![CDATA[
 <p>本篇為 RISC-V Machine-Level ISA（Version 20241101）的中文翻譯與筆記，原文可於<a href="https://github.com/riscv/riscv-isa-manual/tree/main" target="_blank" rel="noopener noreferrer">官方 github</a> 的第 3 章中看到。 大部分的情況下我會直接直譯，但有些地方我覺得文件實在寫得很繞，那種地方我就會直接用我自己的話寫了，或是多補一個 Tips Block 做解釋</p>
 <p>本篇內的 Info block 為原文中的補充段落，我全部都有翻，但會依照前後文的語境來決定要不要安插 Info block 進來，也就是說雖然本文中有些段落不在藍色的 Info 區塊內，但在原文中其屬於補充段落。 至於綠色的 Tips block 則是我個人的補充筆記，其不一定百分百正確，如果發現有誤還請麻煩告知我一下~</p>]]></summary>
@@ -11758,7 +11758,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-09-03T16:47:30.035Z</updated>
+    <updated>2025-09-05T13:42:08.340Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -17534,40 +17534,6 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
     <published>2021-11-15T00:00:00.000Z</published>
   </entry>
   <entry>
-    <title type="text">作業系統 ── 序</title>
-    <id>https://mes0903.github.io/OS/NTHU/</id>
-    <link href="https://mes0903.github.io/OS/NTHU/"/>
-    <updated>2025-04-02T09:54:23.000Z</updated>
-    <summary type="html"><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>]]></summary>
-    <content type="html"><![CDATA[
-<blockquote>
-<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
-</blockquote>
-<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
-<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
-<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
-<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
-<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
-<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
-<p>然後這邊推一下 Jserv 的兩篇回文：</p>
-<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
-<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
-<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
-<p>再來是一些其他的資源：</p>
-<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
-<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
-<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
-<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
-]]></content>
-    <category term="OS"/>
-    <published>2021-12-10T00:00:00.000Z</published>
-  </entry>
-  <entry>
     <title type="text">The mind behind Linux 筆記 &amp; 心得</title>
     <id>https://mes0903.github.io/Linux/The_mind_behind_Linux/</id>
     <link href="https://mes0903.github.io/Linux/The_mind_behind_Linux/"/>
@@ -18488,6 +18454,40 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 ]]></content>
     <category term="Linux"/>
     <published>2023-11-20T00:00:00.000Z</published>
+  </entry>
+  <entry>
+    <title type="text">作業系統 ── 序</title>
+    <id>https://mes0903.github.io/OS/NTHU/</id>
+    <link href="https://mes0903.github.io/OS/NTHU/"/>
+    <updated>2025-04-02T09:54:23.000Z</updated>
+    <summary type="html"><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>]]></summary>
+    <content type="html"><![CDATA[
+<blockquote>
+<p>2025/04/02: 那時候因為字幕生成還沒有現在這麼方便，所以寫這種課堂筆記的速度很慢，到後面這就沒繼續寫了，如果哪天心血來潮我再繼續把它補上吧XD</p>
+</blockquote>
+<p>這裡是我讀作業系統的筆記，修的是清大周志遠老師的作業系統</p>
+<p>課程網址：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course&amp;cid=141&amp;" target="_blank" rel="noopener noreferrer">10501 資訊工程學系 作業系統</a></p>
+<p>影片 YT 連結：<a href="https://www.youtube.com/playlist?list=PLS0SUwlYe8czigQPzgJTH2rJtwm0LXvDX" target="_blank" rel="noopener noreferrer">【10510周志遠教授：作業系統】</a></p>
+<p>課本：<a href="https://www.wiley.com/en-sg/Operating+System+Concepts%2C+9th+Edition%2C+International+Student+Version-p-9781118093757" target="_blank" rel="noopener noreferrer">Operating System Concepts, 9th Edition, International Student Version</a></p>
+<p>課堂講義：<a href="https://ocw.nthu.edu.tw/ocw/index.php?page=course_news_content&amp;cid=141&amp;id=999" target="_blank" rel="noopener noreferrer">【周志遠教授作業系統講義】</a></p>
+<p>如果我有另外補充什麼，參考資料都會列在文章下方</p>
+<p>然後這邊推一下 Jserv 的兩篇回文：</p>
+<p><a href="https://disp.cc/b/163-baku" class="wheatlink">1. [問卦] 作業系統是不是理科最簡單科目</a></p>
+<p><a href="" class="wheatlink">2. [問卦] 精通數位邏輯對Coding有什麼幫助？</a></p>
+<p>雖然我自己非常喜歡作業系統與編譯器，但可能有很多人不知道自己學這些東西要幹嘛，我認為這兩篇回覆很值得讀一下，長度也挺剛好的</p>
+<p>再來是一些其他的資源：</p>
+<p><a href="https://hackmd.io/@Pl-eQT9CQaS0jhExKqL8_w/BkhOSR4jW/https%3A%2F%2Fhackmd.io%2Fs%2FS14A_CVjW?type=book" class="wheatlink">1. 陳品媛整理的筆記</a></p>
+<p><a href="https://mropengate.blogspot.com/search/label/Computer%20Science-Operating%20System" class="wheatlink">2. Mr. Opengate 整理的筆記</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PL6S9AqLQkFpongEA75M15_BlQBC9rTdd8" class="wheatlink">3. Linux 核心設計影片</a>、<a href="http://hackfoldr.org/linux/" class="wheatlink">講義</a></p>
+<p><a href="https://github.com/sysprog21/lkmpg" class="wheatlink">4. The Linux Kernel Module Programming Guide</a></p>
+]]></content>
+    <category term="OS"/>
+    <published>2021-12-10T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">Ros Install (noetic)</title>
@@ -23734,7 +23734,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-09-03T16:47:32.380Z</updated>
+    <updated>2025-09-05T13:42:10.589Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子：</p>
@@ -24063,7 +24063,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-09-03T16:47:32.404Z</updated>
+    <updated>2025-09-05T13:42:10.611Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開</p>
@@ -24213,7 +24213,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-09-03T16:47:32.415Z</updated>
+    <updated>2025-09-05T13:42:10.622Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>事情起於 jserv 的講義裡面有個 <code>&amp;((data*)0)-&gt;c)</code> 這樣的操作，作用是求 <code>c</code> 在 <code>data</code> 這個 struct 中的偏移量，但那個 <code>0</code> 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)</p>
@@ -24469,7 +24469,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-09-03T16:47:32.426Z</updated>
+    <updated>2025-09-05T13:42:10.633Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD</p>
@@ -25999,7 +25999,7 @@ B：1-&gt;int</li>
     <title type="text">（WIP）礦坑系列 ── malloc、new 與 POD Type</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-09-03T16:47:32.550Z</updated>
+    <updated>2025-09-05T13:42:10.748Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p><code>new</code> 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 <code>malloc</code>，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 <code>new</code> 比 <code>malloc</code> 多做了一些事情</p>
