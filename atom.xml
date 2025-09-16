@@ -4,10 +4,11 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-09-07T12:25:04.348Z</updated>
+  <updated>2025-09-16T05:31:22.795Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
+  <category term="virtio"/>
   <category term="Linux"/>
   <category term="computer-graphic"/>
   <category term="OS"/>
@@ -19,6 +20,402 @@
   <category term="ROS1"/>
   <category term="computer-network"/>
   <category term="security"/>
+  <entry>
+    <title type="text">(WIP) Virtual I/O Device (VIRTIO) Version 1.3 翻譯</title>
+    <id>https://mes0903.github.io/system/</id>
+    <link href="https://mes0903.github.io/system/"/>
+    <updated>2025-09-16T05:31:22.797Z</updated>
+    <summary type="html"><![CDATA[<h2>1 Introduction</h2>
+<p>本文件描述了「virtio」裝置家族的規格。 這些裝置雖然存在於虛擬環境中，但設計上它們在虛擬機內對 guest 來說，看起來就像實體裝置（同時本文件也直接將其視為實體裝置）。 這種相似性使得 guest 能夠使用標準的驅動程式與探索機制</p>
+<p>virtio 及本規格的目的在於讓虛擬環境與 guest 能夠透過一個直接、有效率、標準且可擴充的機制來使用虛擬裝置，而不是依賴每個環境或作業系統特製化的機制</p>
+<ul>
+<li>直接：<br>
+Virtio 裝置使用中斷與 DMA 等常見的匯流排機制，撰寫裝置驅動程式的人應該不陌生。 Virtio 裝置並沒有使用 page-flipping 或 COW（Copy-On-Write）等特殊的機制，它就是一個普通的裝置</li>
+<li>高效：<br>
+Virtio 裝置由輸入與輸出的描述子的環（ring）組成，這些環被整齊地排列，以避免驅動程式與裝置同時寫入同一快取列時所產生的快取效應</li>
+<li>標準：<br>
+除了需要支援裝置所連接的匯流排以外，Virtio 對其運作環境沒有其他要求。 本規格中，virtio 裝置透過 MMIO、Channel I/O 與 PCI 匯流排傳輸來實作，早期的草稿曾在其他匯流排上實作過，但未收錄於此</li>
+<li>可擴充：<br>
+Virtio 裝置包含特徵位元，guest 作業系統在裝置初始化時會確認這些位元。 這機制允許向前與向後相容：裝置會提供所有它支援的功能，而驅動程式則會確認它支援且想要使用的部分</li>
+</ul>]]></summary>
+    <content type="html"><![CDATA[<h2>1 Introduction</h2>
+<p>本文件描述了「virtio」裝置家族的規格。 這些裝置雖然存在於虛擬環境中，但設計上它們在虛擬機內對 guest 來說，看起來就像實體裝置（同時本文件也直接將其視為實體裝置）。 這種相似性使得 guest 能夠使用標準的驅動程式與探索機制</p>
+<p>virtio 及本規格的目的在於讓虛擬環境與 guest 能夠透過一個直接、有效率、標準且可擴充的機制來使用虛擬裝置，而不是依賴每個環境或作業系統特製化的機制</p>
+<ul>
+<li>直接：<br>
+Virtio 裝置使用中斷與 DMA 等常見的匯流排機制，撰寫裝置驅動程式的人應該不陌生。 Virtio 裝置並沒有使用 page-flipping 或 COW（Copy-On-Write）等特殊的機制，它就是一個普通的裝置</li>
+<li>高效：<br>
+Virtio 裝置由輸入與輸出的描述子的環（ring）組成，這些環被整齊地排列，以避免驅動程式與裝置同時寫入同一快取列時所產生的快取效應</li>
+<li>標準：<br>
+除了需要支援裝置所連接的匯流排以外，Virtio 對其運作環境沒有其他要求。 本規格中，virtio 裝置透過 MMIO、Channel I/O 與 PCI 匯流排傳輸來實作，早期的草稿曾在其他匯流排上實作過，但未收錄於此</li>
+<li>可擴充：<br>
+Virtio 裝置包含特徵位元，guest 作業系統在裝置初始化時會確認這些位元。 這機制允許向前與向後相容：裝置會提供所有它支援的功能，而驅動程式則會確認它支援且想要使用的部分</li>
+</ul>
+<h3>1.1 Normative References</h3>
+<ul>
+<li>[RFC2119] Bradner S., “Key words for use in RFCs to Indicate Requirement Levels”, BCP 14, RFC 2119, March 1997. <a href="http://www.ietf.org/rfc/rfc2119.txt" target="_blank" rel="noopener noreferrer">http://www.ietf.org/rfc/rfc2119.txt</a></li>
+<li>[RFC4122] Leach, P., Mealling, M., and R. Salz, “A Universally Unique IDentifier (UUID) URN Namespace”, RFC 4122, DOI 10.17487/RFC4122, July 2005.<br>
+<a href="http://www.ietf.org/rfc/rfc4122.txt" target="_blank" rel="noopener noreferrer">http://www.ietf.org/rfc/rfc4122.txt</a></li>
+<li>[S390 PoP] z/Architecture Principles of Operation, IBM Publication SA22-7832,<br>
+<a href="https://www.ibm.com/docs/en/SSQ2R2_15.0.0/com.ibm.tpf.toolkit.hlasm.doc/dz9zr006.pdf" target="_blank" rel="noopener noreferrer">https://www.ibm.com/docs/en/SSQ2R2_15.0.0/com.ibm.tpf.toolkit.hlasm.doc/dz9zr006.pdf</a>, and any future revisions</li>
+<li>[S390 Common I/O] ESA/390 Common I/O-Device and Self-Description, IBM Publication SA22-7204,<br>
+<a href="https://www.ibm.com/resources/publications/OutputPubsDetails?PubID=SA22720401" target="_blank" rel="noopener noreferrer">https://www.ibm.com/resources/publications/OutputPubsDetails?PubID=SA22720401</a>, and any future revisions</li>
+<li>[PCI] Conventional PCI Specifications,<br>
+<a href="http://www.pcisig.com/specifications/conventional/" target="_blank" rel="noopener noreferrer">http://www.pcisig.com/specifications/conventional/</a>, PCI-SIG</li>
+<li>[PCIe] PCI Express Specifications<br>
+<a href="http://www.pcisig.com/specifications/pciexpress/" target="_blank" rel="noopener noreferrer">http://www.pcisig.com/specifications/pciexpress/</a>, PCI-SIG</li>
+<li>[IEEE 802] IEEE Standard for Local and Metropolitan Area Networks: Overview and Architecture,<br>
+<a href="http://www.ieee802.org/" target="_blank" rel="noopener noreferrer">http://www.ieee802.org/</a>, IEEE</li>
+<li>[SAM] SCSI Architectural Model,<br>
+<a href="http://www.t10.org/cgi-bin/ac.pl?t=f&amp;f=sam4r05.pdf" target="_blank" rel="noopener noreferrer">http://www.t10.org/cgi-bin/ac.pl?t=f&amp;f=sam4r05.pdf</a></li>
+<li>[SCSI MMC] SCSI Multimedia Commands,<br>
+<a href="http://www.t10.org/cgi-bin/ac.pl?t=f&amp;f=mmc6r00.pdf" target="_blank" rel="noopener noreferrer">http://www.t10.org/cgi-bin/ac.pl?t=f&amp;f=mmc6r00.pdf</a></li>
+<li>[FUSE] Linux FUSE interface,<br>
+<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/fuse.h" target="_blank" rel="noopener noreferrer">https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/fuse.h</a></li>
+<li>[errno] Linux error names and numbers,<br>
+<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/asm-generic/errno-base.h" target="_blank" rel="noopener noreferrer">https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/asm-generic/errno-base.h</a></li>
+<li>[eMMC] eMMC Electrical Standard (5.1), JESD84-B51,<br>
+<a href="http://www.jedec.org/sites/default/files/docs/JESD84-B51.pdf" target="_blank" rel="noopener noreferrer">http://www.jedec.org/sites/default/files/docs/JESD84-B51.pdf</a></li>
+<li>[HDA] High Definition Audio Specification,<br>
+<a href="https://www.intel.com/content/dam/www/public/us/en/documents/product-specifications/high-definition-audio-specification.pdf" target="_blank" rel="noopener noreferrer">https://www.intel.com/content/dam/www/public/us/en/documents/product-specifications/high-definition-audio-specification.pdf</a></li>
+<li>[I2C] I2C-bus specification and user manual,<br>
+<a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf" target="_blank" rel="noopener noreferrer">https://www.nxp.com/docs/en/user-guide/UM10204.pdf</a></li>
+<li>[SCMI] Arm System Control and Management Interface, DEN0056,<br>
+<a href="https://developer.arm.com/docs/den0056/c" target="_blank" rel="noopener noreferrer">https://developer.arm.com/docs/den0056/c</a>, version C and any future revisions</li>
+<li>[RFC3447] J. Jonsson.,“Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography”, February 2003.<br>
+<a href="https://www.ietf.org/rfc/rfc3447.txt" target="_blank" rel="noopener noreferrer">https://www.ietf.org/rfc/rfc3447.txt</a></li>
+<li>[FIPS186-3] National Institute of Standards and Technology (NIST), FIPS Publication 180-3: Secure Hash Standard, October 2008.<br>
+<a href="https://csrc.nist.gov/csrc/media/publications/fips/186/3/archive/2009-06-25/documents/fips_186-3.pdf" target="_blank" rel="noopener noreferrer">https://csrc.nist.gov/csrc/media/publications/fips/186/3/archive/2009-06-25/documents/fips_186-3.pdf</a></li>
+<li>[RFC5915] “Elliptic Curve Private Key Structure”, June 2010.<br>
+<a href="https://www.rfc-editor.org/rfc/rfc5915" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc5915</a></li>
+<li>[RFC6025] C.Wallace., “ASN.1 Translation”, October 2010.<br>
+<a href="https://www.ietf.org/rfc/rfc6025.txt" target="_blank" rel="noopener noreferrer">https://www.ietf.org/rfc/rfc6025.txt</a></li>
+<li>[RFC3279] W.Polk., “Algorithms and Identifiers for the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile”, April 2002.<br>
+<a href="https://www.ietf.org/rfc/rfc3279.txt" target="_blank" rel="noopener noreferrer">https://www.ietf.org/rfc/rfc3279.txt</a></li>
+<li>[SEC1] Standards for Efficient Cryptography Group(SECG), “SEC1: Elliptic Cureve Cryptography”, Version 1.0, September 2000.<br>
+<a href="https://www.secg.org/sec1-v2.pdf" target="_blank" rel="noopener noreferrer">https://www.secg.org/sec1-v2.pdf</a></li>
+<li>[RFC2784] Generic Routing Encapsulation. This protocol is only specified for IPv4 and used as either the payload or delivery protocol.<br>
+<a href="https://datatracker.ietf.org/doc/rfc2784/" target="_blank" rel="noopener noreferrer">https://datatracker.ietf.org/doc/rfc2784/</a></li>
+<li>[RFC2890] Key and Sequence Number Extensions to GRE. This protocol describes extensions by which two fields, Key and Sequence Number, can be optionally carried in the GRE Header.<br>
+<a href="https://www.rfc-editor.org/rfc/rfc2890" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc2890</a></li>
+<li>[RFC7676] IPv6 Support for Generic Routing Encapsulation (GRE). This protocol is specified for IPv6 and used as either the payload or delivery protocol. Note that this does not change the GRE header format or any behaviors specified by RFC 2784 or RFC 2890.<br>
+<a href="https://datatracker.ietf.org/doc/rfc7676/" target="_blank" rel="noopener noreferrer">https://datatracker.ietf.org/doc/rfc7676/</a></li>
+<li>[GRE-in-UDP] GRE-in-UDP Encapsulation. This specifies a method of encapsulating network protocol packets within GRE and UDP headers. This protocol is specified for IPv4 and IPv6, and used as either the payload or delivery protocol.<br>
+<a href="https://www.rfc-editor.org/rfc/rfc8086" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc8086</a></li>
+<li>[VXLAN] Virtual eXtensible Local Area Network.<br>
+<a href="https://datatracker.ietf.org/doc/rfc7348/" target="_blank" rel="noopener noreferrer">https://datatracker.ietf.org/doc/rfc7348/</a></li>
+<li>[VXLAN-GPE] Generic Protocol Extension for VXLAN. This protocol describes extending Virtual eXtensible Local Area Network (VXLAN) via changes to the VXLAN header.<br>
+<a href="https://www.ietf.org/archive/id/draft-ietf-nvo3-vxlan-gpe-12.txt" target="_blank" rel="noopener noreferrer">https://www.ietf.org/archive/id/draft-ietf-nvo3-vxlan-gpe-12.txt</a></li>
+<li>[GENEVE] Generic Network Virtualization Encapsulation.<br>
+<a href="https://datatracker.ietf.org/doc/rfc8926/" target="_blank" rel="noopener noreferrer">https://datatracker.ietf.org/doc/rfc8926/</a></li>
+<li>[IPIP] IP Encapsulation within IP.<br>
+<a href="https://www.rfc-editor.org/rfc/rfc2003" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc2003</a></li>
+<li>[NVGRE] NVGRE: Network Virtualization Using Generic Routing Encapsulation<br>
+<a href="https://www.rfc-editor.org/rfc/rfc7637.html" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc7637.html</a></li>
+<li>[IP] INTERNET PROTOCOL<br>
+<a href="https://www.rfc-editor.org/rfc/rfc791" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc791</a></li>
+<li>[UDP] User Datagram Protocol<br>
+<a href="https://www.rfc-editor.org/rfc/rfc768" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc768</a></li>
+<li>[TCP] TRANSMISSION CONTROL PROTOCOL<br>
+<a href="https://www.rfc-editor.org/rfc/rfc793" target="_blank" rel="noopener noreferrer">https://www.rfc-editor.org/rfc/rfc793</a></li>
+<li>[RFC8174] Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174, May 2017<br>
+<a href="http://www.ietf.org/rfc/rfc8174.txt" target="_blank" rel="noopener noreferrer">http://www.ietf.org/rfc/rfc8174.txt</a></li>
+</ul>
+<h3>1.2 Non-Normative References</h3>
+<ul>
+<li>[Virtio PCI Draft] Virtio PCI Draft Specification. <a href="http://ozlabs.org/~rusty/virtio-spec/virtio-0.9.5.pdf" target="_blank" rel="noopener noreferrer">http://ozlabs.org/~rusty/virtio-spec/virtio-0.9.5.pdf</a></li>
+</ul>
+<h3>1.3 Terminology</h3>
+<p>本文件中的關鍵字「MUST」、「MUST NOT」、「REQUIRED」、「SHALL」、「SHALL NOT」、「SHOULD」、「SHOULD NOT」、「RECOMMENDED」、「NOT RECOMMENDED」、「MAY」、「OPTIONAL」在出現全大寫時，必須依 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-3001r1" target="_blank" rel="noopener noreferrer">[RFC2119]</a> 與 [RFC8174] 的定義來解釋</p>
+<h4>1.3.1 Legacy Interface: Terminology</h4>
+<p>在本規格 1.0 版本之前的規格草案（例如見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-4001r2" target="_blank" rel="noopener noreferrer">[Virtio PCI Draft]</a>）定義了一種與本規格相似但不同的驅動程式與裝置之間的介面。 由於這些已被廣泛部署，本規格納入了「選用（OPTIONAL）」功能，以簡化從這些早期草案介面過渡的工作</p>
+<p>具體而言，裝置與驅動程式可能支援：</p>
+<ul>
+<li>Legacy 介面<br>
+指的是由本規格較早的草案（1.0 之前）所規定的介面</li>
+<li>Legacy 裝置<br>
+指在本規格發布之前實作，且在 host 端實作 Legacy 介面的裝置</li>
+<li>Legacy 驅動程式<br>
+指在本規格發布之前實作，且在 guest 端實作 Legacy 介面的驅動程式</li>
+</ul>
+<p>Legacy 裝置與 Legacy 驅動程式不符合本規格。 為了簡化從這些早期草案介面的過渡，裝置可能會實作：</p>
+<ul>
+<li>Transitional 裝置<br>
+同時支援符合本規格的驅動程式，並允許 Legacy 驅動程式的裝置</li>
+</ul>
+<p>同樣地，驅動程式可能會實作：</p>
+<ul>
+<li>Transitional 驅動程式<br>
+同時支援符合本規格的裝置，以及 Legacy 裝置的驅動程式</li>
+</ul>
+<p>注意：Legacy 介面不是必需的，也就是說，除非你需要向後相容性，否則不要實作它們！ 不具有任何 Legacy 相容性的裝置或驅動程式，分別稱為 non-transitional 裝置與 non-transitional 驅動程式</p>
+<h4>1.3.2 Transition from earlier specification drafts</h4>
+<p>對於已經實作 legacy 介面的裝置與驅動程式，為了支援本規格，可能需要進行一些修改。 在這種情況下，讀者可能會受益於章節標題中標示為「Legacy Interface」的部分。 這些段落凸顯了自早期草稿以來所做的更動</p>
+<h3>1.4 結構規格</h3>
+<p>許多裝置與驅動程式的「記憶體內」結構配置使用 C 的 <code>struct</code> 語法來描述。 所有結構預設都不包含額外的填充（padding）。 為了強調這點，在已知一般 C 編譯器可能在結構內插入額外填充的情況，會以 GNU C 的 <code>__attribute__((packed))</code> 語法加以標示</p>
+<p>在結構定義中使用的整數資料型別，遵循以下慣例：</p>
+<ul>
+<li>u8、u16、u32、u64<br>
+指定長度（位元）的無號整數</li>
+<li>le16、le32、le64<br>
+指定長度（位元）、以小端序（little-endian）位元組順序儲存的無號整數</li>
+<li>be16、be32、be64<br>
+指定長度（位元）、以大端序（big-endian）位元組順序儲存的無號整數</li>
+</ul>
+<p>本規格中有些欄位不會從位元組邊界開始，或不會在位元組邊界結束。 這類欄位被稱為 bit-fields。 一組 bit-fields 必定是某個整數型別欄位的 sub-division</p>
+<p>列出整數欄位內的 bit-fields 時一律會從最低有效位（LSB）到最高有效位（MSB）依序列出。 bit-fields 被視為指定寬度的無號整數，並且保留位元由低到高的相鄰順序關係</p>
+<p>例如：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> S { </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    be16 { </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        A : </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">15</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        B : </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    } x; </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    be16 y; </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段描述表示：<code>A</code> 的值存放在 <code>x</code> 的低 15 位元，<code>B</code> 的值存放在 <code>x</code> 的最高 1 位元。 而 16 位元的 <code>x</code> 本身，以大端序儲存在結構 <code>S</code> 的起始位置，接著緊鄰其後的是無號整數 <code>y</code>，同樣以大端序儲存，位於自結構起始位置算起的 2 位元組（16 位元）偏移處</p>
+<p>請注意，此種記法與 C 的 bitfield 語法有些相似，但在可攜式（portable）程式碼中不應天真地轉換為 C 的 bitfield：它與 C 編譯器在小端架構上的 bitfield 打包方式相符，但不符合 C 編譯器在大端架構上的打包方式</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>不同端序與不同編譯器對 C bitfield 的配置（位序、填充）可能不一致。 規格採用自有的「描述性記法」，而非直接要求用 C bitfield，避免因編譯器實作差異導致跨平台不一致</p>
+</div>
+<p>假設 <code>CPU_TO_BE16</code> 會把本機端序的 16 位元整數轉換為大端序的位元組順序，那麼要產生要寫入 <code>x</code> 的值，其可攜式的 C 語言寫法如下：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">CPU_TO_BE16</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">B </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 15</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> |</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><h3>1.5 常數規格</h3>
+<p>在許多情況下，裝置與驅動程式之間介面所使用的數值，會以 C 的 <code>#define</code> 搭配 <code>/* ... */</code> 註解語法來描述。 多個相關的數值會以共同名稱作為前綴，並以底線 <code>_</code> 作為分隔。 以 <code>_XXX</code> 作為後綴時，表示該群組中的全部數值。 例如：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">/* Field Fld value A description */</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> VIRTIO_FLD_A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">/* Field Fld value B description */</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> VIRTIO_FLD_B</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">        (</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段為欄位 <code>Fld</code> 定義了兩個數值：<code>Fld=1</code> 代表 <code>A</code>，<code>Fld=2</code> 代表 <code>B</code>。 注意，<code>&lt;&lt;</code> 表示左移運算</p>
+<p>此外，在此例中，<code>VIRTIO_FLD_A</code> 與 <code>VIRTIO_FLD_B</code> 分別對應 <code>Fld</code> 的數值 1 與 2。 進一步地，<code>VIRTIO_FLD_XXX</code> 代表該群組中的任一個（亦即 <code>VIRTIO_FLD_A</code> 或 <code>VIRTIO_FLD_B</code>）</p>
+<h2>2 Virtio 裝置的基本機制</h2>
+<p>Virtio 裝置的枚舉／識別方式取決於其所連接的匯流排（見各匯流排專節：<a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1300001" target="_blank" rel="noopener noreferrer">4.1 Virtio Over PCI Bus</a>、<a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1800002" target="_blank" rel="noopener noreferrer">4.2 Virtio Over MMIO</a> 與 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1940003" target="_blank" rel="noopener noreferrer">4.3 Virtio Over Channel I/O</a>）</p>
+<p>每個裝置都包含了下列幾個部分：</p>
+<ul>
+<li>裝置狀態欄位（Device status field）</li>
+<li>特徵位元（Feature bits）</li>
+<li>通知（Notifications）</li>
+<li>裝置組態空間（Device Configuration space）</li>
+<li>一個或多個 virtqueue</li>
+</ul>
+<h3>2.1 裝置狀態欄位</h3>
+<p>當驅動程式初始化裝置時，會依 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1220001" target="_blank" rel="noopener noreferrer">3.1</a> 所指定的一連串步驟來進行</p>
+<p>裝置狀態欄位提供了這個流程中已完成步驟的簡單低階指示。 可以把它想像成主控台上的號誌燈（紅綠燈），用來顯示每個裝置的狀態。 定義的位元如下（以下列出它們典型的設定順序）：</p>
+<ul>
+<li><code>ACKNOWLEDGE</code>（1）<br>
+表示 guest 作業系統已找到該裝置，並辨識其為有效的 virtio 裝置</li>
+<li><code>DRIVER</code>（2）<br>
+表示 guest 作業系統知道如何驅動此裝置。 注意：在設定此位元前，可能會有顯著（甚至無限期）的延遲，例如在 Linux 中，驅動程式可能是可載入模組</li>
+<li><code>FAILED</code>（128）<br>
+表示 guest 發生了問題，並且已放棄了這個裝置。 可能的原因包含內部錯誤、驅動程式因某種理由拒絕該裝置，或在裝置操作期間發生致命錯誤等</li>
+<li><code>FEATURES_OK</code>（8）<br>
+表示驅動程式已確認所有它支援的功能，功能協商已完成</li>
+<li><code>DRIVER_OK</code>（4）<br>
+表示驅動程式已設定完成，準備好驅動該裝置了</li>
+<li><code>DEVICE_NEEDS_RESET</code>（64）<br>
+表示裝置遭遇了無法自行復原的錯誤</li>
+</ul>
+<p>裝置狀態欄位初始為 0，在重置期間，裝置也會把它重新設為 0</p>
+<h4>2.1.1 驅動程式需求：裝置狀態欄位</h4>
+<p>驅動程式必須（MUST）更新裝置狀態，依 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1220001" target="_blank" rel="noopener noreferrer">3.1</a> 所述的初始化流程，設定各位元以表示已完成的步驟。 驅動程式不能（MUST NOT）清除任何裝置狀態位元。 若驅動程式設定了 <code>FAILED</code> 位元，則在嘗試重新初始化之前，必須（MUST）先對裝置進行重置（reset）</p>
+<p>當 <code>DEVICE_NEEDS_RESET</code> 被設為 1 時，驅動程式不應該（SHOULD NOT）依賴裝置操作的完成。 注意：例如，若 <code>DEVICE_NEEDS_RESET</code> 已設為 1，驅動程式既不能假設「進行中的請求會完成」，也不能假設「它們尚未完成」。 良好的實作應嘗試透過重置來復原</p>
+<h4>2.1.2 裝置需求：裝置狀態欄位</h4>
+<p>在 <code>DRIVER_OK</code> 之前，裝置不能（MUST NOT）取用（consume）任何緩衝區，亦不得向驅動程式送出任何「已用緩衝區（used buffer）」的通知</p>
+<p>當裝置進入需要重置才能復原的錯誤狀態時，裝置應要（SHOULD）設定 <code>DEVICE_NEEDS_RESET</code>。 若此時 <code>DRIVER_OK</code> 已被設為 1，則在設定 <code>DEVICE_NEEDS_RESET</code> 之後，裝置必須（MUST）向驅動程式送出裝置組態的變更通知</p>
+<h3>2.2 特徵位元（Feature Bits）</h3>
+<p>每個 virtio 裝置會提供它支援的所有特性。 在裝置初始化期間，驅動程式會讀取這些特性，並告訴裝置它所接受的子集合。 要重新協商，只能重置該裝置</p>
+<p>這能讓系統具有向前與向後的相容性：如果裝置新增了一個特徵位元，較舊的驅動程式不會把那個特徵位元回寫給裝置。 同樣地，如果驅動程式新增了一個裝置不支援的功能，驅動程式也能知道該裝置沒有提供此新功能</p>
+<p>特徵位元的配置如下：</p>
+<ul>
+<li>0 到 23，以及 50 到 127：<br>
+用於特定裝置型別的特徵位元</li>
+<li>24 到 41：<br>
+保留給 virtqueue 與功能協商機制的擴充用特徵位元</li>
+<li>42 到 49，以及 128 與以上：<br>
+保留給未來擴充使用的特徵位元</li>
+</ul>
+<p>注意：例如，對網路裝置（也就是 Device ID 1）而言，特徵位元 0 表示該裝置支援封包的 checksum。 而對於裝置組態空間（device configuration space），如果有了新欄位，則需要搭配一個新的特徵位元來表示</p>
+<p>要讓功能協商機制保持可擴充的重點在於：裝置不應提供那些在驅動程式接受後，裝置本身無法處理的特徵位元（雖然依照本規格，驅動程式本就不該接受任何未定義、保留或不受支援的特徵）。 同理，驅動程式也不應接受自己不知道如何處理的特徵位元（雖然依照本規格，裝置本就不該主動提供未定義、保留或不受支援的特徵）。 對於保留或非預期的特徵，首選的處理方式是由驅動程式將其忽略</p>
+<p>對僅限於特定匯流排的功能而言，上述原則更為重要，因為若未來規格將這些功能擴大到更多的匯流排上，很可能需要驅動程式與裝置改變既有行為。 支援多種匯流排的驅動程式與裝置，必須（MUST）謹慎維護每個匯流排各自允許的功能清單</p>
+<h4>2.2.1 驅動程式需求：特徵位元</h4>
+<p>驅動程式不能（MUST NOT）接受裝置未提供的功能，也不能（MUST NOT）接受一個需要其他尚未被接受的功能所依賴的功能</p>
+<p>驅動程式必須（MUST）驗證裝置所提供的特徵位元。 對於下列任一情形的特徵位元，驅動程式必須（MUST）忽略且不能（MUST NOT）接受：</p>
+<ul>
+<li>未在本規格中描述的</li>
+<li>標記為保留（reserved）的</li>
+<li>不適用於該特定匯流排的</li>
+<li>未為該裝置型別所定義的</li>
+</ul>
+<p>如果裝置沒有提供某個驅動程式所支援的功能，驅動程式應要（SHOULD）切換到向後相容模式，否則就必須（MUST）將裝置狀態的 <code>FAILED</code> 位元設為 1，並停止初始化</p>
+<p>相對地，驅動程式不能（MUST NOT）僅僅因為裝置提供了一個驅動程式不支援的功能，就宣告失敗</p>
+<h4>2.2.2 裝置需求：特徵位元</h4>
+<p>裝置不能（MUST NOT）提供一個依賴於其他尚未被提供的功能的特徵。 裝置應該（SHOULD）接受驅動程式所接受的功能中的任何有效子集合，否則當驅動程式寫入時，裝置必須（MUST）讓裝置狀態欄位中的 <code>FEATURES_OK</code> 位元設定失敗</p>
+<p>裝置不能（MUST NOT）提供那些即使驅動程式接受了，裝置本身也無法支援的特徵位元（即便本規格禁止驅動接受這些特徵位元）。 為求明確，這裡指的是：本規格未描述的特徵位元、被標記為保留（reserved）的特徵位元、對特定匯流排或特定裝置型別而言被保留或不受支援的特徵位元。 不過，若未來版本的本規格允許裝置支援相對應功能，則依該未來規格撰寫的裝置當然不在此限</p>
+<p>若某裝置曾成功協商過一組功能（在裝置初始化期間接受了裝置狀態欄位中的 <code>FEATURES_OK</code> 位元），那麼在裝置或系統重置之後，對於相同的一組功能，它不應該（SHOULD NOT）在重新協商時失敗。 否則會影響從暫停（suspend）恢復以及錯誤復原的流程</p>
+<h4>2.2.3 Legacy 介面：特徵位元說明</h4>
+<p>Transitional 驅動程式必須（MUST）透過檢測特徵位元 <code>VIRTIO_F_VERSION_1</code> 有沒有被提供，來偵測 Legacy 裝置。 Transitional 裝置必須（MUST）透過檢測 <code>VIRTIO_F_VERSION_1</code> 有沒有被驅動程式確認，來偵測 Legacy 驅動程式。 在此情形下，將透過 Legacy 介面來使用該裝置</p>
+<p>對 Legacy 介面的支援是選用的（OPTIONAL）。 因此，transitional 與 non-transitional 的裝置與驅動程式，皆符合本規格</p>
+<p>當透過 Legacy 介面使用裝置時，transitional 裝置與 transitional 驅動程式必須（MUST）依照這些 Legacy 介面章節中所記載的需求來運作。 這些章節的規範文字，一般不適用於 non-transitional 裝置</p>
+<h3>2.3 通知（Notifications）</h3>
+<p>在本規格中，傳送通知（從驅動程式到裝置，或從裝置到驅動程式）的概念扮演重要角色。 通知的運作方式（modus operandi）取決於所使用的匯流排</p>
+<p>通知有三種類型：</p>
+<ul>
+<li>組態變更（configuration change notification）</li>
+<li>可用緩衝區（available buffer notification）</li>
+<li>已用緩衝區（used buffer notification）</li>
+</ul>
+<p>configuration change 與 used buffer 這兩種通知由裝置送出，由驅動程式接收。 configuration change 通知表示裝置組態空間（device configuration space）發生了變更，used buffer 通知表示在該通知所指定的 virtqueue 上，可能有緩衝區被標記為已用的（used）</p>
+<p>available buffer 通知由驅動程式送出，由裝置接收。 此類通知表示在該通知所指定的 virtqueue 上，可能有緩衝區被標記為可用的（available）</p>
+<p>不同通知的語義、各匯流排的實作方式，以及其他重要面向，將在後續章節中詳細規範</p>
+<p>多數匯流排會以中斷（interrupts）來實作由裝置送往驅動程式的通知。 因此，在先前版本的規格中，這類通知經常被稱為「中斷」。 本規格中有些名稱仍保留這種「中斷」的術語，偶爾也會以 event 一詞來指稱某個通知或其接收行為</p>
+<h3>2.4 裝置重置（Device Reset）</h3>
+<p>驅動程式可能會在不同時機主動發起裝置重置。 特別是在裝置初始化與裝置清理時，其必須執行重置。 驅動程式用來啟動重置的機制，取決於其使用的匯流排</p>
+<h4>2.4.1 裝置需求：裝置重置</h4>
+<p>裝置在收到重置之後，必須（MUST）將裝置狀態欄位重新初始化為 0</p>
+<p>當裝置透過把裝置狀態欄位重新設為 0 來表示重置已完成之後，在驅動程式重新初始化裝置之前，裝置不能（MUST NOT）送出通知，亦不能（MUST NOT）與各個佇列（queues）互動</p>
+<h4>2.4.2 驅動程式需求：裝置重置</h4>
+<p>當驅動程式讀到裝置狀態欄位為 0 時，驅動程式應該（SHOULD）視其所發起的重置已經完成</p>
+<h3>2.5 裝置組態空間（Device Configuration Space）</h3>
+<p>裝置組態空間通常用於很少改變，或只在初始化時期使用的參數。 對於選用的組態欄位，會用特徵位元來指示其是否存在，未來版本的本規格很可能會在組態空間的尾端加入額外欄位以擴充。 注意：裝置組態空間中的多位元組欄位使用小端序（little-endian）格式</p>
+<p>每種匯流排都會為裝置組態空間提供一個世代計數（generation count），只要存在兩次存取可能讀到不同版本內容的情況，這個值就會改變</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>從驅動程式的角度看，裝置組態空間（Device Configuration Space）就是一小段、可被程式讀/寫的暫存器/記憶體映射區，專門用來放「裝置的參數與狀態」，而且這些參數通常是初始化時要讀、或很少變動的那種。 它不是拿來搬大宗資料的（那是 virtqueue 的工作），而是控制面（control plane）的資訊面板</p>
+<p>其內容是由 virtio 裝置暴露給驅動程式的一小段「欄位集合」，用來放各種裝置特定的設定/能力/狀態，驅動透過讀取它來決定要怎麼啟用裝置、配多少資源、是否開哪些功能，例如 virtio-net（網路）內存放了：</p>
+<ul>
+<li>MAC 位址（若裝置宣告 <code>VIRTIO_NET_F_MAC</code>）</li>
+<li>MTU（<code>VIRTIO_NET_F_MTU</code>）</li>
+<li>最大佇列對數（<code>VIRTIO_NET_F_MQ</code>，多佇列能力）</li>
+</ul>
+<p>由於你可能一次要連續讀多個欄位（有的還是 64-bit），裝置可能在你讀到一半時被更新（例如容量剛被管理端調整）。 為了避免拼出的資訊是「前半新、後半舊」的混合體，匯流排會提供 generation count。 透過「先讀一次 generation → 讀欄位們 → 再讀一次 generation」，若前後讀到的 generation 相等，就代表這次讀到的是一致快照，反之就重讀</p>
+</div>
+<h4>2.5.1 驅動程式需求：裝置組態空間</h4>
+<p>驅動程式不能（MUST NOT）假設寬度大於 32 位元的欄位讀取是原子操作，也不能（MUST NOT）假設跨多個欄位的讀取是原子操作。 驅動程式應該（SHOULD）如下讀取裝置組態空間欄位：</p>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">u32 before, after; </span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">do</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    before </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> get_config_generation</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(device); </span></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // 讀取一個或多個組態項目 </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    after </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> get_config_generation</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(device); </span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">} </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">while</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (after </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">!=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> before);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>大於 32-bit 欄位的讀取不保證原子性，跨欄位更不保證原子性。 建議的樣板是以 generation 計數循環讀取，確保前後一致</p>
+</div>
+<p>對於選用的組態空間欄位，驅動程式必須（MUST）先檢查對應的特徵是否已由裝置提供，然後才可存取該組態區段。 功能協商的細節請見第 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-1220001" target="_blank" rel="noopener noreferrer">3.1</a> 節</p>
+<p>驅動程式不能（MUST NOT）預先限制結構大小或裝置組態空間大小。 相反地，驅動程式應該（SHOULD）只檢查裝置組態空間是否足以包含裝置運作所需的欄位。 例如，若規格說明組態空間「包含一個 8 位元的欄位」，則應理解為組態空間的末端可能還有任意長度的尾端 padding，因此只要組態空間大於或等於該 8 位元的大小，都應接受</p>
+<h4>2.5.2 裝置需求：裝置組態空間</h4>
+<p>在驅動程式設定 <code>FEATURES_OK</code> 之前，裝置必須（MUST）允許驅動讀取任何裝置特定的組態欄位。 這也包含那些取決於特徵位元的欄位，只要這些特徵位元已由裝置提供即可</p>
+<h4>2.5.3 Legacy 介面：裝置組態空間的端序說明</h4>
+<p>對於 legacy 介面，裝置組態空間通常採用 guest 的原生端序，而非 PCI 的小端序。 各裝置正確的端序在其對應的章節中另有記載</p>
+<h4>2.5.4 Legacy 介面：裝置組態空間</h4>
+<p>Legacy 裝置沒有「組態世代（generation）」的欄位，因此在組態被更新時容易遭遇競態（race conditions）。 這會影響到像是區塊容量（block capacity，見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-3100004" target="_blank" rel="noopener noreferrer">5.2.4</a>）與網路 MAC（見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-2400004" target="_blank" rel="noopener noreferrer">5.1.4</a>）等欄位。 在使用 legacy 介面時，驅動程式應該（SHOULD）連續多次讀取，直到兩次的讀值一致為止</p>
+<h3>2.6 Virtqueues</h3>
+<p>在 virtio 裝置上用於大量資料傳輸的機制被稱為 virtqueue。 每個裝置可以有 0 至 65536 個 virtqueue，並以索引值來識別，索引值範圍為 0 到 65535。 例如，最簡單的網路設備會有一個用於傳送的 virtqueue 和一個用於接收的 virtqueue</p>
+<p>驅動程式會透過把可用緩衝區（available buffer）加入佇列（把描述該請求的緩衝區加入某個 virtqueue），讓裝置取得請求。 必要時還可以觸發驅動端事件（driver event），亦即向裝置送出可用緩衝區的通知</p>
+<p>裝置負責執行請求，並在完成時把已用緩衝區（used buffer）加入佇列（將緩衝區標記為 used），以通知驅動。 之後裝置可以觸發裝置端事件（device event），亦即向驅動送出已用緩衝區的通知</p>
+<p>裝置會回報它實際寫入至每個被使用的緩衝區的記憶體的位元組數，稱為「used length」。 一般來說，裝置不需要按照驅動程式提供緩衝區的順序來使用它們</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>virtqueue 是進行大量（bulk）I/O 的核心抽象。 它把「要處理的資料緩衝」排成可供裝置消費的佇列，由驅動與裝置協同操作。 設計上允許一個裝置擁有多個佇列，以支援並行處理</p>
+<p>「將請求加入佇列」意旨把一段描述 I/O 的記憶體區塊（buffer/descriptor）掛到 virtqueue。 是否會同時「通知」裝置，依策略決定：</p>
+<ul>
+<li>高吞吐時可能抑制（coalesce）通知，一次加入多筆後再通知，以減少中斷／MMIO 次數</li>
+<li>低延遲時則每筆都通知，加速裝置開工。 這與 2.3 的通知機制呼應：driver → device 的是「available buffer」通知</li>
+</ul>
+<p>裝置完成處理後會回填狀態／長度等資訊，並更新「已用」結構。 同樣可以彈性地選擇是否要立刻通知驅動，以在延遲與中斷負載間取捨（例如批次完成、多筆合併一次中斷）</p>
+<p>used length 是由裝置回報的實際產出長度，與原先驅動提供的 buffer 容量不同。 驅動需據此判斷：</p>
+<ul>
+<li>資料是否截斷（如通常不允許 used length &gt; 預期容量，可能需丟棄）</li>
+<li>收到的有效資料大小（例如網路 RX 長度、區塊 I/O 回傳的 bytes）。 這也常被用來驅動「分段處理」或「下一步解析」</li>
+</ul>
+<p>這個流程預設允許亂序完成：裝置可依內部排程（大小排序、併發執行、硬體管線）選取可用的 buffer，因此驅動不可假設 FIFO。 這能提升效能與資源利用，但驅動的完成處理必須能對應「任意順序」的回報（例如根據 cookie/descriptor id 對應請求）</p>
+</div>
+<p>有些裝置總是按照緩衝區被提供的順序來使用描述子（descriptor）。 這類裝置可以提供 <code>VIRTIO_F_IN_ORDER</code> 特徵，若成功協商，這項資訊可能允許進一步最佳化，或簡化驅動與／或裝置端的程式碼</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p><code>VIRTIO_F_IN_ORDER</code> 是「保證順序」的合約：</p>
+<ul>
+<li>對驅動，省去額外的亂序對應結構（如 hash table）與紀錄</li>
+<li>對裝置，則須放棄某些重排最佳化。 是否啟用取決於場景（低複雜度 vs. 高吞吐需求）。 若未協商此特徵，驅動必須按亂序路徑實作</li>
+</ul>
+</div>
+<p>每個 virtqueue 最多可以由 3 個部分組成：</p>
+<ul>
+<li>Descriptor Area：用於描述緩衝區</li>
+<li>Driver Area：由驅動程式提供給裝置的額外資料</li>
+<li>Device Area：由裝置提供給驅動程式的額外資料</li>
+</ul>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<ul>
+<li>Descriptor Area：載明每個 buffer 的位址、長度、方向等（例如 readable/writable）</li>
+<li>Driver Area：驅動傳遞控制資訊給裝置（如「哪些描述子現已可用」、available 索引等）</li>
+<li>Device Area：裝置把完成資訊傳回驅動（如 used 索引、used length、狀態碼）</li>
+</ul>
+<p>實際的具體結構與佈局，取決於 Split 或 Packed 兩種格式</p>
+</div>
+<p>先前版本（見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-350007" target="_blank" rel="noopener noreferrer">2.7</a> 之後）對這些部分使用了不同名稱：</p>
+<ul>
+<li>Descriptor Table（對應 Descriptor Area）</li>
+<li>Available Ring（對應 Driver Area）</li>
+<li>Used Ring（對應 Device Area）</li>
+</ul>
+<p>virtqueue 支援兩種格式：Split Virtqueues（見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-350007" target="_blank" rel="noopener noreferrer">2.7</a>）與 Packed Virtqueues（見 <a href="https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-720008" target="_blank" rel="noopener noreferrer">2.8</a>）。 每個驅動與裝置至少會支援其中一種（Packed 或 Split），也可能兩者都支援</p>
+<h4>2.6.1 Virtqueue 重置（Virtqueue Reset）</h4>
+<p>當 <code>VIRTIO_F_RING_RESET</code> 成功協商後，驅動程式可以個別重置某個 virtqueue。 如何重置 virtqueue 取決於各匯流排的規定。 virtqueue 的重置分成兩個步驟：驅動程式先重置該佇列，之後可以選擇性地將其重新啟用（re-enable）</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>Re-enable ≈ 重新初始化單一佇列：</p>
+<ul>
+<li>驅動端：重新配置描述子區、Driver/Device Area、更新可用索引並（視需求）開啟通知，還可以調整參數（如 queue size，用於降級或升級吞吐）</li>
+<li>裝置端：必須按照驅動最新設定運作，避免使用舊的佇列長度或過期的 DMA 位址。 這一來可在不中斷整個裝置的情況下，針對單佇列完成錯誤復原或容量調整</li>
+</ul>
+</div>
+<h5>2.6.1.1 Virtqueue 重置</h5>
+<h6>2.6.1.1.1 裝置需求：Virtqueue 重置</h6>
+<p>在佇列被驅動程式重置之後，裝置不能（MUST NOT）再從該 virtqueue 執行任何請求，也不能（MUST NOT）就此 virtqueue 通知驅動程式。 裝置必須（MUST）把該 virtqueue 的所有狀態重置為預設值，包括 available 狀態與 used 狀態</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<ul>
+<li>靜默：不再消費、亦不再發送通知，避免與驅動在重建資料結構期間產生 race condition</li>
+<li>清空狀態：可用／已用索引、wrap counter（於 packed）、暫存指標等回到初始值，確保後續 re-enable 從乾淨狀態開始</li>
+</ul>
+</div>
+<h6>2.6.1.1.2 驅動程式需求：Virtqueue 重置</h6>
+<p>當驅動程式要求裝置重置某個佇列後，驅動程式必須（MUST）驗證該佇列是否已成功被重置。 在佇列成功重置之後，驅動程式可以（MAY）釋放與該 virtqueue 相關的任何資源</p>
+<h6>2.6.1.2 Virtqueue 重新啟用（Re-enable）</h6>
+<p>此流程與整體裝置初始化期間、針對單一佇列的初始化流程相同</p>
+<h6>2.6.1.2.1 裝置需求：Virtqueue 重新啟用</h6>
+<p>裝置必須（MUST）遵從任何可能已被驅動程式變更的佇列組態，例如最大佇列大小等</p>
+<h6>2.6.1.2.2 驅動程式需求：Virtqueue 重新啟用</h6>
+<p>在重新啟用佇列時，驅動程式必須（MUST）如同初次發現該 virtqueue 時那樣配置佇列資源，但也可以（MAY）採用與先前不同的參數</p>
+<h3>2.7 Split Virtqueues</h3>
+<p>在本標準 1.0（含更早）的版本中只支援 Split 形式的 virtqueue。 Split 形式會把一個 virtqueue 拆成多個部分，其中每一部分只允許驅動程式或裝置其中之一寫入，而不會同時由雙方寫入。 當把緩衝區標記為可用、或把它標記為已用時，必須更新多個部分，以及（或）同一部分中的多個位置</p>
+<div class="hint-container tip">
+<p class="hint-container-title">Tips</p>
+<p>Split 的核心理念是「所有權分離」來降低 cache line 爭用與同步成本：</p>
+<ul>
+<li>Driver Area 只由驅動寫（提供可用描述子）</li>
+<li>Device Area 只由裝置寫（回報完成）</li>
+<li>Descriptor Area 雙方都能讀，但不能同時寫同一格</li>
+</ul>
+<p>因此在「投遞」與「完成」時，需要跨多個區塊更新（例如把索引寫進 Available Ring，完成時把索引寫進 Used Ring），這就是 Split 的操作模式</p>
+</div>
+<p>每個佇列都有一個 16 位元的 queue size 參數，用來設定表列項目的數量，並由此決定整個佇列的總大小</p>
+<p>virtqueue 由三個部分組成：</p>
+<ul>
+<li>Descriptor Table（佔用 Descriptor Area）</li>
+<li>Available Ring（佔用 Driver Area）</li>
+<li>Used Ring（佔用 Device Area）</li>
+</ul>
+<p>每一部分在 guest 記憶體中都必須是實體連續（physically-contiguous）的，並且各自有不同的對齊要求。 各部分的記憶體對齊與大小如下：</p>
+<span class="center-column">
+<p>| Virtqueue 部分     | 對齊（bytes） |              大小（bytes） |<br>
+|</p>
+</span>]]></content>
+    <category term="virtio"/>
+    <published>2025-09-12T00:00:00.000Z</published>
+  </entry>
   <entry>
     <title type="text">The Linux graphics stack in a nutshell 翻譯 &amp; 筆記</title>
     <id>https://mes0903.github.io/Linux/linux-graphic-stack/</id>
@@ -509,7 +906,7 @@
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2025-09-07T12:25:04.396Z</updated>
+    <updated>2025-09-16T05:31:22.880Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -578,7 +975,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2025-09-07T12:25:04.399Z</updated>
+    <updated>2025-09-16T05:31:22.882Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -1682,7 +2079,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2025-09-07T12:25:04.531Z</updated>
+    <updated>2025-09-16T05:31:22.988Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -1749,7 +2146,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2025-09-07T12:25:04.545Z</updated>
+    <updated>2025-09-16T05:31:22.991Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -2070,7 +2467,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2025-09-07T12:25:04.678Z</updated>
+    <updated>2025-09-16T05:31:23.095Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -2167,7 +2564,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2025-09-07T12:25:04.704Z</updated>
+    <updated>2025-09-16T05:31:23.117Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -2300,7 +2697,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2025-09-07T12:25:04.718Z</updated>
+    <updated>2025-09-16T05:31:23.129Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -2512,7 +2909,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2025-09-07T12:25:04.735Z</updated>
+    <updated>2025-09-16T05:31:23.142Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -2996,7 +3393,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2025-09-07T12:25:04.769Z</updated>
+    <updated>2025-09-16T05:31:23.170Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -3021,7 +3418,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2025-09-07T12:25:04.782Z</updated>
+    <updated>2025-09-16T05:31:23.183Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -11834,7 +12231,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-09-07T12:25:05.801Z</updated>
+    <updated>2025-09-16T05:31:24.046Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -23810,7 +24207,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-09-07T12:25:08.399Z</updated>
+    <updated>2025-09-16T05:31:26.218Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子：</p>
@@ -24139,7 +24536,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-09-07T12:25:08.425Z</updated>
+    <updated>2025-09-16T05:31:26.239Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開</p>
@@ -24289,7 +24686,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">礦坑系列 ── Indirect through null pointer</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_BlackMagic/Indirect_through_null_pointer/"/>
-    <updated>2025-09-07T12:25:08.438Z</updated>
+    <updated>2025-09-16T05:31:26.250Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>事情起於 jserv 的講義裡面有個 <code>&amp;((data*)0)-&gt;c)</code> 這樣的操作，作用是求 <code>c</code> 在 <code>data</code> 這個 struct 中的偏移量，但那個 <code>0</code> 實在是讓我覺得很不順眼，為了確定他到底是不是 UB，我翻了一個多禮拜的 standard 與 committee paper，甚至翻了 CWG issue 和 Standard Defect Report，才總算是有個結果 (翻到快吐了)</p>
@@ -24545,7 +24942,7 @@ Meanwhile, the direction of CWG has changed towards a uniform treatment of null 
     <title type="text">礦坑系列 ── Concept と SFINAE と Detection Idiom</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Concept_SFINAE_DetectionIdiom/"/>
-    <updated>2025-09-07T12:25:08.451Z</updated>
+    <updated>2025-09-16T05:31:26.257Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>ぼっち・ざ・ろっく！ 實在太棒了，標題致敬一下ギターと孤独と蒼い惑星 XD</p>
@@ -26070,399 +26467,5 @@ B：1-&gt;int</li>
 ]]></content>
     <category term="C++ Miner"/>
     <published>2022-12-01T00:00:00.000Z</published>
-  </entry>
-  <entry>
-    <title type="text">（WIP）礦坑系列 ── malloc、new 與 POD Type</title>
-    <id>https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/</id>
-    <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/malloc_new_POD/"/>
-    <updated>2025-09-07T12:25:08.587Z</updated>
-    <summary type="html"><![CDATA[
-<h2>前言</h2>
-<p><code>new</code> 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 <code>malloc</code>，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 <code>new</code> 比 <code>malloc</code> 多做了一些事情</p>
-<p>本篇大部分內容為整理 Effective C++ 而來，並額外補上一些細節</p>
-<h2>malloc 與 POD type</h2>
-<p>首先先講一下 <code>malloc</code> 在 C++ 的行為，要想講這個我們最好先知道兩個東西，一個為 Aggregates，一個為 POD，全名為 Plain Old Data，這兩個東西對於 C-style coding 非常的有幫助，在某些 Modern C++ 的場合也會有幫助</p>]]></summary>
-    <content type="html"><![CDATA[
-<h2>前言</h2>
-<p><code>new</code> 是 C++ 內一個幫助我們操作記憶體的工具，傳統的 pure C 內也有類似的工具 <code>malloc</code>，然而由於 C++ 語言上內建多支援了物件導向的特性，導致 <code>new</code> 比 <code>malloc</code> 多做了一些事情</p>
-<p>本篇大部分內容為整理 Effective C++ 而來，並額外補上一些細節</p>
-<h2>malloc 與 POD type</h2>
-<p>首先先講一下 <code>malloc</code> 在 C++ 的行為，要想講這個我們最好先知道兩個東西，一個為 Aggregates，一個為 POD，全名為 Plain Old Data，這兩個東西對於 C-style coding 非常的有幫助，在某些 Modern C++ 的場合也會有幫助</p>
-<p>這邊我主要翻譯一篇 stackoverflow 上的解釋，這篇寫的挺好的，大家也可以去看看原文( <a href="https://stackoverflow.com/questions/4178175/what-are-aggregates-and-pods-and-how-why-are-they-special/7189821#7189821" target="_blank" rel="noopener noreferrer">連結</a> )</p>
-<p>Aggregate 與 POD 的定義在 C++11、C++14、C++17 甚至 C++20 時都有更動，但基本上都是增加了新的東西進去，因此這裡主要以 C++03 為主來去解釋，幫助大家先快速理解，後面再回頭介紹 C++11 後的定義</p>
-<h3>Aggregates</h3>
-<h4>什麼是 Aggregate?</h4>
-<p>一般我們理解的定義來自於 Standard 的定義：</p>
-<blockquote>
-<p>(C++03 8.5.1 §1)：<br>
-An aggregate is an array or a class (clause 9) with no user-declared constructors (12.1), no private or protected non-static data members (clause 11), no base classes (clause 10), and no virtual functions (10.3).</p>
-</blockquote>
-<p>較新的定義(C++17)：</p>
-<blockquote>
-<p><a href="https://timsong-cpp.github.io/cppwp/n4659/dcl.init.aggr#1" target="_blank" rel="noopener noreferrer">n4659(11.6.1 - 1)</a>：<br>
-An aggregate is an array or a class with<br>
-── no user-provided, explicit, or inherited constructors ([class.ctor]),<br>
-── no private or protected non-static data members (Clause [class.access]),<br>
-── no virtual functions, and<br>
-── no virtual, private, or protected base classes ([class.mi]).<br><br></p>
-<p>[ Note: Aggregate initialization does not allow accessing protected and private base class' members or constructors.  — end note ]</p>
-</blockquote>
-<p>所以你可以看見一個 <span class="yellow">array 肯定是個 Aggregate</span>，而 class 的話則要符合上面那些條件，注意 draft 裡面的 class 有包含 struct 與 union</p>
-<p>我們詳細看一下有關 class 的幾個重點</p>
-<ul>
-<li>Aggregate class 不能有自己定義的建構函數或 copy constructor 等等的，但如果是 compiler 幫你生成的可以，不是 user-provided 的就好</li>
-<li>不能有 <code>private</code> 或 <code>protected</code> 的 non-static data member，但如果是 static data member 就沒關係，非 constructor 的 member function 也沒關係，<span class="yellow">但不能有 virtual function</span></li>
-<li>可以有 user-declared/user-defined 的 copy-assignment operator 或 destructor</li>
-<li>就算是 array of non-aggregate class type 也是一個 Aggregate</li>
-<li>不具有繼承關係<br>
-用一個例子來確認一下 (<a href="https://godbolt.org/z/G1W43vcvs" target="_blank" rel="noopener noreferrer">連結</a>)：</li>
-</ul>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// ensure the cpp version is C++17 or newer version</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;type_traits&gt;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> NotAggregate1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  virtual</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // remember? no virtual functions</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> NotAggregate2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> x;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // x is private by default and non-static</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> NotAggregate3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  NotAggregate3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // oops, user-defined constructor</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> Aggregate1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  NotAggregate1 member1;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok, public member</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  [[noreturn]] </span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">Aggregate1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">=(</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">Aggregate1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &amp;</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">rhs</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok, copy-assignment</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">private:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ok, just a private function</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">cout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">setf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(std::ios::boolalpha);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_aggregate_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">NotAggregate1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_aggregate_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">NotAggregate2</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_aggregate_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">NotAggregate3</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_aggregate_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Aggregate1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // true</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_aggregate_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">NotAggregate1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // true</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4>Aggregate 的好處?</h4>
-<p>現在我們就來看看 Aggregate 有什麼好處，主要是可以使用 Aggregate initialization <code>{}</code> 來初始化，你可以常常在 array 的初始化裡看到它，舉個例子：</p>
-<p><code>Type arr[n] = {a<sub>1</sub>, a<sub>2</sub>, …, a<sub>m</sub>};</code></p>
-<p>根據 <code>n</code> 與 <code>m</code> 的不同會有幾個情況：</p>
-<ul>
-<li><code>m == n</code><br>
-陣列裡的第 i 個元素 (i<sup>th</sup>) 會被初始化為 a<sub>i</sub></li>
-<li><code>m &lt; n</code><br>
-陣列中的前 m 個元素會被初始化為 a<sub>1</sub>, a<sub>2</sub>, …, a<sub>m</sub>，而剩下的 n-m 個元素，如果可以的話會嘗試使用 value-initialized，如果 element 是 non-Aggregate type 的話可能會失敗</li>
-<li><code>m &gt; n</code><br>
-compiler 會報錯</li>
-<li>沒有寫 n 的情況<br>
-n 會被設為 m，也就是說 <code>n == m</code></li>
-</ul>
-<p>看個例子：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // no default constructor</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> B</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  B</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // default constructor available</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  A </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">a1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">), </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">), </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">14</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // OK n == m</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  A </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">a2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">A</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ERROR A has no default constructor. Unable to value-initialize a2[1] and a2[2]</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  B </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">b1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">B</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // OK b1[1] and b1[2] are value initialized, in this case with the default-ctor</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> Array1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // All elements are initialized with 0;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> Array2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // Attention: only the first element is 1, the rest are 0;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  bool</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> Array3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {};</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // the braces can be empty too. All elements initialized with false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> Array4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1000</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // no initializer. This is different from an empty {} initializer in that</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // the elements in this case are not value-initialized, but have indeterminate values</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  //(unless, of course, Array4 is a global array)</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> array</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // ERROR, too many initializers</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而對於 class，初始化的方法長的差不多，<code>{}</code> 內會照 class definition 的順序對其 non-static data member 做初始化，同樣的如果 <code>{}</code> 太少，剩下的元素也是使用 value-initialized，如果它不能使用 value-initialized，就會導致 compile-time error，看個例子：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> X</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i1;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i2;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> Y</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> c;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  X x;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> i</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  float</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> f;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">protected:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  static</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> double</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> d;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">private:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> g</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Y y </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'a'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">20</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> }, { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">20</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">30</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> } };</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上例中這裡 <code>y.c</code> 被初始化為 <code>a</code>，<code>y.x.i1</code> 初始化為 <code>10</code>，<code>y.i[1]</code> 初始化為 <code>30</code>，<code>y.f</code> 初始化為 <code>0.0</code></p>
-<h4>結論</h4>
-<p>看到這裡你可能會想說為什麼需要這些設定，前面也講了，這可以幫助 C-style coding，某種程度上也代表這個 Type 類似 built-in type，如 <code>int</code>、<code>char</code> 等可以幫助 compiler 去做優化</p>
-<p>使用 <code>{}</code> 初始化代表這個 class 內的元素就只有 <code>{}</code> 內的元素，且初始化時不需要額外特別的操作</p>
-<p>當你的 class 有自定義的 constructor 時，通常表示在初始化內部成員時需要一些額外的操作，因此使用 aggregate-initialized 會造成 compile-time error</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> Z</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  Z</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  double</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> d;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Z z </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // error</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而如果你的 class 有 virtual function，在大多數的 compiler 實作下，這個 class 會有對應的 vtable，而指向 vtable 的指標 <code>this-&gt;__vptr</code> 通常會利用 constructor 的 member initialize list 初始化，因此使用 aggregate-initialized 也是不恰當的</p>
-<p>對於 vtable，有興趣的可以看看這篇：<a href="https://isocpp.org/wiki/faq/virtual-functions#dyn-binding2" target="_blank" rel="noopener noreferrer">What happens in the hardware when I call a virtual function? How many layers of indirection are there? How much overhead is there?</a></p>
-<h3>POD</h3>
-<h4>定義</h4>
-<p>POD 全名叫 Plain Old Data，一般我們理解的 POD 與 C++03 標準內的定義相同：</p>
-<blockquote>
-<p>(C++ 03 9 §4)：<br>
-A POD-struct is an aggregate class that has no non-static data members of type non-POD-struct, non-POD-union (or array of such types) or reference, and has no user-defined copy assignment operator and no user-defined destructor. Similarly, a POD-union is an aggregate union that has no non-static data members of type non-POD-struct, non-POD-union (or array of such types) or reference, and has no user-defined copy assignment operator and no user-defined destructor. A POD class is a class that is either a POD-struct or a POD-union.</p>
-</blockquote>
-<p>先不看 union 與 enum，把上面的文字稍微過濾一下：</p>
-<blockquote>
-<p>An aggregate class is called a POD if it has no user-defined copy-assignment operator and destructor and none of its nonstatic members is a non-POD class, array of non-POD, or a reference.</p>
-</blockquote>
-<p>這段話基本上表達了幾件事：</p>
-<ul>
-<li>所有的 POD class 都是 Aggregate，換句話說，如果一個 class 不是 Aggregate，那它也不會是 POD</li>
-<li>即使術語是 POD-struct，class 也可以是 POD</li>
-<li>跟前面 Aggregate 的情況一樣，判斷標準基本上跟 class 內的 static member 無關</li>
-</ul>
-<p>順便看一下比較新的例子 (C++17)：</p>
-<blockquote>
-<p><a href="https://timsong-cpp.github.io/cppwp/n4659/class#10" target="_blank" rel="noopener noreferrer">n4659 (12 - 10)</a>：<br>
-A POD struct109 is a non-union class that is both a trivial class and a standard-layout class, and has no non-static data members of type non-POD struct, non-POD union (or array of such types). Similarly, a POD union is a union that is both a trivial class and a standard-layout class, and has no non-static data members of type non-POD struct, non-POD union (or array of such types). A POD class is a class that is either a POD struct or a POD union.</p>
-</blockquote>
-<p>舉一些 POD 的例子：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;vector&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;type_traits&gt;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> POD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> x;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> y;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // no harm if there's a function</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  static</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::vector</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;char&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> v;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // static members do not matter</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> AggregateButNotPOD1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> x;</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  ~AggregateButNotPOD1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // user-defined destructor</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> AggregateButNotPOD2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  AggregateButNotPOD1 </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">arrOfNonPod</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // array of non-POD class</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">cout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">setf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(std::ios::boolalpha);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">POD</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // true</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">AggregateButNotPOD1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">AggregateButNotPOD2</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">POD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // true</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">            &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">AggregateButNotPOD1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">]</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // false</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>而對於 POD-class、POD-union、scalar types 和它們的 array，C++ 給了他們一個名字叫 POD type</p>
-<blockquote>
-<p><a href="https://timsong-cpp.github.io/cppwp/n4659/basic.types#9" target="_blank" rel="noopener noreferrer">n4659 (6.9 - 9)</a>：<br>
-Arithmetic types, enumeration types, pointer types, pointer to member types, std::nullptr_t, and cv-qualified versions of these types are collectively called scalar types. Scalar types, POD classes, arrays of such types and cv-qualified versions of these types are collectively called POD types.</p>
-</blockquote>
-<h4>POD Type 的好處</h4>
-<p>POD 的好處就很多了，這邊舉幾個例子：</p>
-<ul>
-<li>
-<p>POD-class 與 C struct 非常接近，但 POD class 可以有 member function、static member，不過這兩者並不會影響 memory layout。 所以如果你想要寫一個給 C 或甚至 .NET 用的 portable dll，你就需要讓你 exported function 的參數和回傳值都使用 POD-type，簡單來說就是 POD 對序列化很有幫助</p>
-</li>
-<li>
-<p>non-POD class 的生命週期從 constructor 完成開始，到 destructor 完成時結束；POD-class 的生命週期則是從物件占用記憶體開始，不用等到建構子執行完畢，而生命週期也是到其釋放記憶體結束</p>
-</li>
-<li>
-<p>對於 POD types 的物件，標準保證其可以直接使用 <code>memcpy</code>，當你將 POD-class 的內容使用 <code>memcpy</code> 複製到 char/unsinged char array，再對陣列使用 <code>memcpy</code> 把內容複製回物件時，物件會維持原先的值，內容不變。 這件事對 non-POD type object 是沒有保證的</p>
-<p>看個<a href="https://godbolt.org/z/YheTjYPeP" target="_blank" rel="noopener noreferrer">例子</a>：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;type_traits&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;cstring&gt;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i, j;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> a, b, c;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  static_assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(std::is_pod_v</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&gt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> ==</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> true</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // pass</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::byte </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">buf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(T)];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // or char/unsinged char array</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  T obj </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> { .i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, .j </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, .a </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 'a'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, .b </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 'b'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, .c </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 'c'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // obj initialized to its original value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">j</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">a</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">b</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">c</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  memcpy</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(buf, </span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">obj, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(T));</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // between these two calls to memcpy,</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // obj be modified</span></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">j</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">a</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '0'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">b</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '0'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">c</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> =</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '0'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">j</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">a</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">b</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">c</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // all 0</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  memcpy</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">obj, buf, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(T));</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // at this point, each subobject of obj of scalar type</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // holds its original value</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">j</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">a</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">b</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ' '</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> obj</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">c</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div></li>
-<li>
-<p>goto 可以跳過 POD-type 物件的宣告，進入宣告後段的程式碼：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> NonPOD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    NonPOD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  };</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  goto</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> label</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // error, x haven't been declared</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  NonPOD x;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">label</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> g</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> POD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    char</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> c;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  };</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  goto</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> label</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // okay since x is POD</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  POD x;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">label</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">:</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div></li>
-<li>
-<p>POD-type 物件的第一個成員位址會和物件本身的位址一樣，舉個<a href="https://godbolt.org/z/n4rYjMMzd" target="_blank" rel="noopener noreferrer">例子</a>：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;cassert&gt;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> POD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  [[noreturn]] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  [[noreturn]] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i1, i2;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">class</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> NonPOD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">public:</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  NonPOD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() {}</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  virtual</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; }</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  virtual</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fn2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() { </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">return</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; }</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i3 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, i4 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 20</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  POD </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">ptr1 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> POD{ </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> };</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ptr1) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // 1</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  NonPOD </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">ptr2 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> NonPOD</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ptr2) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // 亂數</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ptr1) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">ptr1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">  assert</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(((</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"Not equal"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;int</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *&gt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ptr2) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">==</span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2"> &amp;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">ptr2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">i3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)));</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // error</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div></li>
-</ul>
-<h3>malloc</h3>
-<p>由於 windows 不好分析，這邊以 Linux 環境為主來講 malloc 的原理</p>
-<p>這部分要講很深的話會牽扯到整個 Linux 的記憶體管理，但這並不是我們的重點，所以我盡量不要講太多，提到必要的東西就好，</p>
-<h4>記憶體分配</h4>
-<p>記憶體的分配分為動態分配與靜態分配，靜態分配發生在編譯與 linking 時期，而動態分配則是在程式調入和執行的時候發生的</p>
-<h2>new</h2>
-<h3>std::set_new_handler</h3>
-<h2>Placement new</h2>
-<p>Placement new 本身是一個能夠幫助我們使用 memory pool 的工具，它能夠在預先配置好的一段記憶體建構物件</p>
-<p>這在某些時刻特別有用，如監聽程式、伺服器程式、或是要實作如 <code>std::vector</code> 這類高效能的容器時。因為這類東西，記憶體配置與釋放的頻率很高，若此時使用傳統的 new 與 delete 來配置與釋放記憶體，可能會有效率上的疑慮(new 在申請時需要查表)，也有可能會造成 memory fragmentation 等問題</p>
-<p>甚至有時候有些核心程式不允許記憶體申請失敗，我們希望每次的記憶體申請都是成功的，這種極端的要求下，使用 memory pool 的好處就很大</p>
-<h2>new operator 與 operator new</h2>
-<p>首先，new operator/delete operator 為運算子，而 operator new/operator delete 為函式</p>
-<p>Operator new 是一個幫忙配置 raw memory 的「函式」，它可以被 overload，同樣的 operator delete 也可以，如：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#include</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> &lt;iostream&gt;</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// class-specific allocation functions</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> X</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  static</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> new(std::</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> count</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "custom new for size "</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> count </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ::operator </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(count);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  static</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> void*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> new[](std::</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> count</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  {</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    std::cout </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "custom new[] for size "</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &lt;&lt;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> count </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&lt;&lt;</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> '</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">\n</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">'</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ::operator </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[](count);</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  }</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  X</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> p1 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> X;</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  delete</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> p1;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  X</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> p2 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> X</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">10</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  delete[]</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> p2;</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>operator new 也有可能是透過一般的函式呼叫形式來呼叫的；呼叫的形式有很多種，可以到這邊參考：<a href="https://en.cppreference.com/w/cpp/memory/new/operator_new" target="_blank" rel="noopener noreferrer">operator new, operator new[ ]</a></p>
-<p>而 new operator 就是我們平常用來分配記憶體的 operator，如</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> i </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>要注意 new operator 不能被 overload，挺合理的，因為它是 operator</p>
-<p>使用 new operator 時它會先去<span class="yellow">呼叫 operator new</span>，幫我們分配足夠的 raw memory，再去<span class="yellow">呼叫對象的建構子</span></p>
-<h2>Placement new</h2>
-<p>Placement new 是 operator new 的一種標準的 global overload，它不像一般的 operator new 可以被替換掉</p>
-<p>它的形式主要長：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> new  ( std::</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> count</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> ptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> );</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void*</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> operator</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> new[]( std::</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">size_t</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> count</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void*</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> ptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> );</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>不過 placement new 在執行時會忽略第一個 <code>size_t</code> 的參數，並回傳第二個參數</p>
-<p>placement new 的用處是於 <code>ptr</code> 處建構我們想要的物件，通常我們會於前方先分配好 memory pool，並將其指標傳入，像是：</p>
-<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// within any block scope...</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Statically allocate the storage with automatic storage duration</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // which is large enough for any object of type `T`.</span></span>
-<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">  alignas</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(T) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">unsigned</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> buf</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(T)];</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  T</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> tptr </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> new</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(buf) T;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Construct a `T` object, placing it directly into your </span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // pre-allocated storage at memory address `buf`.</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">  tptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">-&gt;</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">~T</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">           // You must **manually** call the object's destructor</span></span>
-<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                        // if its side effects is depended by the program.</span></span>
-<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                       // Leaving this block scope automatically deallocates `buf`.</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此處的 <code>alignas(T) unsigned char buf[sizeof(T)];</code> 就為我們分配的 memory pool，大小為一個 <code>T</code> 的大小，前方的 <code>alignas</code> 是幫助對齊的，不是我們這邊的重點，而這裡使用 <code>unsigned char</code> 的原因是因為 <code>sizeof(char) == 1</code>，你也可以用 <code>char</code> 或 <code>std::byte</code> 等等，我自己傾向使用 <code>std::byte</code></p>
-<p>需要注意的是物件使用完畢後需要自己手動呼叫解構子，所以上例使用了 <code>tptr-&gt;~T();</code>，如此一來前面建構的物件會被解構，但先前分配好的 <code>buf</code> 不會被釋放</p>
-<h2>參考資料</h2>
-<ul>
-<li>
-<p><a href="https://www.dsi.fceia.unr.edu.ar/downloads/informatica/info_II/c++/Effective%20C++%20+%20More%20Effective%20C++.pdf" target="_blank" rel="noopener noreferrer">1. Effective C++</a></p>
-</li>
-<li>
-<p><a href="https://stackoverflow.com/questions/184537/in-what-cases-do-i-use-malloc-and-or-new" target="_blank" rel="noopener noreferrer">2. In what cases do I use malloc and/or new?</a></p>
-</li>
-<li>
-<p><a href="https://stackoverflow.com/questions/146452/what-are-pod-types-in-c" target="_blank" rel="noopener noreferrer">3. What are POD types in C++?</a></p>
-</li>
-<li>
-<p><a href="https://stackoverflow.com/questions/4178175/what-are-aggregates-and-pods-and-how-why-are-they-special/7189821#7189821" target="_blank" rel="noopener noreferrer">4. What are Aggregates and PODs and how/why are they special?</a></p>
-</li>
-</ul>
-]]></content>
-    <category term="C++ Miner"/>
-    <published>2022-09-19T00:00:00.000Z</published>
   </entry>
 </feed>
