@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Sun, 21 Sep 2025 15:50:08 GMT</pubDate>
-    <lastBuildDate>Sun, 21 Sep 2025 15:50:08 GMT</lastBuildDate>
+    <pubDate>Sat, 27 Sep 2025 08:36:47 GMT</pubDate>
+    <lastBuildDate>Sat, 27 Sep 2025 08:36:47 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>virtio</category>
@@ -270,10 +270,6 @@
 <p>同理，若已協議 <code>VIRTIO_F_EVENT_IDX</code>，device 會檢查 <code>used_event</code> 以判斷是否需要發出通知。 這對於維持「供 device 寫入」的 virtqueue（例如 virtio-net 的接收佇列）特別有效</p>
 <p>在下章中，我們會做個總結，並檢視數種建立於兩種 ring 佈局之上的最佳化技巧，這些技巧取決於通訊／裝置的類型，以及各方的具體實作方式</p>
 <h2>Packed virtqueue: How to reduce overhead with virtio</h2>
-<div class="hint-container warning">
-<p class="hint-container-title">Warning</p>
-<p>原文的表格似乎有些問題，我做了一些修正，如果發現有不對的地方還請再通知我一下，如果覺得怪怪的，也請再回去確認一下原文的表格</p>
-</div>
 <h3>Split virtqueue 的問題：繞太多圈</h3>
 <p>雖然 split virtqueue 以設計簡潔著稱，但它有一個根本問題：avail 與 used 的循環會以非常零散的方式使用記憶體。 這會對 CPU 快取的使用造成壓力，而對於硬體，這通常意味著每個描述符會需要發起多次 PCI 的交互</p>
 <p>Packed virtqueue 透過把三個 ring 合併到虛擬環境的 guest 記憶體中的同一處來進行了修正。 乍看之下好像更複雜，但你如果有意識到 driver 的資料在被裝置讀過後，其實是可以被丟棄並覆寫的（反之亦然），那就能明白這其實是很自然的修正</p>
