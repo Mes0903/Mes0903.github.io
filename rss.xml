@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Thu, 02 Oct 2025 18:22:23 GMT</pubDate>
-    <lastBuildDate>Thu, 02 Oct 2025 18:22:23 GMT</lastBuildDate>
+    <pubDate>Thu, 09 Oct 2025 12:19:14 GMT</pubDate>
+    <lastBuildDate>Thu, 09 Oct 2025 12:19:14 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>Linux</category>
@@ -542,7 +542,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>Q：如果 <code>lseek()</code> 使用的負 offset 超過了檔案開頭，會發生什麼？
 <ul>
-<li>A：回傳 -1，並設置 <code>errno</code>（通常為 <code>EINVAL</code>）。</li>
+<li>A：回傳 -1，並設置 <code>errno</code>（通常為 <code>EINVAL</code>）</li>
 </ul>
 </li>
 </ul>
@@ -575,10 +575,10 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h5>執行流程</h5>
 <ol>
-<li>使用 <code>creat()</code> 建立新檔案 <code>file.hole</code>。</li>
-<li><code>write(fd, buf1, 10)</code> → 在檔案開頭寫入 "abcdefghij"，此時 offset = 10。</li>
-<li><code>lseek(fd, 16384, SEEK_SET)</code> → 將 offset 移到 16384（中間的區域尚未寫入）。</li>
-<li><code>write(fd, buf2, 10)</code> → 在 offset=16384 的位置寫入 "ABCDEFGHIJ"，最後 offset=16394。</li>
+<li>使用 <code>creat()</code> 建立新檔案 <code>file.hole</code></li>
+<li><code>write(fd, buf1, 10)</code> → 在檔案開頭寫入 "abcdefghij"，此時 offset = 10</li>
+<li><code>lseek(fd, 16384, SEEK_SET)</code> → 將 offset 移到 16384（中間的區域尚未寫入）</li>
+<li><code>write(fd, buf2, 10)</code> → 在 offset=16384 的位置寫入 "ABCDEFGHIJ"，最後 offset=16394</li>
 </ol>
 <h5>檔案內容觀察</h5>
 <div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">$</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./a.out</span></span>
@@ -620,11 +620,11 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <p>當我們在 Linux 使用 <code>time</code> 命令來測量程式執行時間時，會看到三個主要的時間統計值：</p>
 <ul>
 <li>real<br>
-又稱「wall clock time」或「elapsed time」，表示從程式開始執行到結束所經過的實際時間，就像用手錶量到的時間。 這個時間包含了 CPU 執行時間、I/O 等待時間、context switch、以及其他程式執行所造成的延遲。</li>
+又稱「wall clock time」或「elapsed time」，表示從程式開始執行到結束所經過的實際時間，就像用手錶量到的時間。 這個時間包含了 CPU 執行時間、I/O 等待時間、context switch、以及其他程式執行所造成的延遲</li>
 <li>user<br>
-程式在「user space」中執行所消耗的 CPU 時間。 這部分主要包含應用程式本身的計算工作，例如數學運算、字串處理、記憶體操作等。</li>
+程式在「user space」中執行所消耗的 CPU 時間。 這部分主要包含應用程式本身的計算工作，例如數學運算、字串處理、記憶體操作等</li>
 <li>sys<br>
-程式在「kernel space」中執行所消耗的 CPU 時間。 這通常來自系統呼叫，例如 <code>read()</code>、<code>write()</code>、<code>open()</code>、<code>close()</code> 等需要進入 kernel 的操作。</li>
+程式在「kernel space」中執行所消耗的 CPU 時間。 這通常來自系統呼叫，例如 <code>read()</code>、<code>write()</code>、<code>open()</code>、<code>close()</code> 等需要進入 kernel 的操作</li>
 </ul>
 <p>例如下面是我環境上 <code>time ls</code> 命令的輸出：</p>
 <div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mes@MesDesktop:~/MesBlog$</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> time</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ls</span></span>
@@ -635,8 +635,8 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sys</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">     0m0.001s</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這三個值的關係為：</p>
 <ul>
-<li>一般情況下 <code>real &gt;= user + sys</code>，因為除了 CPU 真正執行的時間外，還有等待 I/O、被排程器暫停、或其他延遲。</li>
-<li>在平行運算（多核心）下，可能出現 <code>real &lt; user + sys</code>，因為多個核心同時貢獻了 CPU 時間。</li>
+<li>一般情況下 <code>real &gt;= user + sys</code>，因為除了 CPU 真正執行的時間外，還有等待 I/O、被排程器暫停、或其他延遲</li>
+<li>在平行運算（多核心）下，可能出現 <code>real &lt; user + sys</code>，因為多個核心同時貢獻了 CPU 時間</li>
 </ul>
 <p>導致 <code>real</code> 大於 <code>user + sys</code> 差異的原因很多，常見的包括：</p>
 <ul>
@@ -667,12 +667,12 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    err_sys</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"read error"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>測試結果：</p>
 <figure><figcaption>（From APUE 3rd Edition：Figure 3.6）</figcaption></figure>
-<p>針對一個約 516 MB 的檔案，其使用 20 種不同的 buffer size 測試，觀察 user CPU time、system CPU time、以及 wall clock time。</p>
+<p>針對一個約 516 MB 的檔案，其使用 20 種不同的 buffer size 測試，觀察 user CPU time、system CPU time、以及 wall clock time</p>
 <ul>
-<li>當 buffer size 很小（例如 1 byte, 2 bytes），<code>read()</code> 與 <code>write()</code> 呼叫次數非常多（數億次），system CPU time 非常高（&gt;100 秒），wall clock time 也非常長（&gt;130 秒）。</li>
-<li>當 buffer size 增大（例如 4096, 8192, 32768 bytes），系統呼叫次數急劇下降，system CPU time 減少到 &lt;1 秒，wall clock time 也穩定在 ~8.5 秒左右。</li>
-<li>這顯示「I/O 系統呼叫的開銷」遠大於「單純搬移資料的時間」，因此較大的 buffer 能大幅減少系統呼叫數量，提升效能。</li>
-<li>特殊現象：當 buffer size 到達 32 bytes 或更大時，wall clock time 幾乎沒有差異，因為系統呼叫次數已經下降到一個相對合理的數量，再增大 buffer 並不會帶來太大改進。</li>
+<li>當 buffer size 很小（例如 1 byte, 2 bytes），<code>read()</code> 與 <code>write()</code> 呼叫次數非常多（數億次），system CPU time 非常高（&gt;100 秒），wall clock time 也非常長（&gt;130 秒）</li>
+<li>當 buffer size 增大（例如 4096, 8192, 32768 bytes），系統呼叫次數急劇下降，system CPU time 減少到 &lt;1 秒，wall clock time 也穩定在 ~8.5 秒左右</li>
+<li>這顯示「I/O 系統呼叫的開銷」遠大於「單純搬移資料的時間」，因此較大的 buffer 能大幅減少系統呼叫數量，提升效能</li>
+<li>特殊現象：當 buffer size 到達 32 bytes 或更大時，wall clock time 幾乎沒有差異，因為系統呼叫次數已經下降到一個相對合理的數量，再增大 buffer 並不會帶來太大改進</li>
 <li>小整理：
 <ul>
 <li><code>time</code> 呈現的三種時間（real, user, sys）能幫助我們理解程式效能瓶頸：
@@ -682,27 +682,27 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <li>real 高但 user+sys 小 → 程式在等待 I/O 或被 scheduler 暫停</li>
 </ul>
 </li>
-<li>在 I/O 效率實驗中，最關鍵的瓶頸是 buffer size 選擇。
+<li>在 I/O 效率實驗中，最關鍵的瓶頸是 buffer size 選擇
 <ul>
 <li>小 buffer → 太多 <code>read/write</code> 系統呼叫 → sys time 過高</li>
 <li>適當的 buffer（4KB 到數十 KB）→ 效能最佳化，因為呼叫次數與 CPU 負載達到平衡</li>
 <li>再增大 buffer → 改善有限，因為瓶頸不在系統呼叫，而在 I/O 裝置吞吐量</li>
 </ul>
 </li>
-<li>實際應用中，作業系統和標準 I/O 函式庫（例如 <code>fread/fwrite</code>）通常已經提供緩衝機制，避免了使用極小 buffer 的低效率情況。</li>
-<li><code>real &gt;= user + sys</code> 的原因主要在於等待與調度，而不是 CPU time 的計算錯誤。</li>
-<li>適當的 buffer size 對 I/O 效率影響極大。 小 buffer 造成 system CPU time 激增，導致整體效能低下。</li>
-<li>在實務上，理解 <code>time</code> 三種時間的關係，可以幫助定位效能問題是出在「演算法計算」還是「I/O 系統呼叫」。</li>
+<li>實際應用中，作業系統和標準 I/O 函式庫（例如 <code>fread/fwrite</code>）通常已經提供緩衝機制，避免了使用極小 buffer 的低效率情況</li>
+<li><code>real &gt;= user + sys</code> 的原因主要在於等待與調度，而不是 CPU time 的計算錯誤</li>
+<li>適當的 buffer size 對 I/O 效率影響極大。 小 buffer 造成 system CPU time 激增，導致整體效能低下</li>
+<li>在實務上，理解 <code>time</code> 三種時間的關係，可以幫助定位效能問題是出在「演算法計算」還是「I/O 系統呼叫」</li>
 </ul>
 </li>
 </ul>
 <h4>Unix Buffer（Page）Cache</h4>
 <ul>
-<li>Unix kernel 會維護一個 Buffer Cache（或稱 Page Cache），目的是避免每次存取都直接觸發昂貴的磁碟 I/O。</li>
+<li>Unix kernel 會維護一個 Buffer Cache（或稱 Page Cache），目的是避免每次存取都直接觸發昂貴的磁碟 I/O</li>
 <li>核心的兩個優化策略是：
 <ul>
-<li>Read-ahead（預讀）：當系統偵測到應用程式在順序讀檔案，會自動一次讀取超過應用程式要求的區塊，把未來可能會需要的資料先放進快取，這樣之後的 <code>read()</code> 就能直接從快取中取資料，而不用再向磁碟請求。</li>
-<li>Delayed-write（延遲寫入）：當應用程式呼叫 <code>write()</code>，資料會先寫入 kernel 的 buffer cache，而不是馬上寫到磁碟。 之後系統會根據策略（例如快取區塊滿了、或定期同步）再把資料真正寫回磁碟。 這樣可以合併多次小的寫入，降低磁碟 I/O 次數。</li>
+<li>Read-ahead（預讀）：當系統偵測到應用程式在順序讀檔案，會自動一次讀取超過應用程式要求的區塊，把未來可能會需要的資料先放進快取，這樣之後的 <code>read()</code> 就能直接從快取中取資料，而不用再向磁碟請求</li>
+<li>Delayed-write（延遲寫入）：當應用程式呼叫 <code>write()</code>，資料會先寫入 kernel 的 buffer cache，而不是馬上寫到磁碟。 之後系統會根據策略（例如快取區塊滿了、或定期同步）再把資料真正寫回磁碟。 這樣可以合併多次小的寫入，降低磁碟 I/O 次數</li>
 </ul>
 </li>
 </ul>
@@ -798,7 +798,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </ul>
 <h4>範例 5</h4>
 <p>執行命令：<code>./a.out file1 file2</code></p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> envp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> **</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> envp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd1, fd2;</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> dummy;</span></span>
@@ -834,11 +834,11 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fcntl</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> cmd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> ...</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> /* int arg */</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> );</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>fcntl</code> 函式有以下 5 種功能：</p>
 <ol>
-<li>複製一個已有的描述符（<code>cmd = F_DUPFD</code> 或 <code>F_DUPFD_CLOEXEC</code>）。</li>
-<li>獲取／設置file descriptor flags（<code>cmd = F_GETFD</code> 或 <code>F_SETFD</code>）。</li>
-<li>獲取／設置file status flags（<code>cmd = F_GETFL</code> 或 <code>F_SETFL</code>）。</li>
-<li>獲取／設置異步 I/O 所有者（<code>cmd = F_GETOWN</code> 或 <code>F_SETOWN</code>）。</li>
-<li>獲取／設置記錄鎖（<code>cmd = F_GETLK</code>, <code>F_SETLK</code>, <code>F_SETLKW</code>）。</li>
+<li>複製一個已有的描述符（<code>cmd = F_DUPFD</code> 或 <code>F_DUPFD_CLOEXEC</code>）</li>
+<li>獲取／設置file descriptor flags（<code>cmd = F_GETFD</code> 或 <code>F_SETFD</code>）</li>
+<li>獲取／設置file status flags（<code>cmd = F_GETFL</code> 或 <code>F_SETFL</code>）</li>
+<li>獲取／設置異步 I/O 所有者（<code>cmd = F_GETOWN</code> 或 <code>F_SETOWN</code>）</li>
+<li>獲取／設置記錄鎖（<code>cmd = F_GETLK</code>, <code>F_SETLK</code>, <code>F_SETLKW</code>）</li>
 </ol>
 <h4>file descriptor flags 與 file status flags</h4>
 <p>descriptor flag 與 status flag 是兩種不同層級：前者綁在「fd 本身」，後者綁在「open file table entry」</p>
@@ -851,7 +851,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>
 <p><code>F_DUPFD_CLOEXEC</code><br>
-複製 file descriptor，並為新的 descriptor 設定 <code>FD_CLOEXEC</code> 旗標。 回傳新的 file descriptor。</p>
+複製 file descriptor，並為新的 descriptor 設定 <code>FD_CLOEXEC</code> 旗標。 回傳新的 file descriptor</p>
 </li>
 <li>
 <p><code>F_GETFD</code><br>
@@ -879,7 +879,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>
 <p><code>F_SETOWN</code><br>
-設定將接收 <code>SIGIO</code> 與 <code>SIGURG</code> 訊號的行程 ID 或行程群組 ID。 第三個引數若為正值，表示指定的是行程 ID； 若為負值，則表示行程群組 ID，且其值為該引數的絕對值</p>
+設定將接收 <code>SIGIO</code> 與 <code>SIGURG</code> 訊號的行程 ID 或行程群組 ID。 第三個引數若為正值，表示指定的是行程 ID，若為負值，則表示行程群組 ID，且其值為該引數的絕對值</p>
 </li>
 </ul>
 <h4>返回值說明</h4>
@@ -931,9 +931,9 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">read</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> write</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><ul>
 <li><code>5&lt;&gt;temp.foo</code>  會把 <code>temp.foo</code> 以讀寫模式開啟到 file descriptor 5</li>
-<li>在 bash 中，<code>n&lt;&gt;file</code> 代表以「讀寫」模式把檔案繫結到 <code>fd n</code>。</li>
-<li>這不是 C 程式直接呼叫 <code>open()</code>，而是由 shell 在執行你的程式前就替你打開 <code>fd 5</code>。</li>
-<li>因為是「讀寫」模式，所以用上例程式去檢查 <code>fd 5</code>，會看到 <code>O_RDWR</code>。</li>
+<li>在 bash 中，<code>n&lt;&gt;file</code> 代表以「讀寫」模式把檔案繫結到 <code>fd n</code></li>
+<li>這不是 C 程式直接呼叫 <code>open()</code>，而是由 shell 在執行你的程式前就替你打開 <code>fd 5</code></li>
+<li>因為是「讀寫」模式，所以用上例程式去檢查 <code>fd 5</code>，會看到 <code>O_RDWR</code></li>
 <li>這也說明：程式端不一定知道檔名，但能藉由 <code>fd</code> 觀察到開啟模式與旗標</li>
 </ul>
 <h4>範例 2：修改 file status flags</h4>
@@ -972,8 +972,8 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </ul>
 <h3>/dev/fd</h3>
 <ul>
-<li>新版 Unix 系統提供 <code>/dev/fd</code> 目錄，內有 <code>0</code>、<code>1</code>、<code>2</code>… 等項目（以檔案形式對應 fd）。</li>
-<li>開啟 <code>/dev/fd/n</code> 等同於複製 descriptor <code>n</code>。</li>
+<li>新版 Unix 系統提供 <code>/dev/fd</code> 目錄，內有 <code>0</code>、<code>1</code>、<code>2</code>… 等項目（以檔案形式對應 fd）</li>
+<li>開啟 <code>/dev/fd/n</code> 等同於複製 descriptor <code>n</code></li>
 </ul>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"/dev/fd/0"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> mode</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">   // 等同於</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd2 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> dup</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
@@ -983,16 +983,16 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">/* 失敗回傳 -1，成功回傳其他值 */</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> ioctl</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> request</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> ...</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><ul>
-<li><code>ioctl</code> 是 I/O 操作的萬用介面：凡無法用標準檔案 I/O 函式表達的操作，通常以 <code>ioctl</code> 提供。</li>
-<li>每個裝置驅動可以自訂自己的 <code>ioctl</code> 命令集合。</li>
+<li><code>ioctl</code> 是 I/O 操作的萬用介面：凡無法用標準檔案 I/O 函式表達的操作，通常以 <code>ioctl</code> 提供</li>
+<li>每個裝置驅動可以自訂自己的 <code>ioctl</code> 命令集合</li>
 <li>系統也為不同裝置類別提供通用的 <code>ioctl</code> 命令</li>
 </ul>
 <h3>Error Handling（錯誤處理）</h3>
 <ul>
-<li><code>&lt;errno.h&gt;</code> 定義整數變數 <code>errno</code>，在系統呼叫或部分程式庫函式失敗時設定，以指出錯因。</li>
-<li>規範於 POSIX.1 與 C99。</li>
-<li>只有當呼叫的回傳值表示錯誤時（多數系統呼叫回傳 <code>-1</code>，多數函式回傳 <code>-1</code> 或 <code>NULL</code>），<code>errno</code> 的值才有意義。</li>
-<li>若沒有錯誤，<code>errno</code> 不會被改變。</li>
+<li><code>&lt;errno.h&gt;</code> 定義整數變數 <code>errno</code>，在系統呼叫或部分程式庫函式失敗時設定，以指出錯因</li>
+<li>規範於 POSIX.1 與 C99</li>
+<li>只有當呼叫的回傳值表示錯誤時（多數系統呼叫回傳 <code>-1</code>，多數函式回傳 <code>-1</code> 或 <code>NULL</code>），<code>errno</code> 的值才有意義</li>
+<li>若沒有錯誤，<code>errno</code> 不會被改變</li>
 <li>可參考 Linux 的 <code>errno(3)</code> man page</li>
 </ul>
 <h3>Error Recovery（錯誤復原）</h3>
@@ -1031,12 +1031,12 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這邊的目標是：</p>
 <ul>
-<li>若檔案已存在：用唯寫開啟。</li>
-<li>若不存在：建立後開啟。</li>
+<li>若檔案已存在：用唯寫開啟</li>
+<li>若不存在：建立後開啟</li>
 </ul>
 <p>乍看合理，但中間有競態窗與語意不一致兩個大問題</p>
 <h5>問題：TOCTTOU 競態（Time Of Check To Time Of Use）</h5>
-<p><code>open(path, O_WRONLY)</code> 失敗（ENOENT）與後續 <code>creat(path, mode)</code> 之間不是原子動作。 只要在這個空窗期有別的行程動到同一路徑，就可能出事。</p>
+<p><code>open(path, O_WRONLY)</code> 失敗（ENOENT）與後續 <code>creat(path, mode)</code> 之間不是原子動作。 只要在這個空窗期有別的行程動到同一路徑，就可能出事</p>
 <p>典型時序（A、B 兩個行程同時執行）：</p>
 <span class="center-column">
 <p>| 時間 | 行程 A                            | 行程 B                                                     | 結果                                                                               |<br>

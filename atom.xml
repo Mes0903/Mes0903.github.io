@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2025-10-02T18:22:23.155Z</updated>
+  <updated>2025-10-09T12:19:14.733Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -25,7 +25,7 @@
     <title type="text">（WIP）台大 SP 筆記</title>
     <id>https://mes0903.github.io/Linux/NTU_SP/</id>
     <link href="https://mes0903.github.io/Linux/NTU_SP/"/>
-    <updated>2025-10-02T18:21:30.000Z</updated>
+    <updated>2025-10-09T12:13:22.000Z</updated>
     <summary type="html"><![CDATA[
 <p>大部分是用 GPT 整理的就是了，簡單修一下而已，有些自己沒看很懂得地方拿了課本的段落來做了翻譯。 只是自用筆記，想好好學的人去上課或是讀 TLPI 吧XD</p>
 <p>課本是《 Advanced Programming in the UNIX Environment, 3/e》這本</p>
@@ -587,7 +587,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>Q：如果 <code>lseek()</code> 使用的負 offset 超過了檔案開頭，會發生什麼？
 <ul>
-<li>A：回傳 -1，並設置 <code>errno</code>（通常為 <code>EINVAL</code>）。</li>
+<li>A：回傳 -1，並設置 <code>errno</code>（通常為 <code>EINVAL</code>）</li>
 </ul>
 </li>
 </ul>
@@ -620,10 +620,10 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h5>執行流程</h5>
 <ol>
-<li>使用 <code>creat()</code> 建立新檔案 <code>file.hole</code>。</li>
-<li><code>write(fd, buf1, 10)</code> → 在檔案開頭寫入 "abcdefghij"，此時 offset = 10。</li>
-<li><code>lseek(fd, 16384, SEEK_SET)</code> → 將 offset 移到 16384（中間的區域尚未寫入）。</li>
-<li><code>write(fd, buf2, 10)</code> → 在 offset=16384 的位置寫入 "ABCDEFGHIJ"，最後 offset=16394。</li>
+<li>使用 <code>creat()</code> 建立新檔案 <code>file.hole</code></li>
+<li><code>write(fd, buf1, 10)</code> → 在檔案開頭寫入 "abcdefghij"，此時 offset = 10</li>
+<li><code>lseek(fd, 16384, SEEK_SET)</code> → 將 offset 移到 16384（中間的區域尚未寫入）</li>
+<li><code>write(fd, buf2, 10)</code> → 在 offset=16384 的位置寫入 "ABCDEFGHIJ"，最後 offset=16394</li>
 </ol>
 <h5>檔案內容觀察</h5>
 <div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">$</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./a.out</span></span>
@@ -665,11 +665,11 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <p>當我們在 Linux 使用 <code>time</code> 命令來測量程式執行時間時，會看到三個主要的時間統計值：</p>
 <ul>
 <li>real<br>
-又稱「wall clock time」或「elapsed time」，表示從程式開始執行到結束所經過的實際時間，就像用手錶量到的時間。 這個時間包含了 CPU 執行時間、I/O 等待時間、context switch、以及其他程式執行所造成的延遲。</li>
+又稱「wall clock time」或「elapsed time」，表示從程式開始執行到結束所經過的實際時間，就像用手錶量到的時間。 這個時間包含了 CPU 執行時間、I/O 等待時間、context switch、以及其他程式執行所造成的延遲</li>
 <li>user<br>
-程式在「user space」中執行所消耗的 CPU 時間。 這部分主要包含應用程式本身的計算工作，例如數學運算、字串處理、記憶體操作等。</li>
+程式在「user space」中執行所消耗的 CPU 時間。 這部分主要包含應用程式本身的計算工作，例如數學運算、字串處理、記憶體操作等</li>
 <li>sys<br>
-程式在「kernel space」中執行所消耗的 CPU 時間。 這通常來自系統呼叫，例如 <code>read()</code>、<code>write()</code>、<code>open()</code>、<code>close()</code> 等需要進入 kernel 的操作。</li>
+程式在「kernel space」中執行所消耗的 CPU 時間。 這通常來自系統呼叫，例如 <code>read()</code>、<code>write()</code>、<code>open()</code>、<code>close()</code> 等需要進入 kernel 的操作</li>
 </ul>
 <p>例如下面是我環境上 <code>time ls</code> 命令的輸出：</p>
 <div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mes@MesDesktop:~/MesBlog$</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> time</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ls</span></span>
@@ -680,8 +680,8 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sys</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">     0m0.001s</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這三個值的關係為：</p>
 <ul>
-<li>一般情況下 <code>real &gt;= user + sys</code>，因為除了 CPU 真正執行的時間外，還有等待 I/O、被排程器暫停、或其他延遲。</li>
-<li>在平行運算（多核心）下，可能出現 <code>real &lt; user + sys</code>，因為多個核心同時貢獻了 CPU 時間。</li>
+<li>一般情況下 <code>real &gt;= user + sys</code>，因為除了 CPU 真正執行的時間外，還有等待 I/O、被排程器暫停、或其他延遲</li>
+<li>在平行運算（多核心）下，可能出現 <code>real &lt; user + sys</code>，因為多個核心同時貢獻了 CPU 時間</li>
 </ul>
 <p>導致 <code>real</code> 大於 <code>user + sys</code> 差異的原因很多，常見的包括：</p>
 <ul>
@@ -712,12 +712,12 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    err_sys</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"read error"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>測試結果：</p>
 <figure><figcaption>（From APUE 3rd Edition：Figure 3.6）</figcaption></figure>
-<p>針對一個約 516 MB 的檔案，其使用 20 種不同的 buffer size 測試，觀察 user CPU time、system CPU time、以及 wall clock time。</p>
+<p>針對一個約 516 MB 的檔案，其使用 20 種不同的 buffer size 測試，觀察 user CPU time、system CPU time、以及 wall clock time</p>
 <ul>
-<li>當 buffer size 很小（例如 1 byte, 2 bytes），<code>read()</code> 與 <code>write()</code> 呼叫次數非常多（數億次），system CPU time 非常高（&gt;100 秒），wall clock time 也非常長（&gt;130 秒）。</li>
-<li>當 buffer size 增大（例如 4096, 8192, 32768 bytes），系統呼叫次數急劇下降，system CPU time 減少到 &lt;1 秒，wall clock time 也穩定在 ~8.5 秒左右。</li>
-<li>這顯示「I/O 系統呼叫的開銷」遠大於「單純搬移資料的時間」，因此較大的 buffer 能大幅減少系統呼叫數量，提升效能。</li>
-<li>特殊現象：當 buffer size 到達 32 bytes 或更大時，wall clock time 幾乎沒有差異，因為系統呼叫次數已經下降到一個相對合理的數量，再增大 buffer 並不會帶來太大改進。</li>
+<li>當 buffer size 很小（例如 1 byte, 2 bytes），<code>read()</code> 與 <code>write()</code> 呼叫次數非常多（數億次），system CPU time 非常高（&gt;100 秒），wall clock time 也非常長（&gt;130 秒）</li>
+<li>當 buffer size 增大（例如 4096, 8192, 32768 bytes），系統呼叫次數急劇下降，system CPU time 減少到 &lt;1 秒，wall clock time 也穩定在 ~8.5 秒左右</li>
+<li>這顯示「I/O 系統呼叫的開銷」遠大於「單純搬移資料的時間」，因此較大的 buffer 能大幅減少系統呼叫數量，提升效能</li>
+<li>特殊現象：當 buffer size 到達 32 bytes 或更大時，wall clock time 幾乎沒有差異，因為系統呼叫次數已經下降到一個相對合理的數量，再增大 buffer 並不會帶來太大改進</li>
 <li>小整理：
 <ul>
 <li><code>time</code> 呈現的三種時間（real, user, sys）能幫助我們理解程式效能瓶頸：
@@ -727,27 +727,27 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <li>real 高但 user+sys 小 → 程式在等待 I/O 或被 scheduler 暫停</li>
 </ul>
 </li>
-<li>在 I/O 效率實驗中，最關鍵的瓶頸是 buffer size 選擇。
+<li>在 I/O 效率實驗中，最關鍵的瓶頸是 buffer size 選擇
 <ul>
 <li>小 buffer → 太多 <code>read/write</code> 系統呼叫 → sys time 過高</li>
 <li>適當的 buffer（4KB 到數十 KB）→ 效能最佳化，因為呼叫次數與 CPU 負載達到平衡</li>
 <li>再增大 buffer → 改善有限，因為瓶頸不在系統呼叫，而在 I/O 裝置吞吐量</li>
 </ul>
 </li>
-<li>實際應用中，作業系統和標準 I/O 函式庫（例如 <code>fread/fwrite</code>）通常已經提供緩衝機制，避免了使用極小 buffer 的低效率情況。</li>
-<li><code>real &gt;= user + sys</code> 的原因主要在於等待與調度，而不是 CPU time 的計算錯誤。</li>
-<li>適當的 buffer size 對 I/O 效率影響極大。 小 buffer 造成 system CPU time 激增，導致整體效能低下。</li>
-<li>在實務上，理解 <code>time</code> 三種時間的關係，可以幫助定位效能問題是出在「演算法計算」還是「I/O 系統呼叫」。</li>
+<li>實際應用中，作業系統和標準 I/O 函式庫（例如 <code>fread/fwrite</code>）通常已經提供緩衝機制，避免了使用極小 buffer 的低效率情況</li>
+<li><code>real &gt;= user + sys</code> 的原因主要在於等待與調度，而不是 CPU time 的計算錯誤</li>
+<li>適當的 buffer size 對 I/O 效率影響極大。 小 buffer 造成 system CPU time 激增，導致整體效能低下</li>
+<li>在實務上，理解 <code>time</code> 三種時間的關係，可以幫助定位效能問題是出在「演算法計算」還是「I/O 系統呼叫」</li>
 </ul>
 </li>
 </ul>
 <h4>Unix Buffer（Page）Cache</h4>
 <ul>
-<li>Unix kernel 會維護一個 Buffer Cache（或稱 Page Cache），目的是避免每次存取都直接觸發昂貴的磁碟 I/O。</li>
+<li>Unix kernel 會維護一個 Buffer Cache（或稱 Page Cache），目的是避免每次存取都直接觸發昂貴的磁碟 I/O</li>
 <li>核心的兩個優化策略是：
 <ul>
-<li>Read-ahead（預讀）：當系統偵測到應用程式在順序讀檔案，會自動一次讀取超過應用程式要求的區塊，把未來可能會需要的資料先放進快取，這樣之後的 <code>read()</code> 就能直接從快取中取資料，而不用再向磁碟請求。</li>
-<li>Delayed-write（延遲寫入）：當應用程式呼叫 <code>write()</code>，資料會先寫入 kernel 的 buffer cache，而不是馬上寫到磁碟。 之後系統會根據策略（例如快取區塊滿了、或定期同步）再把資料真正寫回磁碟。 這樣可以合併多次小的寫入，降低磁碟 I/O 次數。</li>
+<li>Read-ahead（預讀）：當系統偵測到應用程式在順序讀檔案，會自動一次讀取超過應用程式要求的區塊，把未來可能會需要的資料先放進快取，這樣之後的 <code>read()</code> 就能直接從快取中取資料，而不用再向磁碟請求</li>
+<li>Delayed-write（延遲寫入）：當應用程式呼叫 <code>write()</code>，資料會先寫入 kernel 的 buffer cache，而不是馬上寫到磁碟。 之後系統會根據策略（例如快取區塊滿了、或定期同步）再把資料真正寫回磁碟。 這樣可以合併多次小的寫入，降低磁碟 I/O 次數</li>
 </ul>
 </li>
 </ul>
@@ -843,7 +843,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </ul>
 <h4>範例 5</h4>
 <p>執行命令：<code>./a.out file1 file2</code></p>
-<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> envp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
+<div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> argc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> **</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic">argv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> char</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> envp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd1, fd2;</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">  int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> dummy;</span></span>
@@ -879,11 +879,11 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> fcntl</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> cmd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> ...</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> /* int arg */</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> );</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>fcntl</code> 函式有以下 5 種功能：</p>
 <ol>
-<li>複製一個已有的描述符（<code>cmd = F_DUPFD</code> 或 <code>F_DUPFD_CLOEXEC</code>）。</li>
-<li>獲取／設置file descriptor flags（<code>cmd = F_GETFD</code> 或 <code>F_SETFD</code>）。</li>
-<li>獲取／設置file status flags（<code>cmd = F_GETFL</code> 或 <code>F_SETFL</code>）。</li>
-<li>獲取／設置異步 I/O 所有者（<code>cmd = F_GETOWN</code> 或 <code>F_SETOWN</code>）。</li>
-<li>獲取／設置記錄鎖（<code>cmd = F_GETLK</code>, <code>F_SETLK</code>, <code>F_SETLKW</code>）。</li>
+<li>複製一個已有的描述符（<code>cmd = F_DUPFD</code> 或 <code>F_DUPFD_CLOEXEC</code>）</li>
+<li>獲取／設置file descriptor flags（<code>cmd = F_GETFD</code> 或 <code>F_SETFD</code>）</li>
+<li>獲取／設置file status flags（<code>cmd = F_GETFL</code> 或 <code>F_SETFL</code>）</li>
+<li>獲取／設置異步 I/O 所有者（<code>cmd = F_GETOWN</code> 或 <code>F_SETOWN</code>）</li>
+<li>獲取／設置記錄鎖（<code>cmd = F_GETLK</code>, <code>F_SETLK</code>, <code>F_SETLKW</code>）</li>
 </ol>
 <h4>file descriptor flags 與 file status flags</h4>
 <p>descriptor flag 與 status flag 是兩種不同層級：前者綁在「fd 本身」，後者綁在「open file table entry」</p>
@@ -896,7 +896,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>
 <p><code>F_DUPFD_CLOEXEC</code><br>
-複製 file descriptor，並為新的 descriptor 設定 <code>FD_CLOEXEC</code> 旗標。 回傳新的 file descriptor。</p>
+複製 file descriptor，並為新的 descriptor 設定 <code>FD_CLOEXEC</code> 旗標。 回傳新的 file descriptor</p>
 </li>
 <li>
 <p><code>F_GETFD</code><br>
@@ -924,7 +924,7 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </li>
 <li>
 <p><code>F_SETOWN</code><br>
-設定將接收 <code>SIGIO</code> 與 <code>SIGURG</code> 訊號的行程 ID 或行程群組 ID。 第三個引數若為正值，表示指定的是行程 ID； 若為負值，則表示行程群組 ID，且其值為該引數的絕對值</p>
+設定將接收 <code>SIGIO</code> 與 <code>SIGURG</code> 訊號的行程 ID 或行程群組 ID。 第三個引數若為正值，表示指定的是行程 ID，若為負值，則表示行程群組 ID，且其值為該引數的絕對值</p>
 </li>
 </ul>
 <h4>返回值說明</h4>
@@ -976,9 +976,9 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">read</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> write</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><ul>
 <li><code>5&lt;&gt;temp.foo</code>  會把 <code>temp.foo</code> 以讀寫模式開啟到 file descriptor 5</li>
-<li>在 bash 中，<code>n&lt;&gt;file</code> 代表以「讀寫」模式把檔案繫結到 <code>fd n</code>。</li>
-<li>這不是 C 程式直接呼叫 <code>open()</code>，而是由 shell 在執行你的程式前就替你打開 <code>fd 5</code>。</li>
-<li>因為是「讀寫」模式，所以用上例程式去檢查 <code>fd 5</code>，會看到 <code>O_RDWR</code>。</li>
+<li>在 bash 中，<code>n&lt;&gt;file</code> 代表以「讀寫」模式把檔案繫結到 <code>fd n</code></li>
+<li>這不是 C 程式直接呼叫 <code>open()</code>，而是由 shell 在執行你的程式前就替你打開 <code>fd 5</code></li>
+<li>因為是「讀寫」模式，所以用上例程式去檢查 <code>fd 5</code>，會看到 <code>O_RDWR</code></li>
 <li>這也說明：程式端不一定知道檔名，但能藉由 <code>fd</code> 觀察到開啟模式與旗標</li>
 </ul>
 <h4>範例 2：修改 file status flags</h4>
@@ -1017,8 +1017,8 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 </ul>
 <h3>/dev/fd</h3>
 <ul>
-<li>新版 Unix 系統提供 <code>/dev/fd</code> 目錄，內有 <code>0</code>、<code>1</code>、<code>2</code>… 等項目（以檔案形式對應 fd）。</li>
-<li>開啟 <code>/dev/fd/n</code> 等同於複製 descriptor <code>n</code>。</li>
+<li>新版 Unix 系統提供 <code>/dev/fd</code> 目錄，內有 <code>0</code>、<code>1</code>、<code>2</code>… 等項目（以檔案形式對應 fd）</li>
+<li>開啟 <code>/dev/fd/n</code> 等同於複製 descriptor <code>n</code></li>
 </ul>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> open</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"/dev/fd/0"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> mode</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">   // 等同於</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fd2 </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> dup</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
@@ -1028,16 +1028,16 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">/* 失敗回傳 -1，成功回傳其他值 */</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> ioctl</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> fd</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-light-font-style:inherit;--shiki-dark:#E06C75;--shiki-dark-font-style:italic"> request</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> ...</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><ul>
-<li><code>ioctl</code> 是 I/O 操作的萬用介面：凡無法用標準檔案 I/O 函式表達的操作，通常以 <code>ioctl</code> 提供。</li>
-<li>每個裝置驅動可以自訂自己的 <code>ioctl</code> 命令集合。</li>
+<li><code>ioctl</code> 是 I/O 操作的萬用介面：凡無法用標準檔案 I/O 函式表達的操作，通常以 <code>ioctl</code> 提供</li>
+<li>每個裝置驅動可以自訂自己的 <code>ioctl</code> 命令集合</li>
 <li>系統也為不同裝置類別提供通用的 <code>ioctl</code> 命令</li>
 </ul>
 <h3>Error Handling（錯誤處理）</h3>
 <ul>
-<li><code>&lt;errno.h&gt;</code> 定義整數變數 <code>errno</code>，在系統呼叫或部分程式庫函式失敗時設定，以指出錯因。</li>
-<li>規範於 POSIX.1 與 C99。</li>
-<li>只有當呼叫的回傳值表示錯誤時（多數系統呼叫回傳 <code>-1</code>，多數函式回傳 <code>-1</code> 或 <code>NULL</code>），<code>errno</code> 的值才有意義。</li>
-<li>若沒有錯誤，<code>errno</code> 不會被改變。</li>
+<li><code>&lt;errno.h&gt;</code> 定義整數變數 <code>errno</code>，在系統呼叫或部分程式庫函式失敗時設定，以指出錯因</li>
+<li>規範於 POSIX.1 與 C99</li>
+<li>只有當呼叫的回傳值表示錯誤時（多數系統呼叫回傳 <code>-1</code>，多數函式回傳 <code>-1</code> 或 <code>NULL</code>），<code>errno</code> 的值才有意義</li>
+<li>若沒有錯誤，<code>errno</code> 不會被改變</li>
 <li>可參考 Linux 的 <code>errno(3)</code> man page</li>
 </ul>
 <h3>Error Recovery（錯誤復原）</h3>
@@ -1076,12 +1076,12 @@ Process A 的 fd=3 可能是 <code>a.txt</code>，Process B 的 fd=3 可能是 <
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這邊的目標是：</p>
 <ul>
-<li>若檔案已存在：用唯寫開啟。</li>
-<li>若不存在：建立後開啟。</li>
+<li>若檔案已存在：用唯寫開啟</li>
+<li>若不存在：建立後開啟</li>
 </ul>
 <p>乍看合理，但中間有競態窗與語意不一致兩個大問題</p>
 <h5>問題：TOCTTOU 競態（Time Of Check To Time Of Use）</h5>
-<p><code>open(path, O_WRONLY)</code> 失敗（ENOENT）與後續 <code>creat(path, mode)</code> 之間不是原子動作。 只要在這個空窗期有別的行程動到同一路徑，就可能出事。</p>
+<p><code>open(path, O_WRONLY)</code> 失敗（ENOENT）與後續 <code>creat(path, mode)</code> 之間不是原子動作。 只要在這個空窗期有別的行程動到同一路徑，就可能出事</p>
 <p>典型時序（A、B 兩個行程同時執行）：</p>
 <span class="center-column">
 <p>| 時間 | 行程 A                            | 行程 B                                                     | 結果                                                                               |<br>
@@ -2346,7 +2346,7 @@ Virtio 裝置包含旗標，guest 作業系統在裝置初始化時會確認這�
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2025-10-02T18:22:23.475Z</updated>
+    <updated>2025-10-09T12:19:15.122Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -2415,7 +2415,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2025-10-02T18:22:23.477Z</updated>
+    <updated>2025-10-09T12:19:15.124Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -3519,7 +3519,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2025-10-02T18:22:23.582Z</updated>
+    <updated>2025-10-09T12:19:15.233Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -3586,7 +3586,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2025-10-02T18:22:23.585Z</updated>
+    <updated>2025-10-09T12:19:15.244Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -3907,7 +3907,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2025-10-02T18:22:23.688Z</updated>
+    <updated>2025-10-09T12:19:15.353Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -4004,7 +4004,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2025-10-02T18:22:23.710Z</updated>
+    <updated>2025-10-09T12:19:15.376Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -4137,7 +4137,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2025-10-02T18:22:23.722Z</updated>
+    <updated>2025-10-09T12:19:15.388Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -4349,7 +4349,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2025-10-02T18:22:23.735Z</updated>
+    <updated>2025-10-09T12:19:15.401Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -4833,7 +4833,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2025-10-02T18:22:23.764Z</updated>
+    <updated>2025-10-09T12:19:15.432Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -4858,7 +4858,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2025-10-02T18:22:23.775Z</updated>
+    <updated>2025-10-09T12:19:15.446Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -13671,7 +13671,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2025-10-02T18:22:24.656Z</updated>
+    <updated>2025-10-09T12:19:16.384Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -25648,7 +25648,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">(WIP) 礦坑系列 ── Dependent Name 與 Name lookup</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Dependent_Name/"/>
-    <updated>2025-10-02T18:22:26.952Z</updated>
+    <updated>2025-10-09T12:19:18.591Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>在對 C++ 做語法解析的時候，編譯器需要知道某個名稱是不是一個型態，像是這個例子：</p>
@@ -25977,7 +25977,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">C++ 教學系列 ── 淺談計算機概論</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_Tutorial/Computer_Introduction/"/>
-    <updated>2025-10-02T18:22:26.974Z</updated>
+    <updated>2025-10-09T12:19:18.613Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <p>首先對於這系列的文，如果有什麼寫錯的地方，都歡迎直接修改或與我討論，文章有被修改我都會收到 email 通知，這部分我想老生常談了，因此就不再多做展開</p>
