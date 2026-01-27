@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Mon, 26 Jan 2026 16:40:45 GMT</pubDate>
-    <lastBuildDate>Mon, 26 Jan 2026 16:40:45 GMT</lastBuildDate>
+    <pubDate>Tue, 27 Jan 2026 08:06:55 GMT</pubDate>
+    <lastBuildDate>Tue, 27 Jan 2026 08:06:55 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>VM</category>
@@ -389,14 +389,14 @@
 <li>實作 host-GL accelerated path，讓 virtio-gpu 得以 passthrough</li>
 </ul>
 <p>目前已將 2D 的部分閱讀與整理完畢，剛將 commit 整理完畢，重新編譯沒問題後就 rebase 並發送 PR</p>
-<p>材料部份，目前已初步閱讀完 spec 中 virtqueue（ch1 &amp; 2）、PCI（4.1）與 GPU（5.7）的部分。 另外也閱讀了一些還閱讀了一些 graphic stack 的東西，因此寫了一些筆記</p>
+<p>材料部份，目前已初步閱讀完 spec 中 virtqueue（ch1 &amp; 2）、PCI（4.1）、GPU（5.7）與 Input（5.8）的部分。 另外也閱讀了一些還閱讀了一些 graphic stack 的東西，因此寫了一些筆記</p>
 <ul>
 <li><a href="https://mes0903.github.io/VM/redhat_virtio/" target="_blank" rel="noopener noreferrer">Red Hat Virtio 介紹文的翻譯 &amp; 筆記</a></li>
 <li><a href="https://mes0903.github.io/VM/virtio_spec/" target="_blank" rel="noopener noreferrer">Virtual I/O Device (VIRTIO) Version 1.3 翻譯 &amp; 筆記</a></li>
 <li><a href="https://mes0903.github.io/Linux/linux-graphic-stack/" target="_blank" rel="noopener noreferrer">The Linux graphics stack in a nutshell 翻譯 &amp; 筆記</a></li>
 </ul>
 <p>還有一些尚在進行中的筆記，集中在 DRM/KMS 的部分，底下是針對目前 semu 中 vgpu 2D 部分的實作的筆記，3D 部分尚未開始</p>
-<p>後面有紀錄了一些遇到的問題，和做 trace code 的過程，但是我仍然不是很熟悉 Mesa 與 X11，如果有寫錯的部分，麻煩再告知我，謝謝</p>
+<p>後面有紀錄了一些遇到的問題，和做 trace code 的過程，但是我仍然不是很熟悉 Mesa、X11 與 DRM/KMS，如果有寫錯的部分，麻煩再告知我，謝謝</p>
 <h2>有關 VirGL</h2>
 <p>以下片段翻譯自 <a href="https://www.reddit.com/r/linux_gaming/comments/9firc7/do_nvidia_gpus_require_mesa_re_what_is_mesa_vs/" target="_blank" rel="noopener noreferrer">Do Nvidia GPUs require Mesa? (re: what is Mesa vs proprietary drivers?)</a>：</p>
 <p>在 Linux 當中，所有硬體的驅動程式都會以某種形式被包含在核心裡面，這當然也包含了 GPU 驅動。 每一張 GPU 都需要一個核心驅動（或說 kernel module 模組）才能運作</p>
