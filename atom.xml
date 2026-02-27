@@ -4,15 +4,15 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2026-01-27T08:06:55.403Z</updated>
+  <updated>2026-02-27T12:30:07.499Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
+  <category term="Linux"/>
+  <category term="computer-graphic"/>
   <category term="VM"/>
   <category term="virtio"/>
-  <category term="Linux"/>
   <category term="infra"/>
-  <category term="computer-graphic"/>
   <category term="OS"/>
   <category term="risc-v"/>
   <category term="essay"/>
@@ -26,12 +26,11 @@
     <title type="text">（WIP）Direct Rendering Infrastructure</title>
     <id>https://mes0903.github.io/Linux/DRI/</id>
     <link href="https://mes0903.github.io/Linux/DRI/"/>
-    <updated>2026-01-11T02:16:08.000Z</updated>
-    <summary type="html"><![CDATA[
-<p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形 stack 的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速。 DRI 也曾被改造，用來在沒有執行顯示伺服器的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>
-<p>DRI 的實作分散在 X Server 以及其相關的 client 函式庫、<code>Mesa 3D</code>，還有 <code>Direct Rendering Manager</code> 核心子系統之中。 它的所有原始碼都是開放原始碼軟體</p>]]></summary>
-    <content type="html"><![CDATA[
-<p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形 stack 的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速。 DRI 也曾被改造，用來在沒有執行顯示伺服器的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>
+    <updated>2026-02-27T12:29:31.000Z</updated>
+    <summary type="html"><![CDATA[<h2>（WIP）Direct Rendering Infrastructure</h2>
+<p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形堆疊的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速。 DRI 也曾被改造，用來在沒有執行顯示伺服器（display server）的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>]]></summary>
+    <content type="html"><![CDATA[<h2>（WIP）Direct Rendering Infrastructure</h2>
+<p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形堆疊的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速。 DRI 也曾被改造，用來在沒有執行顯示伺服器（display server）的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>
 <p>DRI 的實作分散在 X Server 以及其相關的 client 函式庫、<code>Mesa 3D</code>，還有 <code>Direct Rendering Manager</code> 核心子系統之中。 它的所有原始碼都是開放原始碼軟體</p>
 <h3>概觀</h3>
 <p>在傳統 X Window System 的架構裡，X Server 是唯一擁有對圖形硬體獨佔存取權的行程，因此也就是那個在 framebuffer 上做實際算繪的行程。 所有 X client 能做的事，就是和 X Server 溝通，並把算繪命令交給它</p>
@@ -106,7 +105,7 @@
 <p>DRI3 與 Present 這兩個 extension 於 2013 年間被開發完成，並在 2013 年 12 月釋出的 <a href="http://X.Org" target="_blank" rel="noopener noreferrer">X.Org</a> Server 1.15 版本中合併進主分支。 DRI3 協定的第一個也是唯一一個版本（1.0）則是在 2013 年 11 月釋出</p>
 <h2>Direct Rendering Manager</h2>
 <p>Direct Rendering Manager（DRM）是 Linux 作業系統核心中的一個子系統，負責與現代顯示卡上的 GPU 進行介接。 DRM 對外提供一組 API，讓 user space 的程式可以把命令與資料送到 GPU，並執行各種操作，例如設定顯示器的模式（mode setting）</p>
-<p>DRM 一開始是作為 X Server Direct Rendering Infrastructure 的 kernel space 元件而被開發出來，但之後也被其他圖形 stack 的替代方案（例如 Wayland）以及各種獨立應用程式與函式庫（例如 <code>SDL2</code> 與 <code>Kodi</code>）採用</p>
+<p>DRM 一開始是作為 X Server Direct Rendering Infrastructure 的 kernel space 元件而被開發出來，但之後也被其他圖形堆疊的替代方案（例如 Wayland）以及各種獨立應用程式與函式庫（例如 <code>SDL2</code> 與 <code>Kodi</code>）採用</p>
 <p>user space 的程式可以透過 DRM API 控制 GPU 進行硬體加速的 3D 算繪與影片解碼，也可以做 GPGPU 計算</p>
 <h3>概觀</h3>
 <p>Linux 作業系統核心原本就有一個名為 <code>fbdev</code> 的 API，用來管理顯示卡的 framebuffer，但它無法滿足現代以 GPU 為基礎、支援 3D 加速的視訊硬體需求。 這些裝置通常需要在自己的記憶體中設定與管理一個命令佇列，用來把命令派送給 GPU，同時也必須管理該記憶體中的緩衝區與可用空間</p>
@@ -177,7 +176,7 @@
 <ul>
 <li>suspend/resume 流程必須仰賴 user space 工具來還原之前的 mode。 只要其中任何一個程式失敗或當掉，就可能因為 modeset 設定錯誤而讓系統失去可用的顯示畫面，整台機器等於無法使用</li>
 <li>當螢幕處於圖形模式時（例如 X 正在執行時），核心也無法在螢幕上顯示錯誤或除錯訊息，因為核心只知道 VESA BIOS 的標準文字模式</li>
-<li>更迫切的問題是，越來越多圖形應用程式開始繞過 X Server，並且出現了其他 X 的圖形 stack 替代方案，讓系統中到處都多了一份 mode-setting 程式碼的複本</li>
+<li>更迫切的問題是，越來越多圖形應用程式開始繞過 X Server，並且出現了其他 X 的圖形堆疊替代方案，讓系統中到處都多了一份 mode-setting 程式碼的複本</li>
 </ul>
 <p>為了處理這些問題，mode-setting 程式碼被移入核心內部的一個單一位置，具體來說就是現有的 DRM 模組。 之後，每個行程──包含 X Server 在內──都應該透過命令請核心執行 mode-setting 操作，而由核心負責確保並行的操作不會導致狀態不一致。 新增到 DRM 模組、用來執行這些 mode-setting 操作的核心 API 與程式碼，被稱為 Kernel Mode-Setting（KMS）</p>
 <p>Kernel Mode-Setting 帶來了好幾項好處。 最直接的一點，就是可以把重複的 mode-setting 程式碼移除，無論是在核心端（Linux console、<code>fbdev</code>）還是 user space 端（X Server 的 DDX drivers）。 KMS 也讓撰寫替代性的圖形系統變得更容易，因為它們不再需要自行實作一套 mode-setting 程式碼</p>
@@ -272,7 +271,7 @@
 </ul>
 <p><code>DRM</code> 是特定於核心的。 一般來說，各個作業系統都會提供一個 <code>VESA</code> 驅動程式。 <code>VESA</code> 驅動程式在沒有硬體加速的情況下支援大部分顯示卡，顯示解析度則受到製造商在 Video BIOS 中預先設定的一組模式所限制</p>
 <h3>歷史</h3>
-<p>Linux 圖形 stack 的演進曾被 X Window System 的核心通訊協定帶離原本的路徑</p>
+<p>Linux 圖形堆疊的演進曾被 X Window System 的核心通訊協定帶離原本的路徑</p>
 <h3>自由與開放原始碼驅動程式</h3>
 <h4>ATI 與 AMD</h4>
 <h5>Radeon</h5>
@@ -342,7 +341,7 @@
 <p>Broadcom 在其 SoC 中開發並設計 VideoCore GPU 系列。 由於它被用在 Raspberry Pi 上，因此社群對於 VideoCore 的 FOSS 驅動程式有相當高的興趣。 Raspberry Pi 基金會與 Broadcom 合作，於 2012 年 10 月 24 日宣布他們已開放「所有用來驅動 GPU 的 ARM（CPU）端程式碼」為開放原始碼</p>
 <p>不過，根據 <code>Lima</code> 逆向工程驅動程式作者的說法，這項公告有些誤導；新開放原始碼的元件只提供 ARM CPU 與 VideoCore 之間的訊息傳遞能力，對於了解 VideoCore 本身或增加可程式性幫助不大</p>
 <p>VideoCore GPU 執行的是一個 RTOS，負責處理各種工作；視訊加速則由執行在這個專有 GPU 上的 RTOS 韌體完成，而這套韌體在當時並未一併開放原始碼。 由於當時既沒有以該專有 GPU 為目標的 toolchain，也沒有文件化的指令集，即使韌體原始碼開放，也沒有辦法從中獲得太多實際好處。 <code>Videocoreiv</code> 專案 則嘗試為 VideoCore GPU 撰寫文件</p>
-<p>2014 年 2 月 28 日（Raspberry Pi 問世滿兩週年），Broadcom 與 Raspberry Pi 基金會宣布釋出 VideoCore IV graphics core 的完整文件，以及整套圖形 stack 的原始碼，授權條款為 3-clause BSD。 這套採用自由授權條款的 3D 圖形程式碼於 2014 年 8 月 29 日被提交到 <code>Mesa</code>，並首次出現在 <code>Mesa</code> 10.3 版中</p>
+<p>2014 年 2 月 28 日（Raspberry Pi 問世滿兩週年），Broadcom 與 Raspberry Pi 基金會宣布釋出 VideoCore IV graphics core 的完整文件，以及整套圖形堆疊的原始碼，授權條款為 3-clause BSD。 這套採用自由授權條款的 3D 圖形程式碼於 2014 年 8 月 29 日被提交到 <code>Mesa</code>，並首次出現在 <code>Mesa</code> 10.3 版中</p>
 <h4>其他廠商</h4>
 <p>雖然 Silicon Integrated Systems 與 VIA Technologies 表示過對開放原始碼驅動程式的興趣有限，但兩家公司仍有釋出部分原始碼，並在 FOSS 開發者的推動下整合進 <code>X.Org</code>。 2008 年 7 月，VIA 開放了其產品的技術文件，藉此改善在 Linux 與開放原始碼社群中的形象</p>
 <p>然而，該公司並未與開放原始碼社群妥善合作來提供技術文件與可用的 DRM 驅動程式，使得人們對 Linux 支援的期待落空。 2011 年 1 月 6 日，有消息指出 VIA 不再有意支援自由圖形相關的倡議</p>
@@ -370,13 +369,15 @@
 <p>| 技術 | Direct3D | OpenGL | Vulkan | OpenCL | DXVA |<br>
 |</p>
 ]]></content>
-    <published>2026-01-08T23:11:23.000Z</published>
+    <category term="Linux"/>
+    <category term="computer-graphic"/>
+    <published>2026-01-29T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">（WIP）VirtIO-GPU in semu</title>
     <id>https://mes0903.github.io/VM/semu-vgpu-2D/</id>
     <link href="https://mes0903.github.io/VM/semu-vgpu-2D/"/>
-    <updated>2026-01-26T16:40:14.000Z</updated>
+    <updated>2026-02-27T12:29:31.000Z</updated>
     <summary type="html"><![CDATA[
 <p>專題，預期產出是</p>
 <ul>
@@ -1714,7 +1715,7 @@ Xorg 中處理圖形的部分主要由兩個子系統構成：DIX Driver Indepen
     <title type="text">（WIP）Virtual I/O Device (VIRTIO) Version 1.3 翻譯 &amp; 筆記</title>
     <id>https://mes0903.github.io/VM/virtio_spec/</id>
     <link href="https://mes0903.github.io/VM/virtio_spec/"/>
-    <updated>2026-01-27T08:05:24.000Z</updated>
+    <updated>2026-02-27T12:29:31.000Z</updated>
     <summary type="html"><![CDATA[<h2>1 Introduction</h2>
 <p>本文件描述了「virtio」裝置家族的規格。 這些裝置雖然存在於虛擬環境中，但設計上它們在虛擬機內對 guest 來說，看起來就像實體裝置（同時本文件也直接將其視為實體裝置）。 這種相似性使得 guest 能夠使用標準的驅動程式與探索機制</p>
 <p>virtio 及本規格的目的在於讓虛擬環境與 guest 能夠透過一個直接、有效率、標準且可擴充的機制來使用虛擬裝置，而不是依賴每個環境或作業系統特製化的機制</p>
@@ -2967,7 +2968,7 @@ Virtio 裝置包含旗標，guest 作業系統在裝置初始化時會確認這�
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2026-01-27T08:06:55.994Z</updated>
+    <updated>2026-02-27T12:30:08.108Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -3036,7 +3037,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2026-01-27T08:06:56.003Z</updated>
+    <updated>2026-02-27T12:30:08.110Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -4140,7 +4141,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2026-01-27T08:06:56.114Z</updated>
+    <updated>2026-02-27T12:30:08.228Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -4207,7 +4208,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2026-01-27T08:06:56.124Z</updated>
+    <updated>2026-02-27T12:30:08.231Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -4528,7 +4529,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2026-01-27T08:06:56.230Z</updated>
+    <updated>2026-02-27T12:30:08.341Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -4625,7 +4626,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2026-01-27T08:06:56.260Z</updated>
+    <updated>2026-02-27T12:30:08.365Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -4758,7 +4759,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2026-01-27T08:06:56.265Z</updated>
+    <updated>2026-02-27T12:30:08.377Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -4970,7 +4971,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2026-01-27T08:06:56.280Z</updated>
+    <updated>2026-02-27T12:30:08.392Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -5454,7 +5455,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2026-01-27T08:06:56.310Z</updated>
+    <updated>2026-02-27T12:30:08.424Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -5479,7 +5480,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2026-01-27T08:06:56.323Z</updated>
+    <updated>2026-02-27T12:30:08.430Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -14292,7 +14293,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2026-01-27T08:06:57.234Z</updated>
+    <updated>2026-02-27T12:30:09.418Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -21690,6 +21691,54 @@ roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
     <published>2021-11-17T00:00:00.000Z</published>
   </entry>
   <entry>
+    <title type="text">關於往前這件事</title>
+    <id>https://mes0903.github.io/essay/AboutMovingForward/</id>
+    <link href="https://mes0903.github.io/essay/AboutMovingForward/"/>
+    <updated>2025-06-02T03:50:24.000Z</updated>
+    <summary type="html"><![CDATA[
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>其實原本應該已經是一個月前就該寫這篇了，那時候跟幾個朋友去看驀然回首，我大概在京本的漫畫出現，藤野買了大量素描本開始一本接一本地畫下去時就開始哭了，結果旁邊有人給我睡著，真的是太不應該了哀</p>
+<p>剛上映的那段時間好多人發了評價，不知是否由於是藤本樹的作品，熱度很高，尚未播出便已看到許多文出現在版面上。 有些人看不懂，但會發文的大部分都是有所共鳴，很多人對那句「你為什麼還要畫漫畫」感觸很深，好像大家都不曉得為何自己身在此處，每個人都在抱怨，但卻沒有人停下，大家就這樣唸著碎語持續往前</p>]]></summary>
+    <content type="html"><![CDATA[
+<div class="center-column">
+<figure><figcaption></figcaption></figure>
+</div>
+<p>其實原本應該已經是一個月前就該寫這篇了，那時候跟幾個朋友去看驀然回首，我大概在京本的漫畫出現，藤野買了大量素描本開始一本接一本地畫下去時就開始哭了，結果旁邊有人給我睡著，真的是太不應該了哀</p>
+<p>剛上映的那段時間好多人發了評價，不知是否由於是藤本樹的作品，熱度很高，尚未播出便已看到許多文出現在版面上。 有些人看不懂，但會發文的大部分都是有所共鳴，很多人對那句「你為什麼還要畫漫畫」感觸很深，好像大家都不曉得為何自己身在此處，每個人都在抱怨，但卻沒有人停下，大家就這樣唸著碎語持續往前</p>
+<p>作品內花了一段時間來描繪藤野和京本一起討論和畫圖的橋段，後來投了稿，拿到了一筆大錢，去吃了很多東西，接著繼續一本又一本地畫下去，17 歲就出了 7 篇短篇，收到了編輯長的連載邀請。 但就是在這樣一帆風順的日子裡，京本想去美術大學，所以沒法幫忙了</p>
+<p>為了使劇情有所轉折，作品裡代入的都是藤野的視角，讓觀眾有了事情步上正軌的認知，也因此讓京本的決定造成了落差，牽動觀眾的情緒。 但其實在連載邀約來到之前，藤本樹特地花了一頁來畫京本翻見「背景美術的世界」這本書，被其深深吸引的表情，我想那個是京本終於找到自己想要的東西的表情</p>
+<p>京本想要畫得更好，所以前往了美術大學，哪怕她是個超級社恐，她還是一個人出發了。 藤野留了下來，繼續一本接著一本的畫下去，這裡電影加了一個藤野想要換助手的橋段來襯托京本，為京本的死又添上了一筆重量</p>
+<p>作品的後面我想大家都知道，藤本樹畫了京本沒有追出房間的時空，之後京本還是去了大學，藤野救了她後又開始畫畫了。 我覺得這裡想表達的是，京本只是個契機，就算沒有京本，大概仍會有其他的契機使藤野繼續畫畫。 我想藤本樹對於京本死亡的這個安排，有一部分就是為了呈現這件事，藤野會繼續畫畫就是對京本的葬禮</p>
+<p>大一進了 MCL，當時看見融哥和家好他們坐在後面開著雙螢幕寫 code，我感覺自己終於找到了想要的東西，雖然他們當時螢幕上開著的是我現在最討厭的 php。 不過當時也覺得奇怪，明明高中電腦社也有人在寫 code，卻沒有這樣激動的感覺，我想有一部分也是因為剛上大學所產生的心理因素XD</p>
+<p>後來的故事大概有看過我自我介紹的人都知道，從林信良老師的 C++ 開始，接著一直翻一直讀 spec，因此接觸了 PL 與 OS，開始讀 jserv 的文章，然後就像藤野畫一本又一本的素描本一樣，開始寫文章，雖然下一篇 Miner 難產中</p>
+<p>有些人問我為什麼都轉走了還要回去央數的計中幫忙，明明就沒錢領了，也不是自己的工作，卻還要特地搭車回去弄機房。 但其實那些並不是重點，我覺得就像當初融哥和家好幫我引起興趣，京本成為藤野畫畫的契機一樣，這個地方大概也可以成為之後某個人的契機，進而產生交流。</p>
+<p>我大一進來時育愷跟 yoyo 都已經畢業了，yoyo 甚至畢業 4、5 年了，但現在我們仍時常在 DC 內交流，這裡就是有這樣的環境能做到這件事，這對於沒有興趣的人來說大概是很難理解的</p>
+<p>作品的一開始有一個橋段，藤野看著最新一期的校刊，說了一句算了，於是不畫了，覺得可以了就這樣了，直到遇見京本為止。 我覺得如果有像京本那樣可以交流的朋友存在，那人就能一直往前</p>
+<p>很多人聽到我轉學的第一個問題就是為什麼大四才轉，一方面是想把 MCL 用好，一方面是覺得自己很多東西都只學了一半。 大一說要看 jserv 的 Linux 到現在才開始看，大四被老師揶揄每學期都在猶豫實在是很羞愧，不能就這樣默默地就走了</p>
+<p>雖然我很社恐，在車和人很多的時候我甚至不敢舉手招公車，吃飯就算餐點送錯了我也會默默接受，找錢就算店員少找一千塊我大概率也會默默閉嘴走掉。 但對於自己實力還不夠的這件事我覺得還是不能就這樣默默地走了</p>
+<p>很喜歡 jserv 分享的一段話「大部分的人一輩子洞察力不彰，原因之一是怕講錯被笑。想了一點點就不敢繼續也沒記錄或分享，時間都花在讀書查資料看別人怎麼想。看完就真的沒有自己的洞察了。」，我個人覺得在前進這件事情上最忌諱的就是沉默妥協了</p>
+<p>藤本樹在訪談的時候說了一句話驚呆了大眾：</p>
+<p>「四年裡要是不能比這些人畫得更好，就把他們都殺了。」──藤本樹</p>
+<p>這句話意外的沒被炎上(嗎)，無論如何，我很喜歡這句話，很契合藤本樹的黑色幽默。 我想這句「把他們都殺了」所代表的，更多的是自身的死亡，如果不能持續前進，達到心目中的繪畫標準，那藤本樹這個人就死了</p>
+<p>我三個社群軟體的簡介中分別貼了三段我很喜歡的話：</p>
+<ul>
+<li>「音樂家不會退休，直到心中沒有音樂才會停止」</li>
+<li>「只有在創造的過程中才能與死和解」</li>
+<li>「stop daydreaming, keep pursuing」</li>
+</ul>
+<p>最後一句與 jserv 所說的「如果你把游泳池當作浴缸泡著，再泡幾年還是不會游泳」是一樣的意思，talk is cheap，期許自己能實際行動，持續前進</p>
+<p>京本衝出房門叫住藤野的那段，比起感動，感受到的更多是喜悅，覺得真好啊，人生就該這樣，前進，於某些自己也不曉得的地方被某人注意到，與他人邂逅，合作，就算道別了，也會帶著他們繼續前進</p>
+<p>如果對「你為什麼還要畫漫畫」這句話有感觸，那我覺得這篇也寫的很棒，可以看看：<a href="https://moptt.tw/p/EE_Comment.M.1456337219.A.38E?fbclid=IwY2xjawFS2qxleHRuA2FlbQIxMAABHVnTlk2xq95jytb24bVB43RSvDEYCXOXxSwYOddJqCQiqbvMwLRXpFb6Bg_aem_XEYELlPNwgwz2c0d1J6OEA" target="_blank" rel="noopener noreferrer">[分享] 我找到人生目標/夢想/計畫 的心路歷程</a></p>
+<p>裡面提到</p>
+<p>「像葉丙成老師所觀察到的，大家都意氣風發不可一世指高氣昂的進來讀大一，但卻大部份人都不再那麼抬頭挺胸自信的畢業。 不要忘記我們是誰，從哪裡來，記得要相信自己在自己領域打滾的能力」</p>
+<p>我覺得真的寫得很好</p>
+]]></content>
+    <category term="essay"/>
+    <published>2024-09-15T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">GSM &amp; UMTS &amp; IGP</title>
     <id>https://mes0903.github.io/computer_network/GSM_UMTS_IGP/</id>
     <link href="https://mes0903.github.io/computer_network/GSM_UMTS_IGP/"/>
@@ -22328,54 +22377,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content>
     <category term="computer-network"/>
     <published>2024-04-16T00:00:00.000Z</published>
-  </entry>
-  <entry>
-    <title type="text">關於往前這件事</title>
-    <id>https://mes0903.github.io/essay/AboutMovingForward/</id>
-    <link href="https://mes0903.github.io/essay/AboutMovingForward/"/>
-    <updated>2025-06-02T03:50:24.000Z</updated>
-    <summary type="html"><![CDATA[
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>其實原本應該已經是一個月前就該寫這篇了，那時候跟幾個朋友去看驀然回首，我大概在京本的漫畫出現，藤野買了大量素描本開始一本接一本地畫下去時就開始哭了，結果旁邊有人給我睡著，真的是太不應該了哀</p>
-<p>剛上映的那段時間好多人發了評價，不知是否由於是藤本樹的作品，熱度很高，尚未播出便已看到許多文出現在版面上。 有些人看不懂，但會發文的大部分都是有所共鳴，很多人對那句「你為什麼還要畫漫畫」感觸很深，好像大家都不曉得為何自己身在此處，每個人都在抱怨，但卻沒有人停下，大家就這樣唸著碎語持續往前</p>]]></summary>
-    <content type="html"><![CDATA[
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>其實原本應該已經是一個月前就該寫這篇了，那時候跟幾個朋友去看驀然回首，我大概在京本的漫畫出現，藤野買了大量素描本開始一本接一本地畫下去時就開始哭了，結果旁邊有人給我睡著，真的是太不應該了哀</p>
-<p>剛上映的那段時間好多人發了評價，不知是否由於是藤本樹的作品，熱度很高，尚未播出便已看到許多文出現在版面上。 有些人看不懂，但會發文的大部分都是有所共鳴，很多人對那句「你為什麼還要畫漫畫」感觸很深，好像大家都不曉得為何自己身在此處，每個人都在抱怨，但卻沒有人停下，大家就這樣唸著碎語持續往前</p>
-<p>作品內花了一段時間來描繪藤野和京本一起討論和畫圖的橋段，後來投了稿，拿到了一筆大錢，去吃了很多東西，接著繼續一本又一本地畫下去，17 歲就出了 7 篇短篇，收到了編輯長的連載邀請。 但就是在這樣一帆風順的日子裡，京本想去美術大學，所以沒法幫忙了</p>
-<p>為了使劇情有所轉折，作品裡代入的都是藤野的視角，讓觀眾有了事情步上正軌的認知，也因此讓京本的決定造成了落差，牽動觀眾的情緒。 但其實在連載邀約來到之前，藤本樹特地花了一頁來畫京本翻見「背景美術的世界」這本書，被其深深吸引的表情，我想那個是京本終於找到自己想要的東西的表情</p>
-<p>京本想要畫得更好，所以前往了美術大學，哪怕她是個超級社恐，她還是一個人出發了。 藤野留了下來，繼續一本接著一本的畫下去，這裡電影加了一個藤野想要換助手的橋段來襯托京本，為京本的死又添上了一筆重量</p>
-<p>作品的後面我想大家都知道，藤本樹畫了京本沒有追出房間的時空，之後京本還是去了大學，藤野救了她後又開始畫畫了。 我覺得這裡想表達的是，京本只是個契機，就算沒有京本，大概仍會有其他的契機使藤野繼續畫畫。 我想藤本樹對於京本死亡的這個安排，有一部分就是為了呈現這件事，藤野會繼續畫畫就是對京本的葬禮</p>
-<p>大一進了 MCL，當時看見融哥和家好他們坐在後面開著雙螢幕寫 code，我感覺自己終於找到了想要的東西，雖然他們當時螢幕上開著的是我現在最討厭的 php。 不過當時也覺得奇怪，明明高中電腦社也有人在寫 code，卻沒有這樣激動的感覺，我想有一部分也是因為剛上大學所產生的心理因素XD</p>
-<p>後來的故事大概有看過我自我介紹的人都知道，從林信良老師的 C++ 開始，接著一直翻一直讀 spec，因此接觸了 PL 與 OS，開始讀 jserv 的文章，然後就像藤野畫一本又一本的素描本一樣，開始寫文章，雖然下一篇 Miner 難產中</p>
-<p>有些人問我為什麼都轉走了還要回去央數的計中幫忙，明明就沒錢領了，也不是自己的工作，卻還要特地搭車回去弄機房。 但其實那些並不是重點，我覺得就像當初融哥和家好幫我引起興趣，京本成為藤野畫畫的契機一樣，這個地方大概也可以成為之後某個人的契機，進而產生交流。</p>
-<p>我大一進來時育愷跟 yoyo 都已經畢業了，yoyo 甚至畢業 4、5 年了，但現在我們仍時常在 DC 內交流，這裡就是有這樣的環境能做到這件事，這對於沒有興趣的人來說大概是很難理解的</p>
-<p>作品的一開始有一個橋段，藤野看著最新一期的校刊，說了一句算了，於是不畫了，覺得可以了就這樣了，直到遇見京本為止。 我覺得如果有像京本那樣可以交流的朋友存在，那人就能一直往前</p>
-<p>很多人聽到我轉學的第一個問題就是為什麼大四才轉，一方面是想把 MCL 用好，一方面是覺得自己很多東西都只學了一半。 大一說要看 jserv 的 Linux 到現在才開始看，大四被老師揶揄每學期都在猶豫實在是很羞愧，不能就這樣默默地就走了</p>
-<p>雖然我很社恐，在車和人很多的時候我甚至不敢舉手招公車，吃飯就算餐點送錯了我也會默默接受，找錢就算店員少找一千塊我大概率也會默默閉嘴走掉。 但對於自己實力還不夠的這件事我覺得還是不能就這樣默默地走了</p>
-<p>很喜歡 jserv 分享的一段話「大部分的人一輩子洞察力不彰，原因之一是怕講錯被笑。想了一點點就不敢繼續也沒記錄或分享，時間都花在讀書查資料看別人怎麼想。看完就真的沒有自己的洞察了。」，我個人覺得在前進這件事情上最忌諱的就是沉默妥協了</p>
-<p>藤本樹在訪談的時候說了一句話驚呆了大眾：</p>
-<p>「四年裡要是不能比這些人畫得更好，就把他們都殺了。」──藤本樹</p>
-<p>這句話意外的沒被炎上(嗎)，無論如何，我很喜歡這句話，很契合藤本樹的黑色幽默。 我想這句「把他們都殺了」所代表的，更多的是自身的死亡，如果不能持續前進，達到心目中的繪畫標準，那藤本樹這個人就死了</p>
-<p>我三個社群軟體的簡介中分別貼了三段我很喜歡的話：</p>
-<ul>
-<li>「音樂家不會退休，直到心中沒有音樂才會停止」</li>
-<li>「只有在創造的過程中才能與死和解」</li>
-<li>「stop daydreaming, keep pursuing」</li>
-</ul>
-<p>最後一句與 jserv 所說的「如果你把游泳池當作浴缸泡著，再泡幾年還是不會游泳」是一樣的意思，talk is cheap，期許自己能實際行動，持續前進</p>
-<p>京本衝出房門叫住藤野的那段，比起感動，感受到的更多是喜悅，覺得真好啊，人生就該這樣，前進，於某些自己也不曉得的地方被某人注意到，與他人邂逅，合作，就算道別了，也會帶著他們繼續前進</p>
-<p>如果對「你為什麼還要畫漫畫」這句話有感觸，那我覺得這篇也寫的很棒，可以看看：<a href="https://moptt.tw/p/EE_Comment.M.1456337219.A.38E?fbclid=IwY2xjawFS2qxleHRuA2FlbQIxMAABHVnTlk2xq95jytb24bVB43RSvDEYCXOXxSwYOddJqCQiqbvMwLRXpFb6Bg_aem_XEYELlPNwgwz2c0d1J6OEA" target="_blank" rel="noopener noreferrer">[分享] 我找到人生目標/夢想/計畫 的心路歷程</a></p>
-<p>裡面提到</p>
-<p>「像葉丙成老師所觀察到的，大家都意氣風發不可一世指高氣昂的進來讀大一，但卻大部份人都不再那麼抬頭挺胸自信的畢業。 不要忘記我們是誰，從哪裡來，記得要相信自己在自己領域打滾的能力」</p>
-<p>我覺得真的寫得很好</p>
-]]></content>
-    <category term="essay"/>
-    <published>2024-09-15T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">TBDR 簡介</title>
