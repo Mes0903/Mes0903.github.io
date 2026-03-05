@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Thu, 05 Mar 2026 08:42:21 GMT</pubDate>
-    <lastBuildDate>Thu, 05 Mar 2026 08:42:21 GMT</lastBuildDate>
+    <pubDate>Thu, 05 Mar 2026 08:50:10 GMT</pubDate>
+    <lastBuildDate>Thu, 05 Mar 2026 08:50:10 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>Linux</category>
@@ -13555,7 +13555,7 @@ A. Rago. Addison-Wesley, 2005.<br>
 <p class="hint-container-title">Tips</p>
 <p>不過這邊要先潑個冷水，我個人看完後覺得這個東西不是很好用，尤其是在大型專案中，你很難保證大家都宣告了正確的 type，像是有人隨便在一個 context 中宣告了 <code>std::string</code>，我們很難去擋它。 而就算是在嵌入式這種可能沒有 3rdparty 的環境下，這種問題還是有可能出現</p>
 <p>因此我認為這個東西主要還是用在一些較封閉（不會 expose 出去）且小的組件中，用來達到加速的效果，但是對於 global memory pool 這種用途來說，正規的作法應該還是要像 <a href="https://github.com/jemalloc/jemalloc/blob/dev/src/jemalloc.c" target="_blank" rel="noopener noreferrer">jemalloc</a> 一樣透過 override <code>malloc</code> 跟 <code>free</code> 相關的函式，或是讓 linker 去用自己的實作之類的方法來達成</p>
-<p>不過無論如何，有這個東西存在，看看也是挺有趣的，上次奧義的 C++ 讀書會我就拿這篇出來報了（<a href="./Allocator-PMR.pptx">PPT 檔案</a>），PPT 上的圖片有些小錯誤，本文中已經做了勘誤，因此請以本文為準</p>
+<p>不過無論如何，有這個東西存在，看看也是挺有趣的，上次奧義的 C++ 讀書會我就拿這篇出來報了（<a href="https://github.com/Mes0903/Cpp-Miner/blob/my-blog/Miner_main/Allocator_PMR/Allocator-PMR.pptx" target="_blank" rel="noopener noreferrer">PPT 檔案</a>），PPT 上的圖片有些小錯誤，本文中已經做了勘誤，因此請以本文為準</p>
 </div>
 <p>這篇文會參考 Jason Turner 的影片（應該很多人看過?），還有 C++17 Complete Guide 裡面的章節，順便再整理一下幾場 CppCon 與 <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3916.pdf" target="_blank" rel="noopener noreferrer">N3916</a> 的內容</p>
 <p>底下是一個 Jason Turner 在影片底下給的 <code>std::list</code> 的例子（<a href="https://quick-bench.com/q/gyRE6p5EdZ-2P0XOAUwO99JRN7g" target="_blank" rel="noopener noreferrer">Quick C++ Benchmark 連結</a>）：</p>
