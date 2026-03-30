@@ -4,10 +4,11 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being  Towards  Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2026-03-18T08:57:18.550Z</updated>
+  <updated>2026-03-30T22:08:38.972Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
+  <category term="essay"/>
   <category term="Linux"/>
   <category term="computer-graphic"/>
   <category term="VM"/>
@@ -15,7 +16,6 @@
   <category term="infra"/>
   <category term="OS"/>
   <category term="risc-v"/>
-  <category term="essay"/>
   <category term="memory"/>
   <category term="C++ Miner"/>
   <category term="math"/>
@@ -23,13 +23,81 @@
   <category term="computer-network"/>
   <category term="security"/>
   <entry>
+    <title type="text">執著所帶來的收益</title>
+    <id>https://mes0903.github.io/essay/TheStubborn/</id>
+    <link href="https://mes0903.github.io/essay/TheStubborn/"/>
+    <updated>2026-03-30T22:07:59.000Z</updated>
+    <summary type="html"><![CDATA[
+<div class="stubborn-img">
+<figure><figcaption>（<a href="https://x.com/FRIEREN_PR/status/1962757383517815085" target="_blank" rel="noopener noreferrer">クソみたいな驕りと油断だ</a>）</figcaption></figure>
+</div>
+<p>想寫這篇有一段時間了，上次在 YT 看到一個 lofi 風格的 JPOP，一開始聽還蠻好聽的，但是幾首播下來發現幾乎都長一樣，聽久還感覺有點怪，一查發現是 AI 做的，是真他媽噁心到我了，加上最近版上一堆 AI 幹圖，看了實在是很躁，所以就覺得該來寫一下雜記了</p>]]></summary>
+    <content type="html"><![CDATA[
+<div class="stubborn-img">
+<figure><figcaption>（<a href="https://x.com/FRIEREN_PR/status/1962757383517815085" target="_blank" rel="noopener noreferrer">クソみたいな驕りと油断だ</a>）</figcaption></figure>
+</div>
+<p>想寫這篇有一段時間了，上次在 YT 看到一個 lofi 風格的 JPOP，一開始聽還蠻好聽的，但是幾首播下來發現幾乎都長一樣，聽久還感覺有點怪，一查發現是 AI 做的，是真他媽噁心到我了，加上最近版上一堆 AI 幹圖，看了實在是很躁，所以就覺得該來寫一下雜記了</p>
+<p>好久沒寫雜記，但又覺得這種寫 code 上的感觸放 IG 怪怪的，所以就丟 BLOG 上吧，剛好很久沒更新了。 最近都在弄 vGPU 的 PR，剛好又有幸投上了 OSSNA，也在這邊順手紀錄一下心路歷程。 不過我還沒做簡報，搞不好到時候報完又可以再寫一篇，聽說那邊現在治安不是很好，其實有點小害怕，畢竟是第一次去</p>
+<p>感覺不久前還在寫那篇有關翻譯的心得，實際上好像也就是去年七月底的事，才過半年左右，但大概在今年年初，我開始為翻譯建了一套 LLM 的環境，測試起來效果還不錯，雖然還有一些地方需要調整，但整體來說速度和翻譯的品質比之前好了不少。 不過說是環境，其實就是把一大堆的 prompt 都塞到某個資料夾內，然後翻譯時叫他先進去裡面讀一些範本和要求而已。 與以前主要的差別在於，因為有 codex 與 claude code 等工具，所以現在我也不用再手動給他原文了，他自己就能去看，或是用 <code>pdftotext</code> 等工具生出它可以接受的 input</p>
+<p>AI 進步的好快，前陣子版面滑到<a href="https://www.facebook.com/share/v/1GZo1s1SSd/" target="_blank" rel="noopener noreferrer">一部影片</a>，真的挺腦殘的笑死，真實到有點荒謬。 這次弄 vGPU 的期間，根本沒有手寫到一行程式碼，手寫的部分全是文件和註解（幸好還有我可以手寫的地方），開發過程的心情是既噁心又感嘆，我負責講架構、同步要怎麼做、流程要長怎樣等，完全是出一張嘴，spec 也是 clone 下來叫他自己看，然後我再去檢查成品</p>
+<p>感嘆的部分在於，它太熟語法了，而且還能活用，過程中我甚至發現以前 Jserv 老師寫的 code 有部分錯誤的地方，對現有架構我也覺得仍有巨大的改進空間。 所幸我還能針對它產出的程式碼做多輪的修正要求，這都是以前的執著所造就出來的 sense，當時那些通霄嗑 spec 的日子，還有那些為了無聊的潔癖，<a href="https://github.com/Mes0903/Mase" target="_blank" rel="noopener noreferrer">堅持要用 MVC 架構寫一個小垃圾的日子</a>，都成了我現在還能看出程式碼有問題的基石</p>
+<p>但也就是這種無聊透頂的驕傲，讓我在寫的時候對這東西感到噁心。 開發期間，心流可以說基本上是 0，以前在寫那些小垃圾的時候，每個小單元的工作流程都大概是「寫 code」⭢「發現有坑」⭢「stackoverflow / Discord 問」⭢「改 code」⭢「寫 code」⭢「兩個片段合在一起後，發現有更好的寫法，重構」。 現在卻變成了「它生 code」⭢「我檢查」⭢「它生 code」⭢「兩個片段合在一起後，發現有更好的寫法，重構」</p>
+<p>看起來很像，但整個心境就不一樣了，以前一個小單元，我大概會花 20 小時做這一整套流程，期間我可以完全不吃飯，不睡覺，就是坐在電腦前面寫。 而這次開發 vGPU 的期間，同樣的單元，時間大概可以縮到 2 小時左右。 我覺得這主要會導致兩個問題</p>
+<p>首先是思考的時間碎片化了。 以前我是 20 小時不間斷的在思考，但現在用了 LLM 上去後，在它寫 code 的期間，我的思考就斷了，因此雖然看起來流程很像，但思考的時間完全不一樣，模型也不一樣，前者是很連續的，但後者中間多了很多洞，也因此完全沒辦法進心流的狀態</p>
+<p>說實話，現在這對我最大的影響就是，我很難進入狀態，我覺得我真正在思考的時間變得很少，這是因為較機械化的地方，我已經可以完全外包出去了，例如在實作一些 MMIO register handler 時，這種東西的需求基本上就是從某個 memory address 讀 payload 出來，然後套上 spec 裡面定義的 bitshift 來取得你要的目標，接著做完對應的讀寫後再照 spec 要求的 layout 把目標要的結構包好傳回去給它</p>
+<p>這種需求以前我需要自己慢慢看 spec，把 spec 要求的項目一條一條列出來，然後寫 code 時要自己算 bitmask 和 bitshift，接著再自己慢慢 debug 去看有沒有錯誤。 但現在的話，這種東西直接丟給 LLM 基本上不會有錯，完全可以 one-shot 解決，過程賊快，你都還沒意識到這個 register 的功能是什麼，就寫完了</p>
+<p>就產出來說沒問題，對我們來說效率可以快十倍以上，但以前那種「熱機」的過程不見了。 這也是開始用 LLM 後我才發現的，以前的日子裡，邊手敲 <code>#include &lt;iostream&gt;</code> 邊思考實作方式的過程有一種儀式感，能讓自己快速進入狀態，進入狀態之後思考的速度和品質都會好很多，這我想大家都可以體會那種極度專注地情境</p>
+<p>但這種情境現在消失了，這次開發的過程我很少進入這種狀態，而且都是在進行範圍較大的 code review 時才會發生。 基本上因為它生 code 的速度太快了，在等待期間我也沒辦法看什麼東西，所以通常都是滑滑 FB 或看些烤肉（最近很愛 VSPO 的蝶屋はなび）</p>
+<p>這就要進到我的第二個問題，也就是「單元的上下限變高了」，這導致了重構變得極其頻繁。 LLM 生出來的程式碼品質的上下限其實很高，有時候它可以生出讓我有些驚豔的程式碼，寫得很漂亮，但更多時候它就是生一個堪用的東西出來。 但問題在於，只停在「堪用」的程度，往往會缺乏大局觀，因此之後在進行單元與單元的整合時，就會有一堆坑冒出來</p>
+<p>以前我寫 code 時，因為過程比較慢，所以在寫的過程中往往可以邊思考之後這個東西要怎麼與別的單元協作，甚至有時候一個單元還沒寫完，就會先跑去把另一邊的雛型先寫出來，接著再繼續寫原本的單元。 也就是說以前在寫的時候往往會把視野拉到多個單元的層級，但現在由於寫一個單元的時間太快了，所以這種情況大幅下降了</p>
+<p>我是有在開發前先畫過架構圖的，但是這種階段所規劃的東西，顆粒度肯定很粗，而且就算是想先想好兩個較大的單元之間該如何協作，當中的很多細節都還是會被遺漏掉，更不用說上述的情況大部分都是發生在小單元之間。 因此小範圍的重構會不斷地發生，接著造成大範圍的重構</p>
+<p>以開發 vGPU 的過程來說，我先想好了要分 window 與 vGPU device 這兩個組件，前者負責做 host 端上的算繪；後者則負責處理 vGPU 相關指令，以及將算繪需要的資料交給 window。 因此這是兩個執行緒，一開始我先透過 LLM 很快速的寫好了 vGPU 指令的功能。 接著我又弄了一套 2D resource 的架構。 最後就是讓 handler 裡面去呼叫 window 那邊的 API，將 2D resource 的指標傳過去</p>
+<p>接著 window API 的實作內會先上 lock，接著把裡面的 frame data 做一次 deep copy，再 unlock 並發 signal 給算繪的主迴圈，讓其可以看到新的 frame data，具體可以看我<a href="https://github.com/Mes0903/MesBlog/blob/e50696dab8b6f45778e735ec6c18da17cb8e09f9/src/VM/semu-vgpu-2D/README.md" target="_blank" rel="noopener noreferrer">原本的文件</a>，那邊寫得很詳細。 搞完後覺得還不錯，發了 PR，但因為老師剛好最近比較忙，review 比較慢，所以我就有了更多的時間自己做更多更多更多次的 review</p>
+<p>現在回頭看，其實這就是前面所說的「堪用」。 這邊有個問題在於我們傳了 2D resource 的指標，它裡面含了很多 SDL 做算繪不需要用到的資料，而當中就有一些成員是與 vGPU 狀態有關的，例如這個 2D resource 實際上存在 guest memory 的哪幾個 page。 因此很顯然地我就覺得這種非必要的資訊不應該給 window 這端拿到，而且這甚至是很重要的資料，因此就開始了第一次重構</p>
+<figure><figcaption>（圖中的 display_info 是 window 端自己儲存的 scanout info）</figcaption></figure>
+<p>此時我的想法非常直接，那就搞一個算繪專用的結構，然後 vGPU device 這邊傳的時候先轉成算繪用的結構，再丟過去就好，這樣既不用 lock，又可以避免擁有多於資料的問題。 為了避免 vGPU device 這邊充斥著 SDL 相關的程式碼，我將 SDL 需要的東西整理成了一個 scanout view 的結構，成功將這個問題解掉了，但是此時光是一個 scanout，就有三個對應的結構：device 端、用來轉換的 view、最後 SDL 用的 scanout</p>
+<p>但總之我還是先 push 上去了，結果我發現 CI test 竟然 timeout 了，追蹤後發現了第二個問題：那個 lock 因為 reflush 的操作很頻繁，這樣上鎖解鎖效率會很差。 原先只是因為 runner 比較快所以剛好沒事，這次的 runner 比較慢，所以就找到了這個問題。 因為這個問題，還有有三個 scanout 結構的問題，我決定開始第二次重構</p>
+<p>此時我想了想，發現這邊只有一個 producer 和一個 consumer，所以就套了 SPSC queue 上去，交給 LLM 實作真的很快，這個需求一跟它講，大概跑個五分鐘就出來了。 問題在於 scanout 結構是設計上的問題，後來就重新為每個檔案的職責做了更嚴格的切割，把 scanout 統一成只剩下唯一的一個結構，這個過程就十分漫長了，LLM 沒有辦法直接解決這個問題，架構需要人工來設計</p>
+<p>可見整個過程最痛的在於那個 scanout 的結構，這就是前面一直保持「堪用」的後果。 一開始我沒看見各個小單元的協作，因此有了第一次資訊沒切割好的問題。 而修完後我又因為 vGPU device 和 render window 這兩個大組件的協作沒設計好，導致了第二個重構，且成本明顯比前一次更貴，花了我整整兩周多</p>
+<p>雖說如此，但這樣來來回回總共只花了我一個月左右，如果是以前的工作模式，那肯定會花更久，可是重構的次數肯定會比較少，而且也不會有這麼大的重構，畢竟我在寫那個 lock 的時候大概就會想到可以套 SPSC queue 了</p>
+<p>從工程上來講，這當然是好事，但對我們的學習來說這是好事嗎？ 我還真不曉得，我的確是有學到東西，但我覺得如果是以前的模式我可以學到更多，因為會踩到更多的坑</p>
+<p>以前計概老師都說不要用 <code>goto</code>，我嗤之以鼻的覺得 linux 裡面有一堆的 <code>goto</code>，怎麼可能不要用它？ 因此在後來的資結考試寫了一堆大便出來，流程越寫越複雜。 我很好奇現在的學生會有這種經歷嗎XD？ 如果都是用 LLM 直接生 code，那根本就不會寫出這種糞 code，但是這種寫糞 code 的過程恰恰提供了思考的機會，因為它會害你跌倒，會痛，所以會怕，會想預防</p>
+<p>後來我開始寫一些自己的小玩具，漸漸地就有了自己的執著，或者該說潔癖，進而就慢慢地有了自己的見解，還有熱情。 雖然執著過頭會帶來一些坑，例如上面想要用 <code>goto</code> 的場景，或是碰到一些新技術的時候都會有這種情況，但這也又帶來了新的思考，從而變成一個正向的循環</p>
+<figure><figcaption></figcaption></figure>
+<p>沒有這種寫過糞 code 過程，還會有熱情嗎？ 還是單純只是在享受「成功產出東西」的快感？ 這還挺有趣的，這讓我想到以前只是為了成績而讀書的那種痛苦日子，如果可以一鍵拿到及格分，那滿地的及格分會帶來什麼結果？ 我覺得現在滿地的 shit code 應該可以給出一種答案</p>
+<p>很慶幸我有以往那個寫過糞 code 的時期、自己生一堆小垃圾玩具的時期，還有因為一些奇怪的語法而去翻 C/C++ spec 和 proposal 的時期。 我從 GPT 剛推出的時候就開始用了，看著它越來越猛心情真的很複雜，只能放下那無聊透頂的驕傲繼續去學這噁心的東西，不然哪天我搞不好就變成被芙蘭梅一砲轟死的那些魔族了</p>
+<p>希望這篇看起來不會太卡，很久沒直接手打整篇文了，高中很喜歡寫作，但完全沒想過這為我帶來的好處會這麼大</p>
+]]></content>
+    <category term="essay"/>
+    <published>2026-03-31T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">（WIP）Direct Rendering Infrastructure</title>
     <id>https://mes0903.github.io/Linux/DRI/</id>
     <link href="https://mes0903.github.io/Linux/DRI/"/>
-    <updated>2026-02-27T12:29:31.000Z</updated>
+    <updated>2026-03-30T22:08:06.000Z</updated>
     <summary type="html"><![CDATA[<h2>（WIP）Direct Rendering Infrastructure</h2>
-<p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形堆疊的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速，也有被改造來在沒有執行顯示伺服器（display server）的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>]]></summary>
+<div class="hint-container warning">
+<p class="hint-container-title">Warning</p>
+<p>本文目前只做了初步的資料整理與翻譯，尚未進一步撰寫我對原資料的解釋，也尚未對透過 LLM 翻譯出來的文章進行用字上的調整，因此仍不太方便閱讀，可以參考以下原文：</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Direct_Rendering_Infrastructure" target="_blank" rel="noopener noreferrer">Direct Rendering Infrastructure</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Direct_Rendering_Manager" target="_blank" rel="noopener noreferrer">Direct Rendering Manager</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Free_and_open-source_graphics_device_driver" target="_blank" rel="noopener noreferrer">Free and open-source graphics device driver</a></li>
+</ul>
+<p>這三篇 wikipedia 其實寫得非常的好，我認為已經將許多當初不懂的地方都解釋到了。 後續這篇文章的更新，如前所述，會有一大部分是用字上的調整，剩下的就是照以前的風格，把我認為有遺漏的地方補上</p>
+</div>]]></summary>
     <content type="html"><![CDATA[<h2>（WIP）Direct Rendering Infrastructure</h2>
+<div class="hint-container warning">
+<p class="hint-container-title">Warning</p>
+<p>本文目前只做了初步的資料整理與翻譯，尚未進一步撰寫我對原資料的解釋，也尚未對透過 LLM 翻譯出來的文章進行用字上的調整，因此仍不太方便閱讀，可以參考以下原文：</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Direct_Rendering_Infrastructure" target="_blank" rel="noopener noreferrer">Direct Rendering Infrastructure</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Direct_Rendering_Manager" target="_blank" rel="noopener noreferrer">Direct Rendering Manager</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Free_and_open-source_graphics_device_driver" target="_blank" rel="noopener noreferrer">Free and open-source graphics device driver</a></li>
+</ul>
+<p>這三篇 wikipedia 其實寫得非常的好，我認為已經將許多當初不懂的地方都解釋到了。 後續這篇文章的更新，如前所述，會有一大部分是用字上的調整，剩下的就是照以前的風格，把我認為有遺漏的地方補上</p>
+</div>
 <p>Direct Rendering Infrastructure（DRI，直接算繪基礎架構）是構成現代 Linux 圖形堆疊的框架，讓沒有特權的 user space 程式在不與其他程式產生衝突的情況下，能夠對圖形硬體下達命令。 DRI 的主要用途，是為 <code>Mesa</code> 的 <code>OpenGL</code> 實作提供硬體加速，也有被改造來在沒有執行顯示伺服器（display server）的 framebuffer console 上提供 <code>OpenGL</code> 加速</p>
 <p>DRI 的實作分散在 X Server 以及其相關的 client 函式庫、<code>Mesa 3D</code>，還有 <code>Direct Rendering Manager</code> 核心子系統之中。 它的所有原始碼都是開放原始碼軟體</p>
 <h3>概觀</h3>
@@ -1724,7 +1792,7 @@ Xorg 中處理圖形的部分主要由兩個子系統構成：DIX Driver Indepen
     <title type="text">（WIP）Virtual I/O Device (VIRTIO) Version 1.3 翻譯 &amp; 筆記</title>
     <id>https://mes0903.github.io/VM/virtio_spec/</id>
     <link href="https://mes0903.github.io/VM/virtio_spec/"/>
-    <updated>2026-02-27T12:29:31.000Z</updated>
+    <updated>2026-03-30T22:08:06.000Z</updated>
     <summary type="html"><![CDATA[<h2>1 Introduction</h2>
 <p>本文件描述了「virtio」裝置家族的規格。 這些裝置雖然存在於虛擬環境中，但設計上它們在虛擬機內對 guest 來說，看起來就像實體裝置（同時本文件也直接將其視為實體裝置）。 這種相似性使得 guest 能夠使用標準的驅動程式與探索機制</p>
 <p>virtio 及本規格的目的在於讓虛擬環境與 guest 能夠透過一個直接、有效率、標準且可擴充的機制來使用虛擬裝置，而不是依賴每個環境或作業系統特製化的機制</p>
@@ -2977,7 +3045,7 @@ Virtio 裝置包含旗標，guest 作業系統在裝置初始化時會確認這�
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2026-03-18T08:57:19.301Z</updated>
+    <updated>2026-03-30T22:08:39.773Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -3046,7 +3114,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2026-03-18T08:57:19.303Z</updated>
+    <updated>2026-03-30T22:08:39.775Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -4150,7 +4218,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2026-03-18T08:57:19.432Z</updated>
+    <updated>2026-03-30T22:08:39.899Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -4217,7 +4285,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2026-03-18T08:57:19.437Z</updated>
+    <updated>2026-03-30T22:08:39.911Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -4538,7 +4606,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2026-03-18T08:57:19.566Z</updated>
+    <updated>2026-03-30T22:08:40.030Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -4635,7 +4703,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2026-03-18T08:57:19.601Z</updated>
+    <updated>2026-03-30T22:08:40.055Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -4768,7 +4836,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2026-03-18T08:57:19.609Z</updated>
+    <updated>2026-03-30T22:08:40.060Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -4980,7 +5048,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2026-03-18T08:57:19.632Z</updated>
+    <updated>2026-03-30T22:08:40.076Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -5464,7 +5532,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2026-03-18T08:57:19.671Z</updated>
+    <updated>2026-03-30T22:08:40.118Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -5489,7 +5557,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2026-03-18T08:57:19.685Z</updated>
+    <updated>2026-03-30T22:08:40.125Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -14302,7 +14370,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2026-03-18T08:57:20.789Z</updated>
+    <updated>2026-03-30T22:08:41.116Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -16763,7 +16831,7 @@ A copy of this allocator is used for any memory allocation and element construct
     <title type="text">Games101：Rasterization (光柵化)</title>
     <id>https://mes0903.github.io/ComputerGraphic/GAMES101/Rasterization/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/GAMES101/Rasterization/"/>
-    <updated>2025-06-03T10:37:07.000Z</updated>
+    <updated>2026-03-30T22:08:06.000Z</updated>
     <summary type="html"><![CDATA[
 <p>在 MVP Transformation 一節中我們已經介紹了要如何將整個坐標系投影的螢幕坐標上，同時也先簡單介紹了螢幕空間，如果你還不曉得這些是什麼，那記得先去看前一節</p>
 <p>這些轉換後得到的信息此時還只是空間中描述的一堆三角形，還沒有真正的變成圖片，因此這節我們就要講如何讓它變成圖片，也就是要怎麼將這些空間中的三角形轉化成像素，將多邊形打碎成像素的過程就是我們所說的光柵化</p>
@@ -25414,68 +25482,5 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content>
     <category term="math"/>
     <published>2021-11-07T00:00:00.000Z</published>
-  </entry>
-  <entry>
-    <title type="text">Relaxation Method</title>
-    <id>https://mes0903.github.io/Math/numerical_algebra/Relaxation/</id>
-    <link href="https://mes0903.github.io/Math/numerical_algebra/Relaxation/"/>
-    <updated>2025-10-21T14:05:41.000Z</updated>
-    <summary type="html"><![CDATA[
-<h3>Relaxation method</h3>
-<p>這個方法顧名思義就是把原本的方法做一點放鬆，他的概念用到外插法 (extrapolate) 來產生他迭代的方法，像這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>畫成圖形可以像這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>利用上一次的  的資訊與透過某種方式獲得的向量  來取得這一次的 </p>]]></summary>
-    <content type="html"><![CDATA[
-<h3>Relaxation method</h3>
-<p>這個方法顧名思義就是把原本的方法做一點放鬆，他的概念用到外插法 (extrapolate) 來產生他迭代的方法，像這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>畫成圖形可以像這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>利用上一次的  的資訊與透過某種方式獲得的向量  來取得這一次的 </p>
-<p>而怎麼取得呢，簡單來說就是給個權重 w，然後  乘上 1-w， 乘上 w</p>
-<p>w 是一個實數，而  其實是個中間迭代出來的解，不管是用 Jacobi 還是 Gauss-Seidel 都可以，那我們這邊用 Gauss-Seidel 來舉例，也就是說：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>你把  的 <code>*</code> 改成 k 就完全是 Gauss-Seidel 的通式了</p>
-<p>所以我們只要通過上一步迭代的解跟某一個方法得到的中間解做一個線性組合，就可以當作我們這個 Relaxation Method 的新的解</p>
-<p>那 w 的選擇有兩種：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>我們原本考慮的問題如果用 Gauss-Seidel 方法，不會收斂的話，這時候我們就可以考慮用 under-relaxation method。 而一個迭代法會不收斂就代表這個問題的迭代矩陣的譜半徑大於 1</p>
-<p>而如果我們原本 Gauss-Seidel 的方法就會收斂，那我們就可以利用上圖中下面那個 over-relaxation methods 來幫助我們加速收斂</p>
-<p>加速收斂就代表我們迭代的解更快的靠近真實的解，我們先寫成這樣：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>T 是這個問題的迭代矩陣，c 是一個跟 k 無關的向量</p>
-<p>而如果這個迭代法會收斂，就會滿足這個式子：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>注意 T 的譜半徑會小於 1，因為收斂</p>
-<p>那我們讓這兩式相減，會長這樣(紅色部分)：</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>那一樣像上次那樣寫成 D、L、U 的形式</p>
-<div class="center-column">
-<figure><figcaption></figcaption></figure>
-</div>
-<p>可以看見我們一樣要解一個下三角矩陣的問題，那也一樣可以用 forward substitution 來快速解這個問題</p>
-]]></content>
-    <category term="math"/>
-    <published>2021-10-16T00:00:00.000Z</published>
   </entry>
 </feed>
