@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being  Towards  Death</description>
     <language>en-US</language>
-    <pubDate>Wed, 06 May 2026 21:11:37 GMT</pubDate>
-    <lastBuildDate>Wed, 06 May 2026 21:11:37 GMT</lastBuildDate>
+    <pubDate>Thu, 07 May 2026 03:45:42 GMT</pubDate>
+    <lastBuildDate>Thu, 07 May 2026 03:45:42 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>math</category>
@@ -9322,10 +9322,10 @@ A. Rago. Addison-Wesley, 2005.<br>
 ]]></content:encoded>
     </item>
     <item>
-      <title>glTF：A Simple Texture</title>
+      <title>glTF：Morph Targets</title>
       <link>https://mes0903.github.io/ComputerGraphic/gltf/MorphTargets/</link>
       <guid>https://mes0903.github.io/ComputerGraphic/gltf/MorphTargets/</guid>
-      <source url="https://mes0903.github.io/rss.xml">glTF：A Simple Texture</source>
+      <source url="https://mes0903.github.io/rss.xml">glTF：Morph Targets</source>
       <description>Morph Targets 前一節的範例展示了一個 mesh，這個 mesh 是由一個三角形構成，並且定義了兩個 morph target（變形目標）： 這個 mesh 的基礎幾何資料（即原始的三角形幾何）是由 mesh.primitive 裡 &amp;quot;attributes&amp;quot; 內的 &amp;quot;POSITION&amp;quot; 所定義的，而 mesh.primitive 的 tar...</description>
       <category>computer-graphic</category>
       <pubDate>Thu, 01 May 2025 00:00:00 GMT</pubDate>
