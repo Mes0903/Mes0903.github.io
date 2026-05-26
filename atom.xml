@@ -4,7 +4,7 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being Towards Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2026-05-26T13:27:09.290Z</updated>
+  <updated>2026-05-26T13:58:45.334Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
@@ -26,7 +26,7 @@
     <title type="text">2026 OSS-NA 心得</title>
     <id>https://mes0903.github.io/essay/2026-OSS-NA/</id>
     <link href="https://mes0903.github.io/essay/2026-OSS-NA/"/>
-    <updated>2026-05-26T13:26:44.000Z</updated>
+    <updated>2026-05-26T13:57:52.000Z</updated>
     <summary type="html"><![CDATA[
 <p>來紀錄一下 OSSNA，學長也有寫了個會後紀錄，對於演講的部分寫得比我詳細，我大部分都在紀錄每天的行程而已 XD</p>
 <ul>
@@ -71,7 +71,10 @@
 <figure><figcaption>（另一張照片）</figcaption></figure>
 <p>大概八點多的時候有一場無人機秀，但當時已經在飄雨了，到了後面雨變得超大的，只好回到室內再坐一下。 最後坐上接駁車回會場附近，走回飯店後洗個澡就直接睡了（十點半左右 XD）</p>
 <figure><figcaption>（無人機秀）</figcaption></figure>
-<p>晚上老師也幫我寫信給了 Hiroyuki Ishii 先生，看看有沒有什麼交流機會，但目前是還沒有收到回覆</p>
+<p><s>晚上老師也幫我寫信給了 Hiroyuki Ishii 先生，看看有沒有什麼交流機會，但目前是還沒有收到回覆</s></p>
+<blockquote>
+<p>結果好像是我們 email 填錯了，I 跟 l 看起來有點像，之後補寄看看</p>
+</blockquote>
 <h2>5/19（星期二）</h2>
 <p>這天起床就舒服了，終於有一天是睡飽的，前幾週在臺北也是都在趕稿，一直覺得沒睡飽，終於在此時獲得了正常的睡眠 XD</p>
 <p>一樣差不多的行程，先去會場吃早餐，這天的早餐是瑪芬，也是很好吃，然後這天我發現有牛奶可以加，所以早餐就從咖啡進化為了咖啡牛奶，好喝多了 XD</p>
@@ -104,7 +107,7 @@
 <p>回旅館後一樣寫寫 project，學長他們先去躺了一下，結果到了十一點多他們都還沒起來，我也想睡覺了，所以就直接洗澡睡了，沒有吃晚餐</p>
 <h2>5/22（星期五）</h2>
 <p>這天整天都是空的了，我們先去 MOA 吃了一頓還不錯的早餐，我點了班尼迪克蛋 + 吐司 + 燉牛肉 + 煎馬鈴薯餅。 感覺就是標準美式早餐，我真的很喜歡這種美式的早餐拼盤</p>
-<p>其他人都點漢堡，超級大一個的，我絕對吃不完，幸好我沒跟著點。 吃完後我們叫車去雕塑公園看了一下，就是一個很大的公園，中間有一顆很大的櫻桃雕塑，其他地方散布著各種小雕塑。 接著我們去逛了 MIA 美術館，在門口又遇到了 Hiroyuki Ishii 先生，希望他之後會回信 XD</p>
+<p>其他人都點漢堡，超級大一個的，我絕對吃不完，幸好我沒跟著點。 吃完後我們叫車去雕塑公園看了一下，就是一個很大的公園，中間有一顆很大的櫻桃雕塑，其他地方散布著各種小雕塑。 接著我們去逛了 MIA 美術館，在門口又遇到了 Hiroyuki Ishii 先生XD</p>
 <p>美術館還蠻大間的，二樓有很多以前的陶器、瓷器和雕塑之類的，而三樓則是油畫相關的，看油畫一如既往地會讓人心情很好。 逛完美術館後我們去國家公園看了一下瀑布，然後逛了一圈，裡面的那條河好像就是密西西比河，以前只在地理課本裡面聽過，現在算是看到本體了。 逛的時候還有個入口有警示牌，好像寫說會有狼，有點怕</p>
 <p>繞了一圈後大概已經是五點多了，所以我們就叫車回了旅館，接著大概七點多的時候我跟學長他們再出來吃了晚餐</p>
 <p>因為是最後一天，我們選了一間牛排館，我點了一碗洋蔥湯和一份牛排 + 薯條。 洋蔥湯超鹹的笑死，但裡面加了很多起司和麵包，洋蔥也蠻入味的，所以是還蠻好喝的，只是需要一直喝水而已</p>
@@ -3483,7 +3486,7 @@ Virtio 裝置包含旗標，guest 作業系統在裝置初始化時會確認這�
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2026-05-26T13:27:09.882Z</updated>
+    <updated>2026-05-26T13:58:45.864Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -3552,7 +3555,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2026-05-26T13:27:09.883Z</updated>
+    <updated>2026-05-26T13:58:45.865Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -4656,7 +4659,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2026-05-26T13:27:09.926Z</updated>
+    <updated>2026-05-26T13:58:45.906Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -4723,7 +4726,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2026-05-26T13:27:09.930Z</updated>
+    <updated>2026-05-26T13:58:45.908Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -5044,7 +5047,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2026-05-26T13:27:09.997Z</updated>
+    <updated>2026-05-26T13:58:45.968Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -5138,7 +5141,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2026-05-26T13:27:10.013Z</updated>
+    <updated>2026-05-26T13:58:45.984Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -5271,7 +5274,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2026-05-26T13:27:10.015Z</updated>
+    <updated>2026-05-26T13:58:45.987Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -5483,7 +5486,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2026-05-26T13:27:10.020Z</updated>
+    <updated>2026-05-26T13:58:45.994Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -5967,7 +5970,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2026-05-26T13:27:10.035Z</updated>
+    <updated>2026-05-26T13:58:46.006Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -5989,7 +5992,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2026-05-26T13:27:10.038Z</updated>
+    <updated>2026-05-26T13:58:46.012Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -9691,7 +9694,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：An Advanced Material</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/AdvancedMaterial/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/AdvancedMaterial/"/>
-    <updated>2026-05-26T13:27:10.271Z</updated>
+    <updated>2026-05-26T13:58:46.239Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一節的 Simple Texture 範例中，我們看到了如何使用貼圖來指定材質的「base color」，不過除了 base color 以外，glTF 中的材質還可以透過貼圖來定義其他屬性，我們已經在 Materials 一節中簡要列出這些屬性了，包括：</p>
 <ul>
@@ -9732,7 +9735,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Cameras</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Cameras/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Cameras/"/>
-    <updated>2026-05-26T13:27:10.272Z</updated>
+    <updated>2026-05-26T13:58:46.240Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一章 Simple Cameras 中，我們已經看到如何在 glTF 中定義透視相機（perspective camera）和正交相機（orthographic camera），以及如何將這些相機掛載（attach）到節點來整合進場景中了，本節將進一步說明兩種相機的差異與一般相機的處理方式</p>
 <h2>Perspective and orthographic cameras</h2>
@@ -9817,7 +9820,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Morph Targets</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MorphTargets/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MorphTargets/"/>
-    <updated>2026-05-26T13:27:10.273Z</updated>
+    <updated>2026-05-26T13:58:46.241Z</updated>
     <summary type="html"><![CDATA[
 <p>前一節的範例展示了一個 mesh，這個 mesh 是由一個三角形構成，並且定義了兩個 morph target（變形目標）：</p>
 <div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-javascript"><span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF">...</span></span>
@@ -9890,7 +9893,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Simple Cameras</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleCameras/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleCameras/"/>
-    <updated>2026-05-26T13:27:10.278Z</updated>
+    <updated>2026-05-26T13:58:46.246Z</updated>
     <summary type="html"><![CDATA[
 <p>前面幾節介紹了 glTF asset 中如何描述基本場景結構與幾何物件，以及如何對這些物件套用不同的材質，不過目前尚未說明如何設定場景的「觀察視角」，也就是我們所謂的虛擬相機（camera）。 在 glTF 中，相機會被放在場景中的某個節點（node）上，指定其位置與朝向，用來決定畫面呈現的視角</p>
 <p>以下是一個簡單且完整的 glTF asset，它的結構與前面範例相似，包含一個 <code>scene</code>，內部有幾個 <code>node</code> 物件，以及一個幾何物件（<code>mesh</code>），綁定到其中一個 node 上，不同之處在於這個範例額外包含了兩個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-camera" target="_blank" rel="noopener noreferrer"><code>camera</code></a> 物件</p>]]></summary>
@@ -10054,7 +10057,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Morph Target</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMorphTarget/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMorphTarget/"/>
-    <updated>2026-05-26T13:27:10.281Z</updated>
+    <updated>2026-05-26T13:58:46.248Z</updated>
     <summary type="html"><![CDATA[
 <p>從 glTF 2.0 開始，支援為 mesh 定義 morph target（變形目標），Morph target 是一組針對 mesh 某些屬性（如頂點位置）的差異或位移量，在執行階段可以以不同權重加到原始 mesh 上，藉此達成局部動畫變形的效果，這常用於角色動畫中，例如虛擬角色的不同臉部表情</p>
 <p>以下是一個簡單的範例，展示了一個含有兩個 morph target 的 mesh。 這段會簡單列出新增的元素，至於 morph target 的完整概念與執行時如何應用，會在下一節詳細解釋</p>
@@ -10507,7 +10510,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Skin</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleSkin/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleSkin/"/>
-    <updated>2026-05-26T13:27:10.291Z</updated>
+    <updated>2026-05-26T13:58:46.258Z</updated>
     <summary type="html"><![CDATA[
 <p>glTF 支援 vertex skinning（頂點綁定），這項功能可以根據骨架的姿勢去變形 mesh（網格）上的幾何資料（頂點），這對於製作具有動作的虛擬角色等動畫場景來說至關重要。 glTF 中關於 vertex skinning 的核心是 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-skin" target="_blank" rel="noopener noreferrer"><code>skin</code></a> 物件，不過實際實現頂點綁定時，會牽涉到 glTF 中其他部分的交互依賴，這些部分前面章節中都有介紹過</p>]]></summary>
     <content type="html"><![CDATA[
@@ -10665,7 +10668,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Texture</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleTexture/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleTexture/"/>
-    <updated>2026-05-26T13:27:10.294Z</updated>
+    <updated>2026-05-26T13:58:46.261Z</updated>
     <summary type="html"><![CDATA[
 <p>如前幾節所示，glTF asset 中的材質定義可以包含多種參數，這些參數用來描述物件在光照下的顏色或整體外觀。 這些屬性可以直接以單一數值表示，例如整體的顏色或 roughness 值。 但也可以透過貼圖（texture）指定，並映射到物件表面上</p>
 <p>下列是一個 glTF asset 範例，它定義了一個套用簡單貼圖的材質：</p>
@@ -10887,7 +10890,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Skins</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Skins/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Skins/"/>
-    <updated>2026-05-26T13:27:10.302Z</updated>
+    <updated>2026-05-26T13:58:46.270Z</updated>
     <summary type="html"><![CDATA[
 <p>頂點綁定（vertex skinning）的流程相對複雜，它幾乎整合了 glTF asset 中的所有元素，本節將根據前一節 Simple Skin 中的範例，說明頂點綁定的基本概念</p>
 <h2>The geometry data</h2>
@@ -11051,7 +11054,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Animations</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Animations/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Animations/"/>
-    <updated>2026-05-26T13:27:10.306Z</updated>
+    <updated>2026-05-26T13:58:46.274Z</updated>
     <summary type="html"><![CDATA[
 <p>如同在「Simple Animation」的範例中所示，我們可以使用 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-animation" target="_blank" rel="noopener noreferrer"><code>animation</code></a> 物件來描述節點的 translation（位移）、rotation（旋轉）、或 scale（縮放）這些屬性是如何隨著時間改變的</p>
 <p>下面是一個新的 animation 範例，這次的動畫包含了兩個 channel：</p>]]></summary>
@@ -11233,7 +11236,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Materials</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Materials/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Materials/"/>
-    <updated>2026-05-26T13:27:10.310Z</updated>
+    <updated>2026-05-26T13:58:46.277Z</updated>
     <summary type="html"><![CDATA[
 <h2>Introduction</h2>
 <p>glTF 的目的是為了定義一種用於傳輸 3D asset 的格式，如前面幾節所示，這包括了場景結構（scene structure）與場景中出現的幾何物件，但 glTF asset 也可以包含物件的外觀資訊，也就是表示描述物件在畫面上應該被如何渲染的資訊</p>
@@ -11282,7 +11285,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Meshes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Meshes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Meshes/"/>
-    <updated>2026-05-26T13:27:10.310Z</updated>
+    <updated>2026-05-26T13:58:46.278Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一節的「Simple Meshes」範例中，我們看到了如何定義一個基本的 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh" target="_blank" rel="noopener noreferrer"><code>mesh</code></a>，其中包含了一個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive" target="_blank" rel="noopener noreferrer"><code>mesh.primitive</code></a> 物件，該物件定義了多個屬性</p>]]></summary>
     <content type="html"><![CDATA[
@@ -11369,7 +11372,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Material</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMaterial/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMaterial/"/>
-    <updated>2026-05-26T13:27:10.311Z</updated>
+    <updated>2026-05-26T13:58:46.279Z</updated>
     <summary type="html"><![CDATA[
 <p>在前幾節中介紹的 glTF asset 範例，內容主要涵蓋了基本的場景結構與簡單的幾何物件，但這些範例都沒有包含物件的外觀資訊。 當未提供任何外觀資訊時，glTF 規範建議檢視器（viewer）應該使用一個「預設材質（default material）」來渲染物體，如同在「MinimalGltfFile」中的截圖中所見，根據場景中的光照條件，這個預設材質通常會使物件呈現純白或淺灰色的外觀</p>
 <p>本節將從一個非常簡單的材質範例開始，並說明各種材質屬性所帶來的效果。 以下是一個最小化 glTF asset，包含一個簡單的材質設定：</p>
@@ -11582,7 +11585,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Simple Meshes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMeshes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMeshes/"/>
-    <updated>2026-05-26T13:27:10.321Z</updated>
+    <updated>2026-05-26T13:58:46.286Z</updated>
     <summary type="html"><![CDATA[
 <p><a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh" target="_blank" rel="noopener noreferrer"><code>mesh</code></a> 用來表示場景內的一個幾何物件。 我們在「MinimalGltfFile」中已經看過一個 mesh 的範例了，其中有一個 <code>mesh</code> 被掛載在一個 <code>node</code> 上，其只包含一個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive" target="_blank" rel="noopener noreferrer"><code>mesh.primitive</code></a>，且當中只定義了一個頂點位置（vertex positions）的屬性（attribute）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -11712,7 +11715,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Textures, Images, and Samplers</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/TexturesImagesSamplers/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/TexturesImagesSamplers/"/>
-    <updated>2026-05-26T13:27:10.324Z</updated>
+    <updated>2026-05-26T13:58:46.289Z</updated>
     <summary type="html"><![CDATA[
 <p>貼圖（Texture）是實現物件擬真外觀（realistic appearance）的一個重要元素，它可以用來定義物件的主顏色，也可以用來描述材質中的其他特性，這些特性能更進一步地定義物體被渲染時應該呈現的樣貌細節</p>
 <p>一個 glTF asset 中可以定義多個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-texture" target="_blank" rel="noopener noreferrer"><code>texture</code></a> 物件，這些貼圖會在渲染時被用來指定幾何物件的材質屬性，例如 base color、metallic、roughness 等。 實際進行貼圖時，根據不同的圖形 API（如 WebGL、OpenGL），會有很多參數與行為會影響貼圖的映射方式。這些細節大多超出本教學的範圍，若想深入理解，建議參考以下教學資源：</p>]]></summary>
@@ -11766,7 +11769,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Animation</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleAnimation/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleAnimation/"/>
-    <updated>2026-05-26T13:27:10.324Z</updated>
+    <updated>2026-05-26T13:58:46.290Z</updated>
     <summary type="html"><![CDATA[
 <p>如同在「Scenes and Nodes」章節中所說的，每個節點都可以有一個局部變換，這個變換可以透過節點的 matrix 屬性來給定，或者是使用 <code>translation</code>、<code>rotation</code> 和 <code>scale</code>（簡稱 TRS）屬性來表示。 當變換是用 TRS 屬性來給定時，我們可以使用 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-animation" target="_blank" rel="noopener noreferrer"><code>animation</code></a> 來描述節點的 <code>translation</code>、<code>rotation</code> 或 <code>scale</code> 隨時間變化的方式</p>]]></summary>
     <content type="html"><![CDATA[
@@ -11961,7 +11964,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Buffers, BufferViews, and Accessors</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BuffersBufferViewsAccessors/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BuffersBufferViewsAccessors/"/>
-    <updated>2026-05-26T13:27:10.357Z</updated>
+    <updated>2026-05-26T13:58:46.323Z</updated>
     <summary type="html"><![CDATA[
 <p>在「A Minimal glTF File」的章節中已經出現過 <code>buffer</code>、<code>bufferView</code> 和 <code>accessor</code> 物件的範例，本節將會更詳細地說明這些概念</p>
 <h2>Buffers</h2>
@@ -12277,7 +12280,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Scenes and Nodes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/ScenesNodes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/ScenesNodes/"/>
-    <updated>2026-05-26T13:27:10.362Z</updated>
+    <updated>2026-05-26T13:58:46.328Z</updated>
     <summary type="html"><![CDATA[
 <h2>Scenes</h2>
 <p>一個 glTF 檔案中可以儲存多個場景，<code>scene</code> 屬性用來指定這些場景中哪一個應該作為載入 asset 時預設顯示的場景。 每個 scene 包含一個 <code>nodes</code> 陣列，裡面是場景圖根節點的索引。 同樣地，一個場景可以有多個根節點，形成不同的階層結構，不過一般情況下通常只會有一個根節點</p>
@@ -12422,7 +12425,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：The Basic Structure of glTF</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BasicGltfStructure/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BasicGltfStructure/"/>
-    <updated>2026-05-26T13:27:10.369Z</updated>
+    <updated>2026-05-26T13:58:46.336Z</updated>
     <summary type="html"><![CDATA[
 <p>glTF 的核心是一個 JSON 檔案，這個檔案描述了整個 3D 場景的內容。 它包含：</p>
 <ul>
@@ -12506,7 +12509,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Introduction to glTF using WebGL</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Introduction/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Introduction/"/>
-    <updated>2026-05-26T13:27:10.375Z</updated>
+    <updated>2026-05-26T13:58:46.337Z</updated>
     <summary type="html"><![CDATA[
 <p>現代越來越多應用程式和服務都以 3D 內容為基礎。 像是線上商店提供支援 3D 預覽的產品配置器、博物館利用 3D 掃描技術數位化館藏，讓參觀者能在虛擬畫廊中自由探索。 都市規劃師使用 3D 城市模型來進行規劃與資訊可視化，教育工作者也常透過互動式、動畫化的人體 3D 模型輔助教學。 這些應用現在多數都能直接在網頁瀏覽器中運作，這得歸功於現代瀏覽器全面支援 WebGL 的高效渲染技術</p>
 <figure><figcaption>（Image 1a: Screenshots of various websites and applications showing 3D models.）</figcaption></figure>]]></summary>
@@ -12553,7 +12556,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Minimal glTF File</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MinimalGltfFile/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MinimalGltfFile/"/>
-    <updated>2026-05-26T13:27:10.376Z</updated>
+    <updated>2026-05-26T13:58:46.341Z</updated>
     <summary type="html"><![CDATA[
 <p>以下是一個最小但完整的 glTF asset 範例，內容包含了一個三角形。 你可以直接將它複製並貼到一個 <code>.gltf</code> 檔案中，任何基於 glTF 的應用程式都應該能夠正確載入並渲染它。 本節將會以這個範例為基礎，來說明 glTF 的基本概念</p>
 <div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-javascript"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
@@ -12836,7 +12839,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：glTF Tutorial</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/"/>
-    <updated>2026-05-26T13:27:10.380Z</updated>
+    <updated>2026-05-26T13:58:46.345Z</updated>
     <summary type="html"><![CDATA[
 <p>本系列是 KhronosGroup 所寫的 <a href="https://github.com/KhronosGroup/glTF-Tutorials" target="_blank" rel="noopener noreferrer">glTF-Tutorials</a> 的中文翻譯與筆記，主要放在<a href="https://mes0903.github.io/ComputerGraphic/gltf/" target="_blank" rel="noopener noreferrer">我的個人 Blog</a> 上供人閱讀</p>
 <p>原作者為 Marco Hutter, <a href="https://github.com/javagl" target="_blank" rel="noopener noreferrer">@javagl</a></p>]]></summary>
@@ -12964,7 +12967,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2026-05-26T13:27:10.384Z</updated>
+    <updated>2026-05-26T13:58:46.348Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
