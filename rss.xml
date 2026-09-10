@@ -6,8 +6,8 @@
     <link>https://mes0903.github.io/</link>
     <description>Being Towards Death</description>
     <language>zh-TW</language>
-    <pubDate>Wed, 27 May 2026 11:19:43 GMT</pubDate>
-    <lastBuildDate>Wed, 27 May 2026 11:19:43 GMT</lastBuildDate>
+    <pubDate>Thu, 10 Sep 2026 14:05:09 GMT</pubDate>
+    <lastBuildDate>Thu, 10 Sep 2026 14:05:09 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>essay</category>
@@ -24,6 +24,19 @@
     <category>ROS1</category>
     <category>computer-network</category>
     <category>security</category>
+    <item>
+      <title>臺師大資工轉學紀錄分享</title>
+      <link>https://mes0903.github.io/essay/NTNU-Transfer/</link>
+      <guid>https://mes0903.github.io/essay/NTNU-Transfer/</guid>
+      <source url="https://mes0903.github.io/rss.xml">臺師大資工轉學紀錄分享</source>
+      <description>臺師大資工轉學紀錄分享 報名 &amp;amp; 結果 後來跑去臺師大資工念了，從中央大學數學系轉到臺師大資工 台大那時候忘記報了 資料 簡歷、自傳模板(感謝 marty 大大分享)：https://github.com/Mes0903/Resume 後來在 AMD 做 intern 用的履歷我也丟這了 名次證明書 成績單 簡歷 自傳 暑轉 轉學 臺師大 簡章...</description>
+      <category>essay</category>
+      <pubDate>Thu, 01 Aug 2024 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h2>報名 &amp; 結果</h2>
+<p>後來跑去臺師大資工念了，從中央大學數學系轉到臺師大資工</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>2026 OSS-NA 心得</title>
       <link>https://mes0903.github.io/essay/2026-OSS-NA/</link>
@@ -13322,40 +13335,6 @@ A copy of this allocator is used for any memory allocation and element construct
 ]]></content:encoded>
     </item>
     <item>
-      <title>OSTEP 22：Swapping Policies</title>
-      <link>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</link>
-      <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</guid>
-      <source url="https://mes0903.github.io/rss.xml">OSTEP 22：Swapping Policies</source>
-      <description>OSTEP 22：Swapping Policies 在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可 但不幸的是，當可用記憶體很少時，事情就變得...</description>
-      <category>OS</category>
-      <pubDate>Sun, 06 Apr 2025 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<p>在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可</p>
-<p>但不幸的是，當可用記憶體很少時，事情就變得比較麻煩了。 在這種情況下，memory pressure 會迫使 OS 開始把某些 page swap 出去，以空出空間給正在使用的 page。 OS 的 replacement policy 會負責決定要把哪些 page evict 掉，在歷史上，這是早期 virtual memory 系統中最重要的決策之一，因為早期的系統實體記憶體都非常小</p>
-<p>因此我們這章的重點自然就是：</p>
-<div class="hint-container info">
-<p class="hint-container-title">相關信息</p>
-<p>關鍵：如何決定要 evict 哪一個 page</p>
-<p>OS 要如何決定要把哪些 page 從記憶體中移除？ 這由系統的 replacement policy 決定，它通常會依據一些通用原則，但也會加上一些小技巧來避免某些邊界情況的行為</p>
-</div>
-<h2>22.1 Cache Management</h2>
-<p>在深入各種策略之前，我們先來更仔細地描述一下我們要解決的問題。 因為 main memory 只存放了系統中一部分的 page，所以它本質上可以被視為整個系統中 virtual memory page 的一個 cache。 因此 replacement policy 的目標，就是要讓這個 cache 的 miss 數量最小化，也就是盡量減少從 disk 抓 page 的次數</p>
-<p>換個角度看，我們的目標也可以說是要讓 cache hit 的次數最大化，也就是讓存取的 page 儘量能在記憶體裡就找到</p>
-<p>知道 hit 與 miss 的次數，可以讓我們計算某個程式的平均記憶體存取時間（AMAT），這是電腦架構師用來衡量硬體 cache 效能的一個指標 [HP06]。 具體來說，我們可以這樣算出 AMAT：</p>
-<p>其中  代表存取記憶體的成本， 是存取硬碟的成本， 是沒在 cache 裡找到資料的機率，其範圍是 0.0 到 1.0，有時候我們也會用百分比的 miss rate 來表示，例如 10% 的 miss rate 意思就是  = 0.10。 要注意的是你一定會付 memory access 的成本，而如果發生 cache miss，你還得額外付出從 disk 抓資料的成本</p>
-<p>舉個例子，假設有一台機器的位址空間只有 4KB，並使用 256-byte 的 page，則其 virtual address 會分兩部分：一個 4-bit 的 VPN，以及一個 8-bit 的 offset。 所以在這個例子中，一個 process 可以存取 16（）個 virtual page</p>
-<p>再假設這個 process 存取了以下記憶體：0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900。 這些 virtual address 分別對應到前十個 page 的第一個 byte（這裡 page number 為每個 virtual address 的第一個十六進位數字）</p>
-<p>我們再假設除了 virtual page 3 以外，其他 page 都已經在記憶體裡。 因此這組 memory access 的行為會是：hit, hit, hit, miss, hit, hit, hit, hit, hit, hit。 我們可以算出 hit rate 為 90%，因此 miss rate 是 10%（ = 0.1）。 一般來說，，也就是命中率加上失誤率等於 100%</p>
-<p>為了計算 AMAT，我們還需要知道 memory access 與 disk access 的成本。 假設 memory access（）大約是 100 奈秒，disk access（）大約是 10 毫秒，則 AMAT 為</p>
-<p>可以看見差不多是一毫秒。 如果我們的 hit rate 是 99.9%（ = 0.001），結果就會差很多了，這種情況下 AMAT 會是 10.1 微秒，差不多快了 100 倍。 當 hit rate 趨近於 100% 時，AMAT 就會趨近於 100 奈秒</p>
-<p>但很不幸的是，就像這個例子裡顯示的，現代系統中 disk access 的成本太高了，就算只有很小的 miss rate，也會直接主導整體 AMAT。 因此我們必須儘量避免 miss，不然就會像是以 disk 的速度在跑程式</p>
-<h2>22.2 The Optimal Replacement Policy</h2>
-<p>為了更深入了解某個 replacement policy 的好壞，我們需要有個最佳的 replacement policy 能拿來比較，這樣的最佳策略由 Belady 很多年前提出 [B66]（他原本稱它為 MIN），其能夠達到最少的 miss 數。 Belady 證明了一個簡單（但很難實作）的方法 — 把「未來最久之後才會被使用的 page」替換掉，會是最佳策略，能讓 cache miss 數量最少</p>
-<p>想法很簡單，如果你一定要把某個 page 丟掉，只要丟最久之後才會被用到的 page 即可，這樣做等於是說 cache 裡的其他 page 都比這個遙遠的 page 更重要，而這也的確，因為你未來會先存取其他 page，最後才會存取那個最遙遠的 page</p>
-<p>我們用一個簡單的例子來理解最佳策略會做出的選擇，假設一個程式會依序存取以下的 virtual page：0, 1, 2, 0, 1, 3, 0, 3, 1, 2, 1。 下表（Figure 22.1）展示了在 cache 能容納三個 page 的情況下，最佳策略的行為</p>
-]]></content:encoded>
-    </item>
-    <item>
       <title>OSTEP 23：Complete VM Systems</title>
       <link>https://mes0903.github.io/OS/OSTEP/Virtualization/23/</link>
       <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/23/</guid>
@@ -13506,6 +13485,40 @@ A copy of this allocator is used for any memory allocation and element construct
 <div class="language-shell line-numbers-mode" data-highlighter="shiki" data-ext="shell" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-shell"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">0000000000400000</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 372K</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> r-x--</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> tcsh</span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">00000000019d5000</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 1780K</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> rw</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div></div>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>OSTEP 22：Swapping Policies</title>
+      <link>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</link>
+      <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</guid>
+      <source url="https://mes0903.github.io/rss.xml">OSTEP 22：Swapping Policies</source>
+      <description>OSTEP 22：Swapping Policies 在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可 但不幸的是，當可用記憶體很少時，事情就變得...</description>
+      <category>OS</category>
+      <pubDate>Sun, 06 Apr 2025 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<p>在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可</p>
+<p>但不幸的是，當可用記憶體很少時，事情就變得比較麻煩了。 在這種情況下，memory pressure 會迫使 OS 開始把某些 page swap 出去，以空出空間給正在使用的 page。 OS 的 replacement policy 會負責決定要把哪些 page evict 掉，在歷史上，這是早期 virtual memory 系統中最重要的決策之一，因為早期的系統實體記憶體都非常小</p>
+<p>因此我們這章的重點自然就是：</p>
+<div class="hint-container info">
+<p class="hint-container-title">相關信息</p>
+<p>關鍵：如何決定要 evict 哪一個 page</p>
+<p>OS 要如何決定要把哪些 page 從記憶體中移除？ 這由系統的 replacement policy 決定，它通常會依據一些通用原則，但也會加上一些小技巧來避免某些邊界情況的行為</p>
+</div>
+<h2>22.1 Cache Management</h2>
+<p>在深入各種策略之前，我們先來更仔細地描述一下我們要解決的問題。 因為 main memory 只存放了系統中一部分的 page，所以它本質上可以被視為整個系統中 virtual memory page 的一個 cache。 因此 replacement policy 的目標，就是要讓這個 cache 的 miss 數量最小化，也就是盡量減少從 disk 抓 page 的次數</p>
+<p>換個角度看，我們的目標也可以說是要讓 cache hit 的次數最大化，也就是讓存取的 page 儘量能在記憶體裡就找到</p>
+<p>知道 hit 與 miss 的次數，可以讓我們計算某個程式的平均記憶體存取時間（AMAT），這是電腦架構師用來衡量硬體 cache 效能的一個指標 [HP06]。 具體來說，我們可以這樣算出 AMAT：</p>
+<p>其中  代表存取記憶體的成本， 是存取硬碟的成本， 是沒在 cache 裡找到資料的機率，其範圍是 0.0 到 1.0，有時候我們也會用百分比的 miss rate 來表示，例如 10% 的 miss rate 意思就是  = 0.10。 要注意的是你一定會付 memory access 的成本，而如果發生 cache miss，你還得額外付出從 disk 抓資料的成本</p>
+<p>舉個例子，假設有一台機器的位址空間只有 4KB，並使用 256-byte 的 page，則其 virtual address 會分兩部分：一個 4-bit 的 VPN，以及一個 8-bit 的 offset。 所以在這個例子中，一個 process 可以存取 16（）個 virtual page</p>
+<p>再假設這個 process 存取了以下記憶體：0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900。 這些 virtual address 分別對應到前十個 page 的第一個 byte（這裡 page number 為每個 virtual address 的第一個十六進位數字）</p>
+<p>我們再假設除了 virtual page 3 以外，其他 page 都已經在記憶體裡。 因此這組 memory access 的行為會是：hit, hit, hit, miss, hit, hit, hit, hit, hit, hit。 我們可以算出 hit rate 為 90%，因此 miss rate 是 10%（ = 0.1）。 一般來說，，也就是命中率加上失誤率等於 100%</p>
+<p>為了計算 AMAT，我們還需要知道 memory access 與 disk access 的成本。 假設 memory access（）大約是 100 奈秒，disk access（）大約是 10 毫秒，則 AMAT 為</p>
+<p>可以看見差不多是一毫秒。 如果我們的 hit rate 是 99.9%（ = 0.001），結果就會差很多了，這種情況下 AMAT 會是 10.1 微秒，差不多快了 100 倍。 當 hit rate 趨近於 100% 時，AMAT 就會趨近於 100 奈秒</p>
+<p>但很不幸的是，就像這個例子裡顯示的，現代系統中 disk access 的成本太高了，就算只有很小的 miss rate，也會直接主導整體 AMAT。 因此我們必須儘量避免 miss，不然就會像是以 disk 的速度在跑程式</p>
+<h2>22.2 The Optimal Replacement Policy</h2>
+<p>為了更深入了解某個 replacement policy 的好壞，我們需要有個最佳的 replacement policy 能拿來比較，這樣的最佳策略由 Belady 很多年前提出 [B66]（他原本稱它為 MIN），其能夠達到最少的 miss 數。 Belady 證明了一個簡單（但很難實作）的方法 — 把「未來最久之後才會被使用的 page」替換掉，會是最佳策略，能讓 cache miss 數量最少</p>
+<p>想法很簡單，如果你一定要把某個 page 丟掉，只要丟最久之後才會被用到的 page 即可，這樣做等於是說 cache 裡的其他 page 都比這個遙遠的 page 更重要，而這也的確，因為你未來會先存取其他 page，最後才會存取那個最遙遠的 page</p>
+<p>我們用一個簡單的例子來理解最佳策略會做出的選擇，假設一個程式會依序存取以下的 virtual page：0, 1, 2, 0, 1, 3, 0, 3, 1, 2, 1。 下表（Figure 22.1）展示了在 cache 能容納三個 page 的情況下，最佳策略的行為</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -18306,6 +18319,86 @@ system call 對應的實作，kernel 中通常會用 <code>sys</code> 開頭來�
 ]]></content:encoded>
     </item>
     <item>
+      <title>Ros Install (noetic)</title>
+      <link>https://mes0903.github.io/ROS/ROS_Install/</link>
+      <guid>https://mes0903.github.io/ROS/ROS_Install/</guid>
+      <source url="https://mes0903.github.io/rss.xml">Ros Install (noetic)</source>
+      <description>ROS1 Install (noetic) 當初老師請我在大教室的電腦上面灌 ROS，因為我當初沒有使用 Ansible 之類的軟體，所以就寫了個 script，每台開起來 clone 下來跑，這是當初的紀錄，也許可以幫到某位有緣人（? github 手動操作 沒有 vim 的話看你要裝還是用 nano 把下面的內容貼上： 貼上後下： 過程中會有需要輸...</description>
+      <category>ROS1</category>
+      <pubDate>Wed, 13 Dec 2023 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<p>當初老師請我在大教室的電腦上面灌 ROS，因為我當初沒有使用 Ansible 之類的軟體，所以就寫了個 script，每台開起來 clone 下來跑，這是當初的紀錄，也許可以幫到某位有緣人（?</p>
+<h2>github</h2>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/NcuMathRoboticsLab/MRLRosInstall.git</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><h2>手動操作</h2>
+<blockquote>
+<p>沒有 vim 的話看你要裝還是用 nano</p>
+</blockquote>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vim</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install.sh</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>把下面的內容貼上：</p>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">#!/bin/bash</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> update</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> upgrade</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">wget</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://raw.githubusercontent.com/ROBOTIS-GIT/robotis_tools/master/install_ros_noetic.sh</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">chmod</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 755</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./install_ros_noetic.sh</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> </span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">bash</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./install_ros_noetic.sh</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt-get</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-joy</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-teleop-twist-joy</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-teleop-twist-keyboard</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-laser-proc</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rgbd-launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rosserial-arduino</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rosserial-python</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rosserial-client</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rosserial-msgs</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-amcl</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-map-server</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-move-base</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-urdf</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-xacro</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-compressed-image-transport</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rqt</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">*</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rviz</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
+<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-gmapping</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-navigation</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-interactive-markers</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-dynamixel-sdk</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-turtlebot3-msgs</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-turtlebot3</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "source /opt/ros/noetic/setup.bash"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "source ~/catkin_ws/devel/setup.bash"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export ROS_MASTER_URI=http://localhost:11311"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export ROS_HOSTNAME=localhost"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export TURTLEBOT3_MODEL=burger"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">source</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/.bashrc</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mkdir</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> catkin_ws</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mkdir</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> catkin_ws/src</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/catkin_ws/src</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/DynamixelSDK.git</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3.git</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/catkin_ws</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &#x26;&#x26; </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">catkin_make</span></span>
+<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">source</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/.bashrc</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>貼上後下：</p>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">chmod</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> +x</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install.sh</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">./install.sh</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>過程中會有需要輸入 <code>Y</code> 與 enter 的地方</p>
+<h2>測試</h2>
+<h3>Turtlebot simulator</h3>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">export</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> TURTLEBOT3_MODEL</span><span style="--shiki-light:#383A42;--shiki-dark:#56B6C2">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">waffle</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><h3>SLAM</h3>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_slam</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_slam.launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> slam_methods:=gmapping</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_teleop</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_teleop_key.launch</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rosrun</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_server</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_saver</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -f</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/map</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3>Navigation</h3>
+<blockquote>
+<p>上面那個要先做完這個才能跑</p>
+</blockquote>
+<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_navigation</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_navigation.launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_file:=</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">$HOME</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">/map.yaml</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div>]]></content:encoded>
+    </item>
+    <item>
       <title>ROS Tutorial Introduction</title>
       <link>https://mes0903.github.io/ROS/ROS_Tutorial_Introduction/</link>
       <guid>https://mes0903.github.io/ROS/ROS_Tutorial_Introduction/</guid>
@@ -18833,86 +18926,6 @@ roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
 <p><strong><a href="https://ithelp.ithome.com.tw/users/20112348/ironman/1965" class="redlink">7. ROS自學筆記</a></strong></p>
 <p><strong><a href="https://www.facebook.com/profile.php?id=100003209663210" class="redlink">8. 這人台大</a></strong></p>
 ]]></content:encoded>
-    </item>
-    <item>
-      <title>Ros Install (noetic)</title>
-      <link>https://mes0903.github.io/ROS/ROS_Install/</link>
-      <guid>https://mes0903.github.io/ROS/ROS_Install/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Ros Install (noetic)</source>
-      <description>ROS1 Install (noetic) 當初老師請我在大教室的電腦上面灌 ROS，因為我當初沒有使用 Ansible 之類的軟體，所以就寫了個 script，每台開起來 clone 下來跑，這是當初的紀錄，也許可以幫到某位有緣人（? github 手動操作 沒有 vim 的話看你要裝還是用 nano 把下面的內容貼上： 貼上後下： 過程中會有需要輸...</description>
-      <category>ROS1</category>
-      <pubDate>Wed, 13 Dec 2023 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<p>當初老師請我在大教室的電腦上面灌 ROS，因為我當初沒有使用 Ansible 之類的軟體，所以就寫了個 script，每台開起來 clone 下來跑，這是當初的紀錄，也許可以幫到某位有緣人（?</p>
-<h2>github</h2>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/NcuMathRoboticsLab/MRLRosInstall.git</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><h2>手動操作</h2>
-<blockquote>
-<p>沒有 vim 的話看你要裝還是用 nano</p>
-</blockquote>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vim</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install.sh</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>把下面的內容貼上：</p>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">#!/bin/bash</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> update</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> upgrade</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">wget</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://raw.githubusercontent.com/ROBOTIS-GIT/robotis_tools/master/install_ros_noetic.sh</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">chmod</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 755</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./install_ros_noetic.sh</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> </span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">bash</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ./install_ros_noetic.sh</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt-get</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-joy</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-teleop-twist-joy</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-teleop-twist-keyboard</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-laser-proc</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rgbd-launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rosserial-arduino</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rosserial-python</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rosserial-client</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-rosserial-msgs</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-amcl</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-map-server</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-move-base</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-urdf</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-xacro</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-compressed-image-transport</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rqt</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">*</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-rviz</span><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2"> \</span></span>
-<span class="line"><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">  ros-noetic-gmapping</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-navigation</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-interactive-markers</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-dynamixel-sdk</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-turtlebot3-msgs</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> apt</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ros-noetic-turtlebot3</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "source /opt/ros/noetic/setup.bash"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "source ~/catkin_ws/devel/setup.bash"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export ROS_MASTER_URI=http://localhost:11311"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export ROS_HOSTNAME=localhost"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">sudo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> echo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> "export TURTLEBOT3_MODEL=burger"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> >> </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">~/.bashrc</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">source</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/.bashrc</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mkdir</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> catkin_ws</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">mkdir</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> catkin_ws/src</span></span>
-<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/catkin_ws/src</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/DynamixelSDK.git</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3.git</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">git</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> clone</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -b</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> noetic-devel</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git</span></span>
-<span class="line"></span>
-<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">cd</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/catkin_ws</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> &#x26;&#x26; </span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">catkin_make</span></span>
-<span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#56B6C2">source</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/.bashrc</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>貼上後下：</p>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">chmod</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> +x</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> install.sh</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">./install.sh</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>過程中會有需要輸入 <code>Y</code> 與 enter 的地方</p>
-<h2>測試</h2>
-<h3>Turtlebot simulator</h3>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">export</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75"> TURTLEBOT3_MODEL</span><span style="--shiki-light:#383A42;--shiki-dark:#56B6C2">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">waffle</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><h3>SLAM</h3>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_slam</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_slam.launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> slam_methods:=gmapping</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_teleop</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_teleop_key.launch</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rosrun</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_server</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_saver</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> -f</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> ~/map</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3>Navigation</h3>
-<blockquote>
-<p>上面那個要先做完這個才能跑</p>
-</blockquote>
-<div class="language-bash line-numbers-mode" data-highlighter="shiki" data-ext="bash" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-bash"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_gazebo</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_world.launch</span></span>
-<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">roslaunch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_navigation</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> turtlebot3_navigation.launch</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> map_file:=</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">$HOME</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">/map.yaml</span></span></code></pre>
-<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div>]]></content:encoded>
     </item>
     <item>
       <title>GSM &amp; UMTS &amp; IGP</title>
@@ -21803,6 +21816,42 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
+      <title>Gauss-Seidel Metheod</title>
+      <link>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</link>
+      <guid>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</guid>
+      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
+      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
+      <category>math</category>
+      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h3>Gauss-Seidel Metheod</h3>
+<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
+<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
+<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
+<p>上次我們把原本的矩陣分成 D、L、U：</p>
+<figure><figcaption></figcaption></figure>
+<p>那我們做了優化之後，可以把它寫成這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
+<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
+<p>輸出：估計出來的 </p>
+<p>::</p>
+<h3>Lemma7.18</h3>
+<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
+<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
+<p>證明：</p>
+<figure><figcaption></figcaption></figure>
+<h3>Thm 7.19</h3>
+<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
+<p>證明：</p>
+<figure><figcaption></figcaption></figure>
+]]></content:encoded>
+    </item>
+    <item>
       <title>Error Bounds</title>
       <link>https://mes0903.github.io/Math/numerical_algebra/Error-Bound/</link>
       <guid>https://mes0903.github.io/Math/numerical_algebra/Error-Bound/</guid>
@@ -21847,42 +21896,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>那我們把它就代回 Ax = b：</p>
 <figure><figcaption></figcaption></figure>
 <p>這時我們就會發現電腦裡面算出來的  和我們實際上的 x 的相對誤差是上圖下面那樣，一樣取決於 K（A）</p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>Gauss-Seidel Metheod</title>
-      <link>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</link>
-      <guid>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
-      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
-      <category>math</category>
-      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
-<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
-<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
-<p>上次我們把原本的矩陣分成 D、L、U：</p>
-<figure><figcaption></figcaption></figure>
-<p>那我們做了優化之後，可以把它寫成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
-<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
-<p>輸出：估計出來的 </p>
-<p>::</p>
-<h3>Lemma7.18</h3>
-<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
-<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<h3>Thm 7.19</h3>
-<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
 <p>證明：</p>
 <figure><figcaption></figcaption></figure>
 ]]></content:encoded>
@@ -21989,27 +22002,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>基本上跟前面講的一樣</p>
 ]]></content:encoded>
       <enclosure url="https://upload.wikimedia.org/wikipedia/commons/8/84/%E6%95%A3%E7%82%B9%E5%9B%BE.jpg" type="image/jpeg"/>
-    </item>
-    <item>
-      <title>Linear Algebra and Eigenvalues</title>
-      <link>https://mes0903.github.io/Math/numerical_algebra/Linear-Algebra-and-Eigenvalues/</link>
-      <guid>https://mes0903.github.io/Math/numerical_algebra/Linear-Algebra-and-Eigenvalues/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Linear Algebra and Eigenvalues</source>
-      <description>Linear Algebra and Eigenvalues Gershgorin circle 給定一個 矩陣， 記為一個在複數平面上的圓，圓心是 ，半徑是 ，也就是同一個 row 裡面除了圓心以外的其他元素的總和，所以 ， A 的特徵值（eigen value） 會被包含在這些圓（ ） 的聯集內，如果 A 是對角矩陣，那麼圓半徑會退化到 0 證明：...</description>
-      <category>math</category>
-      <pubDate>Sun, 07 Nov 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>Gershgorin circle</h3>
-<p>給定一個  矩陣， 記為一個在複數平面上的圓，圓心是 ，半徑是 ，也就是同一個 row 裡面除了圓心以外的其他元素的總和，所以</p>
-<p>，</p>
-<p>A 的特徵值（eigen value） 會被包含在這些圓（  ） 的聯集內，如果 A 是對角矩陣，那麼圓半徑會退化到 0</p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後如果有 k 個圓的聯集和剩下的 n-k 個圓聯集沒有交集，那麼前者會包含 k 個特徵值，而後者則恰有 n-k 個特徵值</p>
-<p>要逼近特徵值的我們很常使用迭代法，所以先用 Gershgorin circle 找到一個範圍，拿來讓 initial guess 參考是很不錯的選擇，可以提供很好的 initial guess</p>
-<h3>例子</h3>
-<figure><figcaption></figcaption></figure>
-]]></content:encoded>
     </item>
   </channel>
 </rss>
