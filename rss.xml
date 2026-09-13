@@ -6,10 +6,11 @@
     <link>https://mes0903.github.io/</link>
     <description>Being Towards Death</description>
     <language>zh-TW</language>
-    <pubDate>Thu, 10 Sep 2026 14:05:09 GMT</pubDate>
-    <lastBuildDate>Thu, 10 Sep 2026 14:05:09 GMT</lastBuildDate>
+    <pubDate>Sun, 13 Sep 2026 18:35:36 GMT</pubDate>
+    <lastBuildDate>Sun, 13 Sep 2026 18:35:36 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+    <category>graphic-stack</category>
     <category>essay</category>
     <category>math</category>
     <category>Linux</category>
@@ -24,6 +25,1810 @@
     <category>ROS1</category>
     <category>computer-network</category>
     <category>security</category>
+    <item>
+      <title>（WIP）The rendering pipeline in OpenGL</title>
+      <link>https://mes0903.github.io/GraphicStack/rendering-pipeline/</link>
+      <guid>https://mes0903.github.io/GraphicStack/rendering-pipeline/</guid>
+      <source url="https://mes0903.github.io/rss.xml">（WIP）The rendering pipeline in OpenGL</source>
+      <description>The rendering pipeline in OpenGL Background 與 big picture 本文使用的符號與寫法 後面的 rendering pipeline 會同時使用幾何名稱、位置向量、矩陣、純量與程式識別字。 為了讓符號的外觀直接反映它代表的資料種類，本文採用下列慣例： 、、 與 等大寫斜體字母：用來命名幾何點或頂點。 頂...</description>
+      <category>graphic-stack</category>
+      <pubDate>Mon, 14 Sep 2026 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h2>Background 與 big picture</h2>
+<h3>本文使用的符號與寫法</h3>
+<p>後面的 rendering pipeline 會同時使用幾何名稱、位置向量、矩陣、純量與程式識別字。 為了讓符號的外觀直接反映它代表的資料種類，本文採用下列慣例：</p>
+<ul>
+<li>、、 與  等大寫斜體字母：用來命名幾何點或頂點。 頂點序列需要編號時，則使用 、 等名稱</li>
+<li>粗體小寫的 ：表示位置向量。 例如  是頂點  的位置， 是相機的位置。 小節已經固定座標空間時可以省略空間下標，需要追蹤同一個位置如何轉換時，則使用  與  等名稱</li>
+<li>其他粗體小寫字母：表示一般向量。 符號上方的帽號表示它已正規化成單位向量，例如  是相機的單位 gaze direction</li>
+<li>、、 與  等大寫字母：表示矩陣。  表示完整的 model matrix，、 與  則分別表示組成它的平移、旋轉與縮放矩陣</li>
+<li>、、 與  等普通斜體字母：表示座標分量、距離、參數或權重等純量。 <code>object</code>、<code>clip</code>、<code>ndc</code> 與 <code>left</code> 等完整描述詞放入數學下標時使用直立體，例如  與 </li>
+<li> 與 ：表示頂點  攜帶的 RGBA 色彩與 UV。 這類完整名稱使用直立體，下標中的  仍是前述頂點名稱</li>
+<li>矩陣與二維網格的方向：由上往下排列的一組元素稱為行（column），由左往右排列的一組元素稱為列（row）。 分量由上往下排列的向量稱為行向量（column vector）</li>
+<li><code>gl_Position</code>、<code>reciprocal_w</code> 與 <code>hipegl_draw_desc</code> 等程式識別字：使用等寬字體。 公式若直接引用程式欄位，也會沿用相同寫法</li>
+</ul>
+<p>因此， 指的是一個頂點的名稱， 才是用數值表示的頂點位置。 同樣地， 中的小寫粗體  表示位置向量，而  中的大寫 <code>P</code> 是 projection 的縮寫，兩者代表不同概念</p>
+<h3>座標轉換需要的數學背景：齊次座標與矩陣</h3>
+<p>幾何資料在不同座標系統之間移動時，會反覆經過縮放、旋轉與平移。 如果每一種操作都採用不同的表示方式，會使我們難以組合轉換順序，也不容易算出返回原座標系統的操作。 齊次座標會替位置增加一個分量，讓我們能把這些轉換都寫成矩陣乘法。 後續只要沿著矩陣的乘法順序，就能追蹤一個點轉換的過程了</p>
+<h4>平移需要超出線性轉換的表示能力</h4>
+<p>縮放、反射、斜切（shear）與繞原點旋轉等操作都可以寫成二維矩陣乘上一個位置的形式。 我們需要先確認這種表示法能涵蓋哪些操作，才能看出平移為何需要另一種表示方式。 假設點的位置為 ，一般的二維線性轉換可寫成：</p>
+<p>其中線性轉換會把原點留在原點，因為：</p>
+<p>平移則會把每個點加上同一個位移向量 ：</p>
+<p>因此只要 ，原點就會移到 </p>
+<p>然而，任何  的線性轉換矩陣都無法單獨表示這個操作。 若要維持二維座標，那完整形式只能寫成「矩陣乘法再加位移」：</p>
+<p>為了讓平移也能進入矩陣乘法，我們會替二維位置增加第三個分量。 這種表示方式稱為齊次座標（homogeneous coordinates）</p>
+<h4>齊次座標以  區分點與向量</h4>
+<p>增加第三個分量後，我們需要保留點與方向向量的差異。 平移應該改變點的位置，但不應改變只描述方向與長度的向量。 齊次座標利用了  分量來表達這項差異，二維點  與二維向量  分別寫成：</p>
+<p>本文使用行向量，因此矩陣會乘在點或向量的左側。 平移矩陣作用於點時，最右行會加入  與 ：</p>
+<p>同一個矩陣作用於向量時， 會消去最右行中的平移量：</p>
+<p>另外，齊次點的  不必永遠等於 。 只要 ，齊次位置：</p>
+<p>就會對應到下列二維位置：</p>
+<p>當  時，我們可以將齊次座標的每個分量都除以 。 除法完成後，最後一個分量會變成 ，其餘分量就是這個位置的一般座標。 例如齊次位置：</p>
+<p>將三個分量都除以  後會得到：</p>
+<p>因此，它代表的二維位置是 。 由於齊次位置  與  分別除以自己的  後會得到相同結果，所以兩者代表同一個二維位置。 當  時，就無法用這個方式轉換成一般位置。 如前所述，本文使用  表示方向向量</p>
+<p>這個設計也讓點與向量的基本運算能保留著正確的資料種類。 若點使用 ，向量使用 ，則：</p>
+<p>也就是說：</p>
+<ul>
+<li>向量 + 向量：仍然是向量</li>
+<li>點 - 點：結果為向量</li>
+<li>點 + 向量：結果為點</li>
+</ul>
+<p>一般仿射幾何並未將「點加點」定義成合法運算。 若要由多個位置算出另一個位置，較清楚的寫法是使用仿射組合（affine combination）。 仿射組合會替每個輸入位置指定一個權重，而且依定義，所有權重的總和必須是 。 輸出位置是每個輸入位置乘上各自權重後的總和</p>
+<p>以下兩個例子都使用相同的輸入位置：</p>
+<p>第一個例子的兩個權重分別是  與 ：</p>
+<p>因此，輸出位置是 ，也就是  與  的中點</p>
+<p>第二個例子的兩個權重分別是  與 ：</p>
+<p>因此，輸出位置是 。  的權重較大，所以輸出位置也比較靠近 </p>
+<p>另外，前面提到的齊次座標相加，也可以用第一個例子來理解。 兩筆  的齊次座標相加後會得到：</p>
+<p>將所有分量除以結果的 ，就會得到 。 這等同於將兩個原始係數  分別除以總和 ，所以兩個位置的權重都會變成 ，輸出便是兩點的中點</p>
+<h4>affine transformation：統一表示線性轉換與平移</h4>
+<p>有了齊次座標後，我們可以把原本分開的線性轉換與平移放進同一個運算，這被稱為仿射轉換（affine transformation），其會先對位置套用線性轉換，再加入位移向量：</p>
+<p>在齊次座標中，這樣的操作可以直接寫成一個  矩陣：</p>
+<p>矩陣左上角的  區塊負責縮放、旋轉、反射或斜切，最右行負責平移。 常用的二維縮放矩陣為：</p>
+<p>採用行向量與逆時針正角度時，繞原點旋轉的矩陣為：</p>
+<p>平移矩陣則為：</p>
+<p>這三種矩陣具有相同尺寸，因此可以直接相乘。 反射與斜切也只需要替換左上角的線性轉換區塊即可</p>
+<h4>inverse transformation：沿相反方向轉換座標</h4>
+<p>前面介紹的縮放矩陣 、旋轉矩陣 、平移矩陣 ，以及由它們組合而成的仿射矩陣，都能把轉換前的位置映射到轉換後的位置。 本節我們會使用  作為通用符號，表示其中任一個矩陣或組合結果：</p>
+<p>圖形管線有時也需要沿相反方向轉換座標，例如後面的 view transformation 就會用到這項能力。 此時場景記錄的是相機位於何處以及面向哪裡，但算繪時我們需要反過來求出其他位置相對於相機的座標。 這種取消原轉換並沿相反方向還原座標的操作稱為逆轉換（inverse transformation）。 此時我們擁有的是轉換後的位置 ，並且需要找回同一個位置在轉換前使用的座標</p>
+<p>若一項轉換沒有遺失位置資訊，而且每個輸出位置都能唯一對應回一個輸入位置，我們就稱其矩陣可逆。 能夠取消  所做轉換的矩陣稱為  的逆矩陣，記作 ，它滿足下列關係：</p>
+<p>其中  是不會改變位置的單位矩陣。 因此，假設正向轉換為 ，那此時我們便能在等式兩側的左邊乘上 ：</p>
+<p>也就是說，先用  完成正向轉換，再用  沿相反方向轉換，就會回到原本的座標</p>
+<p>平移的逆操作是朝相反方向平移，因此：</p>
+<p>例如位移向量為  時，矩陣  與其逆矩陣為：</p>
+<p>點  經過  後成為 ，再乘上  就會回到 。 在這個例子中，正向轉換會向右移動  並向上移動 ，逆轉換則是向左移動  並向下移動 </p>
+<p>旋轉矩陣中的各個行向量彼此正交且長度為 ，因此旋轉矩陣是正交矩陣（orthogonal matrix）。 它的逆矩陣同時也是轉置矩陣與反向旋轉矩陣：</p>
+<p>也就是說，沿用本文的二維齊次座標，旋轉  的矩陣為：</p>
+<p>將旋轉角度改成  時，，而 ，因此：</p>
+<p> 會沿相反方向旋轉相同角度。 它的矩陣內容也正好等於  的轉置，因此可以取消  做過的旋轉</p>
+<p>縮放只有在每個縮放係數都不等於  時可逆。 如果某一軸的縮放係數是 ，該軸上的所有位置都會重疊，原本的座標資訊也會消失，因此無法唯一還原。 更一般地說，仿射矩陣只有在左上角的線性轉換區塊可逆時才有逆矩陣</p>
+<h4>transformation composition：合併多個轉換並保留操作順序</h4>
+<p>前面分別介紹了縮放、旋轉與平移，但實際擺放一個物件時，通常需要讓同一個位置連續經過多項轉換。 為了看清楚要如何組合這些矩陣，本節先設定一項具體任務：將物件調整成指定大小、轉成指定朝向，最後放到指定位置。 這三個動作依序對應到了縮放矩陣 、旋轉矩陣  與平移矩陣 </p>
+<p>第一步先縮放原始位置：</p>
+<p>第二步將縮放後的位置交給旋轉矩陣：</p>
+<p>第三步再平移旋轉後的位置：</p>
+<p>將前兩步的輸出依序代入下一步，就會得到：</p>
+<p>由於本文使用行向量，並將矩陣寫在向量左側，因此最靠近  的  最先作用，接著是 ，最左側的  最後作用。 由於矩陣乘法具有結合律，所以我們可以將三個矩陣預先組合起來：</p>
+<p>更一般地說，若一個位置依序經過 、 與 ，就可以寫成：</p>
+<p>矩陣乘法通常不具有交換律，交換兩個矩陣往往會得到不同結果。 下面的例子要把左側圖形旋轉 ，再沿 x 軸向右平移一個單位，得到右側的目標位置：</p>
+<figure><figcaption></figcaption></figure>
+<p>如果先平移再旋轉，位移後的位置也會繞原點旋轉。 對行向量而言，這個順序會寫成 ，結果如下：</p>
+<figure><figcaption></figcaption></figure>
+<p>因此如果要得到目標位置，我們得先讓圖形繞原點旋轉，再沿 x 軸向右平移。 這個順序會寫成 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>三張圖顯示了矩陣順序會直接改變幾何結果。 兩種順序都能預先合併成單一矩陣，但合併後的矩陣內容並不相同</p>
+<p>旋轉矩陣預設會以原點為中心。 若要讓圖形繞指定位置  旋轉，我們需要先把  移到原點，執行旋轉後再把它移回原位。 下圖以  表示原點到旋轉中心的位移：</p>
+<figure><figcaption></figcaption></figure>
+<p>依行向量的右至左作用順序，完整矩陣為：</p>
+<p>最右側的  會先作用，使位置  在旋轉前暫時落在原點。 旋轉完成後，最左側的  再把它移回原本的位置，因此旋轉中心本身保持不動</p>
+<h4>三維齊次座標與  transformation matrices</h4>
+<p>三維幾何還要處理 z 座標，因此需要把相同的點、向量、平移與矩陣組合規則延伸到三維。 三維點  與向量  的齊次表示各有四個分量：</p>
+<p>一般的齊次位置  在  時，對應到的三維位置為：</p>
+<p>三維縮放需要分別指定三個軸的倍率：</p>
+<p>三維平移會把位移向量  放入矩陣最右行：</p>
+<p>一般的三維仿射轉換會把任意  的線性轉換與三維平移放進同一個  矩陣：</p>
+<p>最後還需要分別繞三個座標軸旋轉。 在右手座標系統與行向量的慣例下，正角度依右手定則決定。 繞 x 軸旋轉的矩陣為：</p>
+<p>繞 y 軸旋轉的矩陣為：</p>
+<p>繞 z 軸旋轉的矩陣為：</p>
+<p>這些  會矩陣沿用二維情況的所有規則，它們可以依右至左的作用順序組合，可逆的時候也能以逆矩陣返回轉換前的位置。 仿射轉換會讓一般點維持 、方向向量維持 。 投影轉換則可能產生其他 ，管線必須先保留完整的齊次位置來完成裁切，直到透視除法階段才將前三個分量除以 </p>
+<p>後面我們在講 model、view 與 projection transformations 時會直接使用這套表示法。 Model 與 view 會使用前述的仿射矩陣，projection 則會利用齊次位置的  來保存投影所需的資訊</p>
+<h2>一筆 draw call 如何走過 rendering pipeline</h2>
+<p>前面的軟體分層我們說明了一筆 draw call 會由哪些元件接手，但這筆 draw call 內的資料要如何從頂點變成像素，則需要由 rendering pipeline 來定義。 這裡我們會採用教學上的邏輯順序來寫，但實務上 driver 與 GPU 可以自行合併或重排部分工作，只要最後 OpenGL 對外的外顯行為正確即可</p>
+<p>完整的管線如下，每個階段都會接收前一階段的結果，並補上下一階段所需的資訊：</p>
+<div class="language-callgraph line-numbers-mode" data-highlighter="shiki" data-ext="callgraph" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-callgraph"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[一般 rendering pipeline：從頂點資料到畫面緩衝區]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">=================================================</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">頂點／索引資料</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">頂點處理（vertex processing）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 將 object-space 座標轉成 clip-space 座標</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 產生色彩、UV 等頂點屬性</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">圖元組合（primitive assembly）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 依圖元類型將頂點組成三角形</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">裁切（clipping）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 留下可見範圍內的幾何形狀</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">透視除法（clip-space → NDC）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 以 clip-space w 計算正規化裝置座標</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">視埠轉換（NDC → screen-space 座標）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 產生 screen-space x／y 與深度 z</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">三角形覆蓋判定（triangle coverage）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 找出三角形會影響的像素</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">重心座標內插（barycentric interpolation）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 算出每個像素相對於三個頂點的權重</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">片段著色（fragment shading）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 由頂點色彩或紋理產生候選顏色</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">逐片段操作（per-fragment operations）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 執行深度測試等輸出合併規則</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">畫面緩衝區寫入（framebuffer write）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ├─ 保存最後通過測試的色彩與深度</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">  ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">RGB／深度影像</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>上面的 callgraph 提供了階段順序。 下圖則將圖形管線概括成了五個大階段，並在相鄰階段之間標出了資料流的形態：</p>
+<figure><figcaption></figcaption></figure>
+<p>其中：</p>
+<ul>
+<li><code>Vertex Processing</code>：接收 Application 提供的頂點資料，決定本次要處理的頂點，再逐一執行頂點著色器，最後交出包含 clip-space 位置與頂點屬性的 vertex stream</li>
+<li><code>Triangle / Primitive Processing</code>：從 vertex stream 取得頂點，依輸入模式組成圖元，接著完成 clipping、perspective divide 與 viewport transform，再交出位於 screen-space 的 primitive stream</li>
+<li><code>Rasterization</code>：判斷每個三角形在各像素內涵蓋哪些 sample，並為每個至少涵蓋一個 sample 的像素產生一筆 fragment。 若像素內有多個 samples，這筆 fragment 會以 coverage mask 的每個 bit 記錄一個 sample 的涵蓋結果</li>
+<li><code>Fragment Processing</code>：使用內插後的屬性與紋理等輸入計算片段顏色，交出 shaded fragments</li>
+<li><code>Framebuffer Operations</code>：對著色完成的片段執行深度、模板與混色等操作，最後更新輸出影像中的像素</li>
+</ul>
+<p>本文沿用了這五個大階段來作為 H3，並將前面 callgraph 中的細部步驟放進了對應的 H4：</p>
+<ul>
+<li><code>Vertex Processing</code>：包含頂點／索引資料與頂點處理，最後產生 clip-space 位置及頂點的 RGBA、UV 等資料</li>
+<li><code>Triangle / Primitive Processing</code>：包含圖元組合、裁切、透視除法與視埠轉換，最後產生位於 screen-space 的圖元</li>
+<li><code>Rasterization</code>：包含三角形覆蓋判定與重心座標內插，將 screen-space 圖元轉換成片段資料與內插權重</li>
+<li><code>Fragment Processing</code>：對應片段著色，負責產生片段的候選顏色</li>
+<li><code>Framebuffer Operations</code>：包含逐片段的操作與畫面緩衝區的寫入，負責測試片段並更新最後的色彩與深度</li>
+</ul>
+<p>圖中使用「Vertices positioned in screen space」概括了頂點處理後的結果。 但我們後續的解說會明確保留 clip-space 這個中間座標系統，再於 <code>Triangle / Primitive Processing</code> 中依序說明裁切、透視除法與視埠轉換。 兩種畫法採用的分組只是粒度不同，其底層描述的是同一條圖形管線</p>
+<p>我們後面會用 11 個 H4 來追蹤一筆索引式三角形的 draw call。 這個三角形的其中一個頂點會落在右裁切平面外，因此我們可以一路觀察頂點與索引如何形成圖元、MVP transformation 如何產生 clip-space 位置、clipping 如何建立新頂點，以及同一批資料如何繼續變成 NDC、screen-space 座標、片段、候選顏色與深度。 後半段我們會使用  viewport 來顯示完整的 coverage mask，並固定追蹤像素 ，讓每一階段的輸出都能直接成為下一階段的輸入</p>
+<h3>Vertex Processing：從頂點輸入產生 clip-space 資料</h3>
+<p>Vertex Processing 周圍的工作會先決定這筆 draw call 要取用哪些頂點，以及每筆頂點記錄中的欄位要如何解讀。 接著我們會對取出的頂點逐一執行頂點著色器內的操作，將 object-space 位置轉換成 clip-space 位置，並產生後續階段需要的色彩與 UV</p>
+<figure><figcaption></figcaption></figure>
+<p>下面兩個 H4 會分別展開輸入資料與逐頂點的運算</p>
+<h4>vertex / index data：決定要處理哪些頂點</h4>
+<p>Application 提交 draw call 前，會先準備幾何資源與解讀規則。 圖形 API 整理這些狀態後，圖形管線會取得兩類輸入：</p>
+<ol>
+<li>頂點緩衝區及其欄位格式：用來找出每個頂點的位置、色彩與 UV
+<ul>
+<li>頂點緩衝區：保存的是一串原始位元組</li>
+<li>欄位格式：是一組解讀規則。 它會描述 position、color 與 UV 各有幾個分量、每個分量使用什麼資料型態、是否需要正規化、欄位在一筆頂點記錄中的 byte offset，以及相鄰兩筆記錄之間的 stride</li>
+</ul>
+</li>
+<li>索引緩衝區及 draw call 參數：用來決定這次要取用哪些頂點，以及如何將它們組成圖元
+<ul>
+<li>索引緩衝區：保存的是一串頂點編號。 圖形管線會依序讀取這些編號，再到頂點緩衝區取得對應的頂點資料，因此同一筆頂點資料可以被多個圖元重複使用</li>
+<li>draw call 的參數：會指定圖元輸入模式、索引數量、每個索引的資料型態，以及從索引緩衝區哪一個 byte offset 開始讀取。 圖形管線會依照這些參數解讀索引，並將取出的頂點組成點、線段或三角形</li>
+</ul>
+</li>
+</ol>
+<p>先看第一類輸入。 一筆頂點記錄代表的是「其中一個頂點所對應到的一筆資料」，具體排列可能會像這樣：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">struct</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B"> ExampleVertex</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    float</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> position</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // 3 × 4 bytes</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    float</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> color</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">    // 4 × 4 bytes</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    float</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> uv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">];</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">       // 2 × 4 bytes</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>ExampleVertex</code> 以 <code>position</code>、<code>color</code> 與 <code>uv</code> 分別保存位置、RGBA 色彩與紋理座標。 圖形 API 還需要替每個欄位描述 shader input location、分量數、資料型態、正規化方式、stride 與 byte offset 的資訊，圖形管線才能把原始位元組還原成正確的數值</p>
+<figure><figcaption></figcaption></figure>
+<p>這張圖強調欄位格式是讀取原始位元組時的解讀規則。 以上例來說，三個欄位可整理成：</p>
+<ul>
+<li><code>position</code>：位於 location 0，包含 3 個 float32 分量，byte offset 為 0</li>
+<li><code>color</code>：位於 location 1，包含 4 個 float32 分量，byte offset 為 12</li>
+<li><code>uv</code>：位於 location 2，包含 2 個 float32 分量，byte offset 為 28</li>
+</ul>
+<p>三個欄位共用了 36-byte 的 stride，表示相鄰兩筆頂點記錄的起點相隔 36 bytes</p>
+<p>OpenGL 可以用 <code>glVertexAttribPointer()</code> 提供這些規則，其他圖形 API 也會提供等價的頂點輸入描述。 這些欄位設定會把頂點緩衝區中的原始位元組對應到位置、顏色與 UV。 因此若要讀取第 i 筆頂點，可以先算：</p>
+<p>再加上各欄位的 offset 來讀取對應的資料：</p>
+<p>到這裡我們已經說明了該如何解讀第一類輸入中的頂點資料，接著來看第二類輸入會如何決定這次要取用哪些資料。 假設索引緩衝區保存以下六個 <code>uint32_t</code> 頂點編號：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> uint32_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> indices[] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>Application 可以使用下列 draw call 來提交這六個索引：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glDrawElements</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TRIANGLES, index_count,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">               GL_UNSIGNED_INT, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">nullptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div><p>四個參數用來補齊解讀索引所需的資訊：</p>
+<ul>
+<li><code>GL_TRIANGLES</code>：指定三角形輸入模式，圖元組合階段會將每三個索引所對應的頂點組成一個三角形</li>
+<li><code>index_count</code>：指定要讀取多少個索引，在這個例子中是 <code>6</code></li>
+<li><code>GL_UNSIGNED_INT</code>：指定每個索引是 32-bit 無號整數，與索引緩衝區中的 <code>uint32_t</code> 相符</li>
+<li><code>nullptr</code>：表示從目前索引緩衝區的 byte offset 0 開始讀取</li>
+</ul>
+<p>圖形管線因此會按照 <code>vertex 0 → 1 → 2 → 2 → 1 → 3</code> 的順序取得頂點記錄，圖元組合階段再將它們組成兩個三角形：</p>
+<figure><figcaption></figcaption></figure>
+<p>上例的頂點 1 與頂點 2 同時屬於兩個三角形。 索引緩衝區只會保存頂點編號，不會複製整筆頂點資料。 因此它只需要再次引用相同編號，就能重複使用既有的頂點記錄了。 接下來的共用範例會將相同的讀取規則套用到一個三角形</p>
+<h5>共用範例：頂點與索引指出原始三角形</h5>
+<p>我們的共用範例會從三筆 <code>ExampleVertex</code> 的記錄開始。 頂點 、 與  分別帶有 object-space 位置、RGBA 色彩與 UV：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> ExampleVertex vertices[] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {{-1.0f, -1.0f,  0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // A</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {{ 3.0f, -1.0f,  0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // B</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    {{ 0.0f,  3.0f, -1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // C</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> uint32_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> indices[] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glDrawElements</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TRIANGLES, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, GL_UNSIGNED_INT, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">nullptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>GL_TRIANGLES</code> 與索引序列 <code>[0, 1, 2]</code> 表示這筆 draw call 只會建立一個三角形。 輸入階段會先依索引取回 、、 三筆記錄，再依欄位格式把每筆記錄拆成 position、color 與 UV。 此時位置仍在 object-space 中：</p>
+<p><code>ExampleVertex</code> 的 <code>position</code> 原本只有 、、。 進入 vertex processing 後，頂點著色器會再補上第四個分量 ，形成可參與矩陣運算的齊次座標。 因此，頂點／索引輸入階段會依  的順序輸出三筆頂點資料。 每筆資料包含 object-space 位置、RGBA 色彩與 UV。 這批資料會成為下一個 vertex processing 階段的輸入，由頂點著色器逐筆讀取</p>
+<h4>vertex processing：執行 vertex shader，產生 clip-space 頂點</h4>
+<p>上一個管線階段我們已經依索引順序取回了頂點 、 與 。 每筆資料都包含 object-space 位置、RGBA 色彩與 UV，但這些位置現在還都是以模型各自的原點與座標軸為基準，所以我們沒辦法直接用這些座標來判斷它們會出現在相機畫面的哪裡</p>
+<p>如一開始所述，整個 rendering pipeline 的目標是將 3D 模型轉成 2D 影像。 過程中頂點處理階段會先將每筆頂點的位置轉成 clip-space 座標，後續的圖元處理再執行裁切、透視除法與視埠轉換。 本節我們先專注在第一段，並說清楚頂點處理與頂點著色器分別代表什麼</p>
+<h5>vertex processing 是管線階段，vertex shader 是其中執行的程式</h5>
+<p>在本文的管線劃分中，頂點處理（vertex processing）是一個邏輯階段，主要工作是針對每個被取用的頂點執行一次使用者提供的頂點著色器（vertex shader）</p>
+<p>圖形管線實作會在頂點處理階段，依目前綁定的頂點資料與 program state，準備頂點著色器所需的輸入、啟動每次頂點著色器執行，並接收它產生的 <code>gl_Position</code>、色彩與 UV 等資料。 而頂點著色器內部會去描述單一頂點要如何使用這些輸入來計算輸出</p>
+<p>頂點著色器在執行時會讀取兩種輸入資料：</p>
+<ul>
+<li>頂點屬性：輸入階段會依 vertex buffer、頂點欄位格式與索引，找出目前頂點記錄內的 position、RGBA 與 UV，再依 input location 將這些數值送到頂點著色器對應的輸入變數
+<ul>
+<li>註：不同頂點通常會取得不同的屬性值</li>
+</ul>
+</li>
+<li>uniform 參數：由 Application 負責設定這些值，OpenGL 會將它們保存在提交 draw call 時由 <code>glUseProgram()</code> 綁定的 OpenGL program object 中
+<ul>
+<li>在同一筆 draw call 中，頂點著色器每次執行時都會讀取相同的 uniform 值，例如 model、view 與 projection matrices</li>
+</ul>
+</li>
+</ul>
+<p>GLSL 預先定義了名為 <code>gl_Position</code> 的 <code>vec4</code> 輸出變數。 頂點著色器會將目前頂點的 homogeneous clip-space 位置  寫入這個變數，供後續管線執行圖元組合、裁切與透視除法。 它也能產生色彩、UV 與法線等使用者自訂資料，讓後續管線將它們帶到片段著色器</p>
+<p>例如，下列頂點著色器會將輸入位置乘上 MVP matrix，再把得到的 clip-space 位置寫入 <code>gl_Position</code>：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_position;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mvp;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    gl_Position </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mvp </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(in_position, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>其中 <code>in_position</code> 與 <code>mvp</code> 都是使用者撰寫 shader 時自行定義的變數：</p>
+<ul>
+<li><code>in_position</code> 的值來自 vertex buffer 中的 position 欄位，Application 會透過 <code>glVertexAttribPointer()</code> 將這個欄位接到頂點著色器的 input location</li>
+<li><code>mvp</code> 的值則是 Application 計算好的 MVP matrix，並透過 <code>glUniformMatrix4fv()</code> 傳入頂點著色器</li>
+</ul>
+<p>下面是一個簡單的 Application 端範例，示範如何將這兩類資料傳入頂點著色器。 這裡沿用了前一個 H4 的 <code>ExampleVertex</code> 與 vertex buffer，只保留和 <code>in_position</code>、<code>mvp</code> 直接相關的呼叫：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glBindBuffer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_ARRAY_BUFFER, vertex_buffer);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glVertexAttribPointer</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">    0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, GL_FLOAT, GL_FALSE,</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    sizeof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ExampleVertex),</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">    reinterpret_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;void</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *></span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">        offsetof</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(ExampleVertex, position)));</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glEnableVertexAttribArray</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 mvp </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> projection </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> view </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> model;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glUseProgram</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(program);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> GLint mvp_location </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    glGetUniformLocation</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(program, </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"mvp"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glUniformMatrix4fv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mvp_location, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, GL_FALSE,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">                   glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">value_ptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mvp));</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>可以看到，<code>glVertexAttribPointer()</code> 會利用 location 0，將 <code>ExampleVertex::position</code> 對應到 shader 的 <code>in_position</code></p>
+<p>Application 接著會將 model、view 與 projection matrices 相乘，算出 <code>mvp</code>，再以 <code>glGetUniformLocation()</code> 找到同名的 uniform，並透過 <code>glUniformMatrix4fv()</code> 傳入矩陣內容</p>
+<p>頂點著色器執行後，會將 <code>mvp</code> 與 <code>in_position</code> 相乘，再把得到的四個分量寫入 <code>gl_Position</code></p>
+<p>MVP transformation 是產生 <code>gl_Position</code> 的常見方式。 OpenGL 的 API 契約只有要求最後一個啟用的頂點處理著色器要交出合法的 clip-space 位置，不會自動替 Application 建立或套用 model、view 與 projection matrices</p>
+<p>本文範例採用了常見的做法。 Application 會先建立 model、view 與 projection matrices，將三者相乘成一個 MVP matrix，再以 uniform 傳入頂點著色器。 頂點著色器接著會使用這個矩陣轉換輸入位置</p>
+<p>另一種做法是由 Application 將三個矩陣分別傳入頂點著色器，再由頂點著色器按照 projection、view 與 model 的順序完成矩陣乘法：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> model;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> view;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> projection;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    gl_Position </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> projection </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> view </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> model</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">                *</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(in_position, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這兩種做法的差別，在於三個矩陣是在 Application 端先合併，還是在頂點著色器中保持分開。 它們最後都會產生 homogeneous clip-space 位置，並寫入 <code>gl_Position</code></p>
+<p>最後，完整的 OpenGL 管線還能另外再啟用曲面細分著色器（tessellation shader）與幾何著色器（geometry shader）。 前者能把由多個控制點描述的曲面區塊切成較小圖元； 後者則能以整個輸入圖元為單位來產生、修改或捨棄圖元。 但這些暫時不在本文的討論範圍內</p>
+<h5>從 object-space 走到 clip-space</h5>
+<p>MVP transformation 會讓同一個頂點依序經過四個座標空間：</p>
+<ul>
+<li>object-space：以模型自身的原點與座標軸為基準，用來描述頂點位於模型內的哪個位置</li>
+<li>world-space：讓所有模型與其他物件共用同一套座標基準，因此可以表示彼此的相對位置</li>
+<li>view-space：以相機的位置與朝向為基準，表示頂點位於相機的哪個方向，以及離相機多遠</li>
+<li>clip-space：保存 projection transformation 產生的四維齊次位置 ，供後續 clipping 與 perspective divide 使用</li>
+</ul>
+<p>前面我們已經說明了如何把 3D 點寫成四維齊次座標，以及如何組合  matrices。 現在我們要將同一套數學放進管線，來描述 MVP Transformation，整個轉換可以寫成三個階段：</p>
+<p>下圖將這四個空間與後續的 NDC、screen-space 座標一起放了進來。 本節的頂點著色器只負責了圖中的前四個座標空間，輸出會停在 clip-space</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中的後兩個座標空間要等後續管線階段才會產生：</p>
+<ul>
+<li>NDC：perspective divide 會將 clip-space 的 、 與  分別除以 ，把可見範圍轉成與實際畫面大小無關的標準座標
+<ul>
+<li>在 OpenGL 的 NDC 中，位於可見範圍內的 、 與  都會處於  之間</li>
+</ul>
+</li>
+<li>screen-space 座標：viewport transform 會將 NDC 映射到指定視埠，產生以畫面位置表示的 、，以及供深度測試使用的 screen-space 深度 </li>
+</ul>
+<p>因此，頂點處理的位置輸出是 ，不是 NDC 或 pixel 座標。 RGBA 與 UV 仍與各自的頂點相連，一起交給下一個圖元處理階段</p>
+<h5>model transformation：決定模型在世界中的大小、朝向與位置</h5>
+<p>模型檔案通常是以自己的原點與座標軸來保存頂點資訊的，但一個 3D 世界內可能同時會放入桌子、機器手臂與多個物件。 若每個模型都停留在自己的 object-space，我們就無法用同一套座標來比較它們的位置了</p>
+<p>因此整個轉換的第一步是 Model transformation，它用來算出模型在共同的 world-space 中有多大、朝向哪裡，以及放在哪裡</p>
+<p>本文我們會讓 object-space 中的點依序經過縮放、旋轉與平移來作為例子。 首先我們先做縮放：</p>
+<p>再繞模型原點旋轉：</p>
+<p>最後平移到 world-space 中的指定位置：</p>
+<p>將前兩式逐步代入最後一式，就能得到：</p>
+<p>因此我們可得：</p>
+<p>前面我們已經講過三維縮放、旋轉與平移矩陣的形式了。 將其代入後，合併後的 model matrix 會有下列形式：</p>
+<p>左上角的  區域是縮放與旋轉合成後的線性轉換，最右行的  則是模型在 world-space 中的位移</p>
+<p>下圖以同一個三角形顯示了三個操作的分工：縮放改變它相對於模型原點的大小，旋轉改變朝向，平移最後決定它位於 world-space 的哪裡</p>
+<figure><figcaption></figcaption></figure>
+<p>由於本文將行向量放在最右邊，矩陣會由右往左作用。 因此圖中的  代表著先縮放、再旋轉，最後做平移</p>
+<p>下列 GLM 程式會先用不改變輸入座標的單位矩陣（identity matrix）來初始化 <code>matrix</code>，再逐次把平移、繞 x／y／z 軸旋轉與縮放矩陣等操作接到右側。 因此，<code>matrix</code> 的內容會按照下列順序累積：</p>
+<p>因此函式最後傳回的 model matrix 為 。 當它真正作用在右側的 object-space 頂點時，最靠近頂點的矩陣會最先作用上去：</p>
+<p>換句話說，雖然程式碼組合矩陣的順序是平移、、、 與縮放，但頂點實際經歷的順序是縮放、、、 再平移</p>
+<p>下面的程式碼用來展示上述矩陣組合順序。 它會讀取模型的 <code>position</code>、<code>rotationDeg</code> 與 <code>scale</code>，從單位矩陣開始依序組合 ，再回傳後續頂點處理時要使用的 model matrix：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">glm::</span><span style="--shiki-light:#C18401;--shiki-dark:#E5C07B">mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#E5C07B"> GameObject</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">calculateTransformMatrix_</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">() </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    glm::mat4 matrix{</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">translate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(matrix, position);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(matrix, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">x</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">),</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">                         glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(matrix, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">y</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">),</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">                         glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">rotate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(matrix, glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">rotationDeg</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#E45649;--shiki-dark:#E06C75">z</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">),</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">                         glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">));</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    matrix </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">scale</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(matrix, scale);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> matrix;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h5>view transformation：建立以相機為基準的座標系統</h5>
+<p>前面 Model transformation 已經幫我們把所有的物件都放進了共同的 world-space，而下一個階段我們想知道的是「從目前相機看出去，每個頂點位於哪個方向與距離」。 因此該階段做的 View transformation 會把 world-space 的位置改寫成 view-space 中的位置</p>
+<p>建立這項轉換需要知道相機的位置與朝向。 Application 中負責管理相機的程式碼可能直接保存方向向量，也可能保存相機的注視目標或旋轉資訊。 無論採用哪一種表示方式，在建立 View matrix 前都需要取得本文使用的三項資料：</p>
+<ul>
+<li>相機位置向量 ：指出相機位於 world-space 中的哪裡</li>
+<li>gaze direction ：是相機向前看的單位向量</li>
+<li>up direction ：是相機朝上的單位向量，並與 gaze direction 垂直。 兩者會一起描述相機的朝向，並決定畫面如何傾斜</li>
+</ul>
+<p>由於只要相機與物體的相對位置相同，最後看到的結果就會相同，因此 View transformation 不必真的在數學中搬動相機，它可以固定相機，再把整個世界朝相反方向移動與旋轉。 本文採用  的右手座標慣例來把相機放到原點，使它看向 ，並以  作為上方</p>
+<figure><figcaption></figcaption></figure>
+<p>上圖左側展示了兩種等價的配置。 雖然相機與物體在 world-space 中的位置不同，但兩者的相對位置與方向保持不變，因此從相機看見的畫面也會相同。 而 View transformation 會利用這項關係，把 world-space 的頂點轉換到右側所示的 standard view-space，使相機位於原點、看向 ，並將上方與  對齊</p>
+<p>要做到這件事，我們需要算出能將相機移到原點並對齊指定方向的平移與旋轉操作，並將它們組合成 View matrix，再用這個矩陣轉換所有的 world-space 頂點，讓其進到 view-space</p>
+<p>假設相機位於 ，我們首先需要將它移到原點，其所需的平移量為 。 因此，我們會將每個 world-space 的頂點都減去 ，這等同於將相機與所有頂點一起平移 ：</p>
+<p>接著我們需要把相機原本的座標軸對齊到 standard view-space。 下圖左側的  表示相機在 world-space 中的位置，、 與  則分別表示相機的 right、up 與 gaze directions</p>
+<p>因此 View transformation 具體來說會將  移到原點，並把這三個方向分別對齊 standard view-space 的 、 與  軸</p>
+<figure><figcaption></figcaption></figure>
+<p>一開始 Application 會先從相機狀態取得或算出 gaze direction  與 up direction ，再以兩者的外積求得相機的 right direction ：</p>
+<p>在推導旋轉矩陣  時，我們可以先省略齊次座標的第四個分量，只看負責旋轉的  區域。 、 與  分別是相機的 right、up 與 gaze directions。  必須同時完成下列三項轉換：</p>
+<p>接下來我們希望用一個矩陣等式同時表示上方的三項轉換，達到乘上  就能將相機的 right direction、up direction 與 gaze direction，分別轉成 standard view-space 的 、 與  軸的目的</p>
+<p>為了讓合併後的矩陣等式更容易求解，我們會先讓第三個輸出也對應 standard view-space 的正向座標軸。 由於 standard view-space 的相機朝向 ，因此相機的  方向會指向 gaze direction 的反方向 。 如此一來，同一組轉換關係便可以改寫成：</p>
+<p>接著，為了將這三個等式合併成一個矩陣等式，我們可以先將三個輸入方向 、 與  作為三個直行來組成輔助矩陣 ：</p>
+<p>當  從左側乘上  時，矩陣乘法會分別轉換它的三個直行。 乘積的三個直行依序是 、 與 ，也就是 、 與  軸。 將這三個標準座標軸排成矩陣後，便會得到  單位矩陣 ：</p>
+<p>同時由於它是單位矩陣，所以我們可以知道：</p>
+<ol>
+<li>這同時也是將 、 與  三個標準座標軸排成直行後自然得到的結果</li>
+<li> 是  的逆矩陣：</li>
+</ol>
+<p>接著我們需要實際寫出  的矩陣內容。 在開始推導前，我們先用一個具體的  矩陣，看它的三個直行分別代表什麼。 當這個矩陣乘上  的標準軸向量時：</p>
+<p>運算結果  正好是原矩陣的第一個直行。 同理，乘上  與  的標準軸向量時，會分別取出第二個與第三個直行：</p>
+<p>這三個結果顯示，矩陣的第一、第二與第三個直行，分別是 、 與  三個標準軸向量經過矩陣後的輸出。 若要將一個方向向量直接填入矩陣的第  個直行，這個方向就必須是第  個標準軸向量經過矩陣轉換後的輸出</p>
+<p>接著我們來看  的內容。 在接下來的推導中，我們會把 View transformation 實際需要的轉換稱為正方向，它會將 world-space 中的相機座標軸轉成 standard view-space 的標準座標軸。 相反地，從 standard view-space 的標準座標軸轉回 world-space 中的相機座標軸，則稱為反方向。 因此這裡的正、反描述的是座標轉換的流程，並非指順時針或逆時針旋轉</p>
+<p>把前面說明的直行規則套回 ，正方向的旋轉需要滿足三個條件：</p>
+<p>也就是說，、 與  是送入  的三個輸入，而三個標準軸向量則是轉換後的輸出。 若暫時以  表示  中尚未求出的元素，這三個條件可以合併寫成：</p>
+<p>若要由這個等式求出左側第一個矩陣的九個元素，就需要在等式兩側從右邊乘上 ：</p>
+<p>由於 ，因此可得：</p>
+<p>如果直接將三個已知方向填入  的三個直行，寫出的矩陣會是 ，而非 。 根據前面說明的直行規則， 執行的是下列轉換：</p>
+<p>而這剛好是從三個標準軸方向來轉回三個相機方向的操作，恰好與  的正方向相反。 因此，雖然我們無法直接將已知的相機方向填入 ，卻可以用它們來直接建立 。 所以通常在推導這個矩陣內容時，我們會改從反方向的  開始</p>
+<p>接下來我們要把這個反方向的旋轉寫成作用於齊次座標的  矩陣。 前面的推導暫時省略了齊次座標的第四個分量，因此只得到下列  區域：</p>
+<p>在齊次座標中，方向向量的第四個分量是 。 因此，standard view-space 的三個標準軸方向及其經過  旋轉後的結果，可以完整寫成：</p>
+<p>這個矩陣只負責旋轉，不會平移原點，因此還需要滿足：</p>
+<p>上面四個輸入都只有一個分量是 ，其餘分量是 。 矩陣乘上它們時，會分別取出第一、第二、第三與第四個直行。 因此，將等號右側的四個輸出依序排成直行，就能得到完整的 ：</p>
+<p> 是從 view-space 轉到 world-space 的旋轉矩陣，但 View transformation 需要的是從 world-space 轉到 view-space 的 ，因此我們還要將這項旋轉反轉回來</p>
+<p>其中由於 、 與  都是長度為  且彼此垂直的方向，因此  是正交矩陣。 正交矩陣的逆矩陣等於轉置矩陣，所以只要交換矩陣的直行與橫列，就能得到 ：</p>
+<p>最後，我們要把前面的平移與旋轉合併成 View matrix。 本文使用直行向量，因此最靠近頂點的  會先作用，把所有 world-space 頂點平移 。 接著  會把平移後的座標軸旋轉到 standard view-space 的方向。 所以兩個矩陣的組合順序是：</p>
+<p>因此完整的 View matrix 為：</p>
+<p>前三列分別算出了世界位置沿相機右方、上方與後方座標軸的分量，最右行則抵消了相機在 world-space 中的位置。 套用後便可以得到 view-space 中的位置了：</p>
+<p>程式也常會預先計算好 ，並把組合結果稱為 model-view matrix，用來指這兩個矩陣的乘積</p>
+<h5>projection transformation：準備可以裁切與投影的齊次位置</h5>
+<p>前面 View transformation 的過程我們已經把所有的頂點位置改寫成了以相機為基準的 view-space 座標，而下一個階段我們想要做的事是「將相機可以看見的 3D 範圍投影到 2D 畫面，同時保留各頂點的前後深度」。 這會由 Projection transformation 負責</p>
+<p>Projection transformation 會把 view-space 的位置轉換成四維的 clip-space 位置，讓後續管線能利用這四個分量先執行 clipping，再透過 perspective divide 得到投影後的座標</p>
+<p>投影方式取決於我們希望距離要如何影響畫面中物體的大小。 下圖比較了正交投影與透視投影對相同立方體產生的視覺結果</p>
+<figure><figcaption>（img src：<a href="https://stackoverflow.com/questions/36573283/from-perspective-picture-to-orthographic-picture" target="_blank" rel="noopener noreferrer">From perspective picture to orthographic picture</a>）</figcaption></figure>
+<ul>
+<li>正交投影（orthographic projection）：投影射線互相平行，物體大小不隨距離改變，原本平行的線在投影後仍會保持平行</li>
+<li>透視投影（perspective projection）：投影射線從相機位置向外展開，較近的物體看起來較大，延伸到遠方的平行線也可能在影像上逐漸靠攏</li>
+</ul>
+<p>兩種方式都會保留深度，也都會輸出供後續裁切時使用的 </p>
+<p>現在讓我們先從正交投影開始。 當我們不希望物體投影後的大小隨距離改變時，會使用正交投影。 這項轉換會接收 view-space 的位置，並把相機能看見的長方體範圍映射到 OpenGL 的標準裁切立方體內：</p>
+<p>前面的 View transformation 已經將相機移至原點並看向  了。 我們現在以 、 表示長方體的左、右邊界，以 、 表示下、上邊界，再以正數 、 表示近平面與遠平面到相機的距離。 由於相機看向 ，近、遠平面在 view-space 中的 z 座標分別為  與 ，其中 </p>
+<p>我們希望正交投影矩陣完成下列邊界映射：</p>
+<p>因此，只要輸入頂點位於原始長方體內，輸出的 、 與  就會落在  當中，其中  與  為後續投影到 2D 畫面時所需的位置資訊， 則保留近平面到遠平面之間的深度資訊</p>
+<p>為了做出這項映射，我們會先將長方體中心平移到原點，再將三個邊的範圍縮放到 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>長方體的中心是：</p>
+<p>因此平移矩陣為：</p>
+<p>平移後，長方體在 x、y 與 z 三個方向的長度分別是 、 與 。 目標立方體在每一軸的長度都是 ，所以縮放矩陣是：</p>
+<p>其中 z 軸需要另外反轉方向。 在 view-space 中，近平面與遠平面的 z 座標分別是  與 。 經過  平移後，兩者會變成：</p>
+<p>此時近平面的 z 是正值，遠平面的 z 則是負值。 為了將它們依序映射到 clip-space 的  與 ，z 軸的縮放係數必須帶有負號：</p>
+<p>由於正交投影會讓 ，因此這兩個 clip-space 深度經過後續的 perspective divide 後不會改變，並會分別成為  與 </p>
+<p>將前面的平移與縮放合併後可得：</p>
+<p>實際使用時，Application 會先決定正交相機要保留的 view-space 長方體，再將它的六個邊界傳給矩陣函式。 例如，下列程式碼將左右邊界設為  與 ，上下邊界設為  與 ，並將近平面、遠平面到相機的距離分別設為  與 ：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 projection </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">ortho</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    -</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // l, r</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    -</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // b, t</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">     1.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">9.0</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">f</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // n, f</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>相機在 view-space 中看向 ，因此這組參數保留的範圍為：</p>
+<p>將這些數值代入剛才推導的公式，可以得到：</p>
+<p>因此像是近平面的右上角與遠平面的左下角會分別映射到標準裁切範圍的兩個角落：</p>
+<p>現在讓我們接著來看透視投影。 當我們希望畫面呈現與真實相機相似的近大遠小效果時，會使用透視投影。 這項轉換會接收 view-space 的位置，並把相機能看見的 frustum 映射到 OpenGL 的標準裁切範圍內：</p>
+<p>與正交投影不同，透視投影會把頂點的 view-space 深度資訊編碼到  中。 因此，透視投影的輸出會使用  與  表示橫向與縱向的投影資訊，使用  保留前後深度，再以  保存投影結果與 view-space 深度之間的關係。 這四個分量會共同構成目前頂點的 clip-space 位置</p>
+<p>透視投影的可見範圍會從相機向外展開成 frustum，超出這個範圍的部分則會在下一個 clipping 階段處理。 為了建立投影矩陣，我們需要先用參數描述這個 frustum 的形狀，常見的表示方式有下列兩種</p>
+<p>第一種是直接使用 、、、、 與  的邊界形式。 由於  與  是近平面和遠平面到相機的距離（），因此 frustum 的 view-space 深度範圍為：</p>
+<p>、、 與  則定義了近平面在  時的矩形範圍：</p>
+<p>frustum 的四個側面會從相機原點延伸並穿過這個矩形的四條邊。 因此，根據相似三角形，遠平面在  時的範圍會擴大為：</p>
+<p>這種形式能直接指定不對稱的 frustum。 例如， 時，近平面的中心就不會位於相機的視線軸上</p>
+<p>第二種是較接近一般相機設定的對稱形式，使用了垂直視角 、aspect ratio 、近平面距離  與遠平面距離 。 這種形式假設 frustum 以相機的  軸為中心，因此具有  與  的特性</p>
+<p>其中垂直視角（vertical field of view，vertical FOV） 描述相機沿垂直方向能看見的完整角度，決定了 frustum 在垂直方向張開多大。 搭配近平面距離  使用後，可以求出近平面的上、下邊界  與 。 而 aspect ratio 則用來描述可見範圍的寬高比例。 將其搭配上 FOV，我們便可以求出左、右邊界  與  了</p>
+<p>下圖是 vertical FOV 與 aspect ratio 的示意圖：</p>
+<figure><figcaption></figcaption></figure>
+<p>我們可以把透視投影理解成兩個動作：</p>
+<ol>
+<li>把 frustum 擠壓成與正交投影相同的長方體</li>
+<li>使用  將長方體正規化</li>
+</ol>
+<figure><figcaption></figcaption></figure>
+<p>擠壓時需要維持三項關係：</p>
+<ul>
+<li>近平面上的 x 與 y 不變</li>
+<li>所有深度切面中心的 x、y 不變</li>
+<li>近平面與遠平面的 z 仍分別是  與 </li>
+</ul>
+<p>前兩項會形成 x、y 方向的限制條件，我們可以用相似三角形推導對應的縮放關係。 第三項則會形成 z 方向的兩個邊界條件，後面會用來推導控制深度的係數</p>
+<p>現在我們先來看 x 與 y 的部分，找出 frustum 中不同深度的截面應該如何縮放。 假設 view-space 中有一個位於相機前方的齊次位置：</p>
+<p>從原點的相機出發，穿過這個 3D 點的射線可以寫成：</p>
+<p>因為近平面位於 ，所以射線與近平面相交時， 必須滿足：</p>
+<p>由於  且 ，我們可以得到一個正的縮放比例：</p>
+<p>將這個比例乘回原本的 x 與 y，可以先算出交點的前兩個分量：</p>
+<p>由於交點位於近平面，它的第三個分量必須是 。 因此，將  乘回原本位置的三個分量後，完整的交點為：</p>
+<p>下圖從側面畫出了相機、原本的點與近平面交點：</p>
+<figure><figcaption></figcaption></figure>
+<p>例如，令近平面距離為 ，並取 view-space 齊次位置：</p>
+<p>射線抵達近平面時的縮放比例與交點為：</p>
+<p>因此，原本位於  的橫向位置會縮到近平面上的 </p>
+<p>現在我們要把這項幾何關係寫成矩陣。 剛才推導時我們把  與  都除以了該頂點的 ，但一般的  矩陣乘法只能計算各分量的線性組合，無法直接執行這種除法。 為了將除法留到後續處理，我們要先將近平面交點補成齊次座標：</p>
+<p>因為 ，所以可以將上式的四個分量都乘以 ：</p>
+<p>以前面的數值為例，這項等價關係為：</p>
+<p>在這組表示方式中，前兩個分量保存了還原原本 x 與 y 所需的分子，第四個分量則保存了共同的分母 。 但是，如果第三個分量也直接使用 ，除以  後，每個點的 z 都會變成 ，原本的深度便會消失</p>
+<p>因此這裡我們只會沿用第一、第二與第四個分量的結果，而第三個分量我們會將其改寫成 。  與  是接下來要利用近平面與遠平面求出的係數。 為了和最後的 clip-space 座標區分，讓我們先將這組中間的齊次座標記為：</p>
+<p>於是擠壓的操作（squeeze matrix）可以寫成：</p>
+<p>驗證一下，將它乘上 view-space 的位置後，可以得到：</p>
+<p>將這組中間齊次座標除以  後，x、y 與 z 分別會成為：</p>
+<p>也就是說：</p>
+<p>其中 x 與 y 正好符合前面由近平面交點得到的結果，整個向量的最後一個也回到了 ，因此這就是該點位於擠壓後長方體中的位置座標</p>
+<p>接下來我們需要利用深度邊界來求出第三個分量中的  與 。 這會需要用到剛剛的第三個條件：近平面與遠平面在擠壓前後仍然是  與 。 將近平面的  代入上式，可得：</p>
+<p>將遠平面的  代入，則會得到：</p>
+<p>將兩個等式相減，可以消去 ：</p>
+<p>因為 ，所以 ，兩邊可以同除以 ：</p>
+<p>再把  代回近平面的等式：</p>
+<p>因此，完整的 squeeze matrix 為：</p>
+<p>這個矩陣輸出的中間齊次座標除以  後形式如下：</p>
+<p>因此各個深度截面的 x、y 範圍會縮到近平面矩形的大小，近平面與遠平面的 z 則會繼續保持為  與 </p>
+<p>例如，若沿用  的位置 ，並令 ，矩陣乘法會得到：</p>
+<p>將前三個分量除以最後的  之後，x 與 y 正好是前面算出的  與 ，而 z 則是位於  與  之間的 。 這也顯示 squeeze matrix 保留了可供後續深度處理的前後關係，並沒有把每個點都移到近平面</p>
+<p>至此，我們就成功把 frustum 擠壓成一個長方體了：</p>
+<figure><figcaption></figcaption></figure>
+<p>但是現在這個長方體仍使用著原本的 、、、、 與  範圍，還沒有做正規化來映射到標準裁切範圍。 因此接下來我們需要套用前面已經推導完成的 ，將這個長方體正規化到 OpenGL 的標準裁切範圍。 之後將  與  合起來，我們便完成了整個的透視投影轉換，其矩陣記作 ：</p>
+<p>前面為了確認  的幾何效果，我們曾將中間齊次座標  除以 ，把它改寫成長方體中的位置 </p>
+<p>但實際計算時， 可以直接接收  產生的齊次座標，不需要在兩個矩陣之間執行該除法。 原因如下：</p>
+<p>所以矩陣乘法的線性關係會保留這個共同的 ：</p>
+<p>因此，雖然時我們的步驟是「先擠壓，再做正交投影」。 但實際使用時，我們會預先計算好兩個矩陣的乘積。 頂點著色器只需使用組合完成的  轉換 view-space 位置即可</p>
+<p>完成矩陣乘法後，我們就得到了 OpenGL 的一般透視投影矩陣：</p>
+<p>這邊我們直接使用了 、、 與  來描述近平面的四個邊界，並以  與  描述近、遠平面距離。 但實際設定相機時，Application 通常會提供 vertical FOV 、aspect ratio 、近平面距離  與遠平面距離 。 其中 、 與  用來決定近平面的四個邊界， 則用來決定 frustum 延伸到多遠</p>
+<p>其中，近平面位於 ，其矩形中心是 ，上邊界的 y 座標為 ，下邊界的 y 座標為 ，右邊界的 x 座標為 ，左邊界的 x 座標為 。 這個矩形在 x 方向以  對稱，在 y 方向則以  對稱，因此：</p>
+<p>接下來我們要利用 vertical FOV  與近平面距離 ，求出近平面的上邊界  與下邊界 。 我們先處理垂直方向，在  的垂直截面中，從相機位置連到近平面上、下邊界中點的兩條射線會夾出完整的 vertical FOV 。 對稱關係會讓視線軸平分這個角度，因此視線軸和上方射線之間的角度是 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>從這個垂直截面觀察時，相機位置、近平面中心與上邊界中點會形成直角三角形。 其中鄰邊是近平 ，對邊是近平面中心到上邊界中點的距離 ，所以：</p>
+<p>等式兩邊同乘 ，便可以求出上邊界：</p>
+<p>下邊界和上邊界以 x 軸對稱，因此：</p>
+<p>接著處理水平方向。 Aspect ratio  描述目標 viewport 的寬高比例。 為了避免投影結果被橫向或縱向拉伸，frustum 中與近平面平行的矩形截面也會採用相同的比例。 我們可以直接在近平面計算這個比例，它的寬度是 ，高度則是 ，所以：</p>
+<p>將對稱關係  與  代入後，可以得到：</p>
+<p>因此右邊界與左邊界分別是：</p>
+<p>至此，四個邊界就都能由 vertical FOV、aspect ratio 與近平面距離求出來了：</p>
+<p>現在回到一般透視投影矩陣中。 它的 x 與 y 縮放係數中會重複出現 ，我們先把這個值縮寫為 ：</p>
+<p>根據剛才的 ，它也可以寫成：</p>
+<p>對稱 frustum 的高度為 ，所以一般矩陣中的 y 軸縮放係數可以化簡為：</p>
+<p>寬度則是 。 再利用 ，x 軸縮放係數可以化簡為：</p>
+<p>一般矩陣中還有兩個用來處理不對稱邊界的偏移項。 由於對稱 frustum 具有  與 ，因此它們都會變成 ：</p>
+<p>將這些結果代回一般形式後，projection matrix 可以簡化成程式庫常見的形式：</p>
+<p>這個矩陣乘上 view-space 位置  後，最後一列會產生：</p>
+<p>因此， 是頂點著色器執行 projection transformation 時，由 view-space 的 z 座標計算出的 clip-space 第四個分量。 後續的 perspective divide 會使用它還原前面推導出的透視縮放關係</p>
+<p>正交投影矩陣的最後一列則會讓  維持為 。 因此後續即使執行相同的除法，x 與 y 也不會因為頂點距離相機較遠而縮小</p>
+<h5>組合 MVP matrix，並由 vertex shader 交出結果</h5>
+<p>到這裡，Model、view 與 projection transformations 已分別回答了「模型位於世界何處」、「相機如何觀察世界」，以及「可見的 3D 範圍如何轉成 clip-space」。 實際使用時， 可以是  或 。 三個矩陣也可以預先組合成一個 MVP matrix：</p>
+<p>由於矩陣會從右往左作用，所以 object-space 的點會先進入 world-space，再進入 view-space，最後才得到 clip-space 的位置：</p>
+<p>Application 可以在提交 draw call 前先建立好三個矩陣，將它們相乘後再上傳給 OpenGL program。 下例的 GLM 片段示範了實際使用時會如何傳遞相機與投影等參數：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 model </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B"> object</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">calculateTransformMatrix_</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">();</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 view </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">lookAt</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    cameraPosition,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    cameraPosition </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">+</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> gazeDirection,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    upDirection);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 projection </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">perspective</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">radians</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(fovYDegrees),</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">    static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;float></span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(viewportWidth) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">/</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF">        static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;float></span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(viewportHeight),</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    nearDistance,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    farDistance);</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">const</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> glm::mat4 mvp </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> projection </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> view </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> model;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glUniformMatrix4fv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mvpLocation, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, GL_FALSE,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">                   glm::</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">value_ptr</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(mvp));</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>glm::lookAt()</code> 會從相機位置、目標位置與 up direction 建立 。 <code>glm::perspective()</code> 則由垂直 FOV、aspect ratio、near 與 far distances 建立 。 這裡的 <code>viewportWidth / viewportHeight</code> 必須使用浮點除法，才能得到正確的 aspect ratio</p>
+<p>下例的頂點著色器除了計算 clip-space 位置，也會算出目前頂點的 RGBA 色彩與 UV：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">#version </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">330</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> core</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_position;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_color;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_uv;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> mat4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mvp;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> vertex_color;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> vertex_uv;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    gl_Position </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> mvp </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">*</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(in_position, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    vertex_color </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_color;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    vertex_uv </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> in_uv;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>gl_Position</code> 是這個頂點的 clip-space 位置：</p>
+<p>其中  用來在後面的透視除法中產生近大遠小的效果。 <code>vertex_color</code> 與 <code>vertex_uv</code> 分別保存了頂點著色器為目前頂點算出的 RGBA 色彩與 UV</p>
+<p>等光柵化器開始處理由三個頂點組成的三角形時，它會為每個片段內插這些值，再將內插的結果交給片段著色器。 這類從頂點著色器傳往後續著色階段的資料稱為 varyings</p>
+<p>頂點著色器每次只會處理一筆頂點。 執行完成後，每個頂點就都填好了 clip-space 位置、RGBA 色彩與 UV 等資料，圖形管線的下一階段會依 draw call 指定的輸入模式將多筆頂點組成圖元</p>
+<h5>共用範例：MVP 產生三筆 clip-space 頂點</h5>
+<p>現在讓我們回到前面的共用範例，vertex / index data 階段已經依照索引 <code>[0, 1, 2]</code>，取回了 、 與  三筆 <code>ExampleVertex</code> 記錄。 目前準備交給頂點著色器的資料為：</p>
+<ul>
+<li>：object-space 位置為 ，RGBA 為紅色 ，UV 為 </li>
+<li>：object-space 位置為 ，RGBA 為綠色 ，UV 為 </li>
+<li>：object-space 位置為 ，RGBA 為藍色 ，UV 為 </li>
+</ul>
+<p>另外，在目前的頂點處理階段，頂點著色器除了每個頂點各自的位置、RGBA 與 UV 以外，還會需要這筆 draw call 內三個頂點共用的 MVP matrix，才能將每個頂點的 object-space 位置轉換成 clip-space 位置</p>
+<p>為了建立這個 MVP matrix，共用範例會把模型沿 world-space 的  方向移動 ，並把相機放在 world-space 的 、朝  方向觀察。 因此 Model matrix 與 view matrix 都會沿 z 軸平移 ：</p>
+<p>Projection 使用垂直 FOV 、aspect ratio 、近平面距離  與遠平面距離 。 對應的 OpenGL perspective projection matrix 是：</p>
+<p>將這三個矩陣預先相乘，可以得到這次頂點著色器使用的 MVP matrix：</p>
+<p>三筆 object-space 位置會依序經過 world-space、view-space 與 clip-space，得到下列座標：</p>
+<p>圖中前兩個圖框的 x-y 輪廓相同，z 則從 object-space 座標改成在 view-space 中沿相機座標軸量出的帶符號座標。 本文相機朝  觀看，因此相機前方的 ，而  才是沿視線軸量出的正向深度。 clip-space 圖框會在  平面檢查右裁切平面， 的  大於 ，下一節必須先裁切它，不能直接進行透視除法</p>
+<p>這個頂點著色器只轉換位置，RGBA 與 UV 會直接傳到後續階段。 頂點處理因此交出三筆 clip-space 位置、各自原有的紅綠藍色彩，以及 、 與  UV</p>
+<h3>Triangle / Primitive Processing：把 clip-space 頂點轉成可供光柵化的 screen-space 圖元</h3>
+<p>上一節我們從三筆 object-space 頂點的位置、RGBA 與 UV，以及這筆 draw call 共用的 MVP matrix 出發，並將這些資料交給頂點處理階段。 頂點處理階段執行頂點著色器後，我們便成功將各頂點的位置轉換成 clip-space 座標，並將 RGBA 與 UV 一同傳給後續階段了</p>
+<p>接下來我們要把這些處理完成但仍彼此分離的頂點，逐步轉成光柵化器能夠處理的 screen-space 圖元</p>
+<p>圖元組合（primitive assembly）會先依 draw call 指定的輸入模式，決定哪些頂點共同形成一個點、線段或三角形。 組成圖元後，我們才有完整的幾何形狀可以判斷它是否落在相機的可見範圍內。 如果圖元穿過了可見範圍的邊界，clipping 會在 homogeneous clip-space 中把不可見的外側部分裁掉，並在交界處建立新的頂點</p>
+<p>完成 clipping 後，為了讓光柵化器知道圖元位於畫面中的什麼位置，我們需要將留下的 clip-space 頂點轉成 screen-space 座標。 但此時 clip-space 的位置仍使用四維齊次座標，無法直接對應實際視埠中的位置。 所以管線會先透過 perspective divide 將它們轉成 NDC，使可見範圍落入標準座標區間，再由 viewport transform 根據視埠的位置與大小映射到 screen-space</p>
+<p>完成這四個步驟後，這個階段會輸出位於連續 screen-space 座標中的點、線段或三角形，本文接下來會固定追蹤三角形路徑。 每筆輸出頂點都會包含 screen-space 的 x、y 與深度 z，以及對應的 RGBA 與 UV。 管線在執行 perspective divide 時也會保留每個頂點的 ，供後續內插階段修正透視投影造成的 UV 非線性變化，避免紋理產生扭曲</p>
+<p>許多以三角形為主的架構圖會將這一連串工作標成 <code>Triangle Processing</code>，更一般的名稱則是 <code>Primitive Processing</code>。 下面四個 H4 我們會依 primitive assembly、clipping、perspective divide 與 viewport transform 的順序，分別說明各階段會接收什麼資料、如何處理，以及會把什麼結果交給下一個階段</p>
+<h4>primitive assembly：把頂點連成三角形</h4>
+<p>上一階段我們已經分別算出了每個頂點的 clip-space 位置、RGBA 色彩與 UV。 接下來我們要依 draw call 指定的輸入模式，判斷哪些頂點共同描述了同一個幾何單位，並保留這些頂點的先後順序。 圖元組合階段會根據輸入模式解讀頂點序列，建立類型與頂點順序都明確的圖元</p>
+<p>圖元（primitive）是這項分組工作交出的基本幾何單位。 可以直接進入 rasterization 的基本圖元包括點、線段與三角形。 其內部會保留著頂點原有的 clip-space 位置、RGBA 與 UV</p>
+<p>以本文前面使用的 <code>glDrawElements()</code> 為例，第一個引數會替這筆 draw call 指定輸入模式，告訴圖元組合階段該如何解讀索引。 下圖上方先用六個索引展示 <code>triangle list</code> 每三個索引組成一個三角形的規則，下方再把固定的索引序列 <code>[0, 1, 2, 3]</code> 套用到七種 OpenGL 輸入模式，比較同一批頂點如何形成不同的點、線段或三角形圖元</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中下方七個圖框都從相同的 <code>[0, 1, 2, 3]</code> 索引順序出發。 輸入模式只會改變分組與頂點重用方式，索引所指向的 position、RGBA 與 UV 不會跟著改變</p>
+<p>最上方我們先以 <code>triangle list</code> 介紹了最直接的三角形輸入方式，在 OpenGL 中這會對應到 <code>GL_TRIANGLES</code>。 由於本文使用索引式的 draw call，圖元組合階段會依序讀取索引，每三個索引組成一個三角形</p>
+<p>以第一個三角形為例，索引 <code>0</code>、<code>1</code> 與 <code>2</code> 會取得三筆已完成頂點著色的資料。 圖元組合會將它們依這個順序放在一起，以形成第一個三角形圖元。 其中圖元類型 <code>triangle</code> 來自這筆 draw call 的輸入模式，圖元的頂點順序則由三筆頂點的先後次序來決定</p>
+<p>在 <code>triangle list</code> 中，每一組三個索引都會獨立形成一個圖元。 這裡的「獨立」表示下一個圖元會從新的一組索引開始，不會自動沿用前一組的頂點。 不同組仍然可以重複使用相同的索引，藉此共用同一筆頂點資料</p>
+<p>管線還需要保留圖元中的頂點順序，讓後續階段能夠判斷三角形的正面與背面，並以一致的方向計算各條邊。 例如 <code>vertex 0 → vertex 1 → vertex 2</code> 與 <code>vertex 0 → vertex 2 → vertex 1</code> 使用了相同的三筆頂點，卻具有了相反的環繞方向（winding）。 因此，圖元組合不能只保存三個頂點形成的集合，還必須保留它們的先後順序</p>
+<p>三角形在概念上還具有三條邊與內部區域，但通常我們不需要另外保存這些資訊。 圖元組合完成時，三角形圖元直接提供的資訊只有：</p>
+<ul>
+<li>目前的圖元類型</li>
+<li>有順序的三筆頂點</li>
+<li>每筆頂點的 clip-space 位置、RGBA 色彩與 UV</li>
+</ul>
+<p>圖中的幾種常見模式會將同一串索引組合成下列結果：</p>
+<ul>
+<li><code>GL_POINTS</code>：將每個索引對應的頂點各自建立成一個點圖元
+<ul>
+<li>結果：<code>point 0</code>、<code>point 1</code>、<code>point 2</code> 與 <code>point 3</code></li>
+</ul>
+</li>
+<li><code>GL_LINES</code>：每兩個頂點建立一條互相獨立的線段
+<ul>
+<li>結果：<code>line (0, 1)</code> 與 <code>line (2, 3)</code>，兩條線段之間不會自動相連</li>
+</ul>
+</li>
+<li><code>GL_LINE_STRIP</code>：依序連接相鄰頂點，讓下一條線段重複使用上一條線段的終點
+<ul>
+<li>結果：<code>line (0, 1)</code>、<code>line (1, 2)</code> 與 <code>line (2, 3)</code>，三條線段會形成一條連續折線</li>
+</ul>
+</li>
+<li><code>GL_LINE_LOOP</code>：先採用 line strip 的方式連接相鄰頂點，再補上最後一個頂點到第一個頂點的線段
+<ul>
+<li>結果：<code>line (0, 1)</code>、<code>line (1, 2)</code>、<code>line (2, 3)</code> 與 <code>line (3, 0)</code>，最後會形成封閉線圈</li>
+</ul>
+</li>
+<li><code>GL_TRIANGLE_STRIP</code>：先用前三個頂點建立第一個三角形，之後每增加一個頂點，就和前面的兩個頂點建立下一個三角形
+<ul>
+<li>結果：<code>triangle (0, 1, 2)</code> 與 <code>triangle (2, 1, 3)</code>。 第二個三角形會調整前兩個頂點的順序，使相鄰三角形維持一致的環繞方向</li>
+</ul>
+</li>
+<li><code>GL_TRIANGLE_FAN</code>：固定以第一個頂點作為共用錨點，再將後續每一對相鄰頂點與這個錨點組成三角形
+<ul>
+<li>結果：<code>triangle (0, 1, 2)</code> 與 <code>triangle (0, 2, 3)</code>，頂點 <code>0</code> 會出現在每個三角形中。 另外雖然頂點 <code>2</code> 在這個範例中也被兩個相鄰三角形共用了，但加入更多頂點後，後續三角形仍會固定使用頂點 <code>0</code>，不會繼續使用頂點 <code>2</code></li>
+</ul>
+</li>
+</ul>
+<p>OpenGL 也提供了 <code>GL_PATCHES</code>，能將一組控制點（control points）交給曲面細分（tessellation）階段。 曲面細分可以依著色器規則增加頂點並建立更細緻的幾何形狀，最後同樣會產生點、線段或三角形，供後續 rasterization 使用。 不過本文沒有啟用 tessellation，因此接下來我們只會追蹤由上述輸入模式直接建立的基本圖元</p>
+<p>這些輸入模式會使用不同的頂點分組與重用規則，組合完成後則統一交出點、線段或三角形等基本圖元。 一筆 draw call 只會指定一種輸入模式，Application 若要改用另一種模式，就需要再提交一筆 draw call</p>
+<p>本文後面會固定沿用 <code>GL_TRIANGLES</code> 的例子。 因此圖元組合完成後，每個三角形都帶有三筆頂點的 clip-space 位置、RGBA 色彩與 UV。 下一個裁切階段會利用這些資料來判斷三角形有多少部分位於可見範圍內</p>
+<h5>共用範例：三筆頂點組成一個三角形圖元</h5>
+<p>這個範例用來展示圖元組合要如何將頂點處理交出的個別頂點，轉成 clipping 可以接收的三角形圖元。 共用範例的輸入模式是 <code>GL_TRIANGLES</code>，索引序列則是 <code>[0, 1, 2]</code>。 圖元組合會依這個順序，將三筆頂點資料建立成三角形 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中的三條有向邊只用來標示  的環繞順序，不是另外保存的資料。 圖元組合需要取得三筆已完成頂點著色的資料、輸入模式與索引順序，才能找出 、 與 ，並把三者依原有順序交給 clipping</p>
+<h4>clipping：留下可見範圍內的三角形</h4>
+<p>上一階段我們已經建立了三角形圖元，每個頂點都帶有 clip-space 位置、RGBA 色彩與 UV。 接下來為了讓可見的幾何形狀安全地進入透視除法，我們需要找出三角形位於相機可見範圍內的部分。 有些三角形完全位於範圍內或範圍外，有些則會穿過可見範圍的邊界。 裁切（clipping）會在做透視除法之前分辨這些情況，並保留可見的部分</p>
+<p>當三角形穿過邊界時，我們仍要保留位於可見範圍內的區域。 假設其中兩個頂點位於範圍內、第三個頂點位於範圍外，如果我們只丟掉了外側頂點，那就會遺失兩條邊與邊界相交的位置。 因此，裁切階段會在這些交界處建立新頂點，再以原頂點與新頂點圍出可見部分：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中的藍線是上裁切平面。  與  位於可見區域， 位於外側。 三角形的兩條邊與裁切平面相交後，管線會建立新的頂點  與 ，最後保留由 、、 與  圍成的可見部分</p>
+<p>OpenGL 會在 homogeneous clip-space 中執行這項工作，目標是找出「完成透視除法後仍位於可見範圍內的部分」。 要理解這個目標，我們需要先知道下一階段使用的座標系統</p>
+<p>透視除法的目的是把 clip-space 位置轉成正規化裝置座標（normalized device coordinates，NDC）。 由於 NDC 尚未使用畫面緩衝區中的實際像素座標，所以透視除法會先以相同的標準範圍來表示可見位置，與後續視埠的具體寬度與高度無關</p>
+<p>本文固定採用 OpenGL 預設的 NDC 深度範圍慣例（negative-one-to-one depth convention），也就是 NDC 的 z 可見範圍和 x、y 一樣都是 。 因此，只有 x、y 與 z 都落在  內的頂點，才會位於 NDC 的標準可見範圍中：</p>
+<p>但在目前的裁切階段，頂點仍位於 homogeneous clip-space，其位置具有四個分量：</p>
+<p>在下一階段我們會以  執行透視除法，以 x 軸為例，這會做 。 對本文採用的標準透視投影，位於相機前方且能完成透視除法的有效頂點會滿足  這個條件。 在這個情境下，我們可以把 NDC 的 x 軸範圍改寫成 clip-space 內的條件：</p>
+<p>這裡我們先只用透視除法來說明裁切條件中的  從哪裡來，實際的透視除法會留到下一個 H4。 對 y 軸與 z 軸做相同的改寫後，裁切階段最後需要同時檢查：</p>
+<p>例如  時， 的可見範圍是 。 若目標頂點的 ，則其做完透視除法後會得到 ， 則會得到 ，正好落在 NDC 的右邊界</p>
+<p>由於每一組不等式都有較小值與較大值兩個邊界，因此三個座標軸總共會形成六個裁切平面：</p>
+<p>為了讓六個平面共用同一套內外判定方式，並讓判定值之後能沿三角形的邊內插來求交點，我們要把每個平面的內側條件都改寫成「某個判定值大於或等於 」的形式。 以左平面為例，頂點位於內側表示 。 移項後可以得到：</p>
+<p>因此我們可以定義 。 只要 ，頂點就會位於左平面的內側或平面上。 右平面的內側條件  也可以移項成：</p>
+<p>因此右平面的判定值是 。 另外四個平面也使用相同方式，最後我們能得到：</p>
+<p>這裡的  是帶有正負號的平面判定值。 對某一個平面而言：</p>
+<p>下圖彙整了剛才推導的六個平面條件與六個判定值。 左側列出每個平面的公式，右側則固定一個正的 ，顯示這些條件在三維切片中圍出的範圍：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中右側的立方體是固定某個  後得到的切片示意圖。 當  改變時， 的尺度也會跟著改變，因此整個四維 homogeneous clip-space 不能直接視為 NDC 立方體</p>
+<p>以  的左右平面為例：</p>
+<ul>
+<li>當  時， 且 ，所以頂點同時位於左右平面的內側</li>
+<li>當  時，，所以頂點正好位於左平面上</li>
+<li>當  時，，所以頂點位於左平面外側</li>
+<li>當  時，，所以頂點位於右平面外側</li>
+</ul>
+<p>一個頂點必須對六個平面都得到 ，才位於完整的可見範圍內</p>
+<p>因此，裁切階段我們可以先快速判斷三角形：</p>
+<ul>
+<li>若三個頂點對六個平面的判定值都大於或等於 ，則保留原三角形</li>
+<li>若三個頂點對同一個平面的判定值都小於 ，則捨棄整個三角形</li>
+<li>其餘情況表示三角形可能穿過邊界，不能直接保留或捨棄</li>
+</ul>
+<p>對於穿過邊界的情況，裁切階段會先把三角形視為由三個頂點組成的多邊形，再依序以六個平面裁切目前留下的多邊形。 為了建立邊界上的新頂點，我們需要先算出多邊形的邊與裁切平面的交點</p>
+<p>以下使用大寫的 、 與  作為頂點名稱，並使用粗體小寫的 、 與  表示這些頂點的位置向量。 假設多邊形的一條有向邊從頂點  走到頂點 ，我們可以用參數  來表示這條邊上的位置：</p>
+<p>當  從  增加到  時， 會從  沿著邊移動到 。 接著，為了判斷邊上任一位置  位於裁切平面的哪一側，我們會將這個位置代入該平面的判定式 。 先將邊的兩個端點代入，可以得到：</p>
+<p>其中  是頂點  的平面判定值， 是頂點  的平面判定值。 假設  與  位於裁切平面的兩側，那  與  的值就會變得一正一負。 由於裁切平面判定式是頂點座標的線性函數，將  代入後，它的判定值也會使用同一個  從  線性變化到 ：</p>
+<p>如此一來，我們就可以用  的正負號來判斷邊上位置  位於裁切平面的哪一側了：</p>
+<ul>
+<li>： 位於裁切平面的內側</li>
+<li>： 位於裁切平面的外側</li>
+<li>： 正好位於裁切平面上</li>
+</ul>
+<p>而由於交點正好位於裁切平面上，因此我們要找出使  的 。 將這個條件代入上式並解出 ：</p>
+<p>將  代回 ，就能得到位於裁切平面上的新頂點位置了。 由於後續階段需要接收完整的頂點，而且新裁切邊的顏色與紋理必須延續原三角形的變化，因此我們還要為交點建立對應的 RGBA 與 UV。 這些資料的建立方式取決於 shader 指定的內插規則</p>
+<p>本文的 <code>vertex_color</code> 與 <code>vertex_uv</code> 採用 GLSL 的預設內插規則。 在這項規則下， 表示交點位於原 clip-space 內的邊  的比例，所以位置、RGBA 與 UV 都會使用同一個  沿原邊建立：</p>
+<p>其他內插規則會使用不同方式處理裁切產生的新頂點。 為了先專注在交點本身，本節後續公式與共用範例都會沿用上述預設規則。 各種內插規則的名稱、目的與裁切行為會在 barycentric interpolation H4 一節中一併說明</p>
+<p>例如一條邊穿過了右裁切平面 ：</p>
+<p>將  與  代入交點公式，可以先求得 ，再得到交點位置：</p>
+<p>新的交點  會正好位於右裁切平面上。 如果頂點  的 RGBA 色彩是紅色 ，UV 為 ，頂點  的 RGBA 色彩是藍色 ，UV 為 ，那麼新頂點會取得兩者中間的屬性：</p>
+<p>算出邊界交點後，我們還要拿每條有向邊的原頂點與新交點組合成新的多邊形。 對某一個平面處理多邊形的有向邊  時，下列四種規則會依兩端的內外狀態建立新的頂點序列：</p>
+<ul>
+<li> 與  都在內側時，輸出 </li>
+<li> 在內側、 在外側時，只輸出交點</li>
+<li> 在外側、 在內側時，先輸出交點，再輸出 </li>
+<li> 與  都在外側時，不輸出任何頂點</li>
+</ul>
+<p>每處理完一個平面，輸出的頂點序列都會成為下一個平面的輸入。 六個平面都處理完成後，結果可能是：</p>
+<ul>
+<li>空集合</li>
+<li>未改動的原三角形</li>
+<li>由原頂點與新交點構成，但仍只有三個頂點的三角形</li>
+<li>具有四個以上頂點的可見多邊形</li>
+</ul>
+<p>處理完六個平面後，我們還需要把留下的多邊形交回三角形路徑。 每個裁切平面只會保留平面內側的空間。 由於三角形是凸形，而凸形和這類半空間的交集仍會是凸形，因此非空結果會是一個凸多邊形。 這裡的「凸」表示任取多邊形內的兩個位置，連接它們的整條線段都不會離開多邊形。 這項性質也能確保我們從其中一個頂點向其他非相鄰頂點連線時，分割線仍留在多邊形內，因而可以安全地將結果重新拆成三角形</p>
+<p>空集合表示整個圖元不可見。 非空結果若只有三個頂點，可以直接作為三角形繼續處理。 頂點超過三個時，後續 rasterization 必須能處理這個凸多邊形，常見作法之一是重新拆成三角形。 為了讓本文繼續沿用三角形路徑追蹤資料，以下會採用這種作法</p>
+<p>在幾何形狀剛好落在邊界上的退化情況中，結果也可能只剩點或線段。 這類結果的面積為 ，不能形成可填滿的三角形區域，因此下一個 rasterization 階段不會將它們視為一般三角形繼續處理</p>
+<p>為了具體說明重新三角化，本文選擇以第一個頂點為共用頂點，使用 triangle fan 將四邊形拆成：</p>
+<p>裁切完成後，每個輸出的三角形都會位於 clip-space 的可見範圍內，新增的頂點也會具有對應的 clip-space 位置、RGBA 色彩與 UV。 下一階段我們會對這些位置執行透視除法</p>
+<h5>共用範例：右裁切平面產生兩個交點與兩個三角形</h5>
+<p>這個範例我們要找出三角形  與右裁切平面的兩個交點，再將留下的可見四邊形重新拆成下一階段可以接收的兩個三角形。 前面的圖元組合範例已經將索引 <code>[0, 1, 2]</code> 指向的三筆頂點組成了有順序的三角形圖元 。 因此，裁切階段在這裡收到的輸入是：</p>
+<ul>
+<li>圖元類型與頂點順序：三角形 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為紅色 ，UV 為 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為綠色 ，UV 為 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為藍色 ，UV 為 </li>
+</ul>
+<p>下圖同時呈現原三角形、兩個交點、裁切後的四邊形與重新三角化結果，方便核對新頂點的順序：</p>
+<figure><figcaption></figcaption></figure>
+<p>從這三筆 clip-space 位置可以看出，原三角形只有頂點  超出右裁切平面。 因此，我們先將三筆位置代入 ，判斷每個頂點位於平面的哪一側：</p>
+<p> 與  的判定值為正，表示它們位於右平面內側。 而因為  的判定值為負，因此  與  兩條邊都會穿過右平面 </p>
+<p>沿  建立第一個交點時，內插參數為：</p>
+<p>將相同的  套用到位置、色彩與 UV，得到交點 ：</p>
+<p>沿  建立第二個交點時，內插參數為：</p>
+<p>第二個交點  因而是：</p>
+<p>兩個交點都符合 ，都位於右裁切平面上。 裁切後保留下來的是四邊形 。 為了讓後續章節能沿同一組頂點與索引追蹤數值，本文選擇以  為共用頂點，把四邊形拆成兩個三角形：</p>
+<p> 與  沿原本的兩條有向邊插入，因此可見多邊形仍延續  的環繞方向。 圖中的  只是重新三角化時加入的分割線</p>
+<p>若依序將四筆不重複的頂點編為 、、 與 ，後續便可用索引 <code>[0, 1, 2, 0, 2, 3]</code> 來表示這兩個三角形。 這四筆 clip-space 位置及其 RGBA 與 UV，會一起交給透視除法</p>
+<h4>perspective divide：把 clip-space 轉成 NDC</h4>
+<p>裁切階段我們已經算出位於可見範圍內的 clip-space 三角形，而且每個頂點都保留著  四個位置分量。 接下來我們需要把這些齊次位置改寫成統一的三維座標，才能再依 viewport 大小把它映射到畫面上。 透視除法（perspective divide）會將前三個分量分別除以 ，產生正規化裝置座標（normalized device coordinates，NDC）：</p>
+<p>因為不可見的部分已經在前一階段被裁掉了，所以留下的頂點經過透視除法後，、 與  三個 OpenGL NDC 座標分量都會落在  中。 這三組範圍共同形成了下列的標準立方體：</p>
+<p>其中 x 與 y 表示頂點在標準可見範圍內的水平與垂直位置，z 則用來在後續深度比較時表達前後關係。 對透視投影而言，除以  也會讓相同大小的遠處物體在 NDC 中占用較小的寬度與高度，形成近大遠小的投影結果</p>
+<p>為了先只觀察水平方向的變化，下圖從四維 clip-space 位置中取出了  兩個分量，畫成了一張側視圖。 兩條線段具有相同的 ，但分別位於  與 。 對本文使用的 perspective projection matrix 而言，，所以較大的正  代表頂點離相機較遠。 圖中的射線會將兩條線段投向  的 NDC 表示，用來示範除法會如何改變投影尺寸：</p>
+<figure><figcaption></figcaption></figure>
+<p>同樣的  範圍除以較大的  後，會覆蓋較短的 NDC 區間，因此遠處物體會得到較小的投影尺寸</p>
+<p>這個階段會產生尚未套用 viewport 寬度、高度與像素座標的 NDC。 在將這批位置交給視埠轉換前，我們另外再補充一下為何裁切會位於透視除法之前</p>
+<h5>為什麼不能直接先做完 perspective divide 再做 clipping？</h5>
+<p>這是我當初在看時想到的疑問：你做 clipping 時明明就是用 NDC 座標在判斷要裁切的範圍的，那為什麼不先做完 perspective divide 再做 clipping？</p>
+<p>前一節從 NDC 的標準可見範圍推導出了六個 clip-space 裁切條件。 兩組條件描述的是同一個可見邊界，而裁切階段實際接收的是圖元的 clip-space 位置</p>
+<p>若要先執行 perspective divide，再於 NDC 中裁切，裁切階段仍然需要完成兩項工作：</p>
+<ul>
+<li>找出圖元與 NDC 可見邊界的交點位置</li>
+<li>為每個交點建立完整的新頂點，包含位置以及對應的 UV 等頂點資料</li>
+</ul>
+<p>第一項工作可以直接使用 NDC 位置。 第二項工作還需要知道交點位於原 clip-space 邊上的比例，才能按照原本的內插規則算出 UV 等資料</p>
+<p>由於透視除法產生的 NDC 位置只包含 、 與  三個比值，沒有包含原本的 。 當邊上兩端的  不同時，透視除法會改變交點在線段上的比例，因此管線必須另外保留兩端原本的 ，才能從 NDC 中的比例換回 clip-space 中的比例</p>
+<p>以下用一組具體數值來觀察這項差異。 假設兩個端點的  分別是：</p>
+<p>右裁切平面滿足 。 以  表示交點位於原 clip-space 邊上的比例，沿這條邊移動時：</p>
+<p>因此交點在 clip-space 邊上的比例是：</p>
+<p>如果先對兩個端點執行透視除法，它們的 NDC x 座標則會是  與 。 若以  表示交點在這條 NDC 線段上的比例，右邊界  會得到：</p>
+<p>可以看見同一個交點在 clip-space 邊上的比例是 ，在 NDC 線段上的比例卻是 。 裁切建立的交點不只需要位置，也要取得對應的頂點資料。 以本文採用預設內插規則的 UV 為例，假設頂點  與頂點  的 u 座標分別是  與 ，使用原 clip-space 參數  會得到：</p>
+<p>若改用 NDC 線段上的  直接做線性內插，則會錯誤地得到：</p>
+<p>但如果管線另外保留了邊上兩端的 ，就能將  換回原 clip-space 邊上的 ：</p>
+<p>將 、 與  代入後，會還原出 ，接著便能用這個比例算出正確的 UV。 因此，當整個圖元都位於  的區域，而且管線保留了這些資料時，就能在 NDC 中完成裁切</p>
+<p>不過一般 rendering pipeline 還必須處理穿過  的圖元。 對 clip-space 邊上的位置而言， 會依原邊參數  線性變化：</p>
+<p>如果  且 ，那麼這條邊會在下列位置經過 ：</p>
+<p>透視除法無法在  計算 、 與 。 因此，穿過  的邊無法先變成一條完整且有限的 NDC 線段，再以一般線段的方式接受裁切</p>
+<p>在本文使用的標準透視投影矩陣中， 保存的是頂點沿相機視線軸的前後位置。 它和 view-space 的 z 座標具有下列關係：</p>
+<p>由於相機位於 view-space 原點並看向 ，因此  的正負號會對應到：</p>
+<ul>
+<li>、：頂點位於相機前方</li>
+<li>、：頂點位於相機所在的平面</li>
+<li>、：頂點位於相機後方</li>
+</ul>
+<p>例如一條邊的兩端分別具有  與 ，投影後便會得到  與 。 走到邊的中點  時， 且 ，所以這條邊會在相機所在的平面穿過無法執行透視除法的位置。 近平面則位於 ，對應的 </p>
+<p>而相較之下，此時的 clip-space 位置與平面判定值仍然有限，管線可以先在 homogeneous clip-space 中截斷圖元，再讓留下且具有有效  的頂點執行透視除法</p>
+<p>前面我們提的一般 rendering pipeline 的做法會先在 homogeneous clip-space 中裁切。 這個順序能在除法前處理好穿過  的圖元，也能依各項頂點資料的內插規則建立正確的交點資料。 管線確定可見部分後，才會對留下且具有有效  的頂點執行透視除法。 若實作選擇在 NDC 中完成部分裁切，就必須保留原本的 ，並執行上述參數換算</p>
+<p>簡單來說，這兩種順序的差別是：</p>
+<ul>
+<li>先在 homogeneous clip-space 中裁切：可以直接處理穿過  的圖元，並使用 clip-space 邊上的比例建立完整的新頂點</li>
+<li>先轉成 NDC 再裁切：圖元必須位於  的區域，而且管線需要在 NDC 的階段額外再保留原本的 ，以利用它換算交點的頂點資料</li>
+</ul>
+<h5>共用範例：四筆 clip-space 頂點轉成 NDC</h5>
+<p>前一節的裁切範例中我們移除了三角形  超出右裁切平面的部分，並建立了兩個交點  與 ，接著再將留下的四邊形拆成了三角形  與 。 因此，進入這個階段時，我們手上有兩個三角形的頂點順序，以及四筆不重複的頂點資料。 若沿用上一節的頂點編號，這組順序可以寫成索引 <code>[0, 1, 2, 0, 2, 3]</code>，四筆頂點資料則是：</p>
+<ul>
+<li>頂點 ：clip-space 位置為 ，RGBA 為 ，UV 為 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為 ，UV 為 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為 ，UV 為 </li>
+<li>頂點 ：clip-space 位置為 ，RGBA 為 ，UV 為 </li>
+</ul>
+<p>接下來為了把這四筆頂點交給 viewport transform，我們需要將每筆 clip-space 位置轉成 NDC 位置。 透視除法會將每筆位置的 x、y 與 z 分別除以該頂點自己的 ，三角形的頂點順序、RGBA 與 UV 則保持不變。 同時，管線還會算出並保存 ，供後續內插使用，讓它繼續與對應的頂點保持關聯：</p>
+<p>例如  的 x 與 z 分量會算成：</p>
+<p>由於  與  的 ，因此仍位於 NDC 的右邊界。 這個階段交給視埠轉換的資料，是四筆 NDC 位置，以及仍與各頂點保持關聯的 、RGBA 與 UV。 下圖我們逐筆對齊了這些輸入與輸出，以方便確認每個頂點使用的是自己的 ：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中我們以精確分數銜接了裁切與視埠轉換。 實作時選用的浮點數、定點數與捨入方式，都需要維持這裡描述的座標關係並產生符合圖形 API 的結果</p>
+<h4>viewport transform：把 NDC 映射到 screen-space 座標</h4>
+<p>Perspective divide 階段的輸出為 NDC 位置，以及仍與頂點相連的 、RGBA 與 UV。 接下來為了讓 rasterizer 知道每個頂點位於目前視埠的什麼位置，以及具有多少深度，我們需要將 NDC 映射到 screen-space</p>
+<p>在這個階段，OpenGL context 所設定的 viewport 矩形會提供輸出區域的起點、寬度與高度，depth range 則會指定後續 depth test 使用的深度範圍。 視埠轉換（viewport transform）會依這兩項狀態，將 NDC 的 x、y 與 z 轉成連續的 screen-space x、y 與深度</p>
+<p>為了用一個運算表示上述映射，我們會將視埠轉換寫成一個  矩陣，並記作 。 這個矩陣包含縮放與平移兩個步驟。 縮放會將 NDC 的 x、y 與 z 範圍調整成視埠的寬度、高度與深度範圍的跨度，平移則會將調整後的範圍移到視埠與深度範圍指定的位置</p>
+<p>接下來我們要推導  中的縮放與平移係數。 為此，我們先來確認它在完整的座標轉換流程中會接收哪一種座標，以及要輸出哪一種座標。 前面 MVP transformation 中的  會依相機位置與方向，將 world-space 位置轉成 view-space 位置。 經過 projection transformation、clipping 與 perspective divide 後， 會接收該 NDC 位置，並將它映射到 screen-space：</p>
+<p>其中 clipping 會以整個圖元為單位來判斷可見範圍。  可能是保留下來的原頂點，也可能是圖元與裁切平面相交時建立的新頂點。 Perspective divide 與 viewport transform 會接著逐一轉換這些可見頂點</p>
+<p>為了展開 x 與 y 的映射公式，我們先確定兩邊使用的座標範圍。 NDC 以固定的標準範圍表示左、右、上與下，screen-space 則以實際視埠建立連續座標系。 本文沿用了 OpenGL 的左下角原點慣例，向右是 ，向上是 </p>
+<p>假設視埠左下角是 ，寬度與高度分別是 、，而且使用 OpenGL 預設的  depth range。 為了讓  能夠同時表示縮放與平移，我們會先在三維 NDC 位置後補上第四個分量 ，建立供矩陣運算使用的齊次表示：</p>
+<p>現在我們要將 NDC 的 x 與 y 從無單位的  範圍，映射到 viewport 的連續 screen-space 座標。 根據前面定義的 viewport 位置與大小，x 的目標範圍是 ，y 的目標範圍則是 。 所以當  時，目標區域就是 </p>
+<p>要推導這項映射，我們先將 x 方向的轉換寫成「縮放後再平移」的一次函數：</p>
+<p>NDC 的左邊界  要對應到 viewport 左邊界 ，右邊界  則要對應到 。 因此  與  必須滿足：</p>
+<p>將第二式減去第一式，可以解出縮放係數 。 將兩式相加，則可以解出平移量 ：</p>
+<p>y 方向使用相同的方法，將  的兩個端點分別對應到  與 ：</p>
+<p>深度方向則要把  映射到預設的 screen-space depth range 。 將  的兩個端點代入後會得到：</p>
+<p>將這三組縮放係數與平移量分別放入矩陣的前三列，便能得到我們的  了：</p>
+<p>把矩陣的前兩列展開後，就是所謂的視埠轉換公式：</p>
+<p>假設視埠從  開始，大小是 ：</p>
+<p>下圖我們以  與  來簡寫了 viewport 的寬度與高度，並將數值範例設為 、。 我們會追蹤 NDC 位置 ，觀察視埠轉換如何將它映射到連續的 OpenGL screen-space：</p>
+<figure><figcaption></figcaption></figure>
+<p>將這組數值代入視埠轉換公式，可以得到：</p>
+<p> 的第三列則是前面由兩個端點解出的 。 它會產生後續 depth test 要使用的 screen-space 深度，在本文採用的深度規則中， 對應近平面， 對應遠平面</p>
+<p>綜上所述，完成視埠轉換後，我們會輸出具有 screen-space x、y 與深度 z 的頂點。 每個頂點原有的 、RGBA 與 UV 仍會保留下來，供 rasterization 與後續著色階段使用</p>
+<h5>共用範例：NDC 頂點映射到  viewport</h5>
+<p>前一節執行完透視除法後，我們成功將裁切後的四筆頂點 、、 與  轉成了下列 NDC 位置：</p>
+<p>頂點順序仍由索引 <code>[0, 1, 2, 0, 2, 3]</code> 指定，對應  與 。 每筆頂點的 、RGBA 與 UV 也仍與各自的 NDC 位置保持關聯</p>
+<p>接下來，我們要讓 rasterizer 知道這兩個三角形位於輸出影像中的哪個位置，因此需要將 NDC 位置映射到共用範例的 viewport。 這個 viewport 的左下角為 、大小為 ，depth range 則為 </p>
+<p>這個階段會使用前面推導完的視埠轉換公式：</p>
+<p>將  與  代入前兩式，並沿用  depth range 對應的第三式後，我們可以得到：</p>
+<p>以頂點  為例。 它的 NDC 位置為：</p>
+<p>將三個分量分別代入視埠轉換公式後，可以得到：</p>
+<p>因此，頂點  的 screen-space 位置為：</p>
+<p>對其餘三筆頂點也套用上相同的方法來計算，結果為：</p>
+<p>到這裡，我們就取得了兩個三角形的 OpenGL screen-space 座標：</p>
+<p>視埠轉換會把這四筆描述三角形  與  的資料，也就是 OpenGL screen-space 位置，連同其各自的 、RGBA 與 UV，以及索引 <code>[0, 1, 2, 0, 2, 3]</code> 交給 rasterization。 下圖我們將四筆輸出頂點與兩個三角形放進了  viewport：</p>
+<figure><figcaption></figcaption></figure>
+<h3>Rasterization：從 screen-space 圖元產生片段資料</h3>
+<p>做完前一節的圖元處理後，我們手上會有位於 screen-space 座標中的三角形，以及每筆頂點的 screen-space 深度、、RGBA 與 UV。 接下來我們要找出這個三角形會影響離散影像中的哪些位置，並為每個位置準備後續著色所需的資料。 這項工作會由光柵化（rasterization）完成</p>
+<p>它的輸出影像會由一格一格的像素（pixel）組成，每個像素都是影像網格中以整數座標  編號的一個格子。 但前面三角形在描述形狀時使用的是連續座標，因此 rasterizer 必須決定三角形涵蓋了每個像素內的哪些位置。 為此，它會在每個像素內設定一個或多個取樣位置（sample position），每個位置都會對應一個 sample。 取樣位置是執行幾何判定時使用的座標，sample 則是這個座標所對應的取樣單位，用來保存涵蓋判定及後續處理的結果</p>
+<p>每個像素包含多少個 sample，取決於目前使用的取樣模式。 如果每個像素只有一個 sample，這種設定稱為 <code>single-sample</code> 模式。 如果每個像素具有多個 sample，則稱為 <code>multisample</code> 模式。 後者會分別判斷每個 sample 的取樣位置是否被三角形涵蓋，並將判定結果記錄在對應的 sample 中，因此能更細緻地表示三角形只涵蓋像素一部分的情況</p>
+<p>本文的共用範例採用 <code>single-sample</code>，並將唯一一個 sample 的取樣位置設在像素中心。 下圖會先以 OpenGL screen-space 的 y 軸向上座標，解釋像素索引、像素邊界與中心取樣位置的關係：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中的每個像素都以一組整數  作為索引。 在這套座標中，x 每相差  個 screen-space 座標單位，就表示水平方向相隔一個像素的寬度，而 y 每相差  個單位，則表示垂直方向相隔一個像素的高度。 因此，像素  的左、右邊界分別位於  與 ，下、上邊界則分別位於  與 ，中心取樣位置位於 </p>
+<p>在檢查各個 sample 的取樣位置以前，管線還可以先使用三個 screen-space 頂點的環繞方向，來判斷目前正在處理的三角形圖元是正面圖元還是背面圖元。 若 Application 不希望繪製某個朝向，就可以啟用面剔除（face culling），讓該方向的三角形不再進入 coverage。 本文的共用範例沿用 OpenGL 預設狀態，不會啟用面剔除，因此兩種朝向都能繼續處理</p>
+<p>此外，triangle coverage 的目標是找出哪些 sample 的取樣位置落在三角形的二維內部，因此三個頂點必須能在 screen-space 中圍出具有面積的區域。 三個頂點若發生了共線或重合，圍出的面積便是 。 這種圖元稱為退化三角形（degenerate triangle），不會像一般三角形一樣產生被涵蓋的 sample</p>
+<p>找出被三角形涵蓋的 sample 後，我們還需要算出每個 sample 的 RGBA、UV 與候選 screen-space 深度，才能準備後續著色所需的資料。 為此，rasterizer 會接著執行 barycentric interpolation，在目標內插位置算出三個重心權重，再依各項頂點資料的內插規則產生結果</p>
+<p>到這裡，rasterizer 已經知道三角形涵蓋了該像素內的哪些 samples，也已經算出了後續處理這些 samples 時要使用的 RGBA、UV 與候選 screen-space 深度。 接著 rasterizer 會把這些資料整理成一筆片段（fragment）。 就本文追蹤的資料而言，每筆片段會包含：</p>
+<ul>
+<li>片段的 screen-space x、y 位置，以及目前圖元在該像素產生的 coverage mask</li>
+<li>該位置的候選 screen-space 深度</li>
+<li>由三筆頂點內插而來的 RGBA 與 UV，這些資料會成為 fragment shader 的輸入</li>
+</ul>
+<p>片段是之後可能寫入像素的候選資料，一個三角形在一個像素內只會產生一筆 fragment，而如果有兩個三角形都涵蓋了某個像素，那該像素就會有兩個對應的 fragment，之後我們會再透過一系列的規則來決定最終要用哪個 fragment 的內容來寫入該像素</p>
+<p>當同一個三角形在同一個像素內涵蓋多個 samples 時，這些結果會記錄在同一筆 fragment 的 coverage mask 中，其中每個 bit 對應一個 sample。 當多個三角形同時覆蓋同一個像素時，rasterizer 會分別為它們產生各自的片段，因此一個像素可以有多筆候選資料。 光柵化產生這些片段後會再將它們交給後續管線繼續處理，後續的階段會再將其輸出為實際要寫入像素的資料</p>
+<p>下面兩個 H4 會依序展開 triangle coverage 與 barycentric interpolation，並明確列出兩者各自使用與交出的資料</p>
+<h4>triangle coverage：找出三角形會影響的像素</h4>
+<p>Triangle coverage 的目標是利用三筆頂點的 screen-space x 與 y 座標界定三角形邊界，再按照上一段介紹的取樣位置配置（sample pattern），取得每個 sample 的取樣位置，並判斷其中哪些 sample 被三角形涵蓋。 只有被涵蓋的 sample 才需要繼續做內插與著色</p>
+<p>為此，rasterizer 會逐一確認每個 sample 的取樣位置是位於三角形的內部、外部，還是剛好落在邊上。 位於內部時，對應的 sample 會記為被三角形涵蓋。 位於外部時，該 sample 則不會繼續處理。 對於剛好落在邊上的取樣位置，rasterizer 還需要根據邊的方向，決定對應的 sample 是否歸屬於目前的三角形</p>
+<p>Application 會透過畫面緩衝區與相關 API 狀態選擇 single-sample 或 multisample，以及每個像素內的 sample 數量。 各個 sample 的取樣位置則由圖形 API 與實作規則決定</p>
+<p>Triangle coverage 會判斷同一個像素內的每個 sample 是否有被三角形涵蓋，再將這些布林結果依 sample index 記錄成一筆 coverage mask。 下一個 barycentric interpolation 的階段會逐一處理被涵蓋的 sample，使用對應的取樣位置與三筆頂點資料算出 RGBA、UV 與深度</p>
+<p>本文的共用範例只檢查一個 sample，並將它的取樣位置設在像素中心。 因此，triangle coverage 對每個像素要回答的問題是「這個 sample 的取樣位置是否位於三角形內？」</p>
+<p>假設目標像素為 ，光柵化器會先檢查它的中心。 這裡我們將實際採用的取樣位置記為 ：</p>
+<p>接著我們要判斷這個取樣位置是否位於三角形內。 以下將它命名為點 ，其位置向量就是 。 判斷時，我們會沿著  的頂點順序，分別檢查  是位於這三條有向邊的內側還是外側</p>
+<p>先以有向邊  為例。 第三個頂點  所在的一側就是這條邊的三角形內側，因此我們的第一個目標是判斷  與  是否位於直線  的同一側。 Triangle coverage 只需要比較 x 與 y，不會使用頂點的 screen-space 深度。 因此，在接下來的二維內外判定中，我們會暫時忽略深度，將兩條邊的向量都寫成 z 分量為  的三維向量：</p>
+<p>接著，我們利用這兩個向量的外積來建立一個可供後續比較的三角形法向量。 對任意兩個向量  與  而言，外積的三個分量為：</p>
+<p>將  與  代入後，可以得到：</p>
+<p>從算式可以直接看到， 的 x 與 y 分量都是 ，只有 z 分量可能不為 。 但由於前面已排除了退化的三角形，所以這個 z 分量不會是 。 它大於  時， 會指向 ，小於  時則會指向 。 這個正負號取決於  的頂點順序，用來記錄頂點  位於直線  的哪一側。 例如將  與  的順序交換後，外積便會變成 </p>
+<p>接下來我們要以同一條邊  測試點 ，看看它是否與  位於直線  的同一側。 為此，我們還要建立從  指向  的向量 ，再計算：</p>
+<p>這個測試向量是利用已知的 、 與  算出來的結果。 它和  都以  作為第一個向量。 因此，只要比較兩個外積向量的方向，就能知道  與  是否位於直線  的同一側了</p>
+<p>為了將同向、反向與零向量這三種結果轉成一個可以比較正負號的數值，我們會計算測試向量與基準法向量  的內積，並將結果記為 ：</p>
+<p>兩個向量的內積可以寫成：</p>
+<p>其中  是兩個向量的夾角。 兩個非零向量同向時， 且 ，因此內積大於 。 兩者反向時， 且 ，因此內積小於 。 如果測試向量是零向量，內積便等於 </p>
+<p>如此一來：</p>
+<ul>
+<li>：兩個外積向量同向。 這表示從  轉向  和轉向  的方向相同，因此  與  位於直線  的同一側，也就是  位於有向邊  的三角形內側</li>
+<li>：兩個外積向量方向不同。 這表示兩次轉向的方向相反，因此  與  位於直線  的不同側，也就是  位於這條邊的三角形外側</li>
+<li>： 是零向量，表示  與  平行，因此  位於無限延伸的直線  上</li>
+</ul>
+<p>下圖將相同的向量關係套用到了三角形的三條有向邊上，合併起來就可以判斷點  是位於三角形的內部還是外部了：</p>
+<figure><figcaption></figcaption></figure>
+<p>前面我們利用了外積與內積來說明了如何判斷點  是位於三角形的內部還是外部。 但由於 Rasterizer 需要對許多 sample 的取樣位置來重複執行這項判定，因此我們需要將前面的向量運算展開成一個只使用 screen-space x 與 y 座標的純量公式。 這樣只要將取樣位置代入公式，就能得到一個數值來判斷它位於有向邊的哪一側了</p>
+<p>先以有向邊  與待判定位置  為例。 已知兩個端點的位置為  與 ，待判定位置為 ，因此兩個向量可以寫成：</p>
+<p>將  與  代入外積公式後，可以得到：</p>
+<p>與前面一樣，由於外積的 x 與 y 分量都是 ，因此在判斷  位於有向邊哪一側時，只需要專注於 z 分量即可。 為此，我們替這個純量定義了一個函數，稱為邊緣函數（edge function）：</p>
+<p>邊緣函數會為一條有向邊與一個待判定位置輸出一個帶正負號的純量。 在本文使用的 y-up 座標中，這個數值具有下列意義：</p>
+<ul>
+<li>： 位於有向邊  的左側</li>
+<li>： 位於有向邊  的右側</li>
+<li>： 位於無限延伸的直線  上</li>
+</ul>
+<p>邊緣函數的絕對值也和三角形面積有固定關係。 為了看出這項關係，我們可以用  的行列式（determinant）來表示同一個邊緣函數。 一般的  行列式會依下式展開：</p>
+<p>將  的 x 與 y 分量放入第一行，再將  的 x 與 y 分量放入第二行，便會得到：</p>
+<p>前面我們知道 ，而由於這個外積向量只有 z 分量，所以它的長度就是該分量的絕對值。 假設  表示  與  的夾角，那我們可以將這項關係寫成：</p>
+<p>後兩個等號是因為  為兩個向量圍成的平行四邊形面積，而三角形  的面積是它的一半。 將待判定位置  換成頂點  後，我們會得到一個只取決於三角形三個頂點的數值。 本文將它記為有向雙倍面積 ：</p>
+<p>在 y-up 座標中， 表示  採逆時針順序， 則表示採順時針順序。  代表三個頂點共線，形成前面已經排除的退化三角形</p>
+<p>將邊緣函數與  代回前面的內積判定後，可以得到：</p>
+<figure><figcaption></figcaption></figure>
+<p>由於  是  與  的乘積，只要比較這兩個值是否同號，就能取得前面內積判定的結果了，不必為每個取樣位置再次計算與  的內積。 Triangle coverage 會對三條有向邊分別計算：</p>
+<ul>
+<li>如果三個邊緣函數值都與  同號，則取樣位置位於三角形內部</li>
+<li>如果有一個以上的值與  異號，則取樣位置位於三角形外部</li>
+<li>如果沒有任何一個值與  異號，但有一個以上的值等於 ，則取樣位置位於三角形邊界上，還需要決定對應的 sample 是否歸屬於目前的三角形</li>
+</ul>
+<h5>top-left rule：決定共享邊上的 sample 歸屬</h5>
+<p>兩個相鄰三角形共同使用的線段稱為共享邊。 當某個 sample 的取樣位置剛好落在共享邊上時，我們需要決定它要由哪一個三角形涵蓋。 如果兩個三角形都將它算在內，rasterizer 會為同一個 sample 產生兩筆候選片段。 如果兩邊都不將它算在內，接縫處則不會產生任何片段</p>
+<p>要達成這個目標，我們需要讓共享邊兩側的三角形得到相反的涵蓋結果。 然而，當取樣位置位於共享邊上時，兩個三角形對該線段算出的邊緣函數值都會是 。 這個結果只能告訴我們取樣位置位於邊界上，無法決定它應該歸屬於哪一側。 因此圖形 API 會規定一套用在邊界判定上的規則，本文採用的是 top-left rule，這項規則會將三角形的上邊與左邊納入涵蓋範圍，並排除下邊與右邊</p>
+<p>接下來我們要把這四種邊直接寫成 rasterizer 可以計算的代數條件。 本文使用 y-up 座標，並將三角形的三個頂點 、 與  按照逆時針順序排列：</p>
+<p>沿著  走過三角形邊界，可以得到三條有向邊：</p>
+<p>我們可以任取一條從  指向  的邊，並將它的兩個分量記為：</p>
+<p>將這兩個分量代入前面的邊緣函數後，可以得到：</p>
+<p>現在我們取邊上的一點 ，這代表 。 再令 ，分別將  往  與  移動 ，此時其邊緣函數值為：</p>
+<p>由於逆時針三角形的內部滿足 ，因此我們可以根據上式來判斷三角形內部位於這條邊的哪個方向，並將四種邊寫成下列條件：</p>
+<figure><figcaption></figcaption></figure>
+<p>Top-left rule 會納入左邊與上邊，因此如果一個取樣位置要通過某條有向邊的涵蓋判定，必須滿足下面其中一個條件：</p>
+<ul>
+<li>取樣位置位於有向邊的內側，此時邊緣函數值會大於 ：</li>
+<li>取樣位置正好位於有向邊上，而且該邊是 top-left rule 會納入的左邊或上邊：</li>
+</ul>
+<p>如果兩個相鄰三角形採用一致的頂點順序，它們會以相反方向走過共享邊：</p>
+<ul>
+<li>對非水平共享邊而言，其中一個方向的  會小於 ，另一個方向的  則會大於 </li>
+<li>對水平共享邊而言，其中一個方向的  會小於 ，另一個方向的  則會大於 </li>
+</ul>
+<p>如此一來，共享邊上的 sample 就只會讓其中一個三角形的涵蓋判定成立了</p>
+<h5>共用範例：兩個三角形覆蓋哪些像素</h5>
+<p>前一節的視埠轉換已經將 、、 與  映射到了  viewport 的連續 OpenGL screen-space 座標中，並得到了下列兩個三角形：</p>
+<p>接下來我們要利用邊緣函數與 top-left rule，判斷每個像素中心是否有被這兩個三角形涵蓋，並產生完整的 coverage mask。 首先，將兩組頂點代入有向雙倍面積公式：</p>
+<p>兩個結果都大於 ，表示  與  在目前的 y-up 座標中都採用逆時針的頂點順序，因此可以直接使用前面推導的判定式。 兩個三角形共同使用線段 ，但  會沿  走過它， 則會沿相反的  走過它</p>
+<figure><figcaption></figcaption></figure>
+<p>我們先以共享線段  穿過的像素  為例。 這個像素的取樣位置是：</p>
+<p>這個位置可以由  沿著線段  前進四分之一得到，因此它確實位於共享邊上：</p>
+<p>接下來讓我們把  代入前面推導的涵蓋判定式。 對  而言，共享邊的方向是 。 將兩個端點與取樣位置代入邊緣函數後，可以得到：</p>
+<p>這條有向邊的 、。 將這兩個分量與  代入完整的判定式後，可以得到：</p>
+<p>對  而言，同一條共享邊的方向則是 ：</p>
+<p>過程中可以看見這個方向的 、。 將它們與  代入相同的判定式後，可以得到：</p>
+<p>雖然兩個三角形在共享邊上都算出了 ，但只有  的  符合 top-left rule。 這個取樣位置對  的另外兩條邊還會得到  與 ，因此三條邊的涵蓋判定全部成立。 對  來說，其另外兩條邊雖然會得到  與 ，但因為共享邊的涵蓋判定不成立，所以這個 sample 最後只歸屬於 </p>
+<p>本節的共同範例中，判定結果共有二十一個被涵蓋的像素，其中  涵蓋七個， 涵蓋十四個。 共享線段  也會穿過像素  的中心，這個位置會經過相同的判定而歸屬於 </p>
+<p>後續範例我們會固定追蹤圖中以  標出的像素 。 光柵化器使用的中心取樣位置是：</p>
+<p>涵蓋判定階段已經確認像素中心的 sample 被  涵蓋。 共用範例接下來會繼續追蹤這個 sample</p>
+<h4>barycentric interpolation：算出三個頂點的權重</h4>
+<p>經過三角形涵蓋判定的過程後，我們已經找出了一個被涵蓋的 sample，並輸出了它的取樣位置、三角形的三筆頂點與三個邊緣函數值。 接下來我們要算出這個 sample 應從每個頂點取得多少 RGBA、UV 與深度。 為此，重心座標內插會先將邊緣函數描述的幾何關係正規化成三個重心權重，再依每項資料的內插規則產生片段著色器輸入與預設的候選 screen-space 深度</p>
+<h5>由邊緣函數算出重心權重</h5>
+<p>以下會沿用  來表示實際採用的取樣位置。 在本文的 single-sample 範例中，它就是像素中心。 為了算出每個頂點的權重，我們會比較原三角形與三個子三角形的面積。 先令原三角形  的有向雙倍面積為 </p>
+<p>以頂點  為例，它的對邊是 。 而取樣位置  與 、 會形成一個子三角形 ，其有向雙倍面積除以 ，便是頂點  的權重 。 同理，頂點  的權重會使用子三角形 ，頂點  的權重則使用子三角形 。 因此，三個權重可以寫成：</p>
+<p>公式中的 、 與  分別是子三角形 、 與  的有向雙倍面積。 將它們各自除以原三角形的有向雙倍面積，便能得到三個頂點的權重</p>
+<p>這三個除法可以直接用面積比例理解。 下圖把取樣位置與三個頂點相連，將原三角形分成了三個子三角形：</p>
+<figure><figcaption></figcaption></figure>
+<p>圖中的 、 與  對應到了本文的 、 與 。 三塊子三角形會拼回原三角形，因此：</p>
+<p>由於每個  都是對應子三角形與原三角形的面積比，因此它們就是這個取樣位置對頂點 、 與  的 screen-space 幾何權重</p>
+<h5>依內插規則產生 shader inputs</h5>
+<p>接下來我們要依資料指定的內插規則，使用這三個權重與頂點 、 與  保存的資料，算出目前取樣位置所需的 fragment shader inputs</p>
+<p>RGBA、UV 與材質編號通常會需要不同的計算規則，例如 UV 通常需要沿著投影前的模型表面變化； 用來描述畫面效果的色彩或距離可能要在 screen-space 中線性變化； 材質編號等離散資料則要讓整個圖元共用同一筆值。 GLSL 會在 vertex shader output 與對應的 fragment shader input 前加上內插限定詞（interpolation qualifier），指定 rasterizer 要採用哪一種計算規則</p>
+<p>對應的 shader 介面可以寫成：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Vertex shader outputs</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">noperspective</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> screen_color;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">flat</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> material_id;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// Fragment shader inputs</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">noperspective</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> screen_color;</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">flat</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> material_id;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>在這個 GLSL 3.30 範例中，每組 output 與 input 都會使用相同的限定詞。 以下會依序說明三種限定詞是如何使用重心權重或頂點資料產生結果的</p>
+<p>先從 <code>noperspective</code> 開始。 這項規則的目標是讓資料在 screen-space 內呈線性變化。 由於三個  本來就是根據 screen-space 位置算出的權重，因此 rasterizer 會直接用它們來混合三筆頂點的資料</p>
+<p>令 、 與  分別表示介面變數  在頂點 、 與  保存的值，那麼目前取樣位置取得的結果為：</p>
+<p>下圖用頂點色彩呈現了這個加權過程。 圖中的 、 與  代表三筆頂點資料， 則是三個  直接混合後得到的結果：</p>
+<figure><figcaption></figcaption></figure>
+<p><code>smooth</code> 用於 UV 等要延續模型表面變化的資料。 當三個頂點的  不同時，screen-space 中的幾何比例和投影前的模型表面上的比例也會不同。 因此 Rasterizer 需要先依每個頂點的  調整三個 ，再用調整後的比例混合頂點資料</p>
+<p>前面的 perspective divide 已經替每筆頂點保留了 。 我們先將每個 screen-space 的權重乘上對應頂點的 ：</p>
+<p>為了讓這三個權重再次形成總和為  的比例，我們先求出它們的總和：</p>
+<p>接著將每個  除以 ，得到總和為  的新權重：</p>
+<p>最後以這三個新權重來混合頂點 、 與  保存的值：</p>
+<p>這種先以  調整 screen-space 權重，再將它們重新正規化的做法稱為透視正確內插（perspective-correct interpolation）。 下圖將同一張棋盤格紋理與同一組頂點 UV 映射到了相同的 screen-space 三角形，以比較直接使用  與先依  調整權重的結果：</p>
+<figure><figcaption></figcaption></figure>
+<p>左側使用了 <code>noperspective</code>，所以格線會沿 screen-space 線性排列。 右側使用預設的是 <code>smooth</code>，格線間距會反映三筆頂點原有的 clip-space ，因而呈現模型表面經過透視投影後的變化</p>
+<p><code>flat</code> 則比較特別，主要用在與材質有關的情境。 材質編號是用來選擇材質資料的離散索引，如果我們直接對不同頂點的材質編號進行加權混合，其結果可能是小數，也可能會指向另一筆無關的材質資料，因此整個圖元內的材質編號必須相同。 GLSL 使用 <code>flat</code> 這個內插限定詞來完成這項工作，套用 <code>flat</code> 後，OpenGL 會從原圖元選出一個頂點作為資料來源，並將該頂點的值提供給這個圖元產生的所有片段。 這個來源頂點被稱為 provoking vertex</p>
+<p>假設三角形的頂點順序是 ，三筆頂點的材質編號依序為 、 與 。 對 <code>GL_TRIANGLES</code> 而言，OpenGL 預設的 <code>GL_LAST_VERTEX_CONVENTION</code> 會選擇  作為 provoking vertex，因此整個三角形都會使用材質編號 </p>
+<p>若要改由第一筆頂點提供資料，可以在繪製前設定：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glProvokingVertex</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_FIRST_VERTEX_CONVENTION);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>這項設定會讓  成為 provoking vertex，整個三角形因而都會使用材質編號 。 將這個關係一般化成介面變數  後，每個取樣位置所使用的值可以統一寫為：</p>
+<p><code>flat</code> 在這裡固定的是材質編號，因此 UV、法向量、頂點色彩與光照計算所需的其他資料仍會依各自的內插規則在三角形內變化，所以使用同一個材質編號的片段還是可以產生不同的色彩。 但如果同一個三角形內需要混合多種材質，那可以由每個頂點另外再提供各材質的混合權重，rasterizer 會在三角形裡面內插這些權重，fragment shader 再依權重混合各材質的參數或紋理結果，以達到目的</p>
+<h5>multisample 時要在哪個位置計算 shader inputs</h5>
+<p>在前面的 single-sample 共用範例中，我們將唯一的取樣位置與內插位置都設在像素中心。 但 Multisample 會在同一個像素內配置多個取樣位置，每個位置的 screen-space 座標都不同，代入邊緣函數後也會得到不同的重心權重。 因此在 Coverage 判定找出被三角形涵蓋的取樣位置後，barycentric interpolation 還需要再從像素內選定計算 shader inputs 的位置</p>
+<p>這個過程會依序做出兩項決定：</p>
+<ol>
+<li>
+<p>決定在哪個位置計算重心權重。 本文將 coverage 判定所檢查的位置稱為取樣位置（sample position），記為 。 計算 shader inputs 時實際代入邊緣函數的位置則稱為內插位置（interpolation position），記為 。 選定  後，rasterizer 會計算：</p>
+<p>內插位置改變時，三個邊緣函數值與重心權重也會跟著改變。 GLSL 提供了 <code>centroid</code> 與 <code>sample</code> 這兩個輔助儲存限定詞（auxiliary storage qualifier）來控制  應該要選在哪裡，以及同一個像素要使用幾個內插位置</p>
+</li>
+<li>
+<p>決定如何使用重心權重混合頂點資料。 取得三個  後，<code>noperspective</code> 會直接使用它們混合頂點資料。 <code>smooth</code> 則會先以各頂點的  調整三個 ，再使用重新正規化後的  混合資料：</p>
+<p><code>smooth</code> 與 <code>noperspective</code> 控制的是這項加權規則。 因此，像 <code>smooth centroid</code> 這樣的宣告具有兩層資訊：<code>centroid</code> 先決定 ，<code>smooth</code> 再決定如何使用該位置算出的三個重心權重</p>
+</li>
+</ol>
+<p>在 multisample 像素的邊界附近，三角形可能只會涵蓋其中一部分取樣位置。 然而只要 Rasterizer 有找到至少一個被涵蓋的取樣位置，就會為這個像素產生片段。 因此其選出的內插位置可能會落在三角形涵蓋範圍之外，使其中一個以上的重心權重小於 。 此時依這組權重算出的 UV 或色彩會沿著三角形內的數值變化向外延伸，也就是變成了用外插（extrapolation）來計算</p>
+<p>為了讓 shader 指定內插位置的選擇方式，GLSL 提供了 <code>centroid</code> 與 <code>sample</code> 這兩個輔助儲存限定詞。 它們會寫在 shader 介面變數的 <code>in</code> 與 <code>out</code> 宣告中，用來控制 multisample 情境下的內插位置與計算頻率。 以下為了方便對照，三組範例都讓 vertex shader output 與 fragment shader input 採用了相同的限定詞：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// 一般內插</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Vertex shader</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Fragment shader</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// centroid 內插</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> centroid</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Vertex shader</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> centroid</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Fragment shader</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// sample 內插（GLSL 4.00 以上）</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> sample </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic"> // Vertex shader</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">smooth</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> sample </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> surface_uv;</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">  // Fragment shader</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這三組宣告都使用了 <code>smooth</code> 的加權規則，現在讓我們來看一下它們是如何選擇內插位置的。 假設一個像素內有四個取樣位置 、、 與 ，其中三角形只涵蓋了  與 ，則這四個位置的 coverage mask 是 ，每個 bit 依序對應道一個取樣位置，並記錄在同一筆 fragment 中：</p>
+<ul>
+<li><code>smooth</code>：rasterizer 可以在像素範圍內選擇一個 ，並在該處計算三個重心權重。 接著再套用 <code>smooth</code> 的加權規則，算出一組可供  與  共用的 <code>surface_uv</code></li>
+<li><code>smooth centroid</code>：<code>centroid</code> 會將  限制在像素範圍與三角形涵蓋範圍的交集內。 rasterizer 會在該處計算一組重心權重，再套用 <code>smooth</code> 的加權規則，算出一組可供  與  共用的 <code>surface_uv</code></li>
+<li><code>smooth sample</code>：<code>sample</code> 會先將  作為 ，算出第一組重心權重與 <code>surface_uv</code>，再將  作為 ，算出第二組重心權重與 <code>surface_uv</code>。 fragment shader 也會分別為  與  執行一次</li>
+</ul>
+<p>如果宣告改成 <code>noperspective centroid</code> 或 <code>noperspective sample</code>，<code>centroid</code> 與 <code>sample</code> 所選擇的內插位置會相同，但第二個步驟會改為直接使用三個  混合頂點資料</p>
+<figure><figcaption></figcaption></figure>
+<h5>以重心權重產生候選深度</h5>
+<p>Barycentric interpolation 除了產生 shader inputs，也會替目前的取樣位置算出後續 depth test 時使用的預設候選深度。 目前三筆頂點的 screen-space z 已經都包含了投影、透視除法與 viewport transform 的結果，因此 rasterizer 會直接使用 screen-space 的重心權重，讓深度沿三角形所在的平面線性變化：</p>
+<p>這項計算會為每個被涵蓋的取樣位置準備一筆候選 screen-space 深度</p>
+<h5>共用範例：算出像素  的內插資料</h5>
+<p>現在回到共用範例。 為了替像素  產生 RGBA、UV 與候選深度，我們要以它的取樣位置和  的三筆頂點資料計算內插結果。 前面 Triangle coverage 階段已經確認這個像素的中心 sample 會被  涵蓋，因此這次內插會直接使用下列輸入：</p>
+<ul>
+<li>取樣資料：
+<ul>
+<li>像素索引為 </li>
+<li>取樣位置與內插位置都是 </li>
+<li>coverage mask 為 。 唯一的 bit 對應到像素中心的 sample，其值為 ，表示這個 sample 被  涵蓋</li>
+</ul>
+</li>
+<li>頂點 ：
+<ul>
+<li>screen-space 位置為 </li>
+<li>深度為 </li>
+<li>RGBA 為 </li>
+<li>UV 為 </li>
+<li></li>
+</ul>
+</li>
+<li>頂點 ：
+<ul>
+<li>screen-space 位置為 </li>
+<li>深度為 </li>
+<li>RGBA 為 </li>
+<li>UV 為 </li>
+<li></li>
+</ul>
+</li>
+<li>頂點 ：
+<ul>
+<li>screen-space 位置為 </li>
+<li>深度為 </li>
+<li>RGBA 為 </li>
+<li>UV 為 </li>
+<li></li>
+</ul>
+</li>
+<li>內插規則：RGBA 與 UV 都採用預設的 <code>smooth</code></li>
+</ul>
+<p> 在 OpenGL y-up 座標中採用的是逆時針的頂點順序。 由於計算重心權重時只需要三筆頂點與 sample 的 x、y，因此我們可以先從上述輸入取出下列位置：</p>
+<p>三角形的有向雙倍面積定義為 。 將邊緣函數先展開成代數形式，再代入三筆頂點的位置後，我們可以得到：</p>
+<p>而三個重心權重的分子分別為：</p>
+<p>將這三個邊緣函數值分別除以雙倍面積  後，就能得到重心權重了：</p>
+<p>下圖整理了三條對邊、邊緣函數值與重心權重：</p>
+<figure><figcaption></figcaption></figure>
+<p>同時縮放邊緣函數值與雙倍面積並不會改變重心權重，也不會改變有向面積的正負號。 左下角我們用了正比例係數  來表示了這個縮放關係，由於在計算權重時分子與分母都會同乘 ，因此這個係數會被消去掉：</p>
+<p>現在讓我們來看 UV、色彩與深度計算，我們會繼續使用這組重心權重：</p>
+<p>首先來計算 fragment shader 實際收到的 UV。 共用範例使用預設的 <code>smooth</code>，因此還需要三筆頂點的 UV 與 ：</p>
+<p>依  調整後的三個暫時權重及其總和為：</p>
+<p>因此，fragment shader 收到的 UV 為：</p>
+<p>頂點色彩也採用了預設的 <code>smooth</code>。 同一組暫時權重會將  的紅色 、 的色彩 ，以及  的藍色  內插成：</p>
+<p>最後再使用 screen-space 重心權重產生候選深度。 三筆頂點的 screen-space 深度分別是：</p>
+<p>將它們代入候選深度公式，可以得到：</p>
+<p>為了將 triangle coverage 與 barycentric interpolation 的結果交給後續管線，rasterizer 會把像素與取樣位置、coverage mask、shader inputs 及候選深度整理成一筆 fragment。 共用範例得到的資料如下：</p>
+<figure><figcaption></figcaption></figure>
+<p>這筆 fragment 包含：</p>
+<ul>
+<li>像素索引 </li>
+<li>取樣位置 </li>
+<li>coverage mask </li>
+<li>UV </li>
+<li>RGBA </li>
+<li>候選深度 </li>
+</ul>
+<p>Rasterizer 會以相同方式處理三角形涵蓋的其他像素，並為各個像素整理出對應的 fragment</p>
+<h3>Fragment Processing：篩選片段並產生候選顏色與深度</h3>
+<p>光柵化完成後，我們會拿到一系列 fragments。 每筆 fragment 會對應到一個像素，並記錄「該像素內有哪些 samples 被目標圖元涵蓋了」、「內插完成的 shader inputs」與「光柵化器算出的 screen-space 深度」等資訊</p>
+<p>Fragment Processing 的目標是先篩選這些 fragments 中仍需處理的 samples，再替它們算出要交給 Framebuffer Operations 的候選顏色與候選深度。 在執行 fragment shader 前，OpenGL 會依序處理 pixel ownership、scissor 與 multisample fragment operations，藉此決定是否要繼續處理這筆 fragment，以及其中的哪些 samples 資訊是有效的：</p>
+<ul>
+<li>Pixel ownership test：當繪製目標是視窗系統提供的 default framebuffer 時，視窗系統會先判定目前位置是否屬於這個 OpenGL drawable，再將結果提供給 OpenGL
+<ul>
+<li>如果目標位置不屬於該 drawable，那就不會繼續處理該位置了
+<ul>
+<li>這可能會發生在目標視窗被另一個視窗遮住之類的情況</li>
+</ul>
+</li>
+<li>繪製目標若是 Off-Screen framebuffer object（FBO），這項測試會直接通過</li>
+</ul>
+</li>
+<li>Scissor test：繪製狀態可以指定一個 screen-space 的矩形，將後續處理限制在該矩形內。 啟用這項測試後，OpenGL 會將 fragment 的位置與這個矩形比較，並排除位於該矩形之外的 fragment</li>
+<li>Multisample fragment operations：在 multisample framebuffer 中，coverage mask 的每個位元分別對應到了目標像素內的一個 sample。 這組操作會再依 multisample state 來清除其中不需要繼續處理的位元，形成這筆 fragment 目前的 sample mask</li>
+</ul>
+<p>sample mask 與 coverage mask 兩者都以一個 bit 對應像素內的一個 sample，但其描述的是不同階段的結果：</p>
+<ul>
+<li>coverage mask：Triangle coverage 根據幾何邊界算出的結果，記錄哪些 samples 被三角形涵蓋</li>
+<li>sample mask：將 coverage mask 套用 shader 執行前的 multisample state 後，目前仍需交給 fragment shading 的 samples</li>
+</ul>
+<p>例如，一個像素有四個 samples：</p>
+<p>這代表三角形涵蓋 sample 0 與 sample 1。 接著假設 Application 又提供了下列遮罩：</p>
+<p>則逐位元 AND 後我們可以得到：</p>
+<p>完成這些判定後，sample mask 中數值為 1 的位元會指出仍需處理的 samples，之後那些至少保留了一個 sample 的 fragment 會繼續進倒 fragment shading 的階段</p>
+<p>因此以這個例子來說，這裡最後只會繼續處理 sample 0</p>
+<h4>fragment shading：產生候選顏色與候選深度</h4>
+<p>為了依材質、紋理與畫面位置算出 fragment 要提交的顏色，fragment shading 會執行目前選用的 fragment shader。 管線每執行一次 fragment shader，就會建立一次 fragment shader invocation</p>
+<p>一次 invocation 負責的 sample 數量會依 framebuffer 的取樣模式與 shader 的執行頻率而定：</p>
+<ul>
+<li>Single-sample framebuffer 的 fragment 只有一個 sample，因此只會執行一次 fragment shader</li>
+<li>Multisample framebuffer 中，一次 invocation 可以負責一個或多個仍有效的 samples，同一次執行算出的輸出會套用到這些 samples 上</li>
+<li>啟用逐 sample shading 後，管線會為每個仍有效的 sample 分別執行 fragment shader，讓各個 sample 取得自己的輸出</li>
+</ul>
+<p>每次 invocation 會取得 rasterizer 內插完成的 interface inputs（RGBA 與 UV）。 它也可以讀取 uniforms 與目前繪製狀態綁定的紋理資料。 而當 Shader 需要目前 invocation 的畫面位置與深度時，則可以直接讀取 GLSL 的內建輸入 <code>gl_FragCoord</code>，其有四個分量：</p>
+<ul>
+<li>x 與 y 是這次 invocation 在 screen-space 中的位置
+<ul>
+<li>本文沿用了 OpenGL 的預設座標慣例：drawable 的左下角是 ，x 向右增加，y 向上增加</li>
+<li>若像素索引為 ，該像素的中心位於 screen-space 座標 
+<ul>
+<li>在本文的 single-sample 情境中，<code>gl_FragCoord.xy</code> 就是這個中心位置</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>z 是 rasterizer 為這個位置算出的 screen-space 深度</li>
+<li>w 是這個位置的 。 它由三筆頂點的  依 screen-space 重心權重進行仿射內插</li>
+</ul>
+<p>對三角形  而言，假設 <code>gl_FragCoord</code> 所在位置的重心權重是 、 與 ，則：</p>
+<p>為了將 fragment shader 產生的顏色保存成繪製結果，我們需要一個能依畫面位置記錄色彩值的儲存空間。 在 OpenGL 中，色彩影像會承擔這項工作。 色彩影像、color attachment 與 fragment shader invocation 的關係如下：</p>
+<ul>
+<li>色彩影像是一張完整的影像儲存空間。 以  的 single-sample 色彩影像為例，它會包含  個像素位置，每個位置保存一筆色彩</li>
+<li>Framebuffer 會透過一個或多個 color attachments 連接色彩影像，並記錄每個 attachment 對應到哪張影像
+<ul>
+<li>為了將每筆候選顏色送往正確的色彩影像，OpenGL 需要知道 fragment shader 的每筆輸出要送到 framebuffer 的哪個 color attachment</li>
+<li>Fragment shader 會用 output location 編號各筆輸出，而 framebuffer 則可能同時連接著多個 color attachments</li>
+<li>Draw-buffer state 會負責記錄每個 output location 應送往哪個 color attachment</li>
+</ul>
+</li>
+<li>每次 fragment shader invocation 會處理目前 fragment 對應的畫面位置，並透過 <code>out</code> 變數交出一筆或多筆色彩值。 這些值會成為後續附件更新的輸入，因此本文稱它們為候選顏色</li>
+</ul>
+<p>為了讓 fragment shader 將算出的 RGBA 交回管線，GLSL 會使用以 <code>out</code> 宣告的變數保存這筆結果。 下列宣告會建立一個名為 <code>fragment_color</code> 的色彩輸出變數：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fragment_color;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p><code>vec4</code> 會保存 4 個浮點數，在這個輸出中分別代表了 R、G、B 與 A。 <code>layout(location = 0)</code> 會將 <code>fragment_color</code> 指定為 fragment color output location 0。 後續的對應關係是：</p>
+<p>若同一次的繪製需要更新多張色彩影像，shader 可以宣告多個 <code>out</code> 變數，並替它們指定不同的 output locations。 每個 output location 會依 draw-buffer state 中對應的路由找到一個 color attachment，framebuffer 則會記錄該 attachment 實際連接的影像儲存空間。 另外，如果同一次的 invocation 負責了多個 samples，則這些 samples 會共用這次 invocation 交出的候選顏色</p>
+<p>葉片或柵欄等材質常常會用紋理的 alpha 來標示透明部位。 如果 shader 對目標 fragment 做取樣後得到的 alpha 低於了門檻值，那 shader 可以執行 GLSL 的 <code>discard</code> statement，以直接終止目前的 invocation。 如此一來，這次 invocation 的 shader outputs 便不會交給後續的 Framebuffer Operations 了。 如果該 invocation 負責了多個 samples，那這些 samples 也全都不會收到這次 invocation 的 shader outputs</p>
+<p>後續的 depth test 會逐 sample 比較新的深度與 depth attachment 已經保存的深度，因此每個要接受測試的 sample 都需要一筆候選深度。 前面的 barycentric interpolation 已經根據目標 sample 的重心權重算出了它的深度。 Fragment shader 可以透過 <code>gl_FragCoord.z</code> 讀取這個值，接著管線也會將它作為預設候選深度。 Shader 若需要依自身的計算改變深度，可以將新值寫入內建輸出 <code>gl_FragDepth</code></p>
+<p>GLSL 會在編譯時去確認 shader 的程式碼中是否存在對 <code>gl_FragDepth</code> 的寫入敘述，如果有，那我們就稱這個 shader 具有「靜態寫入（statically assign）」<code>gl_FragDepth</code> 的條件。 即使該敘述位於某個動態期間可能不會進入的條件分支也算，例如：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">if</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (use_custom_depth) {</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    gl_FragDepth </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0.4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段程式就符合靜態寫入 <code>gl_FragDepth</code> 的條件</p>
+<p>由於這段程式碼已經構成了靜態寫入，因此每次正常結束的 invocation 都必須在實際走過的分支中為 <code>gl_FragDepth</code> 賦值，透過 <code>return</code> 結束的分支也包含在內</p>
+<p>以上例來說，當 <code>use_custom_depth</code> 為 <code>true</code> 時，候選深度為 。 而當它為 <code>false</code> 時，由於該次 invocation 會沿著未賦值的分支正常結束，因此這次 invocation 的候選深度是未定義值，也不會改用 <code>gl_FragCoord.z</code></p>
+<p>執行 <code>discard</code> 的分支會直接終止該次 invocation 並丟棄目前片段。 這次 invocation 不會交出候選深度，因此該分支不需要為 <code>gl_FragDepth</code> 賦值</p>
+<h5>以 UV 讀取紋理顏色</h5>
+<p>已內插的 UV 會指出紋理中的相對位置。 為了將這個位置轉成 fragment 的候選顏色，fragment shader 還需要取得該位置所保存的資料，這會需要指定紋理影像與取樣設定</p>
+<p>紋理影像的實際資料會保存在 texture object 中。 為了讓 shader 在 draw call 執行時選擇要使用的 texture object，OpenGL 需要一組具有整數編號的綁定位置。 這些位置稱為紋理影像單元（texture image unit），每個單元都能記錄目前綁定的二維 texture object，取樣時我們可以藉由單元編號來找到這個 object 與目前有效的取樣設定</p>
+<p>UV 提供的是紋理中的連續座標。 為了將這個座標轉成一筆確定的取樣結果，取樣流程需要知道座標超出紋理範圍時的處理方式，以及從多個相鄰資料格選取資料的方法。 前者會由紋理環繞模式來處理超出範圍的座標，後者則由過濾方式與 LOD 等設定來決定該如何選取或混合鄰近資料</p>
+<p>Texture object 會保存紋理影像資料，也會保存一套過濾方式、紋理環繞模式與 LOD 等取樣設定。 為了讓同一張紋理影像可以搭配另一套取樣方式，OpenGL 也提供了專門保存取樣設定的 sampler object。 一個紋理影像單元可以同時綁定以下兩種物件：</p>
+<ul>
+<li>texture object：提供紋理影像資料，以及自身保存的取樣設定</li>
+<li>sampler object：選用的物件，用來提供一套獨立的取樣設定</li>
+</ul>
+<p>當紋理影像單元有綁定 sampler object 時，雖然紋理影像仍由 texture object 提供，但取樣流程使用的取樣方式會由 sampler object 決定。 本文的共用範例會直接採用 texture object 自身保存的取樣設定，因此紋理影像單元只需要綁定 texture object</p>
+<p>以本文使用的二維紋理為例，每個紋理影像單元都會記錄一個目前綁定的二維 texture object。 OpenGL 可以同時使用多個單元，例如讓單元 0 綁定 texture object A、單元 1 綁定 texture object B</p>
+<p>GLSL 提供了內建函式 <code>texture()</code> 來執行紋理取樣。 這個函式需要取得兩項資訊：</p>
+<ol>
+<li>一組 UV 取樣座標</li>
+<li>要使用的紋理影像單元</li>
+</ol>
+<p>GLSL 會用 sampler uniform 保存紋理影像單元的編號。 對二維紋理而言，shader 會以 <code>sampler2D</code> 宣告這項 uniform，再將它與 UV 一起傳入 <code>texture()</code>。 <code>texture()</code> 會從指定單元取得二維 texture object 與取樣設定，並傳回取樣得到的 RGBA。 下方的共用範例會用一段完整的 fragment shader 展開這項流程</p>
+<p>對 <code>sampler2D</code> 而言，<code>texture()</code> 會將連續的正規化 UV 解讀為紋理中的相對位置。  到  會橫跨整張紋理， 到  則會縱向橫跨整張紋理。 紋理影像會以二維網格來保存紋理資料，我們通常將一格資料稱作紋理元素（texel），用來保存著一筆色彩或其他格式的資料</p>
+<p>為了將連續的 UV 轉成一筆確定的取樣結果，取樣流程需要處理紋理邊界，並決定要從哪些 texels 取得資料。 前者會由紋理環繞模式（texture wrap mode）負責，後者則由過濾模式（filtering mode）負責</p>
+<p>OpenGL 提供了多種紋理環繞模式，分別會以不同方式處理紋理邊界。 本文的共用範例將  的紋理當成了一張不重複鋪排的影像，因此會使用 <code>clamp-to-edge</code> 模式，讓超出範圍的座標停留在紋理邊緣。 為了比較需要重複鋪排同一張紋理的情況，下面也會介紹 <code>repeat</code>：</p>
+<ul>
+<li><code>clamp-to-edge</code>：將超出範圍的座標限制在紋理邊界，使邊界外的取樣繼續使用最接近的邊緣 texels</li>
+<li><code>repeat</code>：OpenGL 的預設環繞模式，讓座標週期性地繞回紋理另一側，例如  與  會落在相同的水平位置。 常用於地板、牆面等需要重複鋪排的紋理</li>
+</ul>
+<p>OpenGL 也提供了多種過濾模式，用來決定如何從鄰近的 texels 取得顏色。 這邊我們簡單介紹兩種常見的模式：</p>
+<ul>
+<li><code>nearest</code>：選擇最接近目前取樣位置的一個 texel，因此邊界清楚，但放大時容易看見方格</li>
+<li><code>linear</code>：在二維紋理中讀取取樣位置周圍的四個 texels，先沿一個方向內插兩組結果，再沿另一個方向內插，得到雙線性過濾結果</li>
+</ul>
+<p>以寬度為 、高度為  的二維紋理為例，texel  的中心位於正規化座標 。 紋理環繞模式會先把原始 UV 整理成可取樣的 ，<code>nearest</code> 再選擇中心最接近這個位置的 texel。 在本文採用的 <code>nearest</code> 與 <code>clamp-to-edge</code> 情境中，可以用下式取得 texel 索引：</p>
+<p>這裡的  會讓剛好位於上界的  或  留在最後一個 texel。 由於共用範例使用的是  紋理，所以  與  方向各有 4 個紋理元素。 在每個方向上， 的正規化座標會被分成四段，依序對應到索引  至 。 因此將  與  各乘上  再向下取整，便能得到座標所在範圍的紋理元素索引了</p>
+<p>紋理縮小時，一個 screen-space 像素所對應的紋理範圍可能會包含許多來源 texels，直接從原始尺寸的影像選值容易造成閃爍與鋸齒。 為了提供更接近目前縮小比例的資料，mipmap 會替同一張紋理準備一系列逐層縮小的影像。 縮小過濾模式可以指定使用 mipmap。 此時紋理取樣流程會依目前的縮小程度選擇一個層級，或混合兩個相鄰層級的結果</p>
+<h5>共用範例：以內插 UV 取得候選顏色</h5>
+<p>上一個共用範例完成了 rasterization 對像素  的處理。 當時由 Triangle coverage 先確認了  涵蓋該像素的中心 sample，接著再由 barycentric interpolation 算出這個位置的重心權重、RGBA、UV 與候選 screen-space 深度，最後由 rasterizer 將結果整理成一筆 fragment</p>
+<p>因此在進入 Fragment Processing 時，我們手上會有這筆 fragment 及其包含的資料：</p>
+<ul>
+<li>片段來源：三角形  在像素  產生的 fragment</li>
+<li>取樣位置與內插位置：兩者都是像素中心 </li>
+<li>coverage mask：。 唯一的位元為 ，表示中心 sample 被  涵蓋</li>
+<li>內插完成的 shader inputs：
+<ul>
+<li>RGBA 為 </li>
+<li>UV 為 </li>
+</ul>
+</li>
+<li>候選 screen-space 深度：</li>
+</ul>
+<p>現在我們要執行 fragment shader，使用內插後的 UV 從紋理取得 RGBA，並將這筆 RGBA 交給管線作為候選顏色。 候選深度則沿用 rasterizer 算出的 </p>
+<p>為了執行這項工作，Application 需要在提交 draw call 前選用包含 fragment shader 的 OpenGL program object，並準備好 shader 需要的紋理資源與取樣狀態。 本例使用的 fragment shader 如下：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">#version </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">330</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> core</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> vertex_uv;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uniform</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> sampler2D</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> color_texture;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fragment_color;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    fragment_color </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> texture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(color_texture, vertex_uv);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>這段程式會從 <code>vertex_uv</code> 取得目前 fragment 的 UV。 <code>color_texture</code> 保存 Application 指定的紋理影像單元編號，<code>texture()</code> 會使用這兩項資料執行紋理取樣。 取樣得到的 RGBA 會寫入 <code>fragment_color</code>，成為 fragment color output location 0 的候選顏色</p>
+<p>本例由 Application 準備的紋理資源與取樣狀態如下：</p>
+<ul>
+<li>紋理影像單元：單元 0 綁定一個二維 texture object，sampler uniform <code>color_texture</code> 的值也設為 </li>
+<li>紋理影像：texture object 內含一張  的影像，而且只有一個 mipmap 層級
+<ul>
+<li>Internal format 為 <code>GL_RGBA8</code></li>
+<li>每個紋理元素會用 4 個介於  到  的 8-bit 無號整數，分別保存 R、G、B 與 A</li>
+<li><code>sampler2D</code> 取樣時會將每個整數除以 ，轉成  內的浮點數</li>
+</ul>
+</li>
+<li>紋理內容：整數索引  所指向的紋理元素保存位元組 </li>
+<li>紋理取樣狀態：放大與縮小過濾都使用 <code>nearest</code>， 與  方向的紋理環繞模式都使用 <code>clamp-to-edge</code></li>
+</ul>
+<p>下例的 Application 程式碼會建立上述的紋理資源與取樣狀態。 這裡的 <code>program</code> 是已經連結好前述 fragment shader 的 OpenGL program object：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">GLubyte </span><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">texture_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> y </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; y </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">y) {</span></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    for</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">int</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> x </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; x </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">; </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">++</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">x) {</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        texture_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[y][x][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF"> static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">GLubyte</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">></span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">64</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> x);</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        texture_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[y][x][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#A626A4;--shiki-dark:#ABB2BF"> static_cast</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">&#x3C;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">GLubyte</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">></span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">64</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> *</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> y);</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        texture_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[y][x][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">2</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 32</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#E45649;--shiki-dark:#E5C07B">        texture_data</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[y][x][</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">3</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">] </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 255</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    }</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">GLuint color_texture_object </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glGenTextures</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#A626A4;--shiki-dark:#56B6C2">&#x26;</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">color_texture_object);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glActiveTexture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE0);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glBindTexture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE_2D, color_texture_object);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glTexImage2D</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_TEXTURE_2D,</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">    0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_RGBA8,</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">    4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">    4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#986801;--shiki-dark:#D19A66">    0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_RGBA,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_UNSIGNED_BYTE,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    texture_data</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glTexParameteri</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glTexParameteri</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glTexParameteri</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glTexParameteri</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glUseProgram</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(program);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">GLint color_texture_location </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">=</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">    glGetUniformLocation</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(program, </span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379">"color_texture"</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glUniform1i</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(color_texture_location, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>此範例的兩層迴圈會走訪  紋理中的所有 16 個 texels。 每走到索引 ，就依下列規則設定該 texel 的 RGBA：</p>
+<p>這組數字是共用範例刻意設定的紋理內容，由 Application 寫入。 設計目的如下：</p>
+<ul>
+<li>R 使用 ：每往右一格，紅色增加 64</li>
+<li>G 使用 ：每往上一格，綠色增加 64</li>
+<li>B 固定為 32</li>
+<li>A 固定為 255，代表完全不透明</li>
+</ul>
+<p>例如：</p>
+<p>因此 x 越大則紅色分量越高，y 越大則綠色分量越高。 藍色固定為 32，透明度固定為 255。 這樣每一列與每一行就都會有容易辨認的顏色數值，方便我們後面確認 UV 最後選中了哪一個紋理元素</p>
+<p>接著 <code>glTexImage2D()</code> 會為目前綁定的 texture object 建立一張  紋理影像，並把 <code>texture_data</code> 中的 16 個 texels 複製進去，相關屬性與對應的意義為：</p>
+<ul>
+<li>mipmap 層級 0：紋理原本的完整尺寸，也就是 </li>
+<li><code>GL_RGBA8</code>：每個 texel 使用 R、G、B、A 四個通道，每個通道占 8 bits</li>
+</ul>
+<p>取得 UV 後，OpenGL 還需要知道如何選擇 texel。 例子中的四次 <code>glTexParameteri()</code> 呼叫分別設定了：</p>
+<ul>
+<li>縮小紋理時使用 <code>nearest</code></li>
+<li>放大紋理時使用 <code>nearest</code></li>
+<li>u 方向超出紋理範圍時使用 <code>clamp-to-edge</code></li>
+<li>v 方向超出紋理範圍時使用 <code>clamp-to-edge</code></li>
+</ul>
+<p>接著後面幾行程式碼的作用是：</p>
+<ol>
+<li><code>glActiveTexture(GL_TEXTURE0)</code>
+<ul>
+<li>將紋理影像單元 0 設為目前操作的單元</li>
+</ul>
+</li>
+<li><code>glBindTexture(GL_TEXTURE_2D, color_texture_object)</code>
+<ul>
+<li>將 <code>color_texture_object</code> 綁定到目前的單元 0</li>
+</ul>
+</li>
+<li><code>glUniform1i(color_texture_location, 0)</code>
+<ul>
+<li>將數值 <code>0</code> 寫入 sampler uniform <code>color_texture</code>，告訴 shader 使用紋理影像單元 0</li>
+</ul>
+</li>
+</ol>
+<p>這段是在建立 fragment shader 與 texture object 之間的連接。 OpenGL 會使用「紋理影像單元」作為兩者的中間位置：</p>
+<figure><figcaption></figcaption></figure>
+<p>因此 shader 程式在執行：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">texture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">color_texture</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">,</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75"> vertex_uv</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>時，<code>color_texture</code> 便有辦法引導 <code>texture()</code> 找到單元 0 綁定的二維 texture object，<code>vertex_uv</code> 則指定要在這張紋理的哪個位置取樣。 本例的取樣設定保存在了 texture object 中，所以取樣時也會套用先前設定的 <code>nearest</code> 與 <code>clamp-to-edge</code></p>
+<p>在執行 fragment shader 之前，會先做幾項檢查：</p>
+<ul>
+<li><code>pixel ownership test</code>：確認 fragment 對應的像素可以由目前的 OpenGL drawable 更新</li>
+<li><code>scissor test</code>：確認像素是否位於 Application 指定的裁切矩形內
+<ul>
+<li>本例沒有開啟此項測試</li>
+</ul>
+</li>
+<li><code>multisample fragment operations</code>：更新 coverage mask，決定其中哪些 samples 繼續處理</li>
+</ul>
+<p>由於共用範例使用 single-sample，因此像素  只有一個 sample。 前面的 triangle coverage 已經確認了它有被三角形涵蓋，所以初始 coverage mask 是 ，因此整個檢查的流程為：</p>
+<ol>
+<li>coverage mask [1]</li>
+<li>pixel ownership test 通過</li>
+<li>scissor test 關閉，因此保留</li>
+<li>multisample operations 沒有清除這個 sample</li>
+<li>交給 fragment shader 的遮罩仍為 [1]</li>
+<li>執行一次 fragment shader</li>
+</ol>
+<p>開始執行這次的 fragment shader 時，rasterizer 會將內插 UV  接到 shader input <code>vertex_uv</code>，並把取樣位置、候選深度與內插後的  組成內建輸入 <code>gl_FragCoord</code>。 為了展開 <code>gl_FragCoord.w</code> 的數值計算，我們還會沿用上一階段得到的下列中間值：</p>
+<ul>
+<li>screen-space 重心權重：</li>
+<li>三筆頂點的倒數齊次座標：</li>
+</ul>
+<p>接下來我們會先算出 <code>gl_FragCoord</code> 的具體內容，再讓 fragment shader 使用 <code>vertex_uv</code> 找出紋理中的確切紋理元素</p>
+<p>由於本文使用 single-sample framebuffer，因此這次 invocation 的 screen-space 位置就是像素  的中心。 將像素索引代入  後，可以得到：</p>
+<p>接著將上面列出的重心權重與三筆頂點的  代入 <code>gl_FragCoord.w</code> 的內插公式：</p>
+<p>加上 rasterizer 已算出的 screen-space 深度 ，整組內建輸入就是：</p>
+<p>另外我們將前面輸入的正規化 UV  乘上紋理寬高並向下取整後，就可以得到對應的整數 texel 索引了：</p>
+<p>下圖在  的 texel 網格上畫出了這次的 UV 映射。 紋理座標以左下角為 ， 向右增加， 向上增加。 <code>nearest</code> 最後會選中 texel ：</p>
+<figure><figcaption></figcaption></figure>
+<p>Texel  保存的 RGBA 位元組是 。 <code>texture()</code> 依 <code>GL_RGBA8</code> 的正規化規則將每個通道除以  後，傳回的浮點顏色為：</p>
+<p>因此這次 fragment shader invocation 會交出候選顏色 。 候選深度則採用 rasterizer 產生的 ，sample mask 仍為 。 這三筆資料會一起交給下一個 Framebuffer Operations 階段</p>
+<h3>Framebuffer Operations：測試片段並更新輸出影像</h3>
+<p>Framebuffer Operations 的目標是決定目標 sample 的候選顏色與候選深度能否用來更新 framebuffer。 新的 fragment 到達時，Framebuffer Operations 會把它帶來的資料，與 framebuffer 在同一個像素、同一個 sample 已保存的資料進行比較，再決定是否要更新</p>
+<p>具體來說：</p>
+<ul>
+<li><code>sample mask</code> 會指出這筆 fragment 中有哪些 samples 需要處理</li>
+<li>對每個有效的 sample，fragment 會提供候選顏色與候選深度</li>
+<li>Framebuffer 內的 color、depth 與 stencil attachments 則保存著該位置原有的資料</li>
+<li>管線會執行 stencil test 與 depth test，並依兩項測試的結果更新 stencil 值。 同時通過兩項測試的 sample 會再執行色彩操作，並在相應的附件操作中套用寫入遮罩。 這些操作都是逐 sample 進行的</li>
+</ul>
+<p>為了讓這些操作讀取既有資料，framebuffer 會透過 attachments 連接影像儲存空間，其中各 attachment 的職責為：</p>
+<ul>
+<li>Color attachment 為每個 sample 保存色彩</li>
+<li>depth attachment 保存深度</li>
+<li>Stencil attachment 會為每個 sample 保存一個整數。 Application 可以自行定義這些數值的意義，再透過 stencil test 控制後續繪製要處理哪些 samples
+<ul>
+<li>例如：
+<ol>
+<li>先把鏡面涵蓋的 samples 寫成 1</li>
+<li>繪製反射畫面時，只讓 stencil 值等於 1 的 samples 通過測試</li>
+<li>反射畫面便只會出現在鏡面區域內</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p>測試、色彩合成與寫入都需要由目前 draw call 的設定控制。 本文將這些比較函式、運算方式與寫入權限統稱為了繪製狀態（draw state）。 Framebuffer Operations 會依這些設定，依序完成下列工作：</p>
+<ul>
+<li>更新 sample mask，找出仍需處理的 samples</li>
+<li>對這些 samples 執行 stencil test 與 depth test，並依測試結果選擇對應的 stencil operation</li>
+<li>對通過測試的 samples 執行 blending 或 color logical operation，產生色彩結果</li>
+<li>在相應的附件操作中套用 color、depth 與 stencil write masks，決定允許更新的通道或位元</li>
+</ul>
+<p>最後，framebuffer write 會沿著 attachment 的連接關係，保存獲准寫入的資料。 接下來每項操作都會先說明使用的資料與判定方式，再使用一組獨立的具體數值示範。 各小節可以依操作內容選擇不同組態，直接呈現該項設定如何影響結果</p>
+<h4>per-fragment operations：逐 sample 篩選候選資料</h4>
+<p>Per-fragment operations 會逐一處理這些 samples，決定各 sample 的 stencil、depth 與 color 如何更新</p>
+<p>同一筆 fragment 可以涵蓋一個像素內的多個 samples。 每個 sample 都會取得候選顏色與候選深度，並分別讀取 framebuffer 中對應 sample 已保存的 stencil、depth 與 color 值</p>
+<ul>
+<li>當同一次的 fragment shader invocation 需要負責多個 samples 時，這些 samples 會共用該次執行交出的候選顏色</li>
+<li>當啟用了逐 sample 的 shading 時，各 sample 可以分別取得自己的 shader output</li>
+</ul>
+<h5>更新 sample mask：決定哪些 samples 繼續處理</h5>
+<p>進入後續測試以前，管線需要先找出這筆 fragment 中仍需處理的 samples。 Fragment Processing 交出的 sample mask 會提供第一組結果，其中每個 bit 都會對應到目前像素內的其中一個 sample，數值  表示要保留該 sample，數值  則表示會停止處理該 sample</p>
+<p>Fragment shader 可以透過內建輸出 <code>gl_SampleMask</code> 來再提供一組遮罩。 <code>gl_SampleMask[0]</code> 內保存著前 32 個 samples 的位元，bit  對應 sample 。 Shader 只要靜態包含對 <code>gl_SampleMask</code> 任一元素的寫入，每次正常結束的 invocation 就需要替所有相關元素賦值，這組輸出才具有明確內容。 該次執行沒有賦值的相關元素會得到未定義值</p>
+<p>啟用逐 sample shading 時，每次 invocation 只會以自己負責的 samples 所對應的位元更新 sample mask。 其餘位元不會影響由其他 invocations 負責的 samples。 Multisample color buffer 還能使用 alpha-to-coverage，讓一筆 fragment shader color output 的 alpha 控制保留下來的 samples</p>
+<p>令  為 Fragment Processing 交出的遮罩、 為 <code>gl_SampleMask</code> 提供的遮罩， 為 alpha-to-coverage 產生的遮罩。 同時使用這三項資料時，管線會以逐位元 AND 合併它們：</p>
+<p>逐位元 AND 會保留三組遮罩都等於  的位元，因此後續遮罩可以繼續保留或清除  中的 sample。  中數值為  的位元會進入 stencil test，數值為  的位元則在這裡停止處理</p>
+<div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<p>以  multisample 像素為例，像素內有 ～：</p>
+<ul>
+<li><code>gl_SampleMask</code>：由 fragment shader 直接決定要保留哪些 samples
+<ul>
+<li>一次 shader invocation 負責四個 samples 時，它可以同時控制四個 bits</li>
+<li>逐 sample shading 會讓每次 fragment shader invocation 只負責一個 sample。 例如負責  的 invocation，只有 bit 2 會影響 ，它寫入的其他 bits 不會控制 、 或 
+<ul>
+<li>
+<p>假設這次 invocation 負責 ，則它的有效範圍就相當於：</p>
+<p>所以即使 shader 寫出了完整的遮罩：</p>
+<p>管線也只會檢查 bit 2：</p>
+<ul>
+<li>bit 2 為 ：保留 </li>
+<li>bit 2 為 ：排除 </li>
+</ul>
+<p>、 與  由其他 shader invocations 負責，所以這次 invocation 寫出的 bit 0、bit 1 與 bit 3 對它們沒有作用</p>
+<p>換句話說，shader 形式上會寫出完整的 <code>gl_SampleMask</code> 整數，但管線只採用其中對應於這次 invocation 所負責 samples 的 bits</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Alpha-to-coverage：由固定功能管線把 shader 輸出顏色的 alpha（<code>fragment_color.a</code>）轉成另一組 sample mask，以藉由保留不同數量的 samples 來表現部分涵蓋效果
+<ul>
+<li>alpha 為  時排除全部 samples</li>
+<li>alpha 為  時保留全部 samples</li>
+<li>alpha 為  時， multisample 通常會保留其中約兩個 samples，實際選擇由 OpenGL implementation 決定</li>
+</ul>
+</li>
+</ul>
+<p><code>gl_SampleMask</code> 與 alpha-to-coverage 是兩種不同的篩選來源，兩者都只能繼續清除 sample mask 中的位元。 例如原本的 sample mask 是：</p>
+<p>Shader 輸出的 <code>gl_SampleMask</code> 是：</p>
+<p>Alpha-to-coverage 又產生：</p>
+<p>管線會對它們執行逐位元 AND：</p>
+<p>所以最後只會繼續處理 </p>
+</div>
+<p>GLSL 會以 output location 將色彩輸出送往對應的 draw buffer。 同一個 location 若提供了兩筆來源顏色，則會再以 output index 0 與 1 區分。 本文的 <code>fragment_color</code> 位於 output location 0，並使用預設的 output index 0，因此 alpha-to-coverage 會採用這筆輸出的 alpha</p>
+<p>Draw framebuffer 的 <code>SAMPLE_BUFFERS</code> 會指出它是否具有 multisample 儲存空間，數值  代表具有至少一個 multisample buffer，例如 4× multisample framebuffer 的狀態是：</p>
+<ul>
+<li><code>SAMPLE_BUFFERS=1</code>：具有 multisample buffer</li>
+<li><code>SAMPLES=4</code>：每個像素有四個 samples</li>
+</ul>
+<p>當啟用了 <code>GL_MULTISAMPLE</code> 與 <code>GL_SAMPLE_ALPHA_TO_COVERAGE</code>、且 <code>SAMPLE_BUFFERS</code> 為 ，而且 draw buffer 0 沒有連接 color attachment（<code>GL_NONE</code>）或使用 normalized 或 floating-point 色彩格式時，OpenGL 會由該筆 alpha 產生一組遮罩。 Alpha-to-coverage 會將  內的 alpha 轉成一組遮罩，使保留位元的比例隨 alpha 增加。 每個像素實際保留哪些 samples，則由 OpenGL implementation 決定</p>
+<div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<p>假設 shader 寫成：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">location </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">out</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> fragment_color;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> main</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    fragment_color </span><span style="--shiki-light:#383A42;--shiki-dark:#C678DD">=</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> vec4</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0.5</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>Alpha-to-coverage 會使用 <code>fragment_color.a</code> 來設定 alpha，也就是這裡的 。 其中因為 GLSL 支援為同一個 location 提供兩筆來源顏色，但本文只有一筆輸入，所以會直接使用預設的 index 0</p>
+<p>啟用 alpha-to-coverage 後，OpenGL 會把 <code>fragment_color.a</code> 轉成一組 sample mask。 以四個 samples 為例：</p>
+<ul>
+<li>：保留 0 個 samples</li>
+<li>：通常保留約 2 個 samples</li>
+<li>：保留全部 4 個 samples</li>
+</ul>
+<p>例如  可能產生：</p>
+<p>實際選中哪兩個 samples 由 OpenGL implementation 決定。 這組遮罩還會與原有的 sample mask 做 AND，只有最後仍為  的 samples 會繼續處理</p>
+<p>另外，即使 draw buffer 0 沒有連接色彩影像，shader 輸出的 alpha 仍可用來篩選 depth 或 stencil samples</p>
+</div>
+<h5>Stencil test：比較標記並選擇 stencil operation</h5>
+<p>Application 可以自己設定遮罩來去調整 draw call 能操作「sample 內部保存的 stencil 整數」中的哪些 bits，為此 Application 需要設定好對應的遮罩：</p>
+<ul>
+<li>Sample mask：每個 bit 對應像素內的一個 sample，數值為  的 sample 才會進入後續測試</li>
+<li>Stencil attachment：為 framebuffer 中每個 sample 保存一筆 stencil 整數</li>
+<li>Stencil value mask：指定 stencil test 要比較整數中的哪些 bits</li>
+<li>Stencil write mask：指定 stencil operation 可以修改整數中的哪些 bits</li>
+</ul>
+<p>其中：</p>
+<ul>
+<li>
+<p>Stencil value mask 由 <code>glStencilFunc()</code> 的第三個參數設定：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilFunc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_EQUAL, </span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">05</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0F</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>三個參數分別表示：</p>
+<ul>
+<li>比較函式 <code>func=GL_EQUAL</code>：要求遮罩處理後的 stencil reference 與既有 stencil value 相等，sample 才能通過測試</li>
+<li>Stencil reference <code>reference=0x05</code>：Application 為這次 draw call 提供的比較基準。 本例會用它尋找低四個 bits 等於 <code>0x5</code> 的 stencil values</li>
+<li>Stencil value mask <code>value_mask=0x0F</code>：在比較前分別與 reference 和既有 stencil value 執行逐位元 AND。 <code>0x0F</code> 的低四個 bits 是 ，因此只有兩個 stencil 整數的低四個 bits 會參與比較</li>
+</ul>
+</li>
+<li>
+<p>Stencil operation 由 <code>glStencilOp()</code> 設定：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilOp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_REPLACE, GL_INCR, GL_KEEP);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>三個參數會依測試結果選擇要套用的操作：</p>
+<ul>
+<li>Stencil test 失敗時使用第一個參數 <code>GL_REPLACE</code>，以 stencil reference 作為 operation result</li>
+<li>Stencil test 通過、depth test 失敗時使用第二個參數 <code>GL_INCR</code>，將既有 stencil 值增加 ，並在附件格式可表示的最大值停止</li>
+<li>Stencil test 與 depth test 都通過時使用第三個參數 <code>GL_KEEP</code>，保留既有 stencil 值</li>
+</ul>
+</li>
+<li>
+<p>Stencil write mask 由 <code>glStencilMask()</code> 設定：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilMask</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0F</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div></li>
+</ul>
+<p>令  為 stencil reference、 為 stencil value mask， 為該 sample 已保存的 stencil 值。 管線會先對  與  套用相同的 ，再依 <code>func</code> 比較兩個結果：</p>
+<p>例如，<code>GL_EQUAL</code> 要求兩側相等，<code>GL_LESS</code> 要求左側小於右側，<code>GL_ALWAYS</code> 則會直接讓 sample 通過。 Stencil test 通過的 sample 會繼續進行 depth test，測試失敗的 sample 則會停止處理候選顏色與候選深度，並套用 <code>glStencilOp()</code> 第一個參數指定的操作</p>
+<p>stencil test 會逐 sample 比較 stencil attachment 中的既有值與目前 draw call 提供的基準。 假設 4× multisample 像素具有以下資訊：</p>
+<div class="language-text line-numbers-mode" data-highlighter="shiki" data-ext="text" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-text"><span class="line"><span>sample mask： [1, 1, 0, 0]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>q0 stencil value：0xA2</span></span>
+<span class="line"><span>q1 stencil value：0xB1</span></span>
+<span class="line"><span>q2 stencil value：0xC2</span></span>
+<span class="line"><span>q3 stencil value：0xD2</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如果 Application 設定了：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilFunc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_EQUAL, </span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">05</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">, </span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0F</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">     // reference 與 value mask</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilOp</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_REPLACE, GL_INCR, GL_KEEP);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glStencilMask</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#986801;--shiki-dark:#E06C75">0x</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">0F</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">                     // write mask</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>則管線會先透過 Sample mask 選出要處理的  與 ，再將 stencil value mask 和 stencil write mask 分別套用到 、 各自保存的 8-bit stencil value 上：</p>
+<ol>
+<li>從 stencil attachment 讀取每個 sample 的既有值</li>
+<li>將 reference 與既有 stencil value 分別和 value mask <code>0x0F</code> 執行逐位元 AND，再比較兩個結果</li>
+<li>根據 stencil test 與 depth test 的結果選擇一項 stencil operation</li>
+<li>使用 write mask <code>0x0F</code>，只允許 operation 修改低四個 bits</li>
+<li>將結果寫回 stencil attachment</li>
+</ol>
+<p>以  這個 sample 為例，它保存的 8-bit stencil value 是：</p>
+<p>而我們的 stencil value mask 是 <code>0x0F</code>：</p>
+<p>這代表 stencil test 只讀取並比較低四個 bits，因此：</p>
+<p><code>GL_EQUAL</code> 會比較這兩個結果。 由於 <code>0x05</code> 與 <code>0x02</code> 不相等， 的 stencil test 失敗，因此管線會執行 <code>glStencilOp()</code> 第一個參數指定的 <code>GL_REPLACE</code>。 這項操作使用 stencil reference <code>0x05</code> 作為 operation result</p>
+<p>接著，stencil write mask <code>0x0F</code> 只允許 operation result 的低四個 bits 寫回附件，因此：</p>
+<p>所以高四個 bits 會保留為原本的 <code>0xA</code>，低四個 bits 則會採用 operation result 的 <code>0x5</code>。 將兩部分組合後，新值為：</p>
+<p>同樣位於 sample mask 中的  也會接受 stencil test。 它的低四個 bits 為 <code>0x1</code>，因此比較結果同樣失敗，<code>GL_REPLACE</code> 會配合 write mask 將既有值 <code>0xB1</code> 更新成 <code>0xB5</code>。  與  對應的 sample mask bits 為 ，所以不會進入這次 stencil test</p>
+<h5>Depth test：比較候選深度與既有深度</h5>
+<p>當目標 sample 通過 stencil test 後，depth test 會接著比較這筆 fragment 在該 sample 的候選深度，以及 depth attachment 保存的既有深度，判斷目前表面是否比先前寫入的表面更接近相機。 為了做出判斷，depth test 會取得 fragment 的候選 screen-space 深度，以及 depth attachment 在同一個 sample 保存的既有深度，再依 Application 指定的比較方式檢查兩者</p>
+<ul>
+<li>候選深度 ：由 rasterizer 算出，也可以由 fragment shader 寫入 <code>gl_FragDepth</code> 取代</li>
+<li>既有深度 ：depth attachment 在目前 sample 保存的數值</li>
+<li>Depth test 的啟用狀態：Application 以 <code>glEnable(GL_DEPTH_TEST)</code> 啟用深度比較。 停用時，sample 會直接進入色彩操作，depth attachment 也不會更新</li>
+<li>深度比較函式：由 Application 呼叫 <code>glDepthFunc()</code> 設定</li>
+</ul>
+<p>若將 <code>glDepthFunc()</code> 指定的比較關係記為 ，depth test 會依下式比較兩筆深度：</p>
+<p>本文採用的 projection matrix 會以較小的 screen-space 深度表示較接近近平面的表面。 因此，若要讓較靠近相機的表面通過 depth test，可以使用 <code>GL_LESS</code>，要求候選深度小於既有深度。 Application 會透過 <code>glDepthFunc()</code> 指定實際使用的比較規則，常見設定包括：</p>
+<ul>
+<li><code>GL_LESS</code>：候選深度小於既有深度時通過</li>
+<li><code>GL_LEQUAL</code>：候選深度小於或等於既有深度時通過</li>
+<li><code>GL_GREATER</code>：候選深度大於既有深度時通過</li>
+<li><code>GL_ALWAYS</code>：每一筆候選深度都通過</li>
+</ul>
+<p>例如設定：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glDepthFunc</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_LESS);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>時，公式中的  就會替換成 ：</p>
+<p>若設定 <code>GL_LEQUAL</code>，則會變成：</p>
+<p>當 draw framebuffer 具有 stencil attachment，而且有啟用 stencil test 時，depth test 的結果也會決定 <code>glStencilOp()</code> 選用哪一項操作：</p>
+<ul>
+<li>Depth test 失敗：執行 <code>depth_fail</code> 指定的 stencil operation，並停止處理該 sample 的候選顏色與候選深度</li>
+<li>Depth test 通過：執行 <code>depth_pass</code> 指定的 stencil operation，並讓該 sample 繼續進入色彩操作</li>
+</ul>
+<p>停用 stencil test 的 draw call 會直接依 depth test 的結果，決定 sample 是否要進入色彩操作，以及候選深度是否取得寫入資格</p>
+<p>以下使用一個  multisample 像素，示範 depth test 如何比較不同 samples 保存的深度，以及測試結果如何選擇對應的 stencil operation。 這筆 fragment 的候選深度是 。 在 sample-mask 與 stencil 步驟完成後，各 sample 的狀態如下：</p>
+<ul>
+<li>最終 sample mask 為 </li>
+<li>Depth test：
+<ul>
+<li>啟用狀態：已啟用</li>
+<li>比較函式：<code>GL_LESS</code></li>
+<li>候選深度：</li>
+<li>Depth write mask：允許寫入</li>
+</ul>
+</li>
+<li>Stencil test 與 stencil operation 使用下列設定：
+<ul>
+<li>Stencil reference：<code>0x02</code></li>
+<li>Stencil value mask：<code>0x0F</code></li>
+<li>Stencil write mask：<code>0x0F</code></li>
+<li><code>glStencilOp()</code>：
+<ul>
+<li><code>stencil_fail</code>：<code>GL_REPLACE</code></li>
+<li><code>depth_fail</code>：<code>GL_INCR</code></li>
+<li><code>depth_pass</code>：<code>GL_KEEP</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>：
+<ul>
+<li>既有 stencil：<code>0xA2</code></li>
+<li>既有 depth：</li>
+<li>Stencil test：通過</li>
+</ul>
+</li>
+<li>：
+<ul>
+<li>Stencil test：失敗</li>
+<li>Stencil 更新：由 <code>0xB1</code> 變成 <code>0xB2</code></li>
+</ul>
+</li>
+<li>：
+<ul>
+<li>既有 stencil：<code>0xC2</code></li>
+<li>既有 depth：</li>
+<li>Stencil test：通過</li>
+</ul>
+</li>
+<li>：
+<ul>
+<li>Sample-mask bit：</li>
+<li>處理狀態：已在 sample-mask 階段停止</li>
+</ul>
+</li>
+</ul>
+<p>Depth test 會對仍有效的  與 ，分別比較候選深度  與其各自保存的既有深度：</p>
+<p>由於  通過了這兩項測試，因此會執行 <code>depth_pass</code> 對應的 <code>GL_KEEP</code>，stencil 值會維持為 <code>0xA2</code>。 由於本例的 depth write mask 允許寫入，所以這個 sample 的深度更新結果為 </p>
+<p>至於 ，雖然通過了 stencil test，但卻沒有通過 depth test，因此將接著執行 <code>depth_fail</code> 對應到的 <code>GL_INCR</code>。 Operation 會先將 <code>0xC2</code> 增加成 <code>0xC3</code>，stencil write mask <code>0x0F</code> 再允許寫回低四個 bits：</p>
+<p>所以  的既有深度會維持為 ，候選顏色也不會進入後續的色彩操作。 因此這組  multisample 資料最後只剩  能繼續處理</p>
+<p>當大量 samples 注定無法通過測試時，Application 可以要求管線提前執行測試，讓失敗的 samples 省下 fragment shader 的運算。 GLSL 提供了下例的介面限定詞來進行這項設定：</p>
+<div class="language-glsl line-numbers-mode" data-highlighter="shiki" data-ext="glsl" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-glsl"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">layout</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span><span style="--shiki-light:#383A42;--shiki-dark:#E06C75">early_fragment_tests</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">) </span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">in</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">;</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>啟用這項設定後，執行順序與資料來源如下：</p>
+<ul>
+<li>Stencil test 與 depth test 會在 fragment shader invocation 之前執行</li>
+<li>Depth test 會使用 rasterizer 產生的候選深度</li>
+<li>Shader 對 <code>gl_FragDepth</code> 的寫入不會改變這次測試與附件更新所使用的深度</li>
+<li>提前完成的 depth 或 stencil 更新會保留，後續 shader 執行 <code>discard</code> 也不會撤銷這些更新</li>
+</ul>
+<p>例如候選深度為 、既有深度為  時，<code>GL_LESS</code> 會在 shader 執行前就判定  不成立，讓管線直接排除這個 sample。 若既有深度為 ，測試會先以  判定通過。 即使 Shader 之後將 <code>gl_FragDepth</code> 寫成了 ，這次測試與深度更新仍會使用 rasterizer 提供的 </p>
+<h6>補充：透視投影如何分配深度精度</h6>
+<p>Depth test 會直接比較 screen-space 深度，但這些數值其實並未均勻地對應到相機前方的實際距離。 為了理解深度附件在近處與遠處能分辨多細的距離差異，我們需要觀察透視投影與透視除法會如何分配  的深度範圍</p>
+<ul>
+<li>：沿著相機視線軸量出的距離</li>
+<li>：相機到近平面的距離</li>
+<li>：相機到遠平面的距離</li>
+</ul>
+<p>對本文使用的 OpenGL projection matrix 與預設 depth range 而言，轉換後的深度為：</p>
+<p>以 、 為例，三個 view-space 距離會得到：</p>
+<p>可以看見：</p>
+<ul>
+<li>從  移動到 ，實際距離只增加 ，深度值卻從  增加到 </li>
+<li>從  移動到 ，實際距離增加了 ，但深度值只從  增加到了 ，整段只能使用長度為  的數值範圍</li>
+</ul>
+<p>因此這項非線性分配會讓近平面附近保有較細的深度精度，遠處的不同表面則較容易得到相同或非常接近的儲存值</p>
+<p>下圖是一般的色彩結果與同一個場景的深度附件視覺化出來的結果。 右側以灰階呈現了深度附件中的數值，較近處顯示得較暗，較遠處顯示得較亮：</p>
+<figure><figcaption></figcaption></figure>
+<h5>Blending、color logical operation 與 dithering：產生色彩結果</h5>
+<p>通過 stencil test 與 depth test 之後，目標 sample 就取得了更新 color attachment 所連接影像的資格。 為了產生準備寫入該 sample 的色彩結果，管線會取得 fragment shader 交出的候選顏色，以及該影像在同一個 sample 保存的既有顏色：</p>
+<ul>
+<li>來源顏色 ：fragment shader 交出的候選顏色</li>
+<li>目的顏色 ：color attachment 所連接的影像在同一個 sample 保存的既有顏色</li>
+</ul>
+<p>接著管線需要決定要用哪一種方式處理這兩筆顏色。 OpenGL 提供了 blending 與 color logical operation 這兩條互斥的色彩合成路徑：</p>
+<ul>
+<li>Blending：把 RGBA 視為數值，透過算術公式決定來源顏色與目的顏色各占多少比例。 這項操作常用於透明、淡入淡出與光照累加</li>
+<li>Color logical operation：把顏色視為一串 bits，再對來源顏色與目的顏色執行 <code>AND</code>、<code>OR</code> 或 <code>XOR</code> 等位元運算。 這項操作常用於位元遮罩與需要直接控制色彩 bits 的繪製效果</li>
+</ul>
+<p>Application 會使用 <code>GL_COLOR_LOGIC_OP</code> 來選擇要走哪一條路徑：</p>
+<ul>
+<li>關閉這項狀態時，管線會依 blending state 執行 blending，或直接讓來源顏色繼續傳遞</li>
+<li>啟用這項狀態時，管線會略過 blending，再依目的 attachment 的 internal format 與 <code>GL_FRAMEBUFFER_SRGB</code> 狀態處理 color logical operation</li>
+</ul>
+<p>這兩條路徑的輸出最後都要寫入 color attachment 中，但每個對應的 color attachment 內使用的儲存格式可能會不一樣，因此計算的結果可能會遇到「一個連續色彩值無法由 attachment 精確表示」的情況。 為了解決這個問題，Application 可以啟用 Dithering 來處理這兩個路徑的輸入與輸出資料，讓其最終要寫入 color attachment 的資料能夠被正確表示</p>
+<h6>Color attachment 的 internal format：決定顏色如何儲存</h6>
+<p>Color attachment 是 framebuffer 中用來連接色彩影像的 attachment point。 為了讓管線知道一筆 RGBA 要占用多少 bits，以及各個 bits 應該如何解讀，Application 會在建立這張影像時指定一個 internal format。 這項格式會定義每個色彩通道的資料型態、位元數與編碼方式</p>
+<p>本文後面會先介紹下列三種常見的格式：</p>
+<ul>
+<li><code>GL_RGBA8</code>：R、G、B 與 A 都採用 8-bit unsigned normalized fixed-point 格式
+<ul>
+<li>儲存方式：每個通道以  到  的整數保存，共有  個可儲存值</li>
+<li>解讀方式：管線以  解讀 attachment 中保存的整數 。 因此  對應 ， 約對應 ， 對應 </li>
+</ul>
+</li>
+<li><code>GL_RGBA16F</code>：R、G、B 與 A 都採用 16-bit floating-point 格式
+<ul>
+<li>儲存方式：每個通道保存一個 16-bit 浮點值</li>
+<li>解讀方式：通道中的 bits 依 floating-point 格式表示數值，因此可以保存負數與大於  的值</li>
+</ul>
+</li>
+<li><code>GL_RGBA8UI</code>：R、G、B 與 A 都採用 8-bit unsigned integer 格式
+<ul>
+<li>儲存方式：每個通道以  到  的整數保存</li>
+<li>解讀方式：附件中的整數就是該通道的數值，例如整數  代表數值 </li>
+</ul>
+</li>
+</ul>
+<p>另外由於人眼對暗部的亮度差異較敏感，而 8-bit 通道一共只有  個可儲存值。 為了讓這些儲存值更集中地描述暗部差異，同時配合常見影像與顯示系統採用的色彩編碼，color attachment 還可以使用 sRGB encoding。 它會先將線性亮度映射成非線性的數值，使暗部較小的亮度變化也能分配到不同的儲存值</p>
+<ul>
+<li><code>GL_SRGB8_ALPHA8</code>：RGB 使用 sRGB encoding，A 使用 8-bit unsigned normalized fixed-point 格式
+<ul>
+<li>儲存方式：RGB 每個通道保存一組 8-bit unsigned normalized 數值，這些數值會被視為 sRGB 編碼值。 A 則保存線性的 8-bit unsigned normalized 數值</li>
+<li>解讀方式：RGB 的整數代表非線性的 sRGB 編碼值，經過 sRGB decoding 後可以還原成對應的線性亮度。 A 則直接以  解讀</li>
+</ul>
+</li>
+</ul>
+<p>這四種 internal format 會決定每個色彩分量有哪些可表示值。 下一小節我們會說明色彩落在兩個相鄰可表示值之間時，管線該如何藉由 Dithering 來選出後續要使用的值</p>
+<h6>Dithering：依 internal format 選擇可表示值</h6>
+<p>Color attachment 只能保存 internal format 所定義的離散數值。 以 <code>GL_RGBA8</code> 為例，每個通道會以  到  的整數儲存資料，管線會將整數  解讀成 ，因此每個通道共有  個可表示值</p>
+<p>當準備寫入的色彩分量  介於兩個相鄰的可表示值之間時，管線會先找出下列兩個候選值：</p>
+<ul>
+<li>可表示下界：小於或等於  的最大可表示值</li>
+<li>可表示上界：大於或等於  的最小可表示值</li>
+</ul>
+<p>Dithering 會逐一處理各個色彩分量，從這兩個候選值中選出實際要寫入的結果。 <code>GL_DITHER</code> 的狀態會決定選擇時要使用哪些資訊，OpenGL context 的初始狀態會啟用 <code>GL_DITHER</code>，Application 可以透過 <code>glEnable(GL_DITHER)</code> 與 <code>glDisable(GL_DITHER)</code> 調整這項狀態：</p>
+<ul>
+<li>啟用 <code>GL_DITHER</code>：OpenGL implementation 可以同時依據  與 pixel 的 screen-space 位置選擇下界或上界，使相鄰位置採用不同的可表示值</li>
+<li>停用 <code>GL_DITHER</code>：OpenGL implementation 只依據  選擇下界或上界，同一套選擇規則會套用到所有 screen-space 位置</li>
+</ul>
+<p>例如，假設十個相鄰 pixels 的某個通道都算出了 ，若使用的是 <code>GL_RGBA8</code>，則在它兩側的可表示值是  與 ：</p>
+<ul>
+<li>
+<p>停用 <code>GL_DITHER</code> 後，假設 implementation 採用下界，那十個位置就會全都選擇 ，這片區域的平均值會是 </p>
+</li>
+<li>
+<p>啟用 dithering 後，實作可以讓其中六個位置選擇 ，另外四個位置選擇 ，此時平均值為：</p>
+<p>因此每個位置取得的仍是 internal format 可以表示的數值，但一片區域的平均亮度可以更接近原始色彩</p>
+</li>
+</ul>
+<p>實際採用的圖樣與選擇方式由 OpenGL implementation 決定。 Dithering 選出的數值會交給這筆 fragment 後續的逐 sample 操作，真正修改 color attachment 的動作則由後面的 framebuffer write 完成</p>
+<figure><figcaption></figcaption></figure>
+<h6>Blending：以 RGBA 算術合成兩筆顏色</h6>
+<p>下圖整理了 blending 路徑的完整資料流。 管線會先根據 color attachment 的 internal format 準備來源顏色與目的顏色，再執行 blending。 完成 blending 後，管線會根據目的格式找出與計算結果相鄰的可表示值，再由 dithering 選出後續要使用的結果：</p>
+<figure><figcaption></figcaption></figure>
+<p>為了用算術公式來合成「來源顏色」與「目的顏色」，Application 需要指定是否要啟用 blending、要用哪一種公式產生結果，以及需要加權時每筆顏色在公式中所占的比例。 OpenGL 會使用下列 blending state 來保存這些設定：</p>
+<ul>
+<li>Blending 的啟用狀態：Application 以 <code>glEnable(GL_BLEND)</code> 啟用 blending</li>
+<li>Blending equation：指定來源顏色與目的顏色要按照哪一種公式產生結果，由 <code>glBlendEquation()</code> 設定
+<ul>
+<li><code>GL_FUNC_ADD</code>：來源的加權結果加上目的的加權結果</li>
+<li><code>GL_FUNC_SUBTRACT</code>：來源的加權結果減去目的的加權結果</li>
+<li><code>GL_FUNC_REVERSE_SUBTRACT</code>：目的的加權結果減去來源的加權結果</li>
+<li><code>GL_MIN</code>：逐分量選擇來源顏色與目的顏色中的較小值，計算時不使用 blending factors</li>
+<li><code>GL_MAX</code>：逐分量選擇來源顏色與目的顏色中的較大值，計算時不使用 blending factors</li>
+</ul>
+</li>
+<li>Blending factors：指定來源 RGB 與目的 RGB 各自要逐分量乘上的三個數值，以及來源 alpha 與目的 alpha 各自要乘上的單一數值。 <code>glBlendFuncSeparate()</code> 的四個參數會分別選擇這四組 factors 的計算規則。 本文後面的範例會用到下列選項
+<ul>
+<li><code>GL_ZERO</code>：RGB factor 為 ，alpha factor 為 </li>
+<li><code>GL_ONE</code>：RGB factor 為 ，alpha factor 為 </li>
+<li><code>GL_SRC_ALPHA</code>：將來源顏色的 alpha 複製成 RGB factor 的三個分量，alpha factor 也使用來源 alpha</li>
+<li><code>GL_ONE_MINUS_SRC_ALPHA</code>：將 來源顏色的 alpha 複製成 RGB factor 的三個分量，alpha factor 也使用 來源 alpha</li>
+</ul>
+</li>
+</ul>
+<p>Application 會透過這些 blending state 選定 equation 與四個 factor 的計算規則。 以 <code>GL_FUNC_ADD</code> 為例，RGB 與 alpha 的計算可以分別寫成：</p>
+<p>管線會根據目的 color attachment 的 internal format，決定是否執行 blending，並將來源顏色與目的顏色準備成該格式所需的數值。 完成 blending 後，管線也會依同一個格式找出計算結果周圍的可表示值，再由 dithering 選出一個結果</p>
+<p>常見的幾種 internal format 如下：</p>
+<ul>
+<li><code>GL_RGBA8</code>：
+<ul>
+<li>來源顏色：fragment shader 使用浮點 <code>vec4</code> 交出顏色。 管線會將各分量限制在  內，並以限制後的浮點值作為 blending 的來源顏色</li>
+<li>目的顏色：管線會以  將 attachment 中的 8-bit 整數解讀成  內的浮點值</li>
+<li>Blending：來源顏色、目的顏色與 factors 都會限制在  內，再代入 blending equation</li>
+<li>Blending 後的格式處理：管線會將計算結果限制在  內，再依 8-bit normalized 尺度找出相鄰的  可表示值</li>
+<li>Dithering：逐分量選出其中一個 ，並將這組結果交給後續的逐 sample 操作</li>
+</ul>
+</li>
+<li><code>GL_RGBA16F</code>：
+<ul>
+<li>來源顏色：fragment shader 使用浮點 <code>vec4</code> 交出顏色</li>
+<li>目的顏色：管線會將 attachment 中的 16-bit floating-point 數值提供給 blending</li>
+<li>Blending：來源顏色、目的顏色與 factors 會以浮點值參與計算，負數與大於  的數值也能進入 blending equation</li>
+<li>Blending 後的格式處理：管線會依 16-bit floating-point 格式找出每個計算結果周圍的可表示值</li>
+<li>Dithering：逐分量選出其中一個 16-bit floating-point 可表示值，並將結果交給後續的逐 sample 操作</li>
+</ul>
+</li>
+<li><code>GL_RGBA8UI</code>：
+<ul>
+<li>來源顏色：fragment shader 使用 <code>uvec4</code> 這類 unsigned integer output 交出顏色</li>
+<li>目的顏色：attachment 以 8-bit unsigned integer 保存各通道</li>
+<li>Blending：integer color attachment 會略過 blending equation，來源顏色接著進入儲存格式處理</li>
+<li>Blending 後的格式處理：每個來源分量本身就是整數格式使用的數值。 位於格式範圍內時，它就已經可以由 attachment 精確表示了</li>
+<li>Dithering：由於可表示下界與上界是同一個整數，因此來源值會直接交給後續的逐 sample 操作</li>
+</ul>
+</li>
+<li><code>GL_SRGB8_ALPHA8</code>：
+<ul>
+<li>來源顏色：fragment shader 使用浮點 <code>vec4</code> 交出顏色。 管線會將各分量限制在  內，並以限制後的浮點值執行 blending</li>
+<li>目的顏色：
+<ul>
+<li>啟用 <code>GL_FRAMEBUFFER_SRGB</code>：將 attachment 中的 sRGB 編碼值解碼成 linear RGB。 A 維持線性的 normalized 數值</li>
+<li>停用 <code>GL_FRAMEBUFFER_SRGB</code>：直接以  解讀 attachment 中保存的 RGB 與 A</li>
+</ul>
+</li>
+<li>Blending：
+<ul>
+<li>啟用 <code>GL_FRAMEBUFFER_SRGB</code>：將來源 RGB 視為 linear RGB，並與解碼後的目的 RGB 進行計算</li>
+<li>停用 <code>GL_FRAMEBUFFER_SRGB</code>：直接以來源與目的的 normalized RGB 進行計算</li>
+</ul>
+</li>
+<li>Blending 後的格式處理：
+<ul>
+<li>啟用 <code>GL_FRAMEBUFFER_SRGB</code>：將 blending 產生的 linear RGB 編碼成 sRGB，再依 8-bit normalized 尺度找出相鄰的可表示值</li>
+<li>停用 <code>GL_FRAMEBUFFER_SRGB</code>：直接依 8-bit normalized 尺度找出 blending 所產生之 RGB 周圍的可表示值</li>
+<li>A 維持線性數值，並依 8-bit normalized 尺度找出相鄰的可表示值</li>
+</ul>
+</li>
+<li>Dithering：逐分量選出 RGB 與 A 後續要使用的 8-bit normalized 可表示值</li>
+<li>補充：sRGB attachment 保存的是非線性編碼後的 RGB，而 blending 需要在線性空間中進行算術運算
+<ul>
+<li>Application 啟用 <code>GL_FRAMEBUFFER_SRGB</code> 後，管線會先將 attachment 讀出的目的 RGB 解碼成 linear RGB，再與 fragment shader 交出的來源 RGB 進行 blending。 計算完成後，管線會將結果重新編碼成 sRGB，供 attachment 儲存</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>底下以 <code>GL_RGBA8</code> color attachment 為例，完整追蹤 blending 前的輸入準備、blending 計算，以及 blending 後的格式處理與 dithering。 本例使用加法 blending equation，並分別設定了 RGB 與 alpha 的 factor 計算規則：</p>
+<div class="language-cpp line-numbers-mode" data-highlighter="shiki" data-ext="cpp" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-cpp"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glDisable</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_COLOR_LOGIC_OP);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glEnable</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_BLEND);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glBlendEquation</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_FUNC_ADD);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glEnable</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(GL_DITHER);</span></span>
+<span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">glBlendFuncSeparate</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">(</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_SRC_ALPHA,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_ONE,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_ONE,</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    GL_ONE_MINUS_SRC_ALPHA</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">);</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>假設 fragment shader 交出的來源顏色是：</p>
+<p>由於目標 attachment 使用 <code>GL_RGBA8</code>，因此管線會先將來源顏色的每個分量限制在  內。 R 的  會變成 ，B 的  會變成 ，G 與 A 則維持原值：</p>
+<p>管線會以這組限制後的浮點值作為 blending 的來源顏色：</p>
+<p>假設 color attachment 在同一個 sample 內保存的四個 8-bit 整數為 。 <code>GL_RGBA8</code> 會將每個整數除以 ，讓管線取得 blending 使用的 normalized 目的顏色：</p>
+<p><code>glBlendFuncSeparate()</code> 的四個參數會選定 factors 的計算規則。 將來源 alpha  代入後，可以算出下列數值：</p>
+<ul>
+<li>來源 RGB factor：<code>GL_SRC_ALPHA</code>，使用來源 alpha，也就是 </li>
+<li>目的 RGB factor：<code>GL_ONE</code>，使用 </li>
+<li>來源 alpha factor：<code>GL_ONE</code>，使用 </li>
+<li>目的 alpha factor：<code>GL_ONE_MINUS_SRC_ALPHA</code>，使用 來源 alpha，也就是 </li>
+</ul>
+<p>將這些 factors 代入 <code>GL_FUNC_ADD</code> 的計算公式後，可以得到：</p>
+<p>因此 blending 算出的完整顏色是：</p>
+<p>這筆  是 blending equation 的輸出。 由於 R 分量的  超出了 <code>GL_RGBA8</code> 的 normalized 範圍，因此管線會先將四個分量限制在  內：</p>
+<p>接著，管線會將每個分量乘上 ，換算到 <code>GL_RGBA8</code> 的 8-bit 尺度：</p>
+<p>由於 R 與 B 已經是整數了，因此兩者的可表示下界與上界相同。 G 與 A 則由於位於兩個相鄰整數之間，因此各自具有兩個候選值：</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>臺師大資工轉學紀錄分享</title>
       <link>https://mes0903.github.io/essay/NTNU-Transfer/</link>
@@ -13335,6 +15140,40 @@ A copy of this allocator is used for any memory allocation and element construct
 ]]></content:encoded>
     </item>
     <item>
+      <title>OSTEP 22：Swapping Policies</title>
+      <link>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</link>
+      <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</guid>
+      <source url="https://mes0903.github.io/rss.xml">OSTEP 22：Swapping Policies</source>
+      <description>OSTEP 22：Swapping Policies 在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可 但不幸的是，當可用記憶體很少時，事情就變得...</description>
+      <category>OS</category>
+      <pubDate>Sun, 06 Apr 2025 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<p>在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可</p>
+<p>但不幸的是，當可用記憶體很少時，事情就變得比較麻煩了。 在這種情況下，memory pressure 會迫使 OS 開始把某些 page swap 出去，以空出空間給正在使用的 page。 OS 的 replacement policy 會負責決定要把哪些 page evict 掉，在歷史上，這是早期 virtual memory 系統中最重要的決策之一，因為早期的系統實體記憶體都非常小</p>
+<p>因此我們這章的重點自然就是：</p>
+<div class="hint-container info">
+<p class="hint-container-title">相關信息</p>
+<p>關鍵：如何決定要 evict 哪一個 page</p>
+<p>OS 要如何決定要把哪些 page 從記憶體中移除？ 這由系統的 replacement policy 決定，它通常會依據一些通用原則，但也會加上一些小技巧來避免某些邊界情況的行為</p>
+</div>
+<h2>22.1 Cache Management</h2>
+<p>在深入各種策略之前，我們先來更仔細地描述一下我們要解決的問題。 因為 main memory 只存放了系統中一部分的 page，所以它本質上可以被視為整個系統中 virtual memory page 的一個 cache。 因此 replacement policy 的目標，就是要讓這個 cache 的 miss 數量最小化，也就是盡量減少從 disk 抓 page 的次數</p>
+<p>換個角度看，我們的目標也可以說是要讓 cache hit 的次數最大化，也就是讓存取的 page 儘量能在記憶體裡就找到</p>
+<p>知道 hit 與 miss 的次數，可以讓我們計算某個程式的平均記憶體存取時間（AMAT），這是電腦架構師用來衡量硬體 cache 效能的一個指標 [HP06]。 具體來說，我們可以這樣算出 AMAT：</p>
+<p>其中  代表存取記憶體的成本， 是存取硬碟的成本， 是沒在 cache 裡找到資料的機率，其範圍是 0.0 到 1.0，有時候我們也會用百分比的 miss rate 來表示，例如 10% 的 miss rate 意思就是  = 0.10。 要注意的是你一定會付 memory access 的成本，而如果發生 cache miss，你還得額外付出從 disk 抓資料的成本</p>
+<p>舉個例子，假設有一台機器的位址空間只有 4KB，並使用 256-byte 的 page，則其 virtual address 會分兩部分：一個 4-bit 的 VPN，以及一個 8-bit 的 offset。 所以在這個例子中，一個 process 可以存取 16（）個 virtual page</p>
+<p>再假設這個 process 存取了以下記憶體：0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900。 這些 virtual address 分別對應到前十個 page 的第一個 byte（這裡 page number 為每個 virtual address 的第一個十六進位數字）</p>
+<p>我們再假設除了 virtual page 3 以外，其他 page 都已經在記憶體裡。 因此這組 memory access 的行為會是：hit, hit, hit, miss, hit, hit, hit, hit, hit, hit。 我們可以算出 hit rate 為 90%，因此 miss rate 是 10%（ = 0.1）。 一般來說，，也就是命中率加上失誤率等於 100%</p>
+<p>為了計算 AMAT，我們還需要知道 memory access 與 disk access 的成本。 假設 memory access（）大約是 100 奈秒，disk access（）大約是 10 毫秒，則 AMAT 為</p>
+<p>可以看見差不多是一毫秒。 如果我們的 hit rate 是 99.9%（ = 0.001），結果就會差很多了，這種情況下 AMAT 會是 10.1 微秒，差不多快了 100 倍。 當 hit rate 趨近於 100% 時，AMAT 就會趨近於 100 奈秒</p>
+<p>但很不幸的是，就像這個例子裡顯示的，現代系統中 disk access 的成本太高了，就算只有很小的 miss rate，也會直接主導整體 AMAT。 因此我們必須儘量避免 miss，不然就會像是以 disk 的速度在跑程式</p>
+<h2>22.2 The Optimal Replacement Policy</h2>
+<p>為了更深入了解某個 replacement policy 的好壞，我們需要有個最佳的 replacement policy 能拿來比較，這樣的最佳策略由 Belady 很多年前提出 [B66]（他原本稱它為 MIN），其能夠達到最少的 miss 數。 Belady 證明了一個簡單（但很難實作）的方法 — 把「未來最久之後才會被使用的 page」替換掉，會是最佳策略，能讓 cache miss 數量最少</p>
+<p>想法很簡單，如果你一定要把某個 page 丟掉，只要丟最久之後才會被用到的 page 即可，這樣做等於是說 cache 裡的其他 page 都比這個遙遠的 page 更重要，而這也的確，因為你未來會先存取其他 page，最後才會存取那個最遙遠的 page</p>
+<p>我們用一個簡單的例子來理解最佳策略會做出的選擇，假設一個程式會依序存取以下的 virtual page：0, 1, 2, 0, 1, 3, 0, 3, 1, 2, 1。 下表（Figure 22.1）展示了在 cache 能容納三個 page 的情況下，最佳策略的行為</p>
+]]></content:encoded>
+    </item>
+    <item>
       <title>OSTEP 23：Complete VM Systems</title>
       <link>https://mes0903.github.io/OS/OSTEP/Virtualization/23/</link>
       <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/23/</guid>
@@ -13485,40 +15324,6 @@ A copy of this allocator is used for any memory allocation and element construct
 <div class="language-shell line-numbers-mode" data-highlighter="shiki" data-ext="shell" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-shell"><span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">0000000000400000</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 372K</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> r-x--</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> tcsh</span></span>
 <span class="line"><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF">00000000019d5000</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> 1780K</span><span style="--shiki-light:#50A14F;--shiki-dark:#98C379"> rw</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div></div></div></div>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>OSTEP 22：Swapping Policies</title>
-      <link>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</link>
-      <guid>https://mes0903.github.io/OS/OSTEP/Virtualization/22/</guid>
-      <source url="https://mes0903.github.io/rss.xml">OSTEP 22：Swapping Policies</source>
-      <description>OSTEP 22：Swapping Policies 在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可 但不幸的是，當可用記憶體很少時，事情就變得...</description>
-      <category>OS</category>
-      <pubDate>Sun, 06 Apr 2025 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<p>在 virtual memory manager 裡，如果有很多 free memory，事情會變得非常簡單。 發生 page fault 時，你只需要在 free-page list 裡找到一個空的 page，把它分配給 faulting page 即可</p>
-<p>但不幸的是，當可用記憶體很少時，事情就變得比較麻煩了。 在這種情況下，memory pressure 會迫使 OS 開始把某些 page swap 出去，以空出空間給正在使用的 page。 OS 的 replacement policy 會負責決定要把哪些 page evict 掉，在歷史上，這是早期 virtual memory 系統中最重要的決策之一，因為早期的系統實體記憶體都非常小</p>
-<p>因此我們這章的重點自然就是：</p>
-<div class="hint-container info">
-<p class="hint-container-title">相關信息</p>
-<p>關鍵：如何決定要 evict 哪一個 page</p>
-<p>OS 要如何決定要把哪些 page 從記憶體中移除？ 這由系統的 replacement policy 決定，它通常會依據一些通用原則，但也會加上一些小技巧來避免某些邊界情況的行為</p>
-</div>
-<h2>22.1 Cache Management</h2>
-<p>在深入各種策略之前，我們先來更仔細地描述一下我們要解決的問題。 因為 main memory 只存放了系統中一部分的 page，所以它本質上可以被視為整個系統中 virtual memory page 的一個 cache。 因此 replacement policy 的目標，就是要讓這個 cache 的 miss 數量最小化，也就是盡量減少從 disk 抓 page 的次數</p>
-<p>換個角度看，我們的目標也可以說是要讓 cache hit 的次數最大化，也就是讓存取的 page 儘量能在記憶體裡就找到</p>
-<p>知道 hit 與 miss 的次數，可以讓我們計算某個程式的平均記憶體存取時間（AMAT），這是電腦架構師用來衡量硬體 cache 效能的一個指標 [HP06]。 具體來說，我們可以這樣算出 AMAT：</p>
-<p>其中  代表存取記憶體的成本， 是存取硬碟的成本， 是沒在 cache 裡找到資料的機率，其範圍是 0.0 到 1.0，有時候我們也會用百分比的 miss rate 來表示，例如 10% 的 miss rate 意思就是  = 0.10。 要注意的是你一定會付 memory access 的成本，而如果發生 cache miss，你還得額外付出從 disk 抓資料的成本</p>
-<p>舉個例子，假設有一台機器的位址空間只有 4KB，並使用 256-byte 的 page，則其 virtual address 會分兩部分：一個 4-bit 的 VPN，以及一個 8-bit 的 offset。 所以在這個例子中，一個 process 可以存取 16（）個 virtual page</p>
-<p>再假設這個 process 存取了以下記憶體：0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900。 這些 virtual address 分別對應到前十個 page 的第一個 byte（這裡 page number 為每個 virtual address 的第一個十六進位數字）</p>
-<p>我們再假設除了 virtual page 3 以外，其他 page 都已經在記憶體裡。 因此這組 memory access 的行為會是：hit, hit, hit, miss, hit, hit, hit, hit, hit, hit。 我們可以算出 hit rate 為 90%，因此 miss rate 是 10%（ = 0.1）。 一般來說，，也就是命中率加上失誤率等於 100%</p>
-<p>為了計算 AMAT，我們還需要知道 memory access 與 disk access 的成本。 假設 memory access（）大約是 100 奈秒，disk access（）大約是 10 毫秒，則 AMAT 為</p>
-<p>可以看見差不多是一毫秒。 如果我們的 hit rate 是 99.9%（ = 0.001），結果就會差很多了，這種情況下 AMAT 會是 10.1 微秒，差不多快了 100 倍。 當 hit rate 趨近於 100% 時，AMAT 就會趨近於 100 奈秒</p>
-<p>但很不幸的是，就像這個例子裡顯示的，現代系統中 disk access 的成本太高了，就算只有很小的 miss rate，也會直接主導整體 AMAT。 因此我們必須儘量避免 miss，不然就會像是以 disk 的速度在跑程式</p>
-<h2>22.2 The Optimal Replacement Policy</h2>
-<p>為了更深入了解某個 replacement policy 的好壞，我們需要有個最佳的 replacement policy 能拿來比較，這樣的最佳策略由 Belady 很多年前提出 [B66]（他原本稱它為 MIN），其能夠達到最少的 miss 數。 Belady 證明了一個簡單（但很難實作）的方法 — 把「未來最久之後才會被使用的 page」替換掉，會是最佳策略，能讓 cache miss 數量最少</p>
-<p>想法很簡單，如果你一定要把某個 page 丟掉，只要丟最久之後才會被用到的 page 即可，這樣做等於是說 cache 裡的其他 page 都比這個遙遠的 page 更重要，而這也的確，因為你未來會先存取其他 page，最後才會存取那個最遙遠的 page</p>
-<p>我們用一個簡單的例子來理解最佳策略會做出的選擇，假設一個程式會依序存取以下的 virtual page：0, 1, 2, 0, 1, 3, 0, 3, 1, 2, 1。 下表（Figure 22.1）展示了在 cache 能容納三個 page 的情況下，最佳策略的行為</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -14751,11 +16556,11 @@ A copy of this allocator is used for any memory allocation and element construct
     </item>
     <item>
       <title>GLFW Input guide</title>
-      <link>https://mes0903.github.io/ComputerGraphic/glfwInputGuide/</link>
-      <guid>https://mes0903.github.io/ComputerGraphic/glfwInputGuide/</guid>
+      <link>https://mes0903.github.io/GraphicStack/glfwInputGuide/</link>
+      <guid>https://mes0903.github.io/GraphicStack/glfwInputGuide/</guid>
       <source url="https://mes0903.github.io/rss.xml">GLFW Input guide</source>
       <description>GLFW Input guide 原文連結：GLFW Input guide，本文進行了翻譯並做了些許補充 本文介紹了 GLFW 的輸入相關函式，如果想了解某個類別中特定函式的詳細資訊，請參閱 Input reference GLFW 的其他項目的文件： Introduction to the API Window guide Context guid...</description>
-      <category>computer-graphic</category>
+      <category>graphic-stack</category>
       <pubDate>Sun, 16 Mar 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
 <p>原文連結：<a href="https://www.glfw.org/docs/3.3/input_guide.html" target="_blank" rel="noopener noreferrer">GLFW Input guide</a>，本文進行了翻譯並做了些許補充</p>
@@ -21816,42 +23621,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
-      <title>Gauss-Seidel Metheod</title>
-      <link>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</link>
-      <guid>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
-      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
-      <category>math</category>
-      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
-<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
-<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
-<p>上次我們把原本的矩陣分成 D、L、U：</p>
-<figure><figcaption></figcaption></figure>
-<p>那我們做了優化之後，可以把它寫成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
-<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
-<p>輸出：估計出來的 </p>
-<p>::</p>
-<h3>Lemma7.18</h3>
-<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
-<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<h3>Thm 7.19</h3>
-<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-]]></content:encoded>
-    </item>
-    <item>
       <title>Error Bounds</title>
       <link>https://mes0903.github.io/Math/numerical_algebra/Error-Bound/</link>
       <guid>https://mes0903.github.io/Math/numerical_algebra/Error-Bound/</guid>
@@ -21901,6 +23670,42 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content:encoded>
     </item>
     <item>
+      <title>Gauss-Seidel Metheod</title>
+      <link>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</link>
+      <guid>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</guid>
+      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
+      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
+      <category>math</category>
+      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<h3>Gauss-Seidel Metheod</h3>
+<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
+<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
+<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
+<p>上次我們把原本的矩陣分成 D、L、U：</p>
+<figure><figcaption></figcaption></figure>
+<p>那我們做了優化之後，可以把它寫成這樣：</p>
+<figure><figcaption></figcaption></figure>
+<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
+<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
+<p>輸出：估計出來的 </p>
+<p>::</p>
+<h3>Lemma7.18</h3>
+<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
+<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
+<p>證明：</p>
+<figure><figcaption></figcaption></figure>
+<h3>Thm 7.19</h3>
+<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
+<p>證明：</p>
+<figure><figcaption></figcaption></figure>
+]]></content:encoded>
+    </item>
+    <item>
       <title>Gradient Method</title>
       <link>https://mes0903.github.io/Math/numerical_algebra/Gradient-method/</link>
       <guid>https://mes0903.github.io/Math/numerical_algebra/Gradient-method/</guid>
@@ -21934,74 +23739,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <figure><figcaption></figcaption></figure>
 <figure><figcaption></figcaption></figure>
 ]]></content:encoded>
-    </item>
-    <item>
-      <title>Least Squares</title>
-      <link>https://mes0903.github.io/Math/numerical_algebra/Least-Squares/</link>
-      <guid>https://mes0903.github.io/Math/numerical_algebra/Least-Squares/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Least Squares</source>
-      <description>Least Squares 最小絕對偏差法 Least absolute deviation 假設現在給你這些點 （圖源：wiki）（圖源：wiki） 我們沒辦法用一條直線來通過這些全部的點，但我們可以像這樣找到誤差最小的直線： （圖源：wiki）（圖源：wiki） 這條直線可以幫助我們預測資料的方向 假設 是這條直線上的第 i 個值， 是第 i 個給...</description>
-      <category>math</category>
-      <pubDate>Sat, 06 Nov 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>最小絕對偏差法 Least absolute deviation</h3>
-<p>假設現在給你這些點</p>
-<figure><figcaption>（圖源：<a href="https://upload.wikimedia.org/wikipedia/commons/8/84/%E6%95%A3%E7%82%B9%E5%9B%BE.jpg" target="_blank" rel="noopener noreferrer">wiki</a>）</figcaption></figure>
-<p>我們沒辦法用一條直線來通過這些全部的點，但我們可以像這樣找到誤差最小的直線：</p>
-<figure><figcaption>（圖源：<a href="https://upload.wikimedia.org/wikipedia/commons/d/d2/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95%E6%8B%9F%E5%90%88.jpg" target="_blank" rel="noopener noreferrer">wiki</a>）</figcaption></figure>
-<p>這條直線可以幫助我們預測資料的方向</p>
-<p>假設  是這條直線上的第 i 個值， 是第 i 個給定的 y 值（原本的 y 值），我們期望誤差最小，所以我們想要找到 、 最小化這個式子：</p>
-<p></p>
-<p>這個方法稱作 minimax approach，我們還可以換個方法，找絕對偏差的最小值：</p>
-<p></p>
-<p>那我們要找最小值，也就是說我們要找到 、 符合下面這兩條式子：</p>
-<figure><figcaption></figcaption></figure>
-<p>這個方法叫做最小絕對偏差法（least absolute deviation），但問題是這兩條有絕對值，微分的處理很麻煩，所以下一個方法就出來了</p>
-<h3>最小平方法 Least Square</h3>
-<p>剛剛是因為絕對值微分很麻煩，所以這邊就把誤差平方：</p>
-<p></p>
-<p>這樣的話就解決了微分的問題，這樣一來不但微分好算，而且還是 convex 可以找到最佳解</p>
-<h3>正規方程式 Normal Equations</h3>
-<p>我們繼續找最小值，對上方的  做偏微：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們可以推出（用克拉瑪）：</p>
-<figure><figcaption></figcaption></figure>
-<p>這兩個等式就叫 normal equation</p>
-<h3>Polynomial Least Squares</h3>
-<p>然而妳拿到的資料很有可能不是一個用  就能表達的資料分布，像是這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>藍線明顯比紅線更好的講述了這個資料的分布，要做出這種藍線，我們就需要用更高次方的多項式來表達他，這時就需要用 Polynomial Least Squares 了</p>
-<p>我們假設</p>
-<p>，defree n &lt; m - 1</p>
-<p>那我們要找到  來最小化 E：</p>
-<p><br>
-那一樣對他偏微：</p>
-<figure><figcaption></figcaption></figure>
-<p>那我們就可以推出這樣：</p>
-<figure><figcaption></figcaption></figure>
-<h3>用矩陣表示</h3>
-<p>我們的目的是找到一條線 ，或一個曲線，可以很好的表示資料  的走向，後面可能會用 b 來代表 ，畢竟比較習慣用 b 來寫</p>
-<p>寫成矩陣會像這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>但通常 ，所以我們改成去找能讓 residual  最小化的 。 假設 ，其中  (under determine)，</p>
-<p>那麼  最小化  iff  是  的解</p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<p>這裡的  是  裡的隨便一個向量， 作用上去就會變  裡面的一個向量，所以和  內積就會等於 0，因為垂直</p>
-<p>註： 解出來的所有結果會在一個固定的區域中，這個區域就叫作 column space ，顧名思義就是每個 column 的線性組合 ，一維的話就是一條線，二維的話就是一個平面</p>
-<p>那這個東西解起來就會像這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>因為我們拿到的資料通常都不會在平面  上，也就是剛剛說的通常 ，尤其是在妳資料點很多的時候 A 就會很長一坨，像上面就有 m 個資料點，所以 A 就是個  的矩陣，如果 m 遠遠大於 2，那  基本上都沒有解，所以我們才會在這邊用這個方法找到誤差最小的解</p>
-<h4>多維的 normal equation</h4>
-<p>多維代表不只有 、，還有其他的 、 等等，所以你的  的 column 數就會增加，以  來說就會長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>那麼  大家應該就會求了</p>
-<h3>自然對數相關</h3>
-<p>有時候資料的表示式可能是  這類的形式，那麼我們可以這樣寫：</p>
-<figure><figcaption></figcaption></figure>
-<p>基本上跟前面講的一樣</p>
-]]></content:encoded>
-      <enclosure url="https://upload.wikimedia.org/wikipedia/commons/8/84/%E6%95%A3%E7%82%B9%E5%9B%BE.jpg" type="image/jpeg"/>
     </item>
   </channel>
 </rss>
