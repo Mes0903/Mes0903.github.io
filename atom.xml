@@ -4,11 +4,12 @@
   <title>Mes&amp;apos;s Blog</title>
   <subtitle>Being Towards Death</subtitle>
   <icon>https://mes0903.github.io/flame.ico</icon>
-  <updated>2026-09-13T18:35:36.784Z</updated>
+  <updated>2026-09-26T11:00:50.895Z</updated>
   <generator>@vuepress/plugin-feed</generator>
   <link rel="self" href="https://mes0903.github.io/atom.xml"/>
   <link rel="alternate" href="https://mes0903.github.io/"/>
   <category term="graphic-stack"/>
+  <category term="papers"/>
   <category term="essay"/>
   <category term="math"/>
   <category term="Linux"/>
@@ -27,7 +28,7 @@
     <title type="text">（WIP）The rendering pipeline in OpenGL</title>
     <id>https://mes0903.github.io/GraphicStack/rendering-pipeline/</id>
     <link href="https://mes0903.github.io/GraphicStack/rendering-pipeline/"/>
-    <updated>2026-09-13T18:35:36.786Z</updated>
+    <updated>2026-09-26T10:19:10.000Z</updated>
     <summary type="html"><![CDATA[
 <h2>Background 與 big picture</h2>
 <h3>本文使用的符號與寫法</h3>
@@ -1841,10 +1842,214 @@
     <published>2026-09-14T00:00:00.000Z</published>
   </entry>
   <entry>
+    <title type="text">論文筆記：A Sorting Classification of Parallel Rendering</title>
+    <id>https://mes0903.github.io/GraphicStack/sorting-of-rendering-pipeline/</id>
+    <link href="https://mes0903.github.io/GraphicStack/sorting-of-rendering-pipeline/"/>
+    <updated>2026-09-26T10:19:10.000Z</updated>
+    <summary type="html"><![CDATA[
+<ul>
+<li>論文連結：<a href="https://ieeexplore.ieee.org/document/291528" target="_blank" rel="noopener noreferrer">https://ieeexplore.ieee.org/document/291528</a></li>
+</ul>
+<p>這篇是 Molnar 等人在 1994 提出的論文，他是一個針對 parallel rendering architecture 的分類方法。 它提出了三種形式的 rendering pipeline 實作：</p>
+<ul>
+<li>sort-first</li>
+<li>sort-middle</li>
+<li>sort-last</li>
+</ul>]]></summary>
+    <content type="html"><![CDATA[
+<ul>
+<li>論文連結：<a href="https://ieeexplore.ieee.org/document/291528" target="_blank" rel="noopener noreferrer">https://ieeexplore.ieee.org/document/291528</a></li>
+</ul>
+<p>這篇是 Molnar 等人在 1994 提出的論文，他是一個針對 parallel rendering architecture 的分類方法。 它提出了三種形式的 rendering pipeline 實作：</p>
+<ul>
+<li>sort-first</li>
+<li>sort-middle</li>
+<li>sort-last</li>
+</ul>
+<p>可以幫助我們來對 rendering architecture 做初步的分析。 本文只會簡單紀錄一下他的概念，成本的計算本身很簡單，加上實作方法不同其實成本也不一樣，所以直接看論文知道一下怎麼算就好</p>
+<h2>Background</h2>
+<p>我們可以簡單將 rendering pipeline 分為兩個部分：</p>
+<ul>
+<li>幾何處理（geometry processing）：包括座標轉換（transformation）、裁切（clipping）、光照計算（lighting）等</li>
+<li>光柵化（rasterization）：包括掃描轉換（scan conversion）、著色（shading）以及可見性判定（visibility determination）等</li>
+</ul>
+<p>整體流程大致如下：</p>
+<div class="language-callgraph line-numbers-mode" data-highlighter="shiki" data-ext="callgraph" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-callgraph"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">CPU-side commands / GPU resources</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ vertex buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ index buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ textures / constants</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ draw commands</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[CP: Command Processor]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 接收 CPU 提交的 commands</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 解讀 draw / pipeline state</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 啟動後續 graphics workload</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Geometry processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE: Geometry Engine] Input assembly / geometry front-end</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 取得 vertex / index data</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 解讀 primitive topology</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ triangle</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ line</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ point</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 保存 primitive connectivity</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 知道哪些 vertices 屬於同一個 primitive</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ vertex reuse / vertex cache</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 避免 shared vertex 重複執行 Vertex Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [SPI: Shader Processor Input]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 收集 vertex work items</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 組成 wave</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 選擇可用 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 配置 registers / program counter 等執行狀態</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [WGP / CU] Vertex Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 執行 programmer 提供的 VS</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ object-space → clip-space</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 通常包含 Model / View / Projection transformation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 輸出 clip-space position</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 產生 per-vertex varyings</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ UV</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ normal</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ world/model-space position 等</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE + WGP / CU] Tessellation（optional）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [WGP / CU] Tessellation Control / Hull Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 決定 tessellation factors</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [GE: fixed-function tessellator]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 細分 patch domain</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [WGP / CU] Tessellation Evaluation / Domain Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 計算細分後 vertices 的 position / attributes</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE + WGP / CU] Geometry Shader（optional）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ primitive-level programmable processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 可修改 / 丟棄 / 產生 primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [SX: Shader Export]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 接收 geometry shader stages 產生的 vertex outputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 將 position / parameters 送往後續 primitive path</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA: Primitive Assembler]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 取得 Geometry Engine 保存的 connectivity</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 將 transformed vertices 重組成 primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ primitive-level processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ view-frustum / guard-band related processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ face orientation / back-face culling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA_CL: Clipper]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ clip-volume clipping</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ near / far clipping</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ user clip-plane processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 必要時產生新的 clipped vertices / primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA_CL / VTE: Viewport Transform Engine]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ reciprocal / perspective divide</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ (x, y, z) ← (x/w, y/w, z/w)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ viewport transform</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ NDC X/Y → screen / window X/Y</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ NDC Z → viewport depth range</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Rasterization</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Pixel rendering</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SU: Primitive / Setup Unit] Rasterization setup</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ primitive setup state</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ vertex coordinate quantization / conventions</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ pixel-center convention</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 準備後續 scan conversion 所需狀態</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Coarse rasterization</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 接收 screen-space primitive</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 使用 triangle screen-space bounds</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 以 coarse pixel blocks 搜尋候選區域</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ All the Pipelines 範例：4×4 pixel groups</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Fine coverage determination</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 對候選區域測試 triangle edges</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 決定每個 pixel / sample 的 coverage</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 套用 rasterization coverage rules</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生後續 interpolation 所需的</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       barycentric / gradient information</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Quad formation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 將 pixels 組成 2×2 quads</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 保留 helper pixels / lanes</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 支援 Pixel Shader derivatives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [SPI: Shader Processor Input]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 接收 rasterizer 產生的 pixel quads</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 收集 pixel work items / waves</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 準備 Pixel Shader inputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ dispatch 到 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [LDS parameter path + WGP / CU V_INTERP]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   Attribute interpolation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ rasterizer 提供 barycentric coordinates I / J</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 取得 triangle vertex parameters</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ perspective-correct interpolation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生 per-fragment varyings</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ UV</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ color</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ normal</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       └─ 其他 shader inputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [WGP / CU] Pixel / Fragment Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 執行 programmer 提供的 FS / PS</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ material computation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ lighting computation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生 candidate color / shader outputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [Texture Unit: TA / TD / TCP path] Texture sampling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ Pixel Shader 發出 texture / image instruction</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ texture address calculation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ texture cache access</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ filtering / sampling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 將 sampled value 回傳 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [SX: Shader Export]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 將 Pixel Shader 的 color / depth 等輸出</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │           送往 Color / Depth Backend</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Visibility / output operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [DB: Depth Backend]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ depth test / Z comparison</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ stencil test</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ depth / stencil update</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ depth-related compression / backend operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [CB: Color Backend]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color blending</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color write masks / render-target operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ MSAA resolve 等 backend operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color compression</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ render-target write</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Framebuffer / Render Target</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Color buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Depth buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    └─ Stencil buffer</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<details> <summary>上圖中的縮寫一覽</summary>
+<p>| 縮寫         | 全稱                                              | 意義                                                                                                                                              |<br>
+|</p>
+</details></div>
+]]></content>
+    <category term="graphic-stack"/>
+    <category term="papers"/>
+    <published>2026-09-25T00:00:00.000Z</published>
+  </entry>
+  <entry>
     <title type="text">臺師大資工轉學紀錄分享</title>
     <id>https://mes0903.github.io/essay/NTNU-Transfer/</id>
     <link href="https://mes0903.github.io/essay/NTNU-Transfer/"/>
-    <updated>2026-09-10T13:55:41.000Z</updated>
+    <updated>2026-09-26T11:00:15.000Z</updated>
     <summary type="html"><![CDATA[
 <h2>報名 &amp; 結果</h2>
 <p>後來跑去臺師大資工念了，從中央大學數學系轉到臺師大資工</p>
@@ -5333,7 +5538,7 @@ Virtio 裝置包含旗標，guest 作業系統在裝置初始化時會確認這�
     <title type="text">xv6 riscv book 繁體中文翻譯</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/"/>
-    <updated>2026-09-13T18:35:41.247Z</updated>
+    <updated>2026-09-26T11:00:55.349Z</updated>
     <summary type="html"><![CDATA[
 <p>這是 xv6 riscv book 的繁體中文翻譯，順便加了一些我自己的筆記，由於是放在 Blog 上給我自己看的，所以對原文有做一些使語意更加順暢的小修改，還加上了給我 Blog 使用的標籤</p>
 <ul>
@@ -5402,7 +5607,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 8：File system</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter8/"/>
-    <updated>2026-09-13T18:35:41.248Z</updated>
+    <updated>2026-09-26T11:00:55.355Z</updated>
     <summary type="html"><![CDATA[
 <p>檔案系統的目的是為了組織與儲存資料。 檔案系統通常也會支援使用者與應用程式之間的資料共享，並具備資料的持久性，也就是在重新開機後資料仍然可用。 xv6 的檔案系統提供類 Unix 的檔案、目錄與路徑名稱（詳見第一章），並透過 virtio 硬碟來保存其資料以達成持久性。 這個檔案系統需要面對數個挑戰：</p>
 <ul>
@@ -6506,7 +6711,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 9：Concurrency revisited</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter9/"/>
-    <updated>2026-09-13T18:35:41.294Z</updated>
+    <updated>2026-09-26T11:00:55.401Z</updated>
     <summary type="html"><![CDATA[
 <p>在核心設計中，要同時擁有良好的平行效能、並發下的正確性，以及可理解的程式碼，是一項重大挑戰。 直接使用 lock 是達成正確性最可靠的方式，但這並非總是可行的。 本章會列出一些例子：有些情況 xv6 被迫以複雜的方式使用 lock，也有些情況則採用了類似 lock 的技巧，但實際上沒有用 lock</p>
 <h2>9.1 Locking patterns</h2>
@@ -6573,7 +6778,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 7：Scheduling</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter7/"/>
-    <updated>2026-09-13T18:35:41.302Z</updated>
+    <updated>2026-09-26T11:00:55.403Z</updated>
     <summary type="html"><![CDATA[
 <p>任何作業系統在執行時，通常會有比電腦實際擁有的 CPU 數量還多的 process，因此必須有一套計劃來讓這些 process 能夠輪流使用 CPU。 理想上，這種共享機制對使用者的 process 來說應該要是透明的。 常見的做法是透過「multiplexing」的方式，把多個 process 映射（multiplex）到實際的硬體 CPU 上，讓每個 process 產生擁有自己虛擬 CPU 的錯覺。 本章會說明 xv6 是如何實現這樣的 multiplexing 的</p>
 <h2>7.1 Multiplexing</h2>
@@ -6894,7 +7099,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 6：Locking</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter6/"/>
-    <updated>2026-09-13T18:35:41.360Z</updated>
+    <updated>2026-09-26T11:00:55.458Z</updated>
     <summary type="html"><![CDATA[
 <p>包括 xv6 的大多數 kernel，在執行時都會交錯進行多個活動。 造成交錯的其中一個原因是多核的硬體：例如 xv6 的 RISC-V 支援多個獨立執行的 CPU。 這些 CPU 會共用實體 RAM，而 xv6 會善用這樣的特性來維護那些所有 CPU 都會讀寫的資料結構。 這種共用會產生一個問題，就是當某個 CPU 正在讀某個資料結構的同時，另一個 CPU 可能正好在修改它，甚至可能有多個 CPU 同時在修改同一筆資料</p>
 <p>若沒有謹慎設計，這種平行存取很可能導致錯誤的結果，甚至破壞資料結構。 即便在單核心系統中，kernel 也可能在多個執行緒之間切換，使得它們的執行交錯進行。 最後，若某個裝置的 interrupt handler 與可被中斷的程式碼會修改同一份資料，而中斷剛好在不恰當的時機發生，則也可能會破壞資料。 並行（concurrency）這個詞就是指這種多條指令流因為多核平行處理、執行緒切換，或中斷而產生交錯的情況</p>]]></summary>
@@ -6988,7 +7193,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 5：Interrupts and device drivers</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter5/"/>
-    <updated>2026-09-13T18:35:41.376Z</updated>
+    <updated>2026-09-26T11:00:55.475Z</updated>
     <summary type="html"><![CDATA[
 <p>driver 是作業系統中負責管理特定裝置的程式碼：它會設定裝置的硬體、命令裝置執行操作、處理裝置產生的中斷，並與那些可能正在等待該裝置 I/O 的 process 互動。 driver 的程式碼常常很棘手，因為它與其所管理的裝置是並行執行的。 此外，driver 還必須理解裝置的硬體介面，而這些介面可能很複雜，也可能沒有良好文件說明</p>
 <p>需要作業系統處理的裝置通常可以將其設定成會產生 interrupt，kernel 的 trap handler 程式碼會辨認出裝置發出的 interrupt，並呼叫對應 driver 的 interrupt handler； 在 xv6 裡由 <code>devintr</code>（<a href="https://github.com/mit-pdos/xv6-riscv/blob/riscv//kernel/trap.c#L185" target="_blank" rel="noopener noreferrer">kernel/trap.c:185</a>） 來去呼叫對應的 driver</p>]]></summary>
@@ -7121,7 +7326,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 4：Traps and system calls</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter4/"/>
-    <updated>2026-09-13T18:35:41.378Z</updated>
+    <updated>2026-09-26T11:00:55.477Z</updated>
     <summary type="html"><![CDATA[
 <p>有三種類型的事件會使 CPU 暫停正常的指令執行流程，並強制轉移控制權到一段專門處理該事件的程式碼。 第一種情況是系統呼叫，當使用者程式執行 <code>ecall</code> 指令時，會向 kernel 提出對應的要求。 第二種情況是例外（exception）：某條指令（無論是來自使用者或 kernel ）執行了非法操作，例如除以零或使用無效的虛擬位址。 第三種情況是裝置中斷（interrupt），如某個裝置發出訊號表示它需要被處理，例如硬碟完成某次讀寫請求的時候</p>
 <p>本書將上述這些情況統稱為「trap」。 通常，發生 trap 時正在執行的程式碼之後需要能夠繼續執行，並且不應該察覺到任何特殊的事情發生了。 也就是說，我們通常希望 trap 是透明的； 這一點在處理裝置中斷時尤其重要，因為被中斷的程式碼通常不會預期到被打斷。 一般的處理流程是：trap 發生後控制權會轉移到 kernel； kernel 會儲存暫存器與其他狀態，以便之後能夠恢復執行； 接著 kernel 會執行對應的處理程式（例如系統呼叫的實作或裝置驅動程式）； 然後 kernel 會還原先前儲存的狀態並從 trap 返回； 最後原本的程式碼會從中斷處繼續執行</p>]]></summary>
@@ -7333,7 +7538,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 3：Page tables</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter3/"/>
-    <updated>2026-09-13T18:35:41.383Z</updated>
+    <updated>2026-09-26T11:00:55.482Z</updated>
     <summary type="html"><![CDATA[
 <p>Page table 是作業系統用來為每個行程提供私有位址空間與記憶體的最常見的機制。 page table 決定了記憶體位址的含義，以及哪些物理記憶體區段可以被存取。 它們讓 xv6 能夠隔離不同行程的位址空間，並將它們多工使用在單一的物理記憶體上</p>
 <p>page table 之所以被廣泛使用，是因為它們提供了一層間接性，使作業系統能夠應用許多「技巧」。 xv6 就使用了一些技巧：像是將相同的記憶體（例如 trampoline page）映射到多個位址空間中，並且用未映射的 page 來保護 kernel 與 user 的 stack。 接下來的章節會說明 RISC-V 硬體所提供的 page table 功能，以及 xv6 是如何使用這些功能的</p>]]></summary>
@@ -7817,7 +8022,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 1：Operating system interfaces</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter1/"/>
-    <updated>2026-09-13T18:35:41.396Z</updated>
+    <updated>2026-09-26T11:00:55.495Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的任務，是要讓多個程式能夠共享同一部電腦，並提供比硬體本身更多、更加實用的功能。 作業系統負責管理並抽象化底層硬體，使得如文字處理器這類應用程式無需關心所使用的是哪一種硬碟。 作業系統能讓多個程式共享硬體資源，並使它們能夠同時執行（或至少看起來是同時執行）。 最後，作業系統還提供讓程式之間可以互相溝通的介面，使它們能夠共享資料或協同作業</p>
 <p>作業系統透過一組介面來向使用者程式提供服務，但要設計一個好的介面其實並不容易。 一方面，我們希望這個介面要簡單且精確，這樣比較容易實作正確； 但另一方面，我們又會想要提供許多進階的功能給應用程式使用。 解決這個矛盾的訣竅是：設計一組依賴少量機制的介面，並讓這些機制可以組合起來，提供高度的通用性</p>]]></summary>
@@ -7839,7 +8044,7 @@ CONNECTION WITH THE BOOK OR THE USE OR OTHER DEALINGS IN THE BOOK.</p>
     <title type="text">xv6 riscv book chapter 2：Operating system organization</title>
     <id>https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/</id>
     <link href="https://mes0903.github.io/OS/xv6-riscv-book-zh-TW/chapter2/"/>
-    <updated>2026-09-13T18:35:41.399Z</updated>
+    <updated>2026-09-26T11:00:55.499Z</updated>
     <summary type="html"><![CDATA[
 <p>作業系統的一項關鍵需求是要能夠同時支援多個活動，例如透過第一章所描述的系統呼叫介面，一個行程可以使用 <code>fork</code> 建立新的行程。 作業系統還必須在這些行程之間分時共享電腦的資源，例如即使行程數量超過了硬體 CPU 的數量，作業系統仍必須確保所有行程都能獲得執行的機會。 作業系統也必須在行程之間安排隔離機制，換句話說如果某個行程出現錯誤並發生故障，它不應該影響到那些不依賴它的行程。 然而，完全的隔離又過於強硬，因為行程之間應要可以有意地互動，例如 pipeline 就是一個例子。 因此，作業系統必須滿足三個需求：多工（multiplexing）、隔離（isolation）與互動（interaction）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -11541,7 +11746,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：An Advanced Material</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/AdvancedMaterial/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/AdvancedMaterial/"/>
-    <updated>2026-09-13T18:35:41.626Z</updated>
+    <updated>2026-09-26T11:00:55.723Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一節的 Simple Texture 範例中，我們看到了如何使用貼圖來指定材質的「base color」，不過除了 base color 以外，glTF 中的材質還可以透過貼圖來定義其他屬性，我們已經在 Materials 一節中簡要列出這些屬性了，包括：</p>
 <ul>
@@ -11582,7 +11787,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Cameras</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Cameras/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Cameras/"/>
-    <updated>2026-09-13T18:35:41.627Z</updated>
+    <updated>2026-09-26T11:00:55.724Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一章 Simple Cameras 中，我們已經看到如何在 glTF 中定義透視相機（perspective camera）和正交相機（orthographic camera），以及如何將這些相機掛載（attach）到節點來整合進場景中了，本節將進一步說明兩種相機的差異與一般相機的處理方式</p>
 <h2>Perspective and orthographic cameras</h2>
@@ -11667,7 +11872,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Morph Targets</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MorphTargets/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MorphTargets/"/>
-    <updated>2026-09-13T18:35:41.629Z</updated>
+    <updated>2026-09-26T11:00:55.725Z</updated>
     <summary type="html"><![CDATA[
 <p>前一節的範例展示了一個 mesh，這個 mesh 是由一個三角形構成，並且定義了兩個 morph target（變形目標）：</p>
 <div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-javascript"><span class="line"><span style="--shiki-light:#0184BC;--shiki-dark:#ABB2BF">...</span></span>
@@ -11740,7 +11945,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Simple Cameras</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleCameras/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleCameras/"/>
-    <updated>2026-09-13T18:35:41.633Z</updated>
+    <updated>2026-09-26T11:00:55.729Z</updated>
     <summary type="html"><![CDATA[
 <p>前面幾節介紹了 glTF asset 中如何描述基本場景結構與幾何物件，以及如何對這些物件套用不同的材質，不過目前尚未說明如何設定場景的「觀察視角」，也就是我們所謂的虛擬相機（camera）。 在 glTF 中，相機會被放在場景中的某個節點（node）上，指定其位置與朝向，用來決定畫面呈現的視角</p>
 <p>以下是一個簡單且完整的 glTF asset，它的結構與前面範例相似，包含一個 <code>scene</code>，內部有幾個 <code>node</code> 物件，以及一個幾何物件（<code>mesh</code>），綁定到其中一個 node 上，不同之處在於這個範例額外包含了兩個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-camera" target="_blank" rel="noopener noreferrer"><code>camera</code></a> 物件</p>]]></summary>
@@ -11904,7 +12109,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Morph Target</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMorphTarget/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMorphTarget/"/>
-    <updated>2026-09-13T18:35:41.636Z</updated>
+    <updated>2026-09-26T11:00:55.738Z</updated>
     <summary type="html"><![CDATA[
 <p>從 glTF 2.0 開始，支援為 mesh 定義 morph target（變形目標），Morph target 是一組針對 mesh 某些屬性（如頂點位置）的差異或位移量，在執行階段可以以不同權重加到原始 mesh 上，藉此達成局部動畫變形的效果，這常用於角色動畫中，例如虛擬角色的不同臉部表情</p>
 <p>以下是一個簡單的範例，展示了一個含有兩個 morph target 的 mesh。 這段會簡單列出新增的元素，至於 morph target 的完整概念與執行時如何應用，會在下一節詳細解釋</p>
@@ -12357,7 +12562,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Skin</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleSkin/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleSkin/"/>
-    <updated>2026-09-13T18:35:41.647Z</updated>
+    <updated>2026-09-26T11:00:55.742Z</updated>
     <summary type="html"><![CDATA[
 <p>glTF 支援 vertex skinning（頂點綁定），這項功能可以根據骨架的姿勢去變形 mesh（網格）上的幾何資料（頂點），這對於製作具有動作的虛擬角色等動畫場景來說至關重要。 glTF 中關於 vertex skinning 的核心是 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-skin" target="_blank" rel="noopener noreferrer"><code>skin</code></a> 物件，不過實際實現頂點綁定時，會牽涉到 glTF 中其他部分的交互依賴，這些部分前面章節中都有介紹過</p>]]></summary>
     <content type="html"><![CDATA[
@@ -12515,7 +12720,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Texture</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleTexture/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleTexture/"/>
-    <updated>2026-09-13T18:35:41.650Z</updated>
+    <updated>2026-09-26T11:00:55.750Z</updated>
     <summary type="html"><![CDATA[
 <p>如前幾節所示，glTF asset 中的材質定義可以包含多種參數，這些參數用來描述物件在光照下的顏色或整體外觀。 這些屬性可以直接以單一數值表示，例如整體的顏色或 roughness 值。 但也可以透過貼圖（texture）指定，並映射到物件表面上</p>
 <p>下列是一個 glTF asset 範例，它定義了一個套用簡單貼圖的材質：</p>
@@ -12737,7 +12942,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Skins</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Skins/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Skins/"/>
-    <updated>2026-09-13T18:35:41.660Z</updated>
+    <updated>2026-09-26T11:00:55.753Z</updated>
     <summary type="html"><![CDATA[
 <p>頂點綁定（vertex skinning）的流程相對複雜，它幾乎整合了 glTF asset 中的所有元素，本節將根據前一節 Simple Skin 中的範例，說明頂點綁定的基本概念</p>
 <h2>The geometry data</h2>
@@ -12901,7 +13106,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Animations</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Animations/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Animations/"/>
-    <updated>2026-09-13T18:35:41.663Z</updated>
+    <updated>2026-09-26T11:00:55.757Z</updated>
     <summary type="html"><![CDATA[
 <p>如同在「Simple Animation」的範例中所示，我們可以使用 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-animation" target="_blank" rel="noopener noreferrer"><code>animation</code></a> 物件來描述節點的 translation（位移）、rotation（旋轉）、或 scale（縮放）這些屬性是如何隨著時間改變的</p>
 <p>下面是一個新的 animation 範例，這次的動畫包含了兩個 channel：</p>]]></summary>
@@ -13083,7 +13288,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Materials</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Materials/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Materials/"/>
-    <updated>2026-09-13T18:35:41.666Z</updated>
+    <updated>2026-09-26T11:00:55.766Z</updated>
     <summary type="html"><![CDATA[
 <h2>Introduction</h2>
 <p>glTF 的目的是為了定義一種用於傳輸 3D asset 的格式，如前面幾節所示，這包括了場景結構（scene structure）與場景中出現的幾何物件，但 glTF asset 也可以包含物件的外觀資訊，也就是表示描述物件在畫面上應該被如何渲染的資訊</p>
@@ -13132,7 +13337,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Meshes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Meshes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Meshes/"/>
-    <updated>2026-09-13T18:35:41.667Z</updated>
+    <updated>2026-09-26T11:00:55.766Z</updated>
     <summary type="html"><![CDATA[
 <p>在前一節的「Simple Meshes」範例中，我們看到了如何定義一個基本的 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh" target="_blank" rel="noopener noreferrer"><code>mesh</code></a>，其中包含了一個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive" target="_blank" rel="noopener noreferrer"><code>mesh.primitive</code></a> 物件，該物件定義了多個屬性</p>]]></summary>
     <content type="html"><![CDATA[
@@ -13219,7 +13424,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Material</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMaterial/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMaterial/"/>
-    <updated>2026-09-13T18:35:41.674Z</updated>
+    <updated>2026-09-26T11:00:55.768Z</updated>
     <summary type="html"><![CDATA[
 <p>在前幾節中介紹的 glTF asset 範例，內容主要涵蓋了基本的場景結構與簡單的幾何物件，但這些範例都沒有包含物件的外觀資訊。 當未提供任何外觀資訊時，glTF 規範建議檢視器（viewer）應該使用一個「預設材質（default material）」來渲染物體，如同在「MinimalGltfFile」中的截圖中所見，根據場景中的光照條件，這個預設材質通常會使物件呈現純白或淺灰色的外觀</p>
 <p>本節將從一個非常簡單的材質範例開始，並說明各種材質屬性所帶來的效果。 以下是一個最小化 glTF asset，包含一個簡單的材質設定：</p>
@@ -13432,7 +13637,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Simple Meshes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMeshes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleMeshes/"/>
-    <updated>2026-09-13T18:35:41.677Z</updated>
+    <updated>2026-09-26T11:00:55.770Z</updated>
     <summary type="html"><![CDATA[
 <p><a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh" target="_blank" rel="noopener noreferrer"><code>mesh</code></a> 用來表示場景內的一個幾何物件。 我們在「MinimalGltfFile」中已經看過一個 mesh 的範例了，其中有一個 <code>mesh</code> 被掛載在一個 <code>node</code> 上，其只包含一個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive" target="_blank" rel="noopener noreferrer"><code>mesh.primitive</code></a>，且當中只定義了一個頂點位置（vertex positions）的屬性（attribute）</p>]]></summary>
     <content type="html"><![CDATA[
@@ -13562,7 +13767,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Textures, Images, and Samplers</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/TexturesImagesSamplers/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/TexturesImagesSamplers/"/>
-    <updated>2026-09-13T18:35:41.680Z</updated>
+    <updated>2026-09-26T11:00:55.773Z</updated>
     <summary type="html"><![CDATA[
 <p>貼圖（Texture）是實現物件擬真外觀（realistic appearance）的一個重要元素，它可以用來定義物件的主顏色，也可以用來描述材質中的其他特性，這些特性能更進一步地定義物體被渲染時應該呈現的樣貌細節</p>
 <p>一個 glTF asset 中可以定義多個 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-texture" target="_blank" rel="noopener noreferrer"><code>texture</code></a> 物件，這些貼圖會在渲染時被用來指定幾何物件的材質屬性，例如 base color、metallic、roughness 等。 實際進行貼圖時，根據不同的圖形 API（如 WebGL、OpenGL），會有很多參數與行為會影響貼圖的映射方式。這些細節大多超出本教學的範圍，若想深入理解，建議參考以下教學資源：</p>]]></summary>
@@ -13616,7 +13821,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Simple Animation</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleAnimation/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/SimpleAnimation/"/>
-    <updated>2026-09-13T18:35:41.681Z</updated>
+    <updated>2026-09-26T11:00:55.773Z</updated>
     <summary type="html"><![CDATA[
 <p>如同在「Scenes and Nodes」章節中所說的，每個節點都可以有一個局部變換，這個變換可以透過節點的 matrix 屬性來給定，或者是使用 <code>translation</code>、<code>rotation</code> 和 <code>scale</code>（簡稱 TRS）屬性來表示。 當變換是用 TRS 屬性來給定時，我們可以使用 <a href="https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#reference-animation" target="_blank" rel="noopener noreferrer"><code>animation</code></a> 來描述節點的 <code>translation</code>、<code>rotation</code> 或 <code>scale</code> 隨時間變化的方式</p>]]></summary>
     <content type="html"><![CDATA[
@@ -13811,7 +14016,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Buffers, BufferViews, and Accessors</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BuffersBufferViewsAccessors/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BuffersBufferViewsAccessors/"/>
-    <updated>2026-09-13T18:35:41.714Z</updated>
+    <updated>2026-09-26T11:00:55.807Z</updated>
     <summary type="html"><![CDATA[
 <p>在「A Minimal glTF File」的章節中已經出現過 <code>buffer</code>、<code>bufferView</code> 和 <code>accessor</code> 物件的範例，本節將會更詳細地說明這些概念</p>
 <h2>Buffers</h2>
@@ -14127,7 +14332,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Scenes and Nodes</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/ScenesNodes/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/ScenesNodes/"/>
-    <updated>2026-09-13T18:35:41.720Z</updated>
+    <updated>2026-09-26T11:00:55.812Z</updated>
     <summary type="html"><![CDATA[
 <h2>Scenes</h2>
 <p>一個 glTF 檔案中可以儲存多個場景，<code>scene</code> 屬性用來指定這些場景中哪一個應該作為載入 asset 時預設顯示的場景。 每個 scene 包含一個 <code>nodes</code> 陣列，裡面是場景圖根節點的索引。 同樣地，一個場景可以有多個根節點，形成不同的階層結構，不過一般情況下通常只會有一個根節點</p>
@@ -14272,7 +14477,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：The Basic Structure of glTF</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BasicGltfStructure/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/BasicGltfStructure/"/>
-    <updated>2026-09-13T18:35:41.731Z</updated>
+    <updated>2026-09-26T11:00:55.822Z</updated>
     <summary type="html"><![CDATA[
 <p>glTF 的核心是一個 JSON 檔案，這個檔案描述了整個 3D 場景的內容。 它包含：</p>
 <ul>
@@ -14356,7 +14561,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：Introduction to glTF using WebGL</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Introduction/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/Introduction/"/>
-    <updated>2026-09-13T18:35:41.733Z</updated>
+    <updated>2026-09-26T11:00:55.823Z</updated>
     <summary type="html"><![CDATA[
 <p>現代越來越多應用程式和服務都以 3D 內容為基礎。 像是線上商店提供支援 3D 預覽的產品配置器、博物館利用 3D 掃描技術數位化館藏，讓參觀者能在虛擬畫廊中自由探索。 都市規劃師使用 3D 城市模型來進行規劃與資訊可視化，教育工作者也常透過互動式、動畫化的人體 3D 模型輔助教學。 這些應用現在多數都能直接在網頁瀏覽器中運作，這得歸功於現代瀏覽器全面支援 WebGL 的高效渲染技術</p>
 <figure><figcaption>（Image 1a: Screenshots of various websites and applications showing 3D models.）</figcaption></figure>]]></summary>
@@ -14403,7 +14608,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：A Minimal glTF File</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MinimalGltfFile/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/MinimalGltfFile/"/>
-    <updated>2026-09-13T18:35:41.733Z</updated>
+    <updated>2026-09-26T11:00:55.824Z</updated>
     <summary type="html"><![CDATA[
 <p>以下是一個最小但完整的 glTF asset 範例，內容包含了一個三角形。 你可以直接將它複製並貼到一個 <code>.gltf</code> 檔案中，任何基於 glTF 的應用程式都應該能夠正確載入並渲染它。 本節將會以這個範例為基礎，來說明 glTF 的基本概念</p>
 <div class="language-javascript line-numbers-mode" data-highlighter="shiki" data-ext="javascript" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-javascript"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
@@ -14686,7 +14891,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">glTF：glTF Tutorial</title>
     <id>https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/</id>
     <link href="https://mes0903.github.io/ComputerGraphic/glTF-Tutorials-zh-TW/"/>
-    <updated>2026-09-13T18:35:41.737Z</updated>
+    <updated>2026-09-26T11:00:55.828Z</updated>
     <summary type="html"><![CDATA[
 <p>本系列是 KhronosGroup 所寫的 <a href="https://github.com/KhronosGroup/glTF-Tutorials" target="_blank" rel="noopener noreferrer">glTF-Tutorials</a> 的中文翻譯與筆記，主要放在<a href="https://mes0903.github.io/ComputerGraphic/gltf/" target="_blank" rel="noopener noreferrer">我的個人 Blog</a> 上供人閱讀</p>
 <p>原作者為 Marco Hutter, <a href="https://github.com/javagl" target="_blank" rel="noopener noreferrer">@javagl</a></p>]]></summary>
@@ -14814,7 +15019,7 @@ A. Rago. Addison-Wesley, 2005.<br>
     <title type="text">礦坑系列 ── Allocator &amp; PMR</title>
     <id>https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/</id>
     <link href="https://mes0903.github.io/Cpp-Miner/Miner_main/Allocator_PMR/"/>
-    <updated>2026-09-13T18:35:41.739Z</updated>
+    <updated>2026-09-26T11:00:55.837Z</updated>
     <summary type="html"><![CDATA[
 <h2>前言</h2>
 <figure><figcaption>（ろあ 快回歸了，悠針れい 昨天宣布出道，感覺整個日子又都好起來了）</figcaption></figure>
@@ -17381,7 +17586,7 @@ A copy of this allocator is used for any memory allocation and element construct
     <title type="text">GLFW Input guide</title>
     <id>https://mes0903.github.io/GraphicStack/glfwInputGuide/</id>
     <link href="https://mes0903.github.io/GraphicStack/glfwInputGuide/"/>
-    <updated>2026-09-13T18:35:42.159Z</updated>
+    <updated>2026-09-26T10:19:10.000Z</updated>
     <summary type="html"><![CDATA[
 <p>原文連結：<a href="https://www.glfw.org/docs/3.3/input_guide.html" target="_blank" rel="noopener noreferrer">GLFW Input guide</a>，本文進行了翻譯並做了些許補充</p>
 <p>本文介紹了 GLFW 的輸入相關函式，如果想了解某個類別中特定函式的詳細資訊，請參閱 <a href="https://www.glfw.org/docs/3.3/group__input.html" target="_blank" rel="noopener noreferrer">Input reference</a></p>]]></summary>
@@ -19682,7 +19887,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
     <title type="text">常用的 RISC-V 筆記</title>
     <id>https://mes0903.github.io/risc-v/risc-v-note/</id>
     <link href="https://mes0903.github.io/risc-v/risc-v-note/"/>
-    <updated>2026-05-26T13:26:44.000Z</updated>
+    <updated>2026-09-26T11:00:15.000Z</updated>
     <summary type="html"><![CDATA[
 <h3>基本架構</h3>
 <p>一條典型的 RISC-V 語句由 3 部分組成：</p>
@@ -19768,11 +19973,11 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 </li>
 </ul>
 <h3>指令編碼格式</h3>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V 指令格式）</figcaption></figure>
 <p>指令最後會被翻譯為機器指令，裡面的 32 bits 都有對應的意思，以 32 bits 對齊，每個 32 bits 會照上面的圖被劃分為不同的區域（field）</p>
 <p>最終的指令類型是由 funct3/funct7 和 opcode 一起決定的，題外話，funct3 中的 &quot;3&quot; 代表佔了 3 個 bit，funct7 同理</p>
 <p>對於 opcode 的部分有另一張表規定了其內容意義：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 對照表）</figcaption></figure>
 <p>opcode 的前兩位永遠為 11，而第 2~4 位是一組的，5~6 位是一組的，我們用一個例子來學習這個表格是怎麼看得：</p>
 <blockquote>
 <p>0000000 rs2 rs1 000 rd 0110011 | ADD</p>
@@ -19781,7 +19986,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>我們先看第 5~6 位，這裡是 <code>01</code>，因此我們去上表的左邊縱排找 <code>01</code>，之後看有哪些可能，有 STORE、STORE-FP、custom-1、AMO、OP、LUI、OP-32 這些</p>
 <p>我們再依照第 2~4 位來確認位置，這裡是 <code>100</code>，對到表格上就是 <code>OP</code>，也就是說 ADD 屬於 <code>OP</code> 類型的指令，也就是基本操作</p>
 <p>RISC-V 標準中為 little endian，假設在記憶體中的值為 <code>b3 05 95 00</code>，則需要先將其倒反過來為：<code>00 95 05 b3</code>，寫為二進制的話為 <code>00000000-10010101-00000101-10110011</code>，到標準中查表可知此指令為 <code>add x11, x10, x9</code></p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 範例）</figcaption></figure>
 <p>指令格式有 6 種，也就是第一張圖裡面的 R、I、S 那些：</p>
 <ul>
 <li>R-type (register)<br>
@@ -19805,7 +20010,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：add x5, x6, x7 為 x5 = x6 + x7</p>
 </blockquote>
 <p>格式：R-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（R-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode(7)：0110011 (OP)</li>
@@ -19828,7 +20033,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：addi x5, x6, 1  為 x5 = x6 + 1</p>
 </blockquote>
 <p>格式：I-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（I-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0010011 (OP-IMM)</li>
@@ -19847,7 +20052,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：lui x5, 0x12345 為 x5 = 0x12345 &lt;&lt; 12</p>
 </blockquote>
 <p>格式：U-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（U-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0110111 (LUI)</li>
@@ -20173,7 +20378,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <blockquote>
 <p>例：jal x1, label</p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（J-type 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 20 bits 寬的 <code>IMM</code> 乘以 2，然後進行 sign-extension，最後與 PC 相加，因此跳躍的範圍是以 PC 為基準，上下加減 1 MB</p>
 <p>JAL 指令的下一條指令的地址會寫入 RD，保存為返回位址，實際在寫時會用 label 給出跳躍的目標，具體 <code>IMM</code> 值由組譯器和 linker 負責生成</p>
 <h4>JALR (Jump And Link Register)</h4>
@@ -20183,7 +20388,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <blockquote>
 <p>例：<code>jalr x0, 0(x5)</code></p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（JALR 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 12 bits 寬的 <code>IMM</code> 進行 sign-extension，然後將其與 RS1 的值相加，得到最終的結果後將其最低位設為 0（用以確保對齊），因此跳躍的範圍是以 RS1 為基準，上下加減 2KB</p>
 ]]></content>
     <category term="risc-v"/>
@@ -22443,60 +22648,27 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">TBDR 簡介</title>
     <id>https://mes0903.github.io/essay/RasterI/</id>
     <link href="https://mes0903.github.io/essay/RasterI/"/>
-    <updated>2026-05-26T13:26:44.000Z</updated>
+    <updated>2026-09-26T11:00:15.000Z</updated>
     <summary type="html"><![CDATA[
-<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。<br>
-⁡<br>
-最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
-<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a><br>
-⁡<br>
-手機上的 GPU 有著功耗的限制，這和手機電池的壽命息息相關。 而記憶體頻寬是影響功耗的一大因素，資料移動的開銷相對於計算來說大很多，因此在手機的 GPU 設計上，往往會採取不同的策略來減少記憶體頻寬。<br>
-⁡<br>
-以傳統的 OpenGL virtual pipeline 來說，其往往需要大量的頻寬，通常對於每個像素，我們都需要讀寫 depth/stencil buffer，之後還需要寫入 color buffer。<br>
-⁡<br>
-假設沒有 overdraw、blending、multipass algorithms、multisampling 等等的附加功能，這還是需要 12 bytes 的 traffic。 若把這些附加功能考慮進來，每個像素將產生超過 100 bytes 的 memory traffic。 雖然現代 PC 的 GPU 使用的 IMR 架構會有 compression tech 來減少頻寬，但對於手機來說這開銷仍然不小。<br>
-⁡<br>
-為了減少這種大量頻寬的需求，現代手機的 GPU 基本上使用的是另一種稱為 Tile-based rendering 的架構，簡稱為 TBR 或 TBDR。<br>
-⁡<br>
-在這種架構上， GPU 將 framebuffer，包括 depth buffer、multisample buffers 等等的緩衝區從主記憶體移到了 hgih-speed on-chip memory 上。 因為 memory 是 on-chip 的，而且靠近計算單元，因此 access 它所需要功耗會小很多。 這樣的 memory 被稱為 Tile memory。<br>
-⁡<br>
-然而可想而知，這類的 memory 就會很小，on-chip framebuffer 的大小因 GPU 而異，但可以小到只有 16x16 個像素。 針對這種這麼小的 framebuffer，我們將其稱為 tile buffer。<br>
-⁡<br>
-所以故事就開始了，大家開始想要如何利用這麼小的 tile buffer 畫出高解析度的圖像。 對於 OpenGL 來說，它將 OpenGL 的 framebuffer 拆成了 16x16 的 tiles，一次針對一個 tile 做 rendering，也因此才會有 tile-based rendering 一詞。<br>
-⁡<br>
-對於每個 tile，所有有效的 primitives 都會被 render 到 tile buffer 中。 當完成了一個 tile，便會將其複製回功耗較高的主記憶體內。 因此主記憶體內就不需要存 depth/stencil 的值、overdrawn 的 pixels，也沒有 multisample buffer 的資料了。 depth/stencil 的 testing 和 blending 全都在 on-chip 的 memory 內完成。<br>
-⁡<br>
-因此 TBDR 的優勢主要在於有效使用 on-chip memory，使常見的像速處理於 GPU 內高速完成，不用 access主記憶體。 針對那些只在 render pass 內需要的資料還可以於 Tile 完成時直接捨棄掉，省下更多的記憶體頻寬。<br>
-⁡<br>
-</p>]]></summary>
+<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。</p>
+<p>最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
+<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a></p>]]></summary>
     <content type="html"><![CDATA[
-<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。<br>
-⁡<br>
-最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
-<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a><br>
-⁡<br>
-手機上的 GPU 有著功耗的限制，這和手機電池的壽命息息相關。 而記憶體頻寬是影響功耗的一大因素，資料移動的開銷相對於計算來說大很多，因此在手機的 GPU 設計上，往往會採取不同的策略來減少記憶體頻寬。<br>
-⁡<br>
-以傳統的 OpenGL virtual pipeline 來說，其往往需要大量的頻寬，通常對於每個像素，我們都需要讀寫 depth/stencil buffer，之後還需要寫入 color buffer。<br>
-⁡<br>
-假設沒有 overdraw、blending、multipass algorithms、multisampling 等等的附加功能，這還是需要 12 bytes 的 traffic。 若把這些附加功能考慮進來，每個像素將產生超過 100 bytes 的 memory traffic。 雖然現代 PC 的 GPU 使用的 IMR 架構會有 compression tech 來減少頻寬，但對於手機來說這開銷仍然不小。<br>
-⁡<br>
-為了減少這種大量頻寬的需求，現代手機的 GPU 基本上使用的是另一種稱為 Tile-based rendering 的架構，簡稱為 TBR 或 TBDR。<br>
-⁡<br>
-在這種架構上， GPU 將 framebuffer，包括 depth buffer、multisample buffers 等等的緩衝區從主記憶體移到了 hgih-speed on-chip memory 上。 因為 memory 是 on-chip 的，而且靠近計算單元，因此 access 它所需要功耗會小很多。 這樣的 memory 被稱為 Tile memory。<br>
-⁡<br>
-然而可想而知，這類的 memory 就會很小，on-chip framebuffer 的大小因 GPU 而異，但可以小到只有 16x16 個像素。 針對這種這麼小的 framebuffer，我們將其稱為 tile buffer。<br>
-⁡<br>
-所以故事就開始了，大家開始想要如何利用這麼小的 tile buffer 畫出高解析度的圖像。 對於 OpenGL 來說，它將 OpenGL 的 framebuffer 拆成了 16x16 的 tiles，一次針對一個 tile 做 rendering，也因此才會有 tile-based rendering 一詞。<br>
-⁡<br>
-對於每個 tile，所有有效的 primitives 都會被 render 到 tile buffer 中。 當完成了一個 tile，便會將其複製回功耗較高的主記憶體內。 因此主記憶體內就不需要存 depth/stencil 的值、overdrawn 的 pixels，也沒有 multisample buffer 的資料了。 depth/stencil 的 testing 和 blending 全都在 on-chip 的 memory 內完成。<br>
-⁡<br>
-因此 TBDR 的優勢主要在於有效使用 on-chip memory，使常見的像速處理於 GPU 內高速完成，不用 access主記憶體。 針對那些只在 render pass 內需要的資料還可以於 Tile 完成時直接捨棄掉，省下更多的記憶體頻寬。<br>
-⁡<br>
-</p>
-<p>然而缺點就是，因為必須使用主記憶體來存放處理好的幾何資料，因此針對幾何處理的成本會比 IMR 還要高，因為硬體需要額外的記憶體頻寬跟空間來暫時存放幾何處理後的資料，所以對於那些會增加幾何複雜度的功能，像是 geometry shader，都會比較不適合用於 TBDR 中。<br>
-⁡<br>
-本文整理及修改自 OpenGL insights 的第 23 章，想看更多的話可以讀一下原書，或是之前 arm 社群的科普教學：</p>
+<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。</p>
+<p>最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
+<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a></p>
+<p>手機上的 GPU 有著功耗的限制，這和手機電池的壽命息息相關。 而記憶體頻寬是影響功耗的一大因素，資料移動的開銷相對於計算來說大很多，因此在手機的 GPU 設計上，往往會採取不同的策略來減少記憶體頻寬。</p>
+<p>以傳統的 OpenGL virtual pipeline 來說，其往往需要大量的頻寬，通常對於每個像素，我們都需要讀寫 depth/stencil buffer，之後還需要寫入 color buffer。</p>
+<p>假設沒有 overdraw、blending、multipass algorithms、multisampling 等等的附加功能，這還是需要 12 bytes 的 traffic。 若把這些附加功能考慮進來，每個像素將產生超過 100 bytes 的 memory traffic。 雖然現代 PC 的 GPU 使用的 IMR 架構會有 compression tech 來減少頻寬，但對於手機來說這開銷仍然不小。</p>
+<p>為了減少這種大量頻寬的需求，現代手機的 GPU 基本上使用的是另一種稱為 Tile-based rendering 的架構，簡稱為 TBR 或 TBDR。</p>
+<p>在這種架構上， GPU 將 framebuffer，包括 depth buffer、multisample buffers 等等的緩衝區從主記憶體移到了 hgih-speed on-chip memory 上。 因為 memory 是 on-chip 的，而且靠近計算單元，因此 access 它所需要功耗會小很多。 這樣的 memory 被稱為 Tile memory。</p>
+<p>然而可想而知，這類的 memory 就會很小，on-chip framebuffer 的大小因 GPU 而異，但可以小到只有 16x16 個像素。 針對這種這麼小的 framebuffer，我們將其稱為 tile buffer。</p>
+<p>所以故事就開始了，大家開始想要如何利用這麼小的 tile buffer 畫出高解析度的圖像。 對於 OpenGL 來說，它將 OpenGL 的 framebuffer 拆成了 16x16 的 tiles，一次針對一個 tile 做 rendering，也因此才會有 tile-based rendering 一詞。</p>
+<p>對於每個 tile，所有有效的 primitives 都會被 render 到 tile buffer 中。 當完成了一個 tile，便會將其複製回功耗較高的主記憶體內。 因此主記憶體內就不需要存 depth/stencil 的值、overdrawn 的 pixels，也沒有 multisample buffer 的資料了。 depth/stencil 的 testing 和 blending 全都在 on-chip 的 memory 內完成。</p>
+<p>因此 TBDR 的優勢主要在於有效使用 on-chip memory，使常見的像速處理於 GPU 內高速完成，不用 access主記憶體。 針對那些只在 render pass 內需要的資料還可以於 Tile 完成時直接捨棄掉，省下更多的記憶體頻寬。</p>
+<figure><figcaption></figcaption></figure>
+<p>然而缺點就是，因為必須使用主記憶體來存放處理好的幾何資料，因此針對幾何處理的成本會比 IMR 還要高，因為硬體需要額外的記憶體頻寬跟空間來暫時存放幾何處理後的資料，所以對於那些會增加幾何複雜度的功能，像是 geometry shader，都會比較不適合用於 TBDR 中。</p>
+<p>本文整理及修改自 OpenGL insights 的第 23 章，想看更多的話可以讀一下原書，或是之前 arm 社群的科普教學：</p>
 <ul>
 <li><a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4QUTejaX2vpIwXstbgf8Ik7" target="_blank" rel="noopener noreferrer">https://www.youtube.com/playlist?list=PLKjl7IFAwc4QUTejaX2vpIwXstbgf8Ik7</a></li>
 </ul>
@@ -22544,7 +22716,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
     <title type="text">RVOS OSDI 筆記</title>
     <id>https://mes0903.github.io/risc-v/OSDI/</id>
     <link href="https://mes0903.github.io/risc-v/OSDI/"/>
-    <updated>2026-05-26T13:26:44.000Z</updated>
+    <updated>2026-09-26T11:00:15.000Z</updated>
     <summary type="html"><![CDATA[
 <p>這是我在 bilibili 上面看一門叫做「<a href="https://www.bilibili.com/video/BV1Q5411w7z5/?spm_id_from=333.999.0.0&amp;vd_source=493154d46ef9c42825a755d6b7857b3c" target="_blank" rel="noopener noreferrer">循序渐进，学习开发一个RISC-V上的操作系统 - 汪辰 - 2021春</a>」的課的筆記</p>
 <p>課程內介紹了一些 risc-v 常用的指令，並且小改了金門大學陳鐘誠老師的 <a href="https://github.com/cccriscv/mini-riscv-os" target="_blank" rel="noopener noreferrer">mini-riscv-os</a> 來當作課程教材，一步一步的帶學生做了一個，我自己上完是覺得還不錯，所以就把整個過程記錄下來了</p>]]></summary>
@@ -22611,11 +22783,11 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <h3>指令編碼格式</h3>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V 指令格式）</figcaption></figure>
 <p>指令最後會被翻譯為機器指令，裡面的 32 bits 都有對應的意思，以 32 bits 對齊，每個 32 bits 會照上面的圖被劃分為不同的區域（field）</p>
 <p>最終的指令類型是由 funct3/funct7 和 opcode 一起決定的，題外話，funct3 中的 &quot;3&quot; 代表佔了 3 個 bit，funct7 同理</p>
 <p>對於 opcode 的部分有另一張表規定了其內容意義：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 對照表）</figcaption></figure>
 <p>opcode 的前兩位永遠為 11，而第 2~4 位是一組的，5~6 位是一組的，我們用一個例子來學習這個表格是怎麼看得：</p>
 <blockquote>
 <p>0000000 rs2 rs1 000 rd 0110011 | ADD</p>
@@ -22624,7 +22796,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>我們先看第 5~6 位，這裡是 <code>01</code>，因此我們去上表的左邊縱排找 <code>01</code>，之後看有哪些可能，有 STORE、STORE-FP、custom-1、AMO、OP、LUI、OP-32 這些</p>
 <p>我們再依照第 2~4 位來確認位置，這裡是 <code>100</code>，對到表格上就是 <code>OP</code>，也就是說 ADD 屬於 <code>OP</code> 類型的指令，也就是基本操作</p>
 <p>RISC-V 標準中為 little endian，假設在記憶體中的值為 <code>b3 05 95 00</code>，則需要先將其倒反過來為：<code>00 95 05 b3</code>，寫為二進制的話為 <code>00000000-10010101-00000101-10110011</code>，到標準中查表可知此指令為 <code>add x11, x10, x9</code></p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 範例）</figcaption></figure>
 <p>指令格式有 6 種，也就是第一張圖裡面的 R、I、S 那些：</p>
 <ul>
 <li>R-type (register)<br>
@@ -22648,7 +22820,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：add x5, x6, x7 為 x5 = x6 + x7</p>
 </blockquote>
 <p>格式：R-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（R-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode(7)：0110011 (OP)</li>
@@ -22671,7 +22843,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：addi x5, x6, 1  為 x5 = x6 + 1</p>
 </blockquote>
 <p>格式：I-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（I-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0010011 (OP-IMM)</li>
@@ -22690,7 +22862,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：lui x5, 0x12345 為 x5 = 0x12345 &lt;&lt; 12</p>
 </blockquote>
 <p>格式：U-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（U-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0110111 (LUI)</li>
@@ -23016,7 +23188,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <blockquote>
 <p>例：jal x1, label</p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（J-type 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 20 bits 寬的 <code>IMM</code> 乘以 2，然後進行 sign-extension，最後與 PC 相加，因此跳躍的範圍是以 PC 為基準，上下加減 1 MB</p>
 <p>JAL 指令的下一條指令的地址會寫入 RD，保存為返回位址，實際在寫時會用 label 給出跳躍的目標，具體 <code>IMM</code> 值由組譯器和 linker 負責生成</p>
 <h4>JALR (Jump And Link Register)</h4>
@@ -23026,7 +23198,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <blockquote>
 <p>例：<code>jalr x0, 0(x5)</code></p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（JALR 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 12 bits 寬的 <code>IMM</code> 進行 sign-extension，然後將其與 RS1 的值相加，得到最終的結果後將其最低位設為 0（用以確保對齊），因此跳躍的範圍是以 RS1 為基準，上下加減 2KB</p>
 <h2>OS Development</h2>
 <h3>讀取 CSR</h3>
@@ -23034,9 +23206,9 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>RISC-V 中，每一個 privilege level 都對應到一組特定的暫存器，被稱為控制暫存器，簡稱 CSR，從這個暫存器中我們可以讀取 Hart 的編號，高 level 可以訪問低 level，但反過來不行</p>
 <p>要訪問 CSR，我們需要使用 CSR 擴展指令</p>
 <p>首先要看的是 Machine 模式下的 CSR 列表，因為 CPU 一上電時默認是在 machine 模式下，有點類似 x86 的 real mode：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Machine 模式的 CSR 清單）</figcaption></figure>
 <p>可以看見前面有與 Hart ID 相關的暫存器，像是 <code>mvendorid</code>、<code>marchid</code> 等，那接下來要看怎麼讀：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（CSR 指令格式）</figcaption></figure>
 <p>我們關心的是前兩個，先看 CSRRW（Atomic Read/Write CSR）：</p>
 <ul>
 <li>CSRRW
@@ -23282,7 +23454,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">extern</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> uint32_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> HEAP_SIZE;</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如此一來記憶體區段就分配好了，也可以在 C 中使用了，接下來要來實現簡單的 page，一個 page 分配為 4k</p>
 <p>這邊使用陣列來實作 page 的管理：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（頁面管理陣列）</figcaption></figure>
 <p>前方紅藍的部分為管理對應 page 狀態的區域，後方白色的是一個一個的 page</p>
 <p>前方紅藍部分的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> PAGE_TAKEN</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uint8_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &#x3C;&#x3C;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
@@ -23442,10 +23614,10 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>但由於實作上較為簡單，因此我們這邊就先實作 Cooperative Multitasking，後面再實作 Preemtive Multitasking</p>
 <h4>Cooperative Multitasking</h4>
 <p>前面提到了一個 task 的本質是一堆指令的序列，假設這邊有 Task A 和 B，在 Cooperative Multitasking 的情況下他們會長這樣：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式多工的任務指令序列）</figcaption></figure>
 <p>可以看見兩個 Task 內都是由指令序列組成的（Instruction i），中間有一個指令是 <code>call switch_to</code>，這就是讓下一個 task 來使用 CPU 的 function</p>
 <p>那我們就來看一下這個 <code>switch_to</code> 裡面到底做了什麼：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式任務切換流程）</figcaption></figure>
 <p>步驟是：</p>
 <ol>
 <li>將目前的 context 儲存起來</li>
@@ -23465,13 +23637,13 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>初始化好了之後就可以初始化 <code>mscratch</code> 暫存器，假設第一個載入的 task 是 A，那 <code>mscratch</code> 就會指向 A 的 context</p>
 <p>之後開始執行 task 的內容，因此 PC 指標會一個指令一個指令的的跑下來，當 A 執行到 <code>switch_to</code> 的時候就會開始跑交換 context 的流程</p>
 <p>前面有提到 <code>call</code> 這個指令執行的時候是會把下一條指令的位址放到 ra 裡面去的，因此 <code>i+M</code> 會被放到 ra 裡面去：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（呼叫 switch_to 後的返回位址）</figcaption></figure>
 <p>接下來就可以開始執行 <code>switch_to</code> 的內容，根據前面的步驟，第一步是儲存當前的 context，會將剛剛 <code>struct context</code> 內列出的暫存器內容全部從 CPU 儲存起來到 context A 的記憶體中</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時儲存任務狀態）</figcaption></figure>
 <p>下一步是切換 context，改變 CPU 的 ra 就可以了：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時變更任務狀態）</figcaption></figure>
 <p>下一步是 restore，也就是要載入 Task B 的暫存器內容：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時還原任務狀態）</figcaption></figure>
 <p>最後是 return，前面有提到 <code>ret</code> 這個指令會跳回到 <code>ra</code> 暫存器儲存的記憶體位址，這邊已經被我們改成 Instruction j 了，因此就會切換到 Task B 了</p>
 <p>看完了邏輯，就來看一下 code 該怎麼寫，因為 <code>switch_to</code> 這個函式執行效率需要非常高，因此這邊就用 asm 來寫：</p>
 <div class="language-asm line-numbers-mode" data-highlighter="shiki" data-ext="asm" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-asm"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">## void switch_to(struct context *next)</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">;</span></span>
@@ -23583,7 +23755,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>這樣的過程被稱為異常控制流，簡稱為 ECP，分為兩種：異常（Exception） 與中斷（Interrupt）；在 risc-v 內統一把 ECP 稱為 Trap</p>
 <h4>Machine mode 下的 CSR</h4>
 <p>因為我們這邊 OS 是寫在 Machine mode 下的，因此就看 Machine mode 下的 CSR：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Machine 模式的 Trap CSR）</figcaption></figure>
 <p>然後我們把跟 Trap 有關的整理出來：</p>
 <ul>
 <li>mtvec (Machine Trap-Vector Base-Address)
@@ -23643,7 +23815,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <p>現在看不懂沒關係，後面會慢慢用到，接下來我們先看一下每個暫存器對應的 bit 的意義</p>
 <h4>mtvec (Machine Trap-Vector Base-Address)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtvec 暫存器欄位）</figcaption></figure>
 <p>這裡 WARL 的意思是「Write Any Values，Reads Legal Values」，也就是說這個地方可以隨便我們寫的，而讀出來的值都是合法的</p>
 <ul>
 <li>
@@ -23663,11 +23835,11 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 </li>
 </ul>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtvec 模式值）</figcaption></figure>
 </li>
 </ul>
 <h4>mepc (Machine Exception Program Counter)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mepc 暫存器欄位）</figcaption></figure>
 <ul>
 <li>
 <p>當 trap 發生時，PC 會被替換為 mtvec 設定的位址，同時 Hart 會將 mepc 設為目前指令或下一條指令的位址，當我們需要退出 trap 時可以呼叫特殊的 mret 指令，該指令會將 mepc 中的值還原為 PC 中（實現返回的效果）</p>
@@ -23677,18 +23849,26 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <h4>mcause (Machine Cause)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mcause 暫存器欄位）</figcaption></figure>
 <p>這裡 WLRL 的意思是「Write/Read Only Legal Values」，表示我們在讀寫的時候需要確保它的值是合法的</p>
 <ul>
-<li>當 trap 發生時，hart 會設定該暫存器通知我們 trap 發生的原因</li>
-<li>最高位元 Interrupt 為 1 時標識了目前 trap 為 interrupt，否則是  exception</li>
-<li>剩餘的 Exception Code 用來標識具體的 interrupt 或 exception 的種類</li>
-<li>spec 內有附一張表格<br>
+<li>
+<p>當 trap 發生時，hart 會設定該暫存器通知我們 trap 發生的原因</p>
+</li>
+<li>
+<p>最高位元 Interrupt 為 1 時標識了目前 trap 為 interrupt，否則是  exception</p>
+</li>
+<li>
+<p>剩餘的 Exception Code 用來標識具體的 interrupt 或 exception 的種類</p>
+</li>
+<li>
+<p>spec 內有附一張表格</p>
+<figure><figcaption>（mcause 的中斷與例外代碼）</figcaption></figure>
 </li>
 </ul>
 <h4>mtval (Machine Trap Value)</h4>
 <p>用來輔助 mcause 用的暫存器</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtval 暫存器欄位）</figcaption></figure>
 <ul>
 <li>
 <p>當 trap 發生時，除了透過 mcause 可以取得 exception 的種類 code 值外，hart 還提供了 mtval 來提供 exception 的其他資訊來輔助我們執行更進一步的操作</p>
@@ -23699,7 +23879,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <h4>mstatus (Machine Status)</h4>
 <p>用來描述一些狀態信息的，分得很細</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mstatus 暫存器欄位）</figcaption></figure>
 <p>WPRL 的意思是「Reserved Writes Preserve Values，Reads Ignore Values」，也就是說寫是保留值，忽略讀，簡單來說就是盡量不要去動它</p>
 <p>這邊老師挑了比較會用到的來講，分別是第 0~12 bit，其他部分涉及到記憶體訪問的權限、virtual memory 的控制等，暫時先不去管它</p>
 <ul>
@@ -23762,16 +23942,23 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <h4>top half</h4>
 <p>雖然我們沒辦法對這部分做更動，但還是可以看一下硬體部分具體做了什麼</p>
 <ol>
-<li>把 mstatus 的 MIE 值複製到 MPIE 中，清除 mstatus 中的 MIE 標誌位，效果是中斷被禁止
+<li>
+<p>把 mstatus 的 MIE 值複製到 MPIE 中，清除 mstatus 中的 MIE 標誌位，效果是中斷被禁止</p>
 <ul>
 <li>前面有提到 MIE 代表中斷的開或關</li>
 <li>MIE 清除的話代表填 0，也就是說中斷目前是被關掉的狀態</li>
 </ul>
 </li>
-<li>設定 mepc，同時 PC 被設定為 mtvec；需要注意的是，對於exception，mepc 指向導致異常的指令；對於 interrupt，它指向被中斷的指令的下一條指令的位置<br>
+<li>
+<p>設定 mepc，同時 PC 被設定為 mtvec；需要注意的是，對於exception，mepc 指向導致異常的指令；對於 interrupt，它指向被中斷的指令的下一條指令的位置</p>
+<figure><figcaption>（Trap 上半部的處理流程）</figcaption></figure>
 </li>
-<li>根據 trap 的種類設定 mcause，並根據需要為 mtval 設定附加資訊</li>
-<li>將 trap 發生之前的權限模式保存在 mstatus 的 MPP 域中，再把 hart 權限模式改為 M（也就是說無論在任何 Level 下觸發 trap，hart 首先切換到 Machine 模式）</li>
+<li>
+<p>根據 trap 的種類設定 mcause，並根據需要為 mtval 設定附加資訊</p>
+</li>
+<li>
+<p>將 trap 發生之前的權限模式保存在 mstatus 的 MPP 域中，再把 hart 權限模式改為 M（也就是說無論在任何 Level 下觸發 trap，hart 首先切換到 Machine 模式）</p>
+</li>
 </ol>
 <h4>Bottom half</h4>
 <p>這邊寫的是一段異常的處理函式，可以把過程總結為五步：</p>
@@ -23858,7 +24045,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>因此將其與 <code>0x80000000</code> 進行 and 操作，如果結果非 0 的話表示進來的是一個中斷，否則為一個異常</p>
 <h4>從 Trap 返回</h4>
 <p>從 trap 返回的話我們需要 MRET 這個指令</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（MRET 指令格式）</figcaption></figure>
 <ul>
 <li>
 <p>針對不同權限等級下如何退出 trap 有各自的回傳指令 xRET（x = M/S/U）</p>
@@ -23906,22 +24093,22 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <p>所以我們也可以說有三種：software、timer 與 externel；每一種下面都會再分 User、Supervisor、Reserved 與 Machine：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（中斷與例外代碼）</figcaption></figure>
 <h4>mie 與 mip</h4>
 <p>前面講跟 Trap 有關的暫存器時還剩 mie 和 mip 兩個沒講，這兩個跟 Interrupt 有關，所以在這邊補一下</p>
 <p>mie 用於控制 Interrupt 的開或關；前面有提到一個 mstatus，那個是控制全局的，一旦關閉，不管是哪種中斷都無法使用，而 mie 是可以設置要單獨關閉 software interrupt 這類的操作：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mie 暫存器欄位）</figcaption></figure>
 <p>如果 mie 是用來寫的，那 mip 你可以認為就是拿來讀的，透過讀對應的 bit，我們可以得知當前發生了哪種中斷：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mip 暫存器欄位）</figcaption></figure>
 <h4>PLIC</h4>
 <p>外部中斷代表的是外部設備所產生的中斷，通常一個 Hart 會有一根引腳來傳遞外部中斷的訊號，然而外部設備很多，那該怎麼辦呢?</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Hart 的中斷輸入）</figcaption></figure>
 <p>此時我們就引入了一個叫做 PLIC 的設備，全名為 Platform-Level Interrupt Controller，類似一個 hub：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 與 Hart 的連接）</figcaption></figure>
 <p>左邊是很多不同的外設，它們全都會接到 PLIC 上；而 PLIC 到每一個 Hart 只會接一根引腳</p>
 <p>所以它的功能也很明顯，因為 CPU 同一個時間肯定只能處理一個中斷，所以 PLIC 就會起到一個代理人的作用，根據中斷的類型或是優先級之類的條件來篩選要先執行哪個中斷</p>
 <p>左邊的這些外設我們將其稱為中斷源：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 中斷源）</figcaption></figure>
 <p>每一個外設我們會給他一個編號，標準內定義了 53 個中斷源，0 號預留不用，因此實際有效的中斷源為 1~53；前面我們有用到 UART，UART 的 id 為 10，下面是 QEMU 的實作：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// https://github.com/qemu/qemu/blob/master/include/hw/riscv/virt.h</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">enum</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
@@ -24024,18 +24211,18 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <h4>PLIC 操作流程</h4>
 <p>這邊通過一張圖來了解一下設置這些暫存器到底起到了什麼作用</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 運作概觀）</figcaption></figure>
 <p>左方的這個大正方形是一個 PLIC，上面接了兩個中斷源進來，右邊接了兩個 CPU 出去</p>
 <p>這個是用來設置中斷源優先級的：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（設定 PLIC 中斷優先級）</figcaption></figure>
 <p>這個是用來設定是否要啟用此中斷源的：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（啟用 PLIC 中斷源）</figcaption></figure>
 <p>這個用來設定中斷源的閥值：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（設定 PLIC 優先級門檻）</figcaption></figure>
 <p>這個是 Pending，用來判斷中斷是不是發生了：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC Pending 狀態）</figcaption></figure>
 <p>這個是 Claim/Complete：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC Claim 與 Complete）</figcaption></figure>
 <h4>UART 的例子</h4>
 <p>前面我們用 UART 實現了一個字串的輸出，那這邊我們可以利用中斷與 UART 實現一個字串的輸入</p>
 <p>原理是 UART 會接到我們的本機上，我們鍵盤敲一個字後會通知本機，本機再通過 UART 發送一個中斷給 PLIC，如此一來就可以讀一個字符了，然後在通過前面實作的字串輸出，輸出到我們螢幕上</p>
@@ -24118,7 +24305,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> return_pc;</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>cause_code</code> 的數字含意見下表，前面也有貼過：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（UART 範例使用的中斷代碼）</figcaption></figure>
 <p><code>external_interrupt_handler</code> 的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> external_interrupt_handler</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
@@ -24171,7 +24358,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>最後這兩行是將讀資料的 Interrupt 給打開</p>
 <h3>timer interrupt</h3>
 <p>一個 Hart 會有三個 Interrupt 的引腳，剛剛講的屬於 External Interrupt，這邊來講 Timer Interrupt</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（CLINT 的中斷線）</figcaption></figure>
 <p>Timer Interrupt 屬於本地中斷，這代表他不是由外部設備發起的，而是由一個叫做 CLINT 的設備發出來的，其全名為 Core Local Interrupt，主要負責產生 software interrupt 與 timer interrupt</p>
 <p>要訪問他一樣要透過定義好的暫存器，一樣是用 MMIO 的方式，QEMU 的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c</span></span>
@@ -24288,7 +24475,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <h3>Preemtive Multitasking</h3>
 <p>雖然協作式的多任務實作比較簡單，但缺點也很明顯，需要使用者自己去放棄 CPU 的使用，進而衍生出不少的問題，因此已經被慢慢淘汰掉了</p>
 <p>所以我們這邊就來實作搶占式的多任務，首先一樣會有兩個 Task A 和 B：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式多工的任務指令序列）</figcaption></figure>
 <p>可以看見因為式搶占式的多任務，因此 Task 中不會有放棄 CPU 的這個指令</p>
 <p>而這邊實作的方法是利用 timer，讓中斷週期性的發生，當 timer interrupt 發生時去進行 schedule</p>
 <p>因此 trap 發生時要做的事為</p>
@@ -24376,19 +24563,19 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.end</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>接下來用圖來演示一下步驟：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式任務切換流程）</figcaption></figure>
 <p>跟前面一樣，先初始化，並且假設第一個呼叫的任務為 A：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（初始化搶佔式任務切換）</figcaption></figure>
 <p>之後就開始執行了，因此 PC 會跟著改變：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（執行任務 A）</figcaption></figure>
 <p>此時 timer interrupt 發生了，因此將 <code>i+2</code> 存入 <code>mepc</code>，並開始執行 trap 處理函式，首先要保存 context，因此將 <code>mepc</code> 存入 <code>pc</code>：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（計時器中斷觸發任務切換）</figcaption></figure>
 <p>接著切換 context：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式切換時儲存任務狀態）</figcaption></figure>
 <p>然後載入 B 的 context：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（載入任務 B 的狀態）</figcaption></figure>
 <p>最後執行 <code>mret</code> 返回，進到 Task B：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（以 MRET 進入任務 B）</figcaption></figure>
 ]]></content>
     <category term="risc-v"/>
     <category term="OS"/>
@@ -24766,48 +24953,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 ]]></content>
     <category term="math"/>
     <published>2021-10-16T00:00:00.000Z</published>
-  </entry>
-  <entry>
-    <title type="text">Gauss-Seidel Metheod</title>
-    <id>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</id>
-    <link href="https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/"/>
-    <updated>2026-05-26T13:26:44.000Z</updated>
-    <summary type="html"><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>]]></summary>
-    <content type="html"><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
-<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
-<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
-<p>上次我們把原本的矩陣分成 D、L、U：</p>
-<figure><figcaption></figcaption></figure>
-<p>那我們做了優化之後，可以把它寫成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
-<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
-<p>輸出：估計出來的 </p>
-<p>::</p>
-<h3>Lemma7.18</h3>
-<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
-<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<h3>Thm 7.19</h3>
-<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-]]></content>
-    <category term="math"/>
-    <published>2021-10-13T00:00:00.000Z</published>
   </entry>
   <entry>
     <title type="text">Gradient Method</title>

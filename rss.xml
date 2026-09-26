@@ -6,11 +6,12 @@
     <link>https://mes0903.github.io/</link>
     <description>Being Towards Death</description>
     <language>zh-TW</language>
-    <pubDate>Sun, 13 Sep 2026 18:35:36 GMT</pubDate>
-    <lastBuildDate>Sun, 13 Sep 2026 18:35:36 GMT</lastBuildDate>
+    <pubDate>Sat, 26 Sep 2026 11:00:50 GMT</pubDate>
+    <lastBuildDate>Sat, 26 Sep 2026 11:00:50 GMT</lastBuildDate>
     <generator>@vuepress/plugin-feed</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>graphic-stack</category>
+    <category>papers</category>
     <category>essay</category>
     <category>math</category>
     <category>Linux</category>
@@ -1827,6 +1828,201 @@
 <p>這筆  是 blending equation 的輸出。 由於 R 分量的  超出了 <code>GL_RGBA8</code> 的 normalized 範圍，因此管線會先將四個分量限制在  內：</p>
 <p>接著，管線會將每個分量乘上 ，換算到 <code>GL_RGBA8</code> 的 8-bit 尺度：</p>
 <p>由於 R 與 B 已經是整數了，因此兩者的可表示下界與上界相同。 G 與 A 則由於位於兩個相鄰整數之間，因此各自具有兩個候選值：</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>論文筆記：A Sorting Classification of Parallel Rendering</title>
+      <link>https://mes0903.github.io/GraphicStack/sorting-of-rendering-pipeline/</link>
+      <guid>https://mes0903.github.io/GraphicStack/sorting-of-rendering-pipeline/</guid>
+      <source url="https://mes0903.github.io/rss.xml">論文筆記：A Sorting Classification of Parallel Rendering</source>
+      <description>論文筆記：A Sorting Classification of Parallel Rendering 論文連結：https://ieeexplore.ieee.org/document/291528 這篇是 Molnar 等人在 1994 提出的論文，他是一個針對 parallel rendering architecture 的分類方法。 它提出了...</description>
+      <category>graphic-stack</category>
+      <category>papers</category>
+      <pubDate>Fri, 25 Sep 2026 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[
+<ul>
+<li>論文連結：<a href="https://ieeexplore.ieee.org/document/291528" target="_blank" rel="noopener noreferrer">https://ieeexplore.ieee.org/document/291528</a></li>
+</ul>
+<p>這篇是 Molnar 等人在 1994 提出的論文，他是一個針對 parallel rendering architecture 的分類方法。 它提出了三種形式的 rendering pipeline 實作：</p>
+<ul>
+<li>sort-first</li>
+<li>sort-middle</li>
+<li>sort-last</li>
+</ul>
+<p>可以幫助我們來對 rendering architecture 做初步的分析。 本文只會簡單紀錄一下他的概念，成本的計算本身很簡單，加上實作方法不同其實成本也不一樣，所以直接看論文知道一下怎麼算就好</p>
+<h2>Background</h2>
+<p>我們可以簡單將 rendering pipeline 分為兩個部分：</p>
+<ul>
+<li>幾何處理（geometry processing）：包括座標轉換（transformation）、裁切（clipping）、光照計算（lighting）等</li>
+<li>光柵化（rasterization）：包括掃描轉換（scan conversion）、著色（shading）以及可見性判定（visibility determination）等</li>
+</ul>
+<p>整體流程大致如下：</p>
+<div class="language-callgraph line-numbers-mode" data-highlighter="shiki" data-ext="callgraph" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-callgraph"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">CPU-side commands / GPU resources</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ vertex buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ index buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ textures / constants</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ draw commands</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">[CP: Command Processor]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 接收 CPU 提交的 commands</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 解讀 draw / pipeline state</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ 啟動後續 graphics workload</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Geometry processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE: Geometry Engine] Input assembly / geometry front-end</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 取得 vertex / index data</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 解讀 primitive topology</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ triangle</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ line</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ point</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 保存 primitive connectivity</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 知道哪些 vertices 屬於同一個 primitive</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ vertex reuse / vertex cache</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 避免 shared vertex 重複執行 Vertex Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [SPI: Shader Processor Input]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 收集 vertex work items</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 組成 wave</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 選擇可用 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 配置 registers / program counter 等執行狀態</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [WGP / CU] Vertex Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 執行 programmer 提供的 VS</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ object-space → clip-space</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 通常包含 Model / View / Projection transformation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 輸出 clip-space position</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 產生 per-vertex varyings</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ UV</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ normal</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ world/model-space position 等</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE + WGP / CU] Tessellation（optional）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [WGP / CU] Tessellation Control / Hull Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 決定 tessellation factors</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [GE: fixed-function tessellator]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 細分 patch domain</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [WGP / CU] Tessellation Evaluation / Domain Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 計算細分後 vertices 的 position / attributes</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [GE + WGP / CU] Geometry Shader（optional）</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ primitive-level programmable processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 可修改 / 丟棄 / 產生 primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [SX: Shader Export]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 接收 geometry shader stages 產生的 vertex outputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 將 position / parameters 送往後續 primitive path</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA: Primitive Assembler]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 取得 Geometry Engine 保存的 connectivity</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ 將 transformed vertices 重組成 primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ primitive-level processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ view-frustum / guard-band related processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ face orientation / back-face culling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA_CL: Clipper]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ clip-volume clipping</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ near / far clipping</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ user clip-plane processing</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ 必要時產生新的 clipped vertices / primitives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ [PA_CL / VTE: Viewport Transform Engine]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ reciprocal / perspective divide</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ (x, y, z) ← (x/w, y/w, z/w)</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ viewport transform</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ NDC X/Y → screen / window X/Y</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ NDC Z → viewport depth range</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Rasterization</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Pixel rendering</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SU: Primitive / Setup Unit] Rasterization setup</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ primitive setup state</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ vertex coordinate quantization / conventions</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ pixel-center convention</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 準備後續 scan conversion 所需狀態</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Coarse rasterization</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 接收 screen-space primitive</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 使用 triangle screen-space bounds</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 以 coarse pixel blocks 搜尋候選區域</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ All the Pipelines 範例：4×4 pixel groups</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Fine coverage determination</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 對候選區域測試 triangle edges</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 決定每個 pixel / sample 的 coverage</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 套用 rasterization coverage rules</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生後續 interpolation 所需的</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       barycentric / gradient information</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [PA_SC / Scan Converter] Quad formation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 將 pixels 組成 2×2 quads</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 保留 helper pixels / lanes</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 支援 Pixel Shader derivatives</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [SPI: Shader Processor Input]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 接收 rasterizer 產生的 pixel quads</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 收集 pixel work items / waves</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 準備 Pixel Shader inputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ dispatch 到 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [LDS parameter path + WGP / CU V_INTERP]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   Attribute interpolation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ rasterizer 提供 barycentric coordinates I / J</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 取得 triangle vertex parameters</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ perspective-correct interpolation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生 per-fragment varyings</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ UV</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ color</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       ├─ normal</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │       └─ 其他 shader inputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [WGP / CU] Pixel / Fragment Shader</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ 執行 programmer 提供的 FS / PS</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ material computation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ lighting computation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 產生 candidate color / shader outputs</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [Texture Unit: TA / TD / TCP path] Texture sampling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ Pixel Shader 發出 texture / image instruction</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ texture address calculation</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ texture cache access</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ filtering / sampling</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ 將 sampled value 回傳 WGP / CU</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [SX: Shader Export]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ 將 Pixel Shader 的 color / depth 等輸出</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │           送往 Color / Depth Backend</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Visibility / output operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   ├─ [DB: Depth Backend]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ depth test / Z comparison</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ stencil test</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   ├─ depth / stencil update</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │   └─ depth-related compression / backend operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   │</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │   └─ [CB: Color Backend]</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color blending</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color write masks / render-target operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ MSAA resolve 等 backend operations</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       ├─ color compression</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    │       └─ render-target write</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ↓</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">Framebuffer / Render Target</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Color buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    ├─ Depth buffer</span></span>
+<span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">    └─ Stencil buffer</span></span></code></pre>
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<details> <summary>上圖中的縮寫一覽</summary>
+<p>| 縮寫         | 全稱                                              | 意義                                                                                                                                              |<br>
+|</p>
+</details></div>
 ]]></content:encoded>
     </item>
     <item>
@@ -18761,11 +18957,11 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 </li>
 </ul>
 <h3>指令編碼格式</h3>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V 指令格式）</figcaption></figure>
 <p>指令最後會被翻譯為機器指令，裡面的 32 bits 都有對應的意思，以 32 bits 對齊，每個 32 bits 會照上面的圖被劃分為不同的區域（field）</p>
 <p>最終的指令類型是由 funct3/funct7 和 opcode 一起決定的，題外話，funct3 中的 &quot;3&quot; 代表佔了 3 個 bit，funct7 同理</p>
 <p>對於 opcode 的部分有另一張表規定了其內容意義：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 對照表）</figcaption></figure>
 <p>opcode 的前兩位永遠為 11，而第 2~4 位是一組的，5~6 位是一組的，我們用一個例子來學習這個表格是怎麼看得：</p>
 <blockquote>
 <p>0000000 rs2 rs1 000 rd 0110011 | ADD</p>
@@ -18774,7 +18970,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>我們先看第 5~6 位，這裡是 <code>01</code>，因此我們去上表的左邊縱排找 <code>01</code>，之後看有哪些可能，有 STORE、STORE-FP、custom-1、AMO、OP、LUI、OP-32 這些</p>
 <p>我們再依照第 2~4 位來確認位置，這裡是 <code>100</code>，對到表格上就是 <code>OP</code>，也就是說 ADD 屬於 <code>OP</code> 類型的指令，也就是基本操作</p>
 <p>RISC-V 標準中為 little endian，假設在記憶體中的值為 <code>b3 05 95 00</code>，則需要先將其倒反過來為：<code>00 95 05 b3</code>，寫為二進制的話為 <code>00000000-10010101-00000101-10110011</code>，到標準中查表可知此指令為 <code>add x11, x10, x9</code></p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 範例）</figcaption></figure>
 <p>指令格式有 6 種，也就是第一張圖裡面的 R、I、S 那些：</p>
 <ul>
 <li>R-type (register)<br>
@@ -18798,7 +18994,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：add x5, x6, x7 為 x5 = x6 + x7</p>
 </blockquote>
 <p>格式：R-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（R-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode(7)：0110011 (OP)</li>
@@ -18821,7 +19017,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：addi x5, x6, 1  為 x5 = x6 + 1</p>
 </blockquote>
 <p>格式：I-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（I-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0010011 (OP-IMM)</li>
@@ -18840,7 +19036,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <p>例：lui x5, 0x12345 為 x5 = 0x12345 &lt;&lt; 12</p>
 </blockquote>
 <p>格式：U-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（U-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0110111 (LUI)</li>
@@ -19166,7 +19362,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <blockquote>
 <p>例：jal x1, label</p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（J-type 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 20 bits 寬的 <code>IMM</code> 乘以 2，然後進行 sign-extension，最後與 PC 相加，因此跳躍的範圍是以 PC 為基準，上下加減 1 MB</p>
 <p>JAL 指令的下一條指令的地址會寫入 RD，保存為返回位址，實際在寫時會用 label 給出跳躍的目標，具體 <code>IMM</code> 值由組譯器和 linker 負責生成</p>
 <h4>JALR (Jump And Link Register)</h4>
@@ -19176,7 +19372,7 @@ device-tree config，你可以用以下命令生成 <code>SMP = 4</code> 情況�
 <blockquote>
 <p>例：<code>jalr x0, 0(x5)</code></p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（JALR 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 12 bits 寬的 <code>IMM</code> 進行 sign-extension，然後將其與 RS1 的值相加，得到最終的結果後將其最低位設為 0（用以確保對齊），因此跳躍的範圍是以 RS1 為基準，上下加減 2KB</p>
 ]]></content:encoded>
     </item>
@@ -21393,33 +21589,21 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
       <category>essay</category>
       <pubDate>Tue, 08 Oct 2024 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[
-<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。<br>
-⁡<br>
-最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
-<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a><br>
-⁡<br>
-手機上的 GPU 有著功耗的限制，這和手機電池的壽命息息相關。 而記憶體頻寬是影響功耗的一大因素，資料移動的開銷相對於計算來說大很多，因此在手機的 GPU 設計上，往往會採取不同的策略來減少記憶體頻寬。<br>
-⁡<br>
-以傳統的 OpenGL virtual pipeline 來說，其往往需要大量的頻寬，通常對於每個像素，我們都需要讀寫 depth/stencil buffer，之後還需要寫入 color buffer。<br>
-⁡<br>
-假設沒有 overdraw、blending、multipass algorithms、multisampling 等等的附加功能，這還是需要 12 bytes 的 traffic。 若把這些附加功能考慮進來，每個像素將產生超過 100 bytes 的 memory traffic。 雖然現代 PC 的 GPU 使用的 IMR 架構會有 compression tech 來減少頻寬，但對於手機來說這開銷仍然不小。<br>
-⁡<br>
-為了減少這種大量頻寬的需求，現代手機的 GPU 基本上使用的是另一種稱為 Tile-based rendering 的架構，簡稱為 TBR 或 TBDR。<br>
-⁡<br>
-在這種架構上， GPU 將 framebuffer，包括 depth buffer、multisample buffers 等等的緩衝區從主記憶體移到了 hgih-speed on-chip memory 上。 因為 memory 是 on-chip 的，而且靠近計算單元，因此 access 它所需要功耗會小很多。 這樣的 memory 被稱為 Tile memory。<br>
-⁡<br>
-然而可想而知，這類的 memory 就會很小，on-chip framebuffer 的大小因 GPU 而異，但可以小到只有 16x16 個像素。 針對這種這麼小的 framebuffer，我們將其稱為 tile buffer。<br>
-⁡<br>
-所以故事就開始了，大家開始想要如何利用這麼小的 tile buffer 畫出高解析度的圖像。 對於 OpenGL 來說，它將 OpenGL 的 framebuffer 拆成了 16x16 的 tiles，一次針對一個 tile 做 rendering，也因此才會有 tile-based rendering 一詞。<br>
-⁡<br>
-對於每個 tile，所有有效的 primitives 都會被 render 到 tile buffer 中。 當完成了一個 tile，便會將其複製回功耗較高的主記憶體內。 因此主記憶體內就不需要存 depth/stencil 的值、overdrawn 的 pixels，也沒有 multisample buffer 的資料了。 depth/stencil 的 testing 和 blending 全都在 on-chip 的 memory 內完成。<br>
-⁡<br>
-因此 TBDR 的優勢主要在於有效使用 on-chip memory，使常見的像速處理於 GPU 內高速完成，不用 access主記憶體。 針對那些只在 render pass 內需要的資料還可以於 Tile 完成時直接捨棄掉，省下更多的記憶體頻寬。<br>
-⁡<br>
-</p>
-<p>然而缺點就是，因為必須使用主記憶體來存放處理好的幾何資料，因此針對幾何處理的成本會比 IMR 還要高，因為硬體需要額外的記憶體頻寬跟空間來暫時存放幾何處理後的資料，所以對於那些會增加幾何複雜度的功能，像是 geometry shader，都會比較不適合用於 TBDR 中。<br>
-⁡<br>
-本文整理及修改自 OpenGL insights 的第 23 章，想看更多的話可以讀一下原書，或是之前 arm 社群的科普教學：</p>
+<p>Alan Jian 大神實作了一個基於 TBDR 架構，針對 real-time rasterization 的硬體算繪器，簡單來說 Raster I 是一個能在 Arty A7 等 FPGA 平台上運作的簡易 GPU，目前能順暢地畫出 3000 個平面的 Stanford Lucy 模型，且能透過 Phong shading model 計算光影並對頂點資料進行插值。</p>
+<p>最近大神正在申請大學，因此很需要星星，如果各位願意順手幫忙按顆星星，分享出去就太感謝了，有興趣的也歡迎點進去看看大神的 README，XD</p>
+<p>專案 Github：<a href="https://github.com/alanjian85/raster-i" target="_blank" rel="noopener noreferrer">https://github.com/alanjian85/raster-i</a></p>
+<p>手機上的 GPU 有著功耗的限制，這和手機電池的壽命息息相關。 而記憶體頻寬是影響功耗的一大因素，資料移動的開銷相對於計算來說大很多，因此在手機的 GPU 設計上，往往會採取不同的策略來減少記憶體頻寬。</p>
+<p>以傳統的 OpenGL virtual pipeline 來說，其往往需要大量的頻寬，通常對於每個像素，我們都需要讀寫 depth/stencil buffer，之後還需要寫入 color buffer。</p>
+<p>假設沒有 overdraw、blending、multipass algorithms、multisampling 等等的附加功能，這還是需要 12 bytes 的 traffic。 若把這些附加功能考慮進來，每個像素將產生超過 100 bytes 的 memory traffic。 雖然現代 PC 的 GPU 使用的 IMR 架構會有 compression tech 來減少頻寬，但對於手機來說這開銷仍然不小。</p>
+<p>為了減少這種大量頻寬的需求，現代手機的 GPU 基本上使用的是另一種稱為 Tile-based rendering 的架構，簡稱為 TBR 或 TBDR。</p>
+<p>在這種架構上， GPU 將 framebuffer，包括 depth buffer、multisample buffers 等等的緩衝區從主記憶體移到了 hgih-speed on-chip memory 上。 因為 memory 是 on-chip 的，而且靠近計算單元，因此 access 它所需要功耗會小很多。 這樣的 memory 被稱為 Tile memory。</p>
+<p>然而可想而知，這類的 memory 就會很小，on-chip framebuffer 的大小因 GPU 而異，但可以小到只有 16x16 個像素。 針對這種這麼小的 framebuffer，我們將其稱為 tile buffer。</p>
+<p>所以故事就開始了，大家開始想要如何利用這麼小的 tile buffer 畫出高解析度的圖像。 對於 OpenGL 來說，它將 OpenGL 的 framebuffer 拆成了 16x16 的 tiles，一次針對一個 tile 做 rendering，也因此才會有 tile-based rendering 一詞。</p>
+<p>對於每個 tile，所有有效的 primitives 都會被 render 到 tile buffer 中。 當完成了一個 tile，便會將其複製回功耗較高的主記憶體內。 因此主記憶體內就不需要存 depth/stencil 的值、overdrawn 的 pixels，也沒有 multisample buffer 的資料了。 depth/stencil 的 testing 和 blending 全都在 on-chip 的 memory 內完成。</p>
+<p>因此 TBDR 的優勢主要在於有效使用 on-chip memory，使常見的像速處理於 GPU 內高速完成，不用 access主記憶體。 針對那些只在 render pass 內需要的資料還可以於 Tile 完成時直接捨棄掉，省下更多的記憶體頻寬。</p>
+<figure><figcaption></figcaption></figure>
+<p>然而缺點就是，因為必須使用主記憶體來存放處理好的幾何資料，因此針對幾何處理的成本會比 IMR 還要高，因為硬體需要額外的記憶體頻寬跟空間來暫時存放幾何處理後的資料，所以對於那些會增加幾何複雜度的功能，像是 geometry shader，都會比較不適合用於 TBDR 中。</p>
+<p>本文整理及修改自 OpenGL insights 的第 23 章，想看更多的話可以讀一下原書，或是之前 arm 社群的科普教學：</p>
 <ul>
 <li><a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4QUTejaX2vpIwXstbgf8Ik7" target="_blank" rel="noopener noreferrer">https://www.youtube.com/playlist?list=PLKjl7IFAwc4QUTejaX2vpIwXstbgf8Ik7</a></li>
 </ul>
@@ -21531,11 +21715,11 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <h3>指令編碼格式</h3>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V 指令格式）</figcaption></figure>
 <p>指令最後會被翻譯為機器指令，裡面的 32 bits 都有對應的意思，以 32 bits 對齊，每個 32 bits 會照上面的圖被劃分為不同的區域（field）</p>
 <p>最終的指令類型是由 funct3/funct7 和 opcode 一起決定的，題外話，funct3 中的 &quot;3&quot; 代表佔了 3 個 bit，funct7 同理</p>
 <p>對於 opcode 的部分有另一張表規定了其內容意義：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 對照表）</figcaption></figure>
 <p>opcode 的前兩位永遠為 11，而第 2~4 位是一組的，5~6 位是一組的，我們用一個例子來學習這個表格是怎麼看得：</p>
 <blockquote>
 <p>0000000 rs2 rs1 000 rd 0110011 | ADD</p>
@@ -21544,7 +21728,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>我們先看第 5~6 位，這裡是 <code>01</code>，因此我們去上表的左邊縱排找 <code>01</code>，之後看有哪些可能，有 STORE、STORE-FP、custom-1、AMO、OP、LUI、OP-32 這些</p>
 <p>我們再依照第 2~4 位來確認位置，這裡是 <code>100</code>，對到表格上就是 <code>OP</code>，也就是說 ADD 屬於 <code>OP</code> 類型的指令，也就是基本操作</p>
 <p>RISC-V 標準中為 little endian，假設在記憶體中的值為 <code>b3 05 95 00</code>，則需要先將其倒反過來為：<code>00 95 05 b3</code>，寫為二進制的話為 <code>00000000-10010101-00000101-10110011</code>，到標準中查表可知此指令為 <code>add x11, x10, x9</code></p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（RISC-V opcode 範例）</figcaption></figure>
 <p>指令格式有 6 種，也就是第一張圖裡面的 R、I、S 那些：</p>
 <ul>
 <li>R-type (register)<br>
@@ -21568,7 +21752,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：add x5, x6, x7 為 x5 = x6 + x7</p>
 </blockquote>
 <p>格式：R-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（R-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode(7)：0110011 (OP)</li>
@@ -21591,7 +21775,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：addi x5, x6, 1  為 x5 = x6 + 1</p>
 </blockquote>
 <p>格式：I-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（I-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0010011 (OP-IMM)</li>
@@ -21610,7 +21794,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>例：lui x5, 0x12345 為 x5 = 0x12345 &lt;&lt; 12</p>
 </blockquote>
 <p>格式：U-type</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（U-type 指令格式）</figcaption></figure>
 <p>對應意義：</p>
 <ul>
 <li>opcode (7)：0b0110111 (LUI)</li>
@@ -21936,7 +22120,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <blockquote>
 <p>例：jal x1, label</p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（J-type 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 20 bits 寬的 <code>IMM</code> 乘以 2，然後進行 sign-extension，最後與 PC 相加，因此跳躍的範圍是以 PC 為基準，上下加減 1 MB</p>
 <p>JAL 指令的下一條指令的地址會寫入 RD，保存為返回位址，實際在寫時會用 label 給出跳躍的目標，具體 <code>IMM</code> 值由組譯器和 linker 負責生成</p>
 <h4>JALR (Jump And Link Register)</h4>
@@ -21946,7 +22130,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <blockquote>
 <p>例：<code>jalr x0, 0(x5)</code></p>
 </blockquote>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（JALR 指令格式）</figcaption></figure>
 <p>調用函式時地址的計算方法為先對 12 bits 寬的 <code>IMM</code> 進行 sign-extension，然後將其與 RS1 的值相加，得到最終的結果後將其最低位設為 0（用以確保對齊），因此跳躍的範圍是以 RS1 為基準，上下加減 2KB</p>
 <h2>OS Development</h2>
 <h3>讀取 CSR</h3>
@@ -21954,9 +22138,9 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>RISC-V 中，每一個 privilege level 都對應到一組特定的暫存器，被稱為控制暫存器，簡稱 CSR，從這個暫存器中我們可以讀取 Hart 的編號，高 level 可以訪問低 level，但反過來不行</p>
 <p>要訪問 CSR，我們需要使用 CSR 擴展指令</p>
 <p>首先要看的是 Machine 模式下的 CSR 列表，因為 CPU 一上電時默認是在 machine 模式下，有點類似 x86 的 real mode：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Machine 模式的 CSR 清單）</figcaption></figure>
 <p>可以看見前面有與 Hart ID 相關的暫存器，像是 <code>mvendorid</code>、<code>marchid</code> 等，那接下來要看怎麼讀：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（CSR 指令格式）</figcaption></figure>
 <p>我們關心的是前兩個，先看 CSRRW（Atomic Read/Write CSR）：</p>
 <ul>
 <li>CSRRW
@@ -22202,7 +22386,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">extern</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> uint32_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> HEAP_SIZE;</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>如此一來記憶體區段就分配好了，也可以在 C 中使用了，接下來要來實現簡單的 page，一個 page 分配為 4k</p>
 <p>這邊使用陣列來實作 page 的管理：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（頁面管理陣列）</figcaption></figure>
 <p>前方紅藍的部分為管理對應 page 狀態的區域，後方白色的是一個一個的 page</p>
 <p>前方紅藍部分的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">#define</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> PAGE_TAKEN</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> (</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">uint8_t</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)(</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66">1</span><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD"> &#x3C;&#x3C;</span><span style="--shiki-light:#986801;--shiki-dark:#D19A66"> 0</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">)</span></span>
@@ -22362,10 +22546,10 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>但由於實作上較為簡單，因此我們這邊就先實作 Cooperative Multitasking，後面再實作 Preemtive Multitasking</p>
 <h4>Cooperative Multitasking</h4>
 <p>前面提到了一個 task 的本質是一堆指令的序列，假設這邊有 Task A 和 B，在 Cooperative Multitasking 的情況下他們會長這樣：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式多工的任務指令序列）</figcaption></figure>
 <p>可以看見兩個 Task 內都是由指令序列組成的（Instruction i），中間有一個指令是 <code>call switch_to</code>，這就是讓下一個 task 來使用 CPU 的 function</p>
 <p>那我們就來看一下這個 <code>switch_to</code> 裡面到底做了什麼：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式任務切換流程）</figcaption></figure>
 <p>步驟是：</p>
 <ol>
 <li>將目前的 context 儲存起來</li>
@@ -22385,13 +22569,13 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>初始化好了之後就可以初始化 <code>mscratch</code> 暫存器，假設第一個載入的 task 是 A，那 <code>mscratch</code> 就會指向 A 的 context</p>
 <p>之後開始執行 task 的內容，因此 PC 指標會一個指令一個指令的的跑下來，當 A 執行到 <code>switch_to</code> 的時候就會開始跑交換 context 的流程</p>
 <p>前面有提到 <code>call</code> 這個指令執行的時候是會把下一條指令的位址放到 ra 裡面去的，因此 <code>i+M</code> 會被放到 ra 裡面去：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（呼叫 switch_to 後的返回位址）</figcaption></figure>
 <p>接下來就可以開始執行 <code>switch_to</code> 的內容，根據前面的步驟，第一步是儲存當前的 context，會將剛剛 <code>struct context</code> 內列出的暫存器內容全部從 CPU 儲存起來到 context A 的記憶體中</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時儲存任務狀態）</figcaption></figure>
 <p>下一步是切換 context，改變 CPU 的 ra 就可以了：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時變更任務狀態）</figcaption></figure>
 <p>下一步是 restore，也就是要載入 Task B 的暫存器內容：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（協作式切換時還原任務狀態）</figcaption></figure>
 <p>最後是 return，前面有提到 <code>ret</code> 這個指令會跳回到 <code>ra</code> 暫存器儲存的記憶體位址，這邊已經被我們改成 Instruction j 了，因此就會切換到 Task B 了</p>
 <p>看完了邏輯，就來看一下 code 該怎麼寫，因為 <code>switch_to</code> 這個函式執行效率需要非常高，因此這邊就用 asm 來寫：</p>
 <div class="language-asm line-numbers-mode" data-highlighter="shiki" data-ext="asm" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-asm"><span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">## void switch_to(struct context *next)</span><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">;</span></span>
@@ -22503,7 +22687,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>這樣的過程被稱為異常控制流，簡稱為 ECP，分為兩種：異常（Exception） 與中斷（Interrupt）；在 risc-v 內統一把 ECP 稱為 Trap</p>
 <h4>Machine mode 下的 CSR</h4>
 <p>因為我們這邊 OS 是寫在 Machine mode 下的，因此就看 Machine mode 下的 CSR：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Machine 模式的 Trap CSR）</figcaption></figure>
 <p>然後我們把跟 Trap 有關的整理出來：</p>
 <ul>
 <li>mtvec (Machine Trap-Vector Base-Address)
@@ -22563,7 +22747,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <p>現在看不懂沒關係，後面會慢慢用到，接下來我們先看一下每個暫存器對應的 bit 的意義</p>
 <h4>mtvec (Machine Trap-Vector Base-Address)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtvec 暫存器欄位）</figcaption></figure>
 <p>這裡 WARL 的意思是「Write Any Values，Reads Legal Values」，也就是說這個地方可以隨便我們寫的，而讀出來的值都是合法的</p>
 <ul>
 <li>
@@ -22583,11 +22767,11 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 </li>
 </ul>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtvec 模式值）</figcaption></figure>
 </li>
 </ul>
 <h4>mepc (Machine Exception Program Counter)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mepc 暫存器欄位）</figcaption></figure>
 <ul>
 <li>
 <p>當 trap 發生時，PC 會被替換為 mtvec 設定的位址，同時 Hart 會將 mepc 設為目前指令或下一條指令的位址，當我們需要退出 trap 時可以呼叫特殊的 mret 指令，該指令會將 mepc 中的值還原為 PC 中（實現返回的效果）</p>
@@ -22597,18 +22781,26 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <h4>mcause (Machine Cause)</h4>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mcause 暫存器欄位）</figcaption></figure>
 <p>這裡 WLRL 的意思是「Write/Read Only Legal Values」，表示我們在讀寫的時候需要確保它的值是合法的</p>
 <ul>
-<li>當 trap 發生時，hart 會設定該暫存器通知我們 trap 發生的原因</li>
-<li>最高位元 Interrupt 為 1 時標識了目前 trap 為 interrupt，否則是  exception</li>
-<li>剩餘的 Exception Code 用來標識具體的 interrupt 或 exception 的種類</li>
-<li>spec 內有附一張表格<br>
+<li>
+<p>當 trap 發生時，hart 會設定該暫存器通知我們 trap 發生的原因</p>
+</li>
+<li>
+<p>最高位元 Interrupt 為 1 時標識了目前 trap 為 interrupt，否則是  exception</p>
+</li>
+<li>
+<p>剩餘的 Exception Code 用來標識具體的 interrupt 或 exception 的種類</p>
+</li>
+<li>
+<p>spec 內有附一張表格</p>
+<figure><figcaption>（mcause 的中斷與例外代碼）</figcaption></figure>
 </li>
 </ul>
 <h4>mtval (Machine Trap Value)</h4>
 <p>用來輔助 mcause 用的暫存器</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mtval 暫存器欄位）</figcaption></figure>
 <ul>
 <li>
 <p>當 trap 發生時，除了透過 mcause 可以取得 exception 的種類 code 值外，hart 還提供了 mtval 來提供 exception 的其他資訊來輔助我們執行更進一步的操作</p>
@@ -22619,7 +22811,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <h4>mstatus (Machine Status)</h4>
 <p>用來描述一些狀態信息的，分得很細</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mstatus 暫存器欄位）</figcaption></figure>
 <p>WPRL 的意思是「Reserved Writes Preserve Values，Reads Ignore Values」，也就是說寫是保留值，忽略讀，簡單來說就是盡量不要去動它</p>
 <p>這邊老師挑了比較會用到的來講，分別是第 0~12 bit，其他部分涉及到記憶體訪問的權限、virtual memory 的控制等，暫時先不去管它</p>
 <ul>
@@ -22682,16 +22874,23 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <h4>top half</h4>
 <p>雖然我們沒辦法對這部分做更動，但還是可以看一下硬體部分具體做了什麼</p>
 <ol>
-<li>把 mstatus 的 MIE 值複製到 MPIE 中，清除 mstatus 中的 MIE 標誌位，效果是中斷被禁止
+<li>
+<p>把 mstatus 的 MIE 值複製到 MPIE 中，清除 mstatus 中的 MIE 標誌位，效果是中斷被禁止</p>
 <ul>
 <li>前面有提到 MIE 代表中斷的開或關</li>
 <li>MIE 清除的話代表填 0，也就是說中斷目前是被關掉的狀態</li>
 </ul>
 </li>
-<li>設定 mepc，同時 PC 被設定為 mtvec；需要注意的是，對於exception，mepc 指向導致異常的指令；對於 interrupt，它指向被中斷的指令的下一條指令的位置<br>
+<li>
+<p>設定 mepc，同時 PC 被設定為 mtvec；需要注意的是，對於exception，mepc 指向導致異常的指令；對於 interrupt，它指向被中斷的指令的下一條指令的位置</p>
+<figure><figcaption>（Trap 上半部的處理流程）</figcaption></figure>
 </li>
-<li>根據 trap 的種類設定 mcause，並根據需要為 mtval 設定附加資訊</li>
-<li>將 trap 發生之前的權限模式保存在 mstatus 的 MPP 域中，再把 hart 權限模式改為 M（也就是說無論在任何 Level 下觸發 trap，hart 首先切換到 Machine 模式）</li>
+<li>
+<p>根據 trap 的種類設定 mcause，並根據需要為 mtval 設定附加資訊</p>
+</li>
+<li>
+<p>將 trap 發生之前的權限模式保存在 mstatus 的 MPP 域中，再把 hart 權限模式改為 M（也就是說無論在任何 Level 下觸發 trap，hart 首先切換到 Machine 模式）</p>
+</li>
 </ol>
 <h4>Bottom half</h4>
 <p>這邊寫的是一段異常的處理函式，可以把過程總結為五步：</p>
@@ -22778,7 +22977,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>因此將其與 <code>0x80000000</code> 進行 and 操作，如果結果非 0 的話表示進來的是一個中斷，否則為一個異常</p>
 <h4>從 Trap 返回</h4>
 <p>從 trap 返回的話我們需要 MRET 這個指令</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（MRET 指令格式）</figcaption></figure>
 <ul>
 <li>
 <p>針對不同權限等級下如何退出 trap 有各自的回傳指令 xRET（x = M/S/U）</p>
@@ -22826,22 +23025,22 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </li>
 </ul>
 <p>所以我們也可以說有三種：software、timer 與 externel；每一種下面都會再分 User、Supervisor、Reserved 與 Machine：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（中斷與例外代碼）</figcaption></figure>
 <h4>mie 與 mip</h4>
 <p>前面講跟 Trap 有關的暫存器時還剩 mie 和 mip 兩個沒講，這兩個跟 Interrupt 有關，所以在這邊補一下</p>
 <p>mie 用於控制 Interrupt 的開或關；前面有提到一個 mstatus，那個是控制全局的，一旦關閉，不管是哪種中斷都無法使用，而 mie 是可以設置要單獨關閉 software interrupt 這類的操作：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mie 暫存器欄位）</figcaption></figure>
 <p>如果 mie 是用來寫的，那 mip 你可以認為就是拿來讀的，透過讀對應的 bit，我們可以得知當前發生了哪種中斷：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（mip 暫存器欄位）</figcaption></figure>
 <h4>PLIC</h4>
 <p>外部中斷代表的是外部設備所產生的中斷，通常一個 Hart 會有一根引腳來傳遞外部中斷的訊號，然而外部設備很多，那該怎麼辦呢?</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（Hart 的中斷輸入）</figcaption></figure>
 <p>此時我們就引入了一個叫做 PLIC 的設備，全名為 Platform-Level Interrupt Controller，類似一個 hub：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 與 Hart 的連接）</figcaption></figure>
 <p>左邊是很多不同的外設，它們全都會接到 PLIC 上；而 PLIC 到每一個 Hart 只會接一根引腳</p>
 <p>所以它的功能也很明顯，因為 CPU 同一個時間肯定只能處理一個中斷，所以 PLIC 就會起到一個代理人的作用，根據中斷的類型或是優先級之類的條件來篩選要先執行哪個中斷</p>
 <p>左邊的這些外設我們將其稱為中斷源：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 中斷源）</figcaption></figure>
 <p>每一個外設我們會給他一個編號，標準內定義了 53 個中斷源，0 號預留不用，因此實際有效的中斷源為 1~53；前面我們有用到 UART，UART 的 id 為 10，下面是 QEMU 的實作：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// https://github.com/qemu/qemu/blob/master/include/hw/riscv/virt.h</span></span>
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">enum</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> {</span></span>
@@ -22944,18 +23143,18 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 </ul>
 <h4>PLIC 操作流程</h4>
 <p>這邊通過一張圖來了解一下設置這些暫存器到底起到了什麼作用</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC 運作概觀）</figcaption></figure>
 <p>左方的這個大正方形是一個 PLIC，上面接了兩個中斷源進來，右邊接了兩個 CPU 出去</p>
 <p>這個是用來設置中斷源優先級的：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（設定 PLIC 中斷優先級）</figcaption></figure>
 <p>這個是用來設定是否要啟用此中斷源的：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（啟用 PLIC 中斷源）</figcaption></figure>
 <p>這個用來設定中斷源的閥值：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（設定 PLIC 優先級門檻）</figcaption></figure>
 <p>這個是 Pending，用來判斷中斷是不是發生了：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC Pending 狀態）</figcaption></figure>
 <p>這個是 Claim/Complete：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（PLIC Claim 與 Complete）</figcaption></figure>
 <h4>UART 的例子</h4>
 <p>前面我們用 UART 實現了一個字串的輸出，那這邊我們可以利用中斷與 UART 實現一個字串的輸入</p>
 <p>原理是 UART 會接到我們的本機上，我們鍵盤敲一個字後會通知本機，本機再通過 UART 發送一個中斷給 PLIC，如此一來就可以讀一個字符了，然後在通過前面實作的字串輸出，輸出到我們螢幕上</p>
@@ -23038,7 +23237,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">    return</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF"> return_pc;</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">}</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>cause_code</code> 的數字含意見下表，前面也有貼過：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（UART 範例使用的中斷代碼）</figcaption></figure>
 <p><code>external_interrupt_handler</code> 的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A626A4;--shiki-dark:#C678DD">void</span><span style="--shiki-light:#4078F2;--shiki-dark:#61AFEF"> external_interrupt_handler</span><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">()</span></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">{</span></span>
@@ -23091,7 +23290,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>最後這兩行是將讀資料的 Interrupt 給打開</p>
 <h3>timer interrupt</h3>
 <p>一個 Hart 會有三個 Interrupt 的引腳，剛剛講的屬於 External Interrupt，這邊來講 Timer Interrupt</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（CLINT 的中斷線）</figcaption></figure>
 <p>Timer Interrupt 屬於本地中斷，這代表他不是由外部設備發起的，而是由一個叫做 CLINT 的設備發出來的，其全名為 Core Local Interrupt，主要負責產生 software interrupt 與 timer interrupt</p>
 <p>要訪問他一樣要透過定義好的暫存器，一樣是用 MMIO 的方式，QEMU 的定義如下：</p>
 <div class="language-c line-numbers-mode" data-highlighter="shiki" data-ext="c" style="--shiki-light:#383A42;--shiki-dark:#abb2bf;--shiki-light-bg:#FAFAFA;--shiki-dark-bg:#282c34"><pre class="shiki shiki-themes one-light one-dark-pro vp-code"><code class="language-c"><span class="line"><span style="--shiki-light:#A0A1A7;--shiki-light-font-style:italic;--shiki-dark:#7F848E;--shiki-dark-font-style:italic">// https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c</span></span>
@@ -23208,7 +23407,7 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <h3>Preemtive Multitasking</h3>
 <p>雖然協作式的多任務實作比較簡單，但缺點也很明顯，需要使用者自己去放棄 CPU 的使用，進而衍生出不少的問題，因此已經被慢慢淘汰掉了</p>
 <p>所以我們這邊就來實作搶占式的多任務，首先一樣會有兩個 Task A 和 B：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式多工的任務指令序列）</figcaption></figure>
 <p>可以看見因為式搶占式的多任務，因此 Task 中不會有放棄 CPU 的這個指令</p>
 <p>而這邊實作的方法是利用 timer，讓中斷週期性的發生，當 timer interrupt 發生時去進行 schedule</p>
 <p>因此 trap 發生時要做的事為</p>
@@ -23296,19 +23495,19 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#383A42;--shiki-dark:#ABB2BF">.end</span></span></code></pre>
 <div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>接下來用圖來演示一下步驟：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式任務切換流程）</figcaption></figure>
 <p>跟前面一樣，先初始化，並且假設第一個呼叫的任務為 A：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（初始化搶佔式任務切換）</figcaption></figure>
 <p>之後就開始執行了，因此 PC 會跟著改變：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（執行任務 A）</figcaption></figure>
 <p>此時 timer interrupt 發生了，因此將 <code>i+2</code> 存入 <code>mepc</code>，並開始執行 trap 處理函式，首先要保存 context，因此將 <code>mepc</code> 存入 <code>pc</code>：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（計時器中斷觸發任務切換）</figcaption></figure>
 <p>接著切換 context：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（搶佔式切換時儲存任務狀態）</figcaption></figure>
 <p>然後載入 B 的 context：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（載入任務 B 的狀態）</figcaption></figure>
 <p>最後執行 <code>mret</code> 返回，進到 Task B：</p>
-<figure><figcaption></figcaption></figure>
+<figure><figcaption>（以 MRET 進入任務 B）</figcaption></figure>
 ]]></content:encoded>
     </item>
     <item>
@@ -23665,42 +23864,6 @@ IS-IS 是一種鏈路狀態協議，與 OSPF 相似。它使用 Dijkstra 算法�
 <p>那我們把它就代回 Ax = b：</p>
 <figure><figcaption></figcaption></figure>
 <p>這時我們就會發現電腦裡面算出來的  和我們實際上的 x 的相對誤差是上圖下面那樣，一樣取決於 K（A）</p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>Gauss-Seidel Metheod</title>
-      <link>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</link>
-      <guid>https://mes0903.github.io/Math/numerical_algebra/Gauss-Seidel/</guid>
-      <source url="https://mes0903.github.io/rss.xml">Gauss-Seidel Metheod</source>
-      <description>Gauss-Seidel Metheod Gauss-Seidel Metheod 上次我們用了 Jacobi&amp;apos;s method，它操作起來長這樣： 然後我們就發現 裡的元素 , , ... , 都已經被算出來了，那因為 會比 更準更接近解，所以我們可以把上面的公式換成這樣： 可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以...</description>
-      <category>math</category>
-      <pubDate>Wed, 13 Oct 2021 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[
-<h3>Gauss-Seidel Metheod</h3>
-<p>上次我們用了 Jacobi's method，它操作起來長這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>然後我們就發現  裡的元素 , , ... ,  都已經被算出來了，那因為  會比  更準更接近解，所以我們可以把上面的公式換成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>可以看見我把公式拆成了兩部分，前面那邊是已經算出來的，後面的是還沒算到的，以上面  的例子來說，、 就是已經算出來的，、...、 就是還沒算出來的值</p>
-<p>這個方法我們就稱它為 Gauss-Seidel Method，是一種 Jacobi's 的優化</p>
-<h3>Gauss-Seidel Metheod 的矩陣表示法</h3>
-<p>上次我們把原本的矩陣分成 D、L、U：</p>
-<figure><figcaption></figcaption></figure>
-<p>那我們做了優化之後，可以把它寫成這樣：</p>
-<figure><figcaption></figcaption></figure>
-<p>那一樣我們要讓電腦去跑，所以寫個 pseudocode</p>
-<p>輸入（input）：n、矩陣A、rhs 向量 、初始猜測值（initial guess） 、誤差（tolerance） TOL、最大跌代次數 </p>
-<p>輸出：估計出來的 </p>
-<p>::</p>
-<h3>Lemma7.18</h3>
-<p>如果 T 的譜半徑（） 小於 1，那麼會存在 </p>
-<p>你可以把它想像成一個公比小於 1 的等比數列 ，那麼它的和就是 </p>
-<p>證明：</p>
-<figure><figcaption></figcaption></figure>
-<h3>Thm 7.19</h3>
-<p>隨便猜一個初始值 ，定義為  for  的數列  會收斂到某個特殊的解  iff </p>
 <p>證明：</p>
 <figure><figcaption></figcaption></figure>
 ]]></content:encoded>
